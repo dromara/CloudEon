@@ -43,3 +43,12 @@ build/
 */.txt
 */.trc
 powerjob-data/
+
+### web-ui
+web-ui/node_modules
+web-ui/src/.umi
+web-ui/src/.umi-production
+web-ui/yarn.lock
+web-ui/package-lock.json
+web-ui/pnpm-lock.yaml
+web-ui/dist
