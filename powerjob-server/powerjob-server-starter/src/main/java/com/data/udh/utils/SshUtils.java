@@ -1,5 +1,7 @@
 package com.data.udh.utils;
 
+import cn.hutool.core.io.FileUtil;
+import com.data.udh.dto.CheckHostInfo;
 import org.apache.sshd.client.SshClient;
 import org.apache.sshd.client.channel.ChannelExec;
 import org.apache.sshd.client.channel.ClientChannelEvent;
@@ -104,7 +106,7 @@ public class SshUtils {
      * @param command 命令
      * @return 结果
      */
-    public static String execCmdWithResult(ClientSession session, String command) {
+    public static String execCmdWithResult(ClientSession session, String command) throws IOException {
         session.resetAuthTimeout();
         LOG.info("exe cmd: {}", command);
         // 命令返回的结果
@@ -113,34 +115,21 @@ public class SshUtils {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         // 错误信息
         ByteArrayOutputStream err = new ByteArrayOutputStream();
-        try {
-            ce = session.createExecChannel(command);
-            ce.setOut(out);
-            ce.setErr(err);
-            // 执行并等待
-            ce.open();
-            Set<ClientChannelEvent> events =
-                    ce.waitFor(EnumSet.of(ClientChannelEvent.CLOSED), TimeUnit.SECONDS.toMillis(100000));
-            //  检查请求是否超时
-            if (events.contains(ClientChannelEvent.TIMEOUT)) {
-                throw new Exception("mina 连接超时");
-            }
-            int exitStatus = ce.getExitStatus();
-            LOG.info("mina result {}", exitStatus);
-            if (exitStatus == 1) {
-                return "failed";
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        } finally {
-            if (ce.isClosed()) {
-                try {
-                    ce.close();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
+        ce = session.createExecChannel(command);
+        ce.setOut(out);
+        ce.setErr(err);
+        // 执行并等待
+        ce.open();
+        Set<ClientChannelEvent> events =
+                ce.waitFor(EnumSet.of(ClientChannelEvent.CLOSED), TimeUnit.SECONDS.toMillis(100000));
+        //  检查请求是否超时
+        if (events.contains(ClientChannelEvent.TIMEOUT)) {
+            throw new RuntimeException("ssh 连接超时");
+        }
+        int exitStatus = ce.getExitStatus();
+        LOG.info("mina result {}", exitStatus);
+        if (exitStatus != 0) {
+            throw new RuntimeException("ssh 执行命令失败："+err.toString());
         }
         LOG.info("exe cmd return : {}", out);
         return out.toString().trim();
@@ -150,16 +139,16 @@ public class SshUtils {
      * 上传文件,相同路径ui覆盖
      *
      * @param session    连接
-     * @param remotePath 远程目录地址
+     * @param remoteDirPath 远程目录地址
      * @param inputFile  文件 File
      */
-    public static boolean uploadFile(ClientSession session, String remotePath, String inputFile) {
+    public static boolean uploadFile(ClientSession session, String remoteDirPath, String inputFile) {
         File uploadFile = new File(inputFile);
         InputStream input = null;
         SftpFileSystem sftp = null;
         try {
             sftp = SftpClientFactory.instance().createSftpFileSystem(session);
-            Path path = sftp.getDefaultDir().resolve(remotePath);
+            Path path = sftp.getDefaultDir().resolve(remoteDirPath);
             if (!Files.exists(path)) {
                 LOG.info("create pathHome {} ", path);
                 Files.createDirectories(path);

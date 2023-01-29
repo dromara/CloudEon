@@ -8,12 +8,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.sshd.client.session.ClientSession;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+
 @Slf4j
 public class SshTest {
 
 
     @Test
-    public void execCmdWithResult() {
+    public void execCmdWithResult() throws IOException {
         ClientSession session = SshUtils.openConnectionByPassword(
                 "fl001",
                 22,

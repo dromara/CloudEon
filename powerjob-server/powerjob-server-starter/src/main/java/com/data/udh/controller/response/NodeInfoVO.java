@@ -1,28 +1,11 @@
-package com.data.udh.entity;
+package com.data.udh.controller.response;
 
 import lombok.Data;
-import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.*;
-import java.io.Serializable;
 import java.util.Date;
 
-/**
- * 集群主机表
- *
- */
-@Entity
-@Table(name = "udh_cluster_node")
 @Data
-public class ClusterNodeEntity implements Serializable {
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * 主键
-     */
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
-    @GenericGenerator(name = "native", strategy = "native")
+public class NodeInfoVO {
     private Integer id;
     /**
      * 创建时间
@@ -54,7 +37,6 @@ public class ClusterNodeEntity implements Serializable {
     private Integer totalDisk;
 
     private String sshUser;
-    private String sshPassword;
     private Integer sshPort;
 
     /**
@@ -68,5 +50,4 @@ public class ClusterNodeEntity implements Serializable {
     private String nodeLabel;
 
     private Integer serviceRoleNum;
-
 }
