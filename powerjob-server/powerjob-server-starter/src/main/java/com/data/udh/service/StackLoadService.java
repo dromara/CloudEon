@@ -1,0 +1,145 @@
+package com.data.udh.service;
+
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.StrUtil;
+import com.data.udh.dao.StackInfoRepository;
+import com.data.udh.dao.StackServiceConfRepository;
+import com.data.udh.dao.StackServiceRepository;
+import com.data.udh.dao.StackServiceRoleRepository;
+import com.data.udh.dto.StackConfiguration;
+import com.data.udh.dto.StackServiceInfo;
+import com.data.udh.dto.StackServiceRole;
+import com.data.udh.entity.StackInfoEntity;
+import com.data.udh.entity.StackServiceConfEntity;
+import com.data.udh.entity.StackServiceEntity;
+import com.data.udh.entity.StackServiceRoleEntity;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.data.domain.Example;
+import org.springframework.stereotype.Component;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.nodes.Tag;
+
+import javax.annotation.Resource;
+import javax.transaction.Transactional;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringJoiner;
+import java.util.function.Function;
+
+import static com.data.udh.utils.Constant.StackPackageConfYAML;
+import static com.data.udh.utils.Constant.StackPackageInfoYAML;
+
+@Component
+public class StackLoadService implements ApplicationRunner {
+
+    @Value("${udh.stack.load.path}")
+    private String stackLoadPath;
+
+    @Resource
+    private StackInfoRepository stackInfoRepository;
+
+    @Resource
+    private StackServiceRepository stackServiceRepository;
+
+    @Resource
+    private StackServiceRoleRepository stackServiceRoleRepository;
+
+    @Resource
+    StackServiceConfRepository stackServiceConfRepository;
+
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+        Yaml yaml = new Yaml();
+        File[] stackPath = FileUtil.ls(stackLoadPath);
+        for (File file : stackPath) {
+            // 获取框架名
+            String stackName = file.getName();
+            // 遍历框架子目录获取所有服务的目录
+            File[] servicePaths = FileUtil.ls(file.getAbsolutePath());
+
+            // 查找数据库中是否已有该stack
+            StackInfoEntity stackInfoEntity = null;
+            stackInfoEntity = stackInfoRepository.findByStackCode(stackName);
+            if (stackInfoEntity == null) {
+                // 持久化stack
+                stackInfoEntity = new StackInfoEntity();
+                stackInfoEntity.setStackCode(stackName);
+                stackInfoRepository.save(stackInfoEntity);
+            }
+
+            Integer stackInfoEntityId = stackInfoEntity.getId();
+
+
+            // 遍历每一个service并加载文件信息到数据库中
+            for (File servicePath : servicePaths) {
+                String serviceInfoYamlFilePath = servicePath + FileUtil.FILE_SEPARATOR + StackPackageInfoYAML;
+                if (FileUtil.exist(serviceInfoYamlFilePath)) {
+                    System.out.println("找到" + servicePath.getName() + "的" + StackPackageInfoYAML);
+
+                    // 读取service-info文件
+
+                    InputStream infoInputStream = new FileInputStream(serviceInfoYamlFilePath);
+                    StackServiceInfo serviceInfo = yaml.loadAs(infoInputStream, StackServiceInfo.class);
+                    System.out.println(serviceInfo);
+
+                    // 查找数据库中是否含有该service
+                    StackServiceEntity stackServiceEntity = null;
+                    stackServiceEntity = stackServiceRepository.findByStackIdAndName(stackInfoEntityId, serviceInfo.getName());
+                    if (stackServiceEntity == null) {
+                        stackServiceEntity = new StackServiceEntity();
+                    }
+
+                    // 持久化service
+                    BeanUtil.copyProperties(serviceInfo, stackServiceEntity);
+                    stackServiceEntity.setStackId(stackInfoEntityId);
+                    stackServiceEntity.setStackCode(stackInfoEntity.getStackCode());
+                    stackServiceEntity.setDependencies(StrUtil.join(",", serviceInfo.getDependencies()));
+                    stackServiceEntity.setCustomConfigFiles(StrUtil.join(",", serviceInfo.getCustomConfigFiles()));
+                    stackServiceEntity.setServiceConfigurationYaml(yaml.dump(serviceInfo.getConfigurations()));
+                    stackServiceRepository.save(stackServiceEntity);
+                    Integer stackServiceEntityId = stackServiceEntity.getId();
+
+
+                    // 持久化role
+                    for (StackServiceRole serviceInfoRole : serviceInfo.getRoles()) {
+                        StackServiceRoleEntity stackServiceRoleEntity = stackServiceRoleRepository.findByStackIdAndNameAndServiceId(stackInfoEntityId, serviceInfoRole.getName(), stackServiceEntityId);
+                        if (stackServiceRoleEntity == null) {
+                            stackServiceRoleEntity = new StackServiceRoleEntity();
+                        }
+                        BeanUtil.copyProperties(serviceInfoRole, stackServiceRoleEntity);
+                        stackServiceRoleEntity.setStackId(stackInfoEntityId);
+                        stackServiceRoleEntity.setServiceId(stackServiceEntityId);
+                        stackServiceRoleRepository.save(stackServiceRoleEntity);
+                    }
+
+                    // 持久化service conf
+                    for (StackConfiguration configuration : serviceInfo.getConfigurations()) {
+                        StackServiceConfEntity stackServiceConfEntity = stackServiceConfRepository.findByStackIdAndNameAndServiceId(stackInfoEntityId, configuration.getName(), stackServiceEntityId);
+                        if (stackServiceConfEntity == null) {
+                            stackServiceConfEntity = new StackServiceConfEntity();
+                        }
+                        BeanUtil.copyProperties(configuration, stackServiceConfEntity);
+                        stackServiceConfEntity.setStackId(stackInfoEntityId);
+                        stackServiceConfEntity.setServiceId(stackServiceEntityId);
+                        stackServiceConfEntity.setGroups(StrUtil.join(",", configuration.getGroups()));
+                        stackServiceConfRepository.save(stackServiceConfEntity);
+                    }
+
+
+                    // close file stream
+                    IoUtil.close(infoInputStream);
+
+
+                }
+            }
+
+        }
+    }
+}
