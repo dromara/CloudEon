@@ -141,22 +141,26 @@ public class StackController {
                 .distinct()
                 .collect(Collectors.toList());
 
-        List<String> needPreInstallServiceNames = depServiceNames.stream().filter(dep -> {
-            // 检查这次要安装的服务中是否包含了依赖的服务，如果有可以去掉该依赖服务
-            return !installServiceNames.contains(dep);
-        }).filter(dep -> {
-            // 检查该集群是否已经安装过依赖的框架服务
-            Integer clusterId = request.getClusterId();
-            Integer stackId = request.getStackId();
-            // 查询依赖框架服务的id
-            Integer depStackServiceId = serviceRepository.findByStackIdAndName(stackId, dep).getId();
-            ServiceInstanceEntity query = new ServiceInstanceEntity();
-            query.setClusterId(clusterId);
-            query.setStackServiceId(depStackServiceId);
-            // 查询集群已安装的依赖服务实例
-            long count = serviceInstanceRepository.count(Example.of(query));
-            return count <= 0;
-        }).collect(Collectors.toList());
+        List<String> needPreInstallServiceNames = depServiceNames
+                .stream()
+                .filter(dep -> {
+                    // 检查这次要安装的服务中是否包含了依赖的服务，如果有可以去掉该依赖服务
+                    return !installServiceNames.contains(dep);
+                })
+                .filter(dep -> {
+                    // 检查该集群是否已经安装过依赖的框架服务
+                    Integer clusterId = request.getClusterId();
+                    Integer stackId = request.getStackId();
+                    // 查询依赖框架服务的id
+                    Integer depStackServiceId = serviceRepository.findByStackIdAndName(stackId, dep).getId();
+                    ServiceInstanceEntity query = new ServiceInstanceEntity();
+                    query.setClusterId(clusterId);
+                    query.setStackServiceId(depStackServiceId);
+                    // 查询集群已安装的依赖服务实例
+                    long count = serviceInstanceRepository.count(Example.of(query));
+                    return count <= 0;
+                })
+                .collect(Collectors.toList());
 
         if (needPreInstallServiceNames.size() > 0) {
             return ResultDTO.failed("需要提前安装服务：" + StrUtil.join(",", needPreInstallServiceNames));
