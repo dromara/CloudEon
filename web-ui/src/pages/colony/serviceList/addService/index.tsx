@@ -1,103 +1,79 @@
 import { PageContainer, ProCard } from '@ant-design/pro-components';
-import { Space, Steps, Button } from 'antd';
+import { Space, Steps, Button, Spin } from 'antd';
 import { BorderOuterOutlined } from '@ant-design/icons';
-import { FormattedMessage, useIntl, history } from 'umi';
-import { useState } from 'react';
+import { FormattedMessage, useIntl, useRequest, history } from 'umi';
+import { useState, useEffect } from 'react';
 import styles from './index.less';
 import { getListService } from '@/services/ant-design-pro/colony';
+import ChooseService from './components/ChooseService'
+import ConfigSecurity from'./components/ConfigSecurity'
+import AssignRoles from'./components/AssignRoles'
+import ConfigService from'./components/ConfigService'
+// import ConfigSecurity from'./components/ConfigSecurity'
 
-const { Step } = Steps;
-const description = 'This is a description.';
-
-const getServiceData = async (params: any) => {
-  const result = await getListService(params);
-  return result;
-};
-
-const ChooseService: React.FC<{
-  serviceList: any;
-  setServiceList: any;
-}> = ({ serviceList, setServiceList }) => (
-  <>
-    <div className={styles.notSelectWrap}>
-      <div>请选择需要安装的服务</div>
-      <div className={styles.serviceListWrap}>
-        {serviceList.map((sitem: any) => {
-          return <ServiceItem item={sitem} type={0} setServiceList={setServiceList} />;
-        })}
-      </div>
-    </div>
-    <div className={styles.selectedWrap}>
-      <div style={{ paddingLeft: '15px' }}>待安装的服务</div>
-      <div className={styles.serviceListWrap}>
-        {serviceList
-          .filter((fitem: any) => {
-            return fitem.selected;
-          })
-          .map((sitem: any) => {
-            return <ServiceItem item={sitem} type={1} setServiceList={setServiceList} />;
-          })}
-      </div>
-    </div>
-  </>
-);
-
-const changeStatus = (item: any, list: any) => {};
-
-const ServiceItem: React.FC<{
-  item: any;
-  type: number;
-  setServiceList: any;
-}> = ({ item, type, setServiceList }) => (
-  <div className={styles.serviceItem}>
-    <div className={styles.serviceItemLeft}>
-      <div className={styles.serviceItemIcon}>
-        <BorderOuterOutlined />
-      </div>
-      <div className={styles.serviceItemCenter}>
-        <div className={styles.serviceItemTitle}>{item.name}</div>
-        <div className={styles.serviceItemDesc}>HDFS是Hadoop应用的基本存储系统</div>
-      </div>
-    </div>
-    <div>
-      <div>
-        {type == 0 ? (
-          item.selected ? (
-            <div className={styles.disabledBtn}>已添加</div>
-          ) : (
-            <div
-              className={styles.activeBtn}
-              onClick={() => {
-                setServiceList();
-              }}
-            >
-              添加
-            </div>
-          )
-        ) : (
-          <div>移除</div>
-        )}
-      </div>
-    </div>
-  </div>
-);
 
 const serviceAdd: React.FC = () => {
   const intl = useIntl();
-  const serviceData = getServiceData({ clusterId: 1 });
-  console.log('serviceData: ', serviceData);
-
-  const startServiceList = [
-    { name: 'HDFS', desc: 'HDFS是Hadoop应用的基本存储系统', selected: false },
-    { name: 'HDFS', desc: 'HDFS是Hadoop应用的基本存储系统', selected: false },
-    { name: 'HDFS', desc: 'HDFS是Hadoop应用的基本存储系统', selected: false },
-  ];
   // 参数：状态初始值比如,传入 0 表示该状态的初始值为 0
   // 返回值：数组,包含两个值：1 状态值（state） 2 修改该状态的函数（setState）
   const [current, setCurrent] = useState(0);
-  const [serviceList, setServiceList] = useState(startServiceList);
-  // let currentNum: number = 2;
-  console.log('--current:', current);
+  const [serviceListData, setServiceListData] = useState<any[]>();
+  const [loading, setLoading] = useState(false);
+
+  const getServiceData = async (params: any) => {
+    setLoading(true)
+    const result: API.ServiceList =  await getListService(params);
+
+    setLoading(false)
+    const statusData = result.data && result.data.map(item=>{
+      return {
+        ...item,
+        selected:false
+      }
+    })
+    setServiceListData(statusData)
+  };
+
+  useEffect(() => {
+    getServiceData({ clusterId: 1 });
+  }, []);
+
+  const changeStatus = (id:number) => {
+    const statusData = serviceListData && serviceListData.map(item=>{
+      return {
+        ...item,
+        selected: item.id==id ? !item.selected : item.selected 
+      }
+    })
+    setServiceListData(statusData)
+  }
+
+  const checkNext = () => {
+    switch(current){
+      case 0:
+        const selectList = serviceListData?.filter(item=>{ return item.selected})
+        return (selectList && selectList.length > 0 ? true : false)
+      ;break;
+      case 1:
+        return true
+      ;break;
+      case 2:
+        return true
+      ;break;
+      case 3:
+        return true
+      ;break;
+      case 4:
+        return true
+      ;break;
+      case 5:
+        return true
+      ;break;
+    }
+  }
+
+  
+
 
   let stepList: any[] = [
     { title: '选择服务', status: '' },
@@ -108,53 +84,55 @@ const serviceAdd: React.FC = () => {
     { title: '安装', status: '' },
   ];
   const onChange = (value: number) => {
-    // console.log('onChange:', current);
     // setCurrent(value);
-    // console.log('onChange2:', current);
   };
 
   return (
     <PageContainer header={{ title: '' }}>
-      <div className={styles.stepsLayout}>
-        <div className={styles.stepsWrap}>
-          <Steps
-            direction="vertical"
-            size="small"
-            current={current}
-            items={stepList}
-            onChange={onChange}
-          ></Steps>
-        </div>
-        <div className={styles.stepsContent}>
-          <ChooseService serviceList={serviceList} setServiceList={setServiceList} />
-          {/* <div className={styles.notSelectWrap}>
-            <div>请选择需要安装的服务</div>
-            <div className={styles.serviceListWrap}>
-              <ChooseService value={0} />
-              <ChooseService value={0} />
-              <ChooseService value={0} />
+      <Spin tip="Loading" size="small" spinning={loading}>
+        <div className={styles.stepsLayout}>
+          <div className={styles.stepsWrap}>
+            <Steps
+              direction="vertical"
+              size="small"
+              current={current}
+              items={stepList}
+              onChange={onChange}
+            ></Steps>
+          </div>
+          <div className={styles.stepsContent}>
+            {(current == 0 && serviceListData ) && <ChooseService serviceList={serviceListData} changeStatus={changeStatus} />}
+            { current == 1 && <ConfigSecurity />}
+            { current == 2 && <AssignRoles serviceList={ serviceListData?.filter(item=>{ return item.selected}) || [] } /> }
+            { current == 3 && <ConfigService />}
+            {/* { current == 1 && <ConfigSecurity />}
+            { current == 1 && <ConfigSecurity />} */}
+            <div className={styles.stepBottomBtns}>
+              <Button style={{ marginRight: '5px' }}               
+                onClick={()=>{
+                  if(current==0){
+                    history.replace('/colony/serviceList');
+                  }else{
+                    setCurrent(current - 1);
+                  }
+                }}
+              >
+                {current == 0 ? '取消' : '上一步'}
+              </Button>
+              <Button type="primary" 
+                disabled={!checkNext()} 
+                onClick={()=>{
+                  if(current == 5){ // 安装
+
+                  }else{
+                    setCurrent(current + 1);
+                  }
+                }}
+              >下一步</Button>
             </div>
           </div>
-          <div className={styles.selectedWrap}>
-            <div style={{ paddingLeft: '15px' }}>待安装的服务</div>
-            <div className={styles.serviceListWrap}>
-              <ChooseService value={0} />
-              <ChooseService value={0} />
-              <ChooseService value={0} />
-            </div>
-          </div> */}
-          <div className={styles.stepBottomBtns}>
-            <Button style={{ marginRight: '5px' }}>取消/上一步</Button>
-            <Button type="primary">下一步</Button>
-          </div>
         </div>
-      </div>
-      {/* {stepList.map((item, index) => {
-            <Step title={item.name} description={statusDesc[item.status]} />;
-          })} */}
-      {/* <Step title="Finished" description={description} />
-          <Step title="In Progress" description={description} subTitle="Left 00:00:08" />
-          <Step title="Waiting" description={description} /> */}
+      </Spin>
     </PageContainer>
   );
 };
