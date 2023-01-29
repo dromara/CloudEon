@@ -118,7 +118,6 @@ public class StackController {
      * 要安装：YARN、HDFS
      * 解析出依赖：ZK、HDFS
      * 提示：需要先安装ZK
-     *
      */
     @GetMapping("/validInstallServicesDeps")
     public ResultDTO<Void> validInstallServicesDeps(@RequestBody ValidServicesDepRequest request) {
@@ -129,12 +128,18 @@ public class StackController {
         // 获取这次要安装的服务名列表
         List<String> installServiceNames = stackServiceEntities.stream().map(StackServiceEntity::getName).collect(Collectors.toList());
         // 去重获取这次要安装的服务需要依赖的服务名
-        List<String> depServiceNames = stackServiceEntities.stream().flatMap(new Function<StackServiceEntity, Stream<String>>() {
-            @Override
-            public Stream<String> apply(StackServiceEntity stackServiceEntity) {
-                return Arrays.stream(stackServiceEntity.getDependencies().split(","));
-            }
-        }).distinct().collect(Collectors.toList());
+        List<String> depServiceNames = stackServiceEntities
+                .stream()
+                // 去除""值
+                .filter(s -> StrUtil.isNotBlank(s.getDependencies()))
+                .flatMap(new Function<StackServiceEntity, Stream<String>>() {
+                    @Override
+                    public Stream<String> apply(StackServiceEntity stackServiceEntity) {
+                        return Arrays.stream(stackServiceEntity.getDependencies().split(","));
+                    }
+                })
+                .distinct()
+                .collect(Collectors.toList());
 
         List<String> needPreInstallServiceNames = depServiceNames.stream().filter(dep -> {
             // 检查这次要安装的服务中是否包含了依赖的服务，如果有可以去掉该依赖服务
@@ -154,7 +159,7 @@ public class StackController {
         }).collect(Collectors.toList());
 
         if (needPreInstallServiceNames.size() > 0) {
-            throw new RuntimeException("需要提前安装服务："+StrUtil.join(",",needPreInstallServiceNames));
+            return ResultDTO.failed("需要提前安装服务：" + StrUtil.join(",", needPreInstallServiceNames));
         }
 
         return ResultDTO.success(null);
