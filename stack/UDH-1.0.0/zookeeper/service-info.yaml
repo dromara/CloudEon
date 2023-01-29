@@ -1,0 +1,142 @@
+name: ZOOKEEPER
+label: "ZooKeeper"
+description: "分布式协调系统"
+version: 3.5.10
+dockerImage: "udh-zookeeper:3.5.10"
+dependencies: []
+
+runAs: zookeeper
+
+supportKerberos: true
+
+roles:
+  - name: ZOOKEEPER_SERVER
+    label: "Zookeeper Server"
+    roleFullName: "zookeeper-server"
+    linkExpression: ""
+    sortNum: 1
+    type: MASTER
+    jmxPort: 9232
+
+
+
+
+customConfigFiles:
+  - zoo.cfg
+
+configurations:
+
+  - name: zookeeper.peer.communicate.port
+    recommendExpression: 2888
+    valueType: PORT
+    configurableInWizard: true
+    description: ""
+    label: ""
+    groups: [ ]
+
+
+  - name: zookeeper.client.port
+    recommendExpression: 2181
+    valueType: PORT
+    groups: [ ]
+    configurableInWizard: true
+
+  - name: zookeeper.leader.elect.port
+    recommendExpression: 3888
+    valueType: PORT
+    groups: [ ]
+    configurableInWizard: true
+
+  - name: zookeeper.jmxremote.port
+    recommendExpression: 9911
+    valueType: PORT
+    groups: [ ]
+
+
+  - name: tickTime
+    recommendExpression: 9000
+    valueType: MILLISECONDS
+    groups: [ "zoo.cfg" ]
+    configurableInWizard: true
+    label: "心跳时间"
+    description: "Zookeeper服务器与客户端心跳时间，单位毫秒"
+
+  - name: initLimit
+    recommendExpression: 10
+    valueType: NON_NEG_INT
+    groups: [ "zoo.cfg" ]
+    configurableInWizard: true
+
+
+  - name: syncLimit
+    recommendExpression: 5
+    valueType: NON_NEG_INT
+    groups: [ "zoo.cfg" ]
+    configurableInWizard: true
+
+
+  - name: maxClientCnxns
+    recommendExpression: 0
+    valueType: NON_NEG_INT
+    groups: [ "zoo.cfg" ]
+
+
+  - name: zookeeper.server.memory
+    recommendExpression: 1024
+    valueType: MB
+    groups: [ ]
+    configurableInWizard: true
+
+
+  - name: zookeeper.container.limits.memory
+    recommendExpression: -1
+    valueType: FLOAT
+    groups: [ ]
+    configurableInWizard: true
+
+
+  - name: zookeeper.container.limits.cpu
+    recommendExpression: -1
+    valueType: FLOAT
+    groups: [ ]
+    configurableInWizard: true
+
+
+  - name: zookeeper.container.requests.memory
+    recommendExpression: -1
+    valueType: FLOAT
+    groups: [ ]
+    configurableInWizard: true
+
+
+  - name: zookeeper.container.requests.cpu
+    recommendExpression: -1
+    valueType: FLOAT
+    groups: [ ]
+    configurableInWizard: true
+
+
+  - name: zookeeper.memory.ratio
+    recommendExpression: -1
+    valueType: FLOAT
+    groups: [ ]
+    configurableInWizard: true
+
+
+  - name: sasl.oauth2.enabled
+    recommendExpression: true
+    valueType: BOOL
+    groups: [ ]
+
+
+  - name: extendedTypesEnabled
+    recommendExpression: false
+    valueType: BOOL
+    groups: [ "zoo.cfg" ]
+
+
+  - name: znode.container.checkIntervalMs
+    recommendExpression: 1000
+    valueType: NON_NEG_INT
+    groups: [ ]
+

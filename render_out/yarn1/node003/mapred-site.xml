@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<configuration>
+<property>
+    <name>mapreduce.jobhistory.address</name>
+    <value>node004:10020</value>
+</property>
+<property>
+    <name>mapreduce.jobhistory.webapp.address</name>
+    <value>node004:19888</value>
+</property>
+
+<property>
+    <name>mapreduce.jobhistory.principal</name>
+    <value>mapred/_HOST@HADOOP@COM</value>
+</property>
+<property>
+    <name>mapreduce.jobhistory.keytab</name>
+    <value>YARN.keytab</value>
+</property>
+<property>
+    <name>mapreduce.jobhistory.webapp.spnego-keytab-file</name>
+    <value>YARN.keytab</value>
+</property>
+<property>
+    <name>mapreduce.jobhistory.webapp.spnego-principal</name>
+    <value>HTTP/_HOST@HADOOP@COM</value>
+</property>
+<property>
+    <name>mapreduce.framework.name</name>
+    <value>yarn</value>
+</property>
+<property>
+    <name>mapreduce.map.memory.mb</name>
+    <value>5120</value>
+</property>
+<property>
+    <name>mapreduce.reduce.memory.mb</name>
+    <value>5120</value>
+</property>
+</configuration>

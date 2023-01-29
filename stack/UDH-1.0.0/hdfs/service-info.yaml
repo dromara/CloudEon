@@ -1,0 +1,404 @@
+name: HDFS
+label: "HDFS"
+description: "分布式大数据存储"
+version: 3.3.3
+dockerImage: "udh-hadoop-hdfs:3.3.3"
+dependencies:
+  - "ZOOKEEPER"
+
+runAs: hdfs
+
+supportKerberos: true
+
+roles:
+  - name: HDFS_JOURNALNODE
+    label: "Journal Node"
+    roleFullName: "hadoop-hdfs-journalnode"
+    linkExpression: "http://${localhostname}:${service['datanode.http-port']}/?user.name=hdfs"
+    sortNum: 1
+    type: MASTER
+    jmxPort: 9232
+  - name: HDFS_NAMENODE
+    label: "Name Node"
+    roleFullName: "hadoop-hdfs-namenode"
+    linkExpression: "http://${localhostname}:${service['namenode.http-port']}/?user.name=hdfs"
+    sortNum: 2
+    type: MASTER
+    jmxPort: 9232
+  - name: HDFS_DATANODE
+    label: "Data Node"
+    roleFullName: hadoop-hdfs-datanode
+    linkExpression: "http://${localhostname}:${service['datanode.http-port']}/?user.name=hdfs"
+    sortNum: 3
+    type: SLAVE
+    jmxPort: 9232
+  - name: HDFS_HTTPFS
+    label: Httpfs
+    roleFullName: hadoop-hdfs-httpfs
+    sortNum: 4
+    type: SLAVE
+    jmxPort: 9232
+
+
+
+
+customConfigFiles:
+  - capacity-scheduler.xml
+  - mapred-site.xml
+  - yarn-site.xml
+
+
+configurations:
+  - name: namenode.http-port
+    recommendExpression: 50070
+
+    valueType: PORT
+    groups: [ ]
+    configurableInWizard: true
+
+  - name: namenode.rpc-port
+    recommendExpression: 8020
+
+    valueType: PORT
+    groups: [ ]
+    configurableInWizard: true
+
+
+  - name: datanode.http-port
+    recommendExpression: 50075
+
+    valueType: PORT
+    groups: [ ]
+    configurableInWizard: true
+
+
+  - name: datanode.port
+    recommendExpression: 50010
+
+    valueType: PORT
+    groups: [ ]
+    configurableInWizard: true
+
+
+  - name: journalnode.http-port
+    recommendExpression: 8480
+
+    valueType: PORT
+    groups: [ ]
+    configurableInWizard: true
+
+
+
+
+  - name: dfs.namenode.name.dir
+    recommendExpression: ${hadoop.tmp.dir}/dfs/name
+    valueType: COMMA_SEPARATED_ABSOLUTE_PATH
+    groups: [ "hdfs-site.xml" ]
+    configurableInWizard: true
+
+  - name: dfs.datanode.data.dir
+    recommendExpression: ${hadoop.tmp.dir}/dfs/data
+    valueType: COMMA_SEPARATED_ABSOLUTE_PATH
+    groups: [ "hdfs-site.xml" ]
+    configurableInWizard: true
+
+  - name: dfs.datanode.failed.volumes.tolerated
+    recommendExpression: 0
+
+    valueType: NON_NEG_INT
+    groups: [ "hdfs-site.xml" ]
+    configurableInWizard: true
+
+  - name: dfs.data.transfer.protection
+    recommendExpression: authentication
+    valueType: STRING
+    groups: [ "hdfs-site.xml" ]
+
+  - name: dfs.datanode.handler.count
+    recommendExpression: 30
+
+    valueType: NON_NEG_INT
+    groups: [ "hdfs-site.xml" ]
+
+  - name: dfs.namenode.handler.count
+    recommendExpression: 100
+
+    valueType: NON_NEG_INT
+    groups: [ "hdfs-site.xml" ]
+
+  - name: dfs.client.read.shortcircuit
+    recommendExpression: true
+
+    valueType: BOOL
+    groups: [ "hdfs-site.xml" ]
+
+  - name: dfs.client.socket-timeout
+    recommendExpression: 120000
+
+    valueType: NON_NEG_INT
+    groups: [ "hdfs-site.xml" ]
+
+  - name: dfs.ha.fencing.methods
+    recommendExpression: shell(/bin/true)
+
+    valueType: STRING
+    groups: [ "core-site.xml" ]
+
+
+  - name: dfs.datanode.data.dir.perm
+    recommendExpression: 755
+
+    valueType: STRING
+    groups: [ "hdfs-site.xml" ]
+
+
+  - name: dfs.permissions.superusergroup
+    recommendExpression: "supergroup"
+    valueType: STRING
+    groups: [ "hdfs-site.xml" ]
+
+
+  - name: dfs.namenode.acls.enabled
+    recommendExpression: true
+
+    valueType: BOOL
+    groups: [ "hdfs-site.xml" ]
+
+  - name: fs.trash.interval
+    recommendExpression: 1440
+
+    valueType: STRING
+    groups: [ "core-site.xml" ]
+
+
+  - name: namenode.memory
+    recommendExpression: 2000
+
+    valueType: MB
+    groups: [ ]
+    configurableInWizard: true
+
+  - name: zkfc.memory
+    recommendExpression: 1024
+
+    valueType: MB
+    groups: [ ]
+    configurableInWizard: true
+
+
+  - name: journalnode.memory
+    recommendExpression: 1024
+
+    valueType: MB
+    groups: [ ]
+    configurableInWizard: true
+
+
+  - name: datanode.memory
+    recommendExpression: 1024
+
+    valueType: MB
+    groups: [ ]
+    configurableInWizard: true
+
+
+  - name: namenode.container.limits.memory
+    recommendExpression: -1
+
+    valueType: FLOAT
+    groups: [ ]
+    configurableInWizard: true
+
+
+  - name: namenode.container.limits.cpu
+    recommendExpression: -1
+
+    valueType: FLOAT
+    groups: [ ]
+    configurableInWizard: true
+
+
+  - name: namenode.container.requests.memory
+    recommendExpression: -1
+
+    valueType: FLOAT
+    groups: [ ]
+    configurableInWizard: true
+
+
+  - name: namenode.container.requests.cpu
+    recommendExpression: -1
+
+    valueType: FLOAT
+    groups: [ ]
+    configurableInWizard: true
+
+
+  - name: namenode.memory.ratio
+    recommendExpression: -1
+
+    valueType: FLOAT
+    groups: [ ]
+    configurableInWizard: true
+
+
+  - name: zkfc.container.limits.memory
+    recommendExpression: -1
+
+    valueType: FLOAT
+    groups: [ ]
+    configurableInWizard: true
+
+
+  - name: zkfc.container.limits.cpu
+    recommendExpression: -1
+
+    valueType: FLOAT
+    groups: [ ]
+    configurableInWizard: true
+
+
+  - name: zkfc.container.requests.memory
+    recommendExpression: -1
+
+    valueType: FLOAT
+    groups: [ ]
+    configurableInWizard: true
+
+
+  - name: zkfc.container.requests.cpu
+    recommendExpression: -1
+
+    valueType: FLOAT
+    groups: [ ]
+    configurableInWizard: true
+
+
+  - name: zkfc.memory.ratio
+    recommendExpression: -1
+
+    valueType: FLOAT
+    groups: [ ]
+    configurableInWizard: true
+
+
+  - name: journalnode.container.limits.memory
+    recommendExpression: -1
+
+    valueType: FLOAT
+    groups: [ ]
+    configurableInWizard: true
+
+
+  - name: journalnode.container.limits.cpu
+    recommendExpression: -1
+
+    valueType: FLOAT
+    groups: [ ]
+    configurableInWizard: true
+
+
+  - name: journalnode.container.requests.memory
+    recommendExpression: -1
+
+    valueType: FLOAT
+    groups: [ ]
+    configurableInWizard: true
+
+
+  - name: journalnode.container.requests.cpu
+    recommendExpression: -1
+
+    valueType: FLOAT
+    groups: [ ]
+    configurableInWizard: true
+
+
+  - name: journalnode.memory.ratio
+    recommendExpression: -1
+
+    valueType: FLOAT
+    groups: [ ]
+    configurableInWizard: true
+
+
+  - name: datanode.container.limits.memory
+    recommendExpression: -1
+
+    valueType: FLOAT
+    groups: [ ]
+    configurableInWizard: true
+
+
+  - name: datanode.container.limits.cpu
+    recommendExpression: -1
+
+    valueType: FLOAT
+    groups: [ ]
+    configurableInWizard: true
+
+
+  - name: datanode.container.requests.memory
+    recommendExpression: -1
+
+    valueType: FLOAT
+    groups: [ ]
+    configurableInWizard: true
+
+
+  - name: datanode.container.requests.cpu
+    recommendExpression: -1
+
+    valueType: FLOAT
+    groups: [ ]
+    configurableInWizard: true
+
+
+  - name: datanode.memory.ratio
+    recommendExpression: -1
+
+    valueType: FLOAT
+    groups: [ ]
+    configurableInWizard: true
+
+
+  - name: httpfs.container.limits.memory
+    recommendExpression: -1
+
+    valueType: FLOAT
+    groups: [ ]
+    configurableInWizard: true
+
+
+  - name: httpfs.container.limits.cpu
+    recommendExpression: -1
+
+    valueType: FLOAT
+    groups: [ ]
+    configurableInWizard: true
+
+
+  - name: httpfs.container.requests.memory
+    recommendExpression: -1
+
+    valueType: FLOAT
+    groups: [ ]
+    configurableInWizard: true
+
+
+  - name: httpfs.container.requests.cpu
+    recommendExpression: -1
+
+    valueType: FLOAT
+    groups: [ ]
+    configurableInWizard: true
+
+
+  - name: httpfs.memory.ratio
+    recommendExpression: -1
+
+    valueType: FLOAT
+    groups: [ ]
+    configurableInWizard: true
+
+
