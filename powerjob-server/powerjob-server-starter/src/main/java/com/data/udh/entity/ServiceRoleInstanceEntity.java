@@ -50,13 +50,15 @@ public class ServiceRoleInstanceEntity implements Serializable {
      */
     private Date createTime;
     /**
-     * 服务id
+     * 框架服务id
      */
-    private Integer serviceId;
+    private Integer stackServiceId;
+
+
     /**
-     * 角色类型 1:master2:worker3:client
+     * 角色类型
      */
-    private Integer roleType;
+    private String roleType;
     /**
      * 集群id
      */
