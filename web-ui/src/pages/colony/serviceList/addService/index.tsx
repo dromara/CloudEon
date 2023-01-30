@@ -1,10 +1,10 @@
 import { PageContainer, ProCard } from '@ant-design/pro-components';
-import { Space, Steps, Button, Spin } from 'antd';
+import { Space, Steps, Button, Spin, message } from 'antd';
 import { BorderOuterOutlined } from '@ant-design/icons';
-import { FormattedMessage, useIntl, useRequest, history } from 'umi';
+import { FormattedMessage, useIntl, history } from 'umi';
 import { useState, useEffect } from 'react';
 import styles from './index.less';
-import { getListService } from '@/services/ant-design-pro/colony';
+import { getServiceListAPI, checkServiceAPI } from '@/services/ant-design-pro/colony';
 import ChooseService from './components/ChooseService'
 import ConfigSecurity from'./components/ConfigSecurity'
 import AssignRoles from'./components/AssignRoles'
@@ -20,10 +20,25 @@ const serviceAdd: React.FC = () => {
   const [serviceListData, setServiceListData] = useState<any[]>();
   const [loading, setLoading] = useState(false);
 
+  const checkService = async (params: any) => {
+    try {
+      setLoading(true)
+      const result: API.normalResult =  await checkServiceAPI(params);
+      setLoading(false)
+      if(!result.success){
+        message.error(result.message);
+        return false
+      }
+      return true
+    } catch (error) {
+      message.error(error);
+      return false
+    }
+  }; 
+
   const getServiceData = async (params: any) => {
     setLoading(true)
-    const result: API.ServiceList =  await getListService(params);
-
+    const result: API.ServiceList =  await getServiceListAPI(params);
     setLoading(false)
     const statusData = result.data && result.data.map(item=>{
       return {
@@ -48,10 +63,15 @@ const serviceAdd: React.FC = () => {
     setServiceListData(statusData)
   }
 
+  const getSelectedService = ()=>{
+    const selectList = serviceListData?.filter(item=>{ return item.selected})
+    return selectList
+  }
+
   const checkNext = () => {
     switch(current){
       case 0:
-        const selectList = serviceListData?.filter(item=>{ return item.selected})
+        const selectList = getSelectedService()
         return (selectList && selectList.length > 0 ? true : false)
       ;break;
       case 1:
@@ -122,7 +142,18 @@ const serviceAdd: React.FC = () => {
               <Button type="primary" 
                 disabled={!checkNext()} 
                 onClick={()=>{
-                  if(current == 5){ // 安装
+                  if(current == 0){
+                    const selectList = getSelectedService()?.map(stem=> { return stem.id })
+                    const getData = JSON.parse(sessionStorage.getItem('colonyData') || '{}')
+                    const params = {
+                      "clusterId":getData.clusterId,
+                      "stackId":getData.stackId,
+                      "installStackServiceIds": selectList
+                    }
+                    checkService(params).then(checkResult=>{
+                      if(checkResult) setCurrent(current + 1);
+                    })
+                  } else if(current == 5){ // 安装
 
                   }else{
                     setCurrent(current + 1);
