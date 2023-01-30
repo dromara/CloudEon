@@ -15,6 +15,8 @@ import com.data.udh.entity.StackInfoEntity;
 import com.data.udh.entity.StackServiceConfEntity;
 import com.data.udh.entity.StackServiceEntity;
 import com.data.udh.entity.StackServiceRoleEntity;
+import com.data.udh.utils.ImageUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -33,10 +35,10 @@ import java.util.List;
 import java.util.StringJoiner;
 import java.util.function.Function;
 
-import static com.data.udh.utils.Constant.StackPackageConfYAML;
-import static com.data.udh.utils.Constant.StackPackageInfoYAML;
+import static com.data.udh.utils.Constant.*;
 
 @Component
+@Slf4j
 public class StackLoadService implements ApplicationRunner {
 
     @Value("${udh.stack.load.path}")
@@ -80,14 +82,20 @@ public class StackLoadService implements ApplicationRunner {
             // 遍历每一个service并加载文件信息到数据库中
             for (File servicePath : servicePaths) {
                 String serviceInfoYamlFilePath = servicePath + FileUtil.FILE_SEPARATOR + StackPackageInfoYAML;
+                String iconAppFilePath = servicePath + FileUtil.FILE_SEPARATOR + DIR_ICON + FileUtil.FILE_SEPARATOR + ICON_APP;
+                String iconDefaultFilePath = servicePath + FileUtil.FILE_SEPARATOR + DIR_ICON + FileUtil.FILE_SEPARATOR + ICON_DEFAULT;
+                String iconDangerFilePath = servicePath + FileUtil.FILE_SEPARATOR + DIR_ICON + FileUtil.FILE_SEPARATOR + ICON_DANGER;
                 if (FileUtil.exist(serviceInfoYamlFilePath)) {
-                    System.out.println("找到" + servicePath.getName() + "的" + StackPackageInfoYAML);
+                    log.info("找到" + servicePath.getName() + "的" + StackPackageInfoYAML);
 
                     // 读取service-info文件
-
                     InputStream infoInputStream = new FileInputStream(serviceInfoYamlFilePath);
                     StackServiceInfo serviceInfo = yaml.loadAs(infoInputStream, StackServiceInfo.class);
-                    System.out.println(serviceInfo);
+
+                    // 读取图标
+                    String iconAppStr = ImageUtil.GetImageStr(iconAppFilePath);
+                    String iconDefaultStr = ImageUtil.GetImageStr(iconDefaultFilePath);
+                    String iconDangerStr = ImageUtil.GetImageStr(iconDangerFilePath);
 
                     // 查找数据库中是否含有该service
                     StackServiceEntity stackServiceEntity = null;
@@ -103,6 +111,10 @@ public class StackLoadService implements ApplicationRunner {
                     stackServiceEntity.setDependencies(StrUtil.join(",", serviceInfo.getDependencies()));
                     stackServiceEntity.setCustomConfigFiles(StrUtil.join(",", serviceInfo.getCustomConfigFiles()));
                     stackServiceEntity.setServiceConfigurationYaml(yaml.dump(serviceInfo.getConfigurations()));
+                    // 持久化图标base64
+                    stackServiceEntity.setIconDanger(iconDangerStr);
+                    stackServiceEntity.setIconDefault(iconDefaultStr);
+                    stackServiceEntity.setIconApp(iconAppStr);
                     stackServiceRepository.save(stackServiceEntity);
                     Integer stackServiceEntityId = stackServiceEntity.getId();
 
