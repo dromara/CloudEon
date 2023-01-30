@@ -74,6 +74,10 @@ public class StackServiceEntity implements Serializable {
 
     private Integer sortNum;
 
+    private String iconApp;
+    private String iconDanger;
+    private String iconDefault;
+
    
 
 }

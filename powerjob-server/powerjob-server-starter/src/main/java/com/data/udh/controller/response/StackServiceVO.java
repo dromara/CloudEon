@@ -12,6 +12,9 @@ public class StackServiceVO {
     private String version;
     private String description;
     private String dockerImage;
+    private String iconApp;
+    private String iconDanger;
+    private String iconDefault;
 
     /**
      * 角色
