@@ -1,5 +1,7 @@
 package com.data.udh.entity;
 
+import com.data.udh.utils.ServiceRoleState;
+import lombok.Builder;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -33,14 +35,12 @@ public class ServiceRoleInstanceEntity implements Serializable {
      */
     private Integer nodeId;
     /**
-     * 服务角色状态 1:正在运行2：存在告警3：存在异常4：需要重启
+     * 服务角色状态
      */
-    private Integer serviceRoleState;
+    @Enumerated(EnumType.ORDINAL)
+    private ServiceRoleState serviceRoleState;
 
-    /**
-     * 关联角色分组id
-     */
-    private Integer roleGroupId;
+
     /**
      * 更新时间
      */
@@ -50,9 +50,9 @@ public class ServiceRoleInstanceEntity implements Serializable {
      */
     private Date createTime;
     /**
-     * 框架服务id
+     * 框架服务角色id
      */
-    private Integer stackServiceId;
+    private Integer stackServiceRoleId;
 
 
     /**
@@ -74,6 +74,7 @@ public class ServiceRoleInstanceEntity implements Serializable {
     private boolean isDecommission;
 
 
+    public ServiceRoleInstanceEntity() {
 
-
+    }
 }
