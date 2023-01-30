@@ -18,14 +18,21 @@ export default {
     },
     '/stack/': {
       // 要代理的地址
-      target: 'http://1d8baae3.r8.cpolar.top',
+      target: 'https://2835b2ee.r8.cpolar.top',
       // 配置了这个可以从 http 代理到 https
       // 依赖 origin 的功能可能需要这个，比如 cookie
       changeOrigin: true,
     },
     '/cluster/': {
       // 要代理的地址
-      target: 'http://1d8baae3.r8.cpolar.top',
+      target: 'https://2835b2ee.r8.cpolar.top',
+      // 配置了这个可以从 http 代理到 https
+      // 依赖 origin 的功能可能需要这个，比如 cookie
+      changeOrigin: true,
+    },
+    '/node/': {
+      // 要代理的地址
+      target: 'https://2835b2ee.r8.cpolar.top',
       // 配置了这个可以从 http 代理到 https
       // 依赖 origin 的功能可能需要这个，比如 cookie
       changeOrigin: true,
