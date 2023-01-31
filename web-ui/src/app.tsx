@@ -19,7 +19,7 @@ export const request: RequestConfig = {
     if(error && error.name==="BizError"){
       const { response } = error;
       if ('success' in response && !response.success) {
-        message.error(`请求错误: ${('message' in response) ? response.message : '' }`);
+        message.error(`请求错误: ${('message' in response) ? response.message : '' }`, 3);
         return {
           success:false,
           data:[],
@@ -50,6 +50,7 @@ export const request: RequestConfig = {
         504: '网关超时。',
       };
       codeMaps[response.status] && message.error(codeMaps[response.status]);
+      
       return response;
     }
   ],
