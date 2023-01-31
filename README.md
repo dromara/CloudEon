@@ -75,7 +75,7 @@ PowerJob is released under Apache License 2.0. Please refer to [License](./LICEN
 <table>
   <tbody>
     <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/ZMeiMei"><img src="https://avatars.githubusercontent.com/u/39690226?v=4?s=100" width="100px;" alt="ZMeiMei"/><br /><sub><b>ZMeiMei</b></sub></a><br /><a href="https://github.com/Pandas886/e-mapreduce/commits?author=ZMeiMei" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/ZMeiMei"><img src="https://avatars.githubusercontent.com/u/39690226?v=4?s=100" width="100px;" alt="ZMeiMei"/><br /><sub><b>ZMeiMei</b></sub></a><br /><a href="https://github.com/Pandas886/e-mapreduce/commits?author=ZMeiMei" title="Code">💻</a> <a href="https://github.com/Pandas886/e-mapreduce/pulls?q=is%3Apr+reviewed-by%3AZMeiMei" title="Reviewed Pull Requests">👀</a> <a href="#maintenance-ZMeiMei" title="Maintenance">🚧</a></td>
     </tr>
   </tbody>
 </table>
