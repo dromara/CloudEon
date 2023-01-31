@@ -1,6 +1,6 @@
 # English | [简体中文](./README_zhCN.md)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 <p align="center">
@@ -87,6 +87,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   <tbody>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Pandas886"><img src="https://avatars.githubusercontent.com/u/123344357?v=4?s=100" width="100px;" alt="Pandas886"/><br /><sub><b>Pandas886</b></sub></a><br /><a href="https://github.com/Pandas886/e-mapreduce/commits?author=Pandas886" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/ZMeiMei"><img src="https://avatars.githubusercontent.com/u/39690226?v=4?s=100" width="100px;" alt="ZMeiMei"/><br /><sub><b>ZMeiMei</b></sub></a><br /><a href="https://github.com/Pandas886/e-mapreduce/commits?author=ZMeiMei" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
