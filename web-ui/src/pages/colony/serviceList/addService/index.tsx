@@ -26,12 +26,12 @@ const serviceAdd: React.FC = () => {
       const result: API.normalResult =  await checkServiceAPI(params);
       setLoading(false)
       if(!result.success){
-        message.error(result.message);
+        // message.error(result.message);
         return false
       }
       return true
     } catch (error) {
-      message.error(error);
+      // message.error(error);
       return false
     }
   }; 
@@ -40,7 +40,7 @@ const serviceAdd: React.FC = () => {
     setLoading(true)
     const result: API.ServiceList =  await getServiceListAPI(params);
     setLoading(false)
-    const statusData = result.data && result.data.map(item=>{
+    const statusData = result?.data?.map(item=>{
       return {
         ...item,
         selected:false
@@ -151,7 +151,10 @@ const serviceAdd: React.FC = () => {
                       "installStackServiceIds": selectList
                     }
                     checkService(params).then(checkResult=>{
-                      if(checkResult) setCurrent(current + 1);
+                      if(checkResult) {
+                        sessionStorage.setItem('colonyData',JSON.stringify({...getData , selectedServiceList: getSelectedService()}) )
+                        setCurrent(current + 1);
+                      }
                     })
                   } else if(current == 5){ // 安装
 

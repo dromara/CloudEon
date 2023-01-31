@@ -168,9 +168,31 @@ declare namespace API {
     data?: StackItem[];
   };
 
+  type ConfItem = {
+    name?: string,
+    description?: string,
+    label?: string,
+    recommendExpression?: string,
+    valueType?: string,
+    configurableInWizard?: boolean,
+    groups?: string[]
+  }
+
+  type ConfList = {
+    success?: boolean;
+    message?: string;
+    data?: {
+      confs?: ConfItem[],
+      customFileNames?: string[]
+    };
+  };
+
+
+
   type normalResult = {
     success?: boolean;
     message?: string;
     data?: any[];
   }
+
 }
