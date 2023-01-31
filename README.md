@@ -3,9 +3,7 @@
 [![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-<p align="center">
-<img src="https://raw.githubusercontent.com/KFCFans/PowerJob/master/others/images/logo.png" alt="PowerJob" title="PowerJob" width="557"/>
-</p>
+
 
 <p align="center">
 <a href="https://github.com/PowerJob/PowerJob/actions"><img src="https://github.com/PowerJob/PowerJob/workflows/Java%20CI%20with%20Maven/badge.svg?branch=master" alt="actions"></a>
@@ -59,9 +57,12 @@ Refer to [PowerJob Introduction](https://www.yuque.com/powerjob/en/introduce) fo
 <img src="https://raw.githubusercontent.com/KFCFans/PowerJob/master/others/images/user.png" alt="PowerJob User" title="PowerJob User"/>
 </p>
 
-# Stargazers over time
 
-[![Stargazers over time](https://starchart.cc/PowerJob/PowerJob.svg)](https://starchart.cc/PowerJob/PowerJob)
+## Stargazers over time
+
+[![Stargazers over time](https://starchart.cc/Pandas886/e-mapreduce.svg)](https://starchart.cc/Pandas886/e-mapreduce)
+
+
 
 # License
 
