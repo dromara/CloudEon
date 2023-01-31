@@ -3,6 +3,8 @@ package com.data.udh.config;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateProperties;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateSettings;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,13 +32,12 @@ import java.util.Objects;
         basePackages = UDHJpaConfig.CORE_PACKAGES,
         // 实体管理bean名称
         entityManagerFactoryRef = "udhEntityManagerFactory",
-        // 事务管理bean名称
         transactionManagerRef = "udhTransactionManager"
 )
 public class UDHJpaConfig {
 
-    @Resource(name = "omsRemoteDatasource")
-    private DataSource omsRemoteDatasource;
+    @Resource(name = "udhDatasource")
+    private DataSource udhDatasource;
 
 
     public static final String CORE_PACKAGES = "com.data.udh";
@@ -66,7 +67,7 @@ public class UDHJpaConfig {
     public LocalContainerEntityManagerFactoryBean initRemoteEntityManagerFactory(EntityManagerFactoryBuilder builder) {
         Map<String, Object> datasourceProperties = genDatasourceProperties();
         return builder
-                .dataSource(omsRemoteDatasource)
+                .dataSource(udhDatasource)
                 .properties(datasourceProperties)
                 .packages(CORE_PACKAGES)
                 .persistenceUnit("udhPersistenceUnit")
@@ -75,7 +76,11 @@ public class UDHJpaConfig {
 
 
     @Bean(name = "udhTransactionManager")
-    public PlatformTransactionManager initRemoteTransactionManager(EntityManagerFactoryBuilder builder) {
-        return new JpaTransactionManager(Objects.requireNonNull(initRemoteEntityManagerFactory(builder).getObject()));
+    public JpaTransactionManager udhTransactionManager(EntityManagerFactoryBuilder builder) {
+        JpaTransactionManager transactionManager = new JpaTransactionManager();
+        transactionManager.setEntityManagerFactory(initRemoteEntityManagerFactory(builder).getObject());
+        return transactionManager;
     }
+
+
 }

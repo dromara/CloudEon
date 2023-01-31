@@ -9,6 +9,7 @@ import com.data.udh.entity.*;
 import com.data.udh.utils.ServiceRoleState;
 import com.data.udh.utils.ServiceState;
 import org.springframework.beans.BeanUtils;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import tech.powerjob.common.response.ResultDTO;
 
 import javax.annotation.Resource;
-import javax.transaction.Transactional;
+import javax.persistence.EntityManager;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -53,8 +54,10 @@ public class ClusterServiceController {
     @Resource
     private ServiceInstanceConfigRepository serviceInstanceConfigRepository;
 
+    @Resource
+    private EntityManager entityManager;
 
-    @Transactional(rollbackOn = Exception.class)
+    @Transactional(value = "udhTransactionManager",rollbackFor = Exception.class)
     @PostMapping("/initService")
     public ResultDTO<Void> initService(@RequestBody InitServiceRequest req) {
         Integer clusterId = req.getClusterId();
@@ -63,8 +66,11 @@ public class ClusterServiceController {
 
         for (InitServiceRequest.ServiceInfo serviceInfo : serviceInfos) {
             // 查询实例表获取新增的实例序号
-            int maxInstanceSeq = serviceInstanceRepository.maxByStackServiceId(serviceInfo.getStackServiceId());
-            int newInstanceSeq = maxInstanceSeq + 1;
+            Integer maxInstanceSeq = (Integer) entityManager.createNativeQuery("select max(instance_sequence) from udh_service_instance where stack_service_id = 1=" + serviceInfo.getStackServiceId()).getSingleResult();
+            if (maxInstanceSeq == null) {
+                maxInstanceSeq = 0;
+            }
+            Integer newInstanceSeq = maxInstanceSeq + 1;
 
             ServiceInstanceEntity serviceInstanceEntity = new ServiceInstanceEntity();
             serviceInstanceEntity.setInstanceSequence(newInstanceSeq);
@@ -139,7 +145,7 @@ public class ClusterServiceController {
                     BeanUtil.copyProperties(initServicePresetConf, serviceInstanceConfigEntity);
                     serviceInstanceConfigEntity.setUpdateTime(new Date());
                     serviceInstanceConfigEntity.setCreateTime(new Date());
-                    serviceInstanceConfigEntity.setServiceId(serviceInstanceEntityId);
+                    serviceInstanceConfigEntity.setServiceInstanceId(serviceInstanceEntityId);
                     serviceInstanceConfigEntity.setUserId(AdminUserId);
                     return serviceInstanceConfigEntity;
                 }
@@ -160,8 +166,8 @@ public class ClusterServiceController {
                 @Override
                 public String apply(String depStackServiceName) {
                     //查找集群内该服务依赖的服务实例
-                    ServiceInstanceEntity depServiceInstance = serviceInstanceRepository.findByClusterIdAndStackServiceName(clusterId, depStackServiceName);
-                    return depServiceInstance.getId()+"";
+                    Integer depServiceInstanceId = serviceInstanceRepository.findByClusterIdAndStackServiceName(clusterId, depStackServiceName);
+                    return depServiceInstanceId+"";
                 }
             }).collect(Collectors.toList());
 

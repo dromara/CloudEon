@@ -53,7 +53,7 @@ public class ServiceInstanceEntity implements Serializable {
     /**
      * 是否需要重启
      */
-    private boolean needRestart;
+    private Boolean needRestart;
     /**
      * 更新时间
      */
