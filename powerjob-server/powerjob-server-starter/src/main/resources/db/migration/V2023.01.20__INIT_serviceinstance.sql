@@ -35,6 +35,7 @@ create table udh_service_instance
     need_restart                    bit          not null,
     service_name                    varchar(255) null,
     service_state                   int          null,
+    instance_sequence                  int          null,
     sid                             varchar(255) null,
     stack_service_id                int          null,
     update_time                     datetime(6)  null
@@ -49,8 +50,8 @@ create table udh_service_role_instance
     is_decommission     bit          not null,
     need_restart        bit          not null,
     node_id             int          null,
-    role_type           int          null,
-    service_id          int          null,
+    role_type           varchar(255)          null,
+    stack_service_role_id          int          null,
     service_instance_id int          null,
     service_role_name   varchar(255) null,
     service_role_state  int          null,

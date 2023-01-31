@@ -1,8 +1,9 @@
 # English | [简体中文](./README_zhCN.md)
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-<p align="center">
-<img src="https://raw.githubusercontent.com/KFCFans/PowerJob/master/others/images/logo.png" alt="PowerJob" title="PowerJob" width="557"/>
-</p>
+
 
 <p align="center">
 <a href="https://github.com/PowerJob/PowerJob/actions"><img src="https://github.com/PowerJob/PowerJob/workflows/Java%20CI%20with%20Maven/badge.svg?branch=master" alt="actions"></a>
@@ -56,13 +57,17 @@ Refer to [PowerJob Introduction](https://www.yuque.com/powerjob/en/introduce) fo
 <img src="https://raw.githubusercontent.com/KFCFans/PowerJob/master/others/images/user.png" alt="PowerJob User" title="PowerJob User"/>
 </p>
 
-# Stargazers over time
 
-[![Stargazers over time](https://starchart.cc/PowerJob/PowerJob.svg)](https://starchart.cc/PowerJob/PowerJob)
+## Stargazers over time
+
+[![Stargazers over time](https://starchart.cc/Pandas886/e-mapreduce.svg)](https://starchart.cc/Pandas886/e-mapreduce)
+
+
 
 # License
 
 PowerJob is released under Apache License 2.0. Please refer to [License](./LICENSE) for details.
+
 
 # Others
 
@@ -71,3 +76,26 @@ PowerJob is released under Apache License 2.0. Please refer to [License](./LICEN
 - Reach out to me through email **tengjiqi@gmail.com**. Any issues or questions are welcomed on [Issues](https://github.com/PowerJob/PowerJob/issues).
 
 - Look forward to your opinions. Response may be late but not denied.
+
+## Contributors ✨
+
+Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Pandas886"><img src="https://avatars.githubusercontent.com/u/123344357?v=4?s=100" width="100px;" alt="Pandas886"/><br /><sub><b>Pandas886</b></sub></a><br /><a href="https://github.com/Pandas886/e-mapreduce/commits?author=Pandas886" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/ZMeiMei"><img src="https://avatars.githubusercontent.com/u/39690226?v=4?s=100" width="100px;" alt="ZMeiMei"/><br /><sub><b>ZMeiMei</b></sub></a><br /><a href="https://github.com/Pandas886/e-mapreduce/commits?author=ZMeiMei" title="Code">💻</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!

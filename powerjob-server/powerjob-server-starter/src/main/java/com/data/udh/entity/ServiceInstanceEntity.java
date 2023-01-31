@@ -1,5 +1,7 @@
 package com.data.udh.entity;
 
+import com.data.udh.utils.ServiceState;
+import lombok.Builder;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -43,9 +45,10 @@ public class ServiceInstanceEntity implements Serializable {
 
     private String label;
     /**
-     * 服务状态 1、待安装 2：正在运行  3：存在告警 4:存在异常
+     * 服务状态
      */
-    private Integer serviceState;
+    @Enumerated(EnumType.ORDINAL)
+    private ServiceState serviceState;
 
     /**
      * 是否需要重启
@@ -70,9 +73,17 @@ public class ServiceInstanceEntity implements Serializable {
     private Integer stackServiceId;
 
     /**
+     * 相同框架服务的内部实例序号
+     */
+    private Integer instanceSequence;
+
+    /**
      * 是否开启Kerberos
      */
-    private boolean enableKerberos;
+    private Boolean enableKerberos;
 
 
+    public ServiceInstanceEntity() {
+
+    }
 }
