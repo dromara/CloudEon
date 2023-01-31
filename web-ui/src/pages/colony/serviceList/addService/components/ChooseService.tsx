@@ -1,4 +1,5 @@
 import { BorderOuterOutlined } from '@ant-design/icons';
+import { Image } from 'antd'
 import styles from './ChooseService.less'
 
 const ChooseService: React.FC<{
@@ -39,7 +40,8 @@ const ChooseService: React.FC<{
         {type == 0 ? (
           <>
             <div className={styles.serviceItemIcon}>
-              <BorderOuterOutlined />
+              {/* <BorderOuterOutlined /> */}
+              <Image src={'data:image/jpeg;base64,'+item.iconApp} className={styles.serviceItemIcon} alt="" />
             </div>
             <div className={styles.serviceItemCenter}>
               <div className={styles.serviceItemTitle}>{item.label}</div>
@@ -49,9 +51,8 @@ const ChooseService: React.FC<{
           ):(
             <div style={{display:'flex',flexDirection: 'column'}}>
               <div style={{display:'flex',flexDirection: 'row', alignItems: 'center'}}>
-                <div className={styles.serviceItemIcon}>
-                  <BorderOuterOutlined />
-                </div>
+                  {/* <BorderOuterOutlined /> */}
+                  <Image src={'data:image/jpeg;base64,'+item.iconApp} className={styles.serviceItemIcon} alt="" />
                 <div className={styles.serviceItemTitle}>{item.label}</div>
               </div>
               <div className={styles.serviceItemCenter}>
