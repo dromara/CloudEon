@@ -1,6 +1,7 @@
 package com.data.udh.controller;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.StrUtil;
 import com.data.udh.controller.request.InitServiceRequest;
 import com.data.udh.controller.request.ModifyClusterInfoRequest;
 import com.data.udh.dao.*;
@@ -16,10 +17,12 @@ import tech.powerjob.common.response.ResultDTO;
 
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.data.udh.utils.Constant.AdminUserId;
 import static com.data.udh.utils.Constant.AdminUserName;
@@ -40,6 +43,9 @@ public class ClusterServiceController {
 
     @Resource
     private StackServiceRoleRepository stackServiceRoleRepository;
+
+    @Resource
+    private StackServiceRepository stackServiceRepository;
 
     @Resource
     private ServiceRoleInstanceWebuisRepository roleInstanceWebuisRepository;
@@ -130,7 +136,7 @@ public class ClusterServiceController {
                 @Override
                 public ServiceInstanceConfigEntity apply(InitServiceRequest.InitServicePresetConf initServicePresetConf) {
                     ServiceInstanceConfigEntity serviceInstanceConfigEntity = new ServiceInstanceConfigEntity();
-                    BeanUtil.copyProperties(initServicePresetConf,serviceInstanceConfigEntity);
+                    BeanUtil.copyProperties(initServicePresetConf, serviceInstanceConfigEntity);
                     serviceInstanceConfigEntity.setUpdateTime(new Date());
                     serviceInstanceConfigEntity.setCreateTime(new Date());
                     serviceInstanceConfigEntity.setServiceId(serviceInstanceEntityId);
@@ -142,11 +148,32 @@ public class ClusterServiceController {
             // 批量持久化service Conf信息
             serviceInstanceConfigRepository.saveAll(serviceInstanceConfigEntities);
 
-            // todo 根据需要安装的服务在实例表中找到依赖的服务id，并更新service信息
-
-            // todo 生成新增服务command和调用workflow
-
         }
+
+        // 根据需要安装的服务在实例表中找到依赖的服务id，并更新service信息
+        List<Integer> stackServiceIds = req.getServiceInfos().stream().map(e -> e.getStackServiceId()).collect(Collectors.toList());
+        // 过滤出有依赖的服务
+        List<StackServiceEntity> installStackServiceEntities = stackServiceRepository.findAllById(stackServiceIds).stream().filter(e -> StrUtil.isNotBlank(e.getDependencies())).collect(Collectors.toList());
+        for (StackServiceEntity stackServiceEntity : installStackServiceEntities) {
+            String[] depStr = stackServiceEntity.getDependencies().split(",");
+            List<String> depInstanceIds = Arrays.stream(depStr).map(new Function<String, String>() {
+                @Override
+                public String apply(String depStackServiceName) {
+                    //查找集群内该服务依赖的服务实例
+                    ServiceInstanceEntity depServiceInstance = serviceInstanceRepository.findByClusterIdAndStackServiceName(clusterId, depStackServiceName);
+                    return depServiceInstance.getId()+"";
+                }
+            }).collect(Collectors.toList());
+
+            String depInstanceIdStr = StrUtil.join(",", depInstanceIds);
+            // 更新需要安装的服务实例，将依赖服务实例id写入
+            ServiceInstanceEntity updateServiceInstanceEntity = serviceInstanceRepository.findByClusterIdAndStackServiceId(clusterId, stackServiceEntity.getId());
+            updateServiceInstanceEntity.setDependenceServiceInstanceIds(depInstanceIdStr);
+            serviceInstanceRepository.save(updateServiceInstanceEntity);
+        }
+
+
+        // todo 生成新增服务command和调用workflow
 
 
         return ResultDTO.success(null);
