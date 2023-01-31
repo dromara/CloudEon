@@ -64,6 +64,17 @@ Refer to [PowerJob Introduction](https://www.yuque.com/powerjob/en/introduce) fo
 
 PowerJob is released under Apache License 2.0. Please refer to [License](./LICENSE) for details.
 
+# Contributors
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
 # Others
 
 - Any developer interested in getting more involved in PowerJob may join our [Reddit](https://www.reddit.com/r/PowerJob) or [Gitter](https://gitter.im/PowerJob/community) community and make [contributions](https://github.com/PowerJob/PowerJob/pulls)!
