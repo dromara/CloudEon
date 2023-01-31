@@ -1,21 +1,369 @@
 
 import styles from './ConfigService.less'
-import { ProCard } from '@ant-design/pro-components';
-import { Menu } from 'antd';
+import React, { useState, useEffect, useRef } from 'react';
+import { Menu, Form, Table, Button, Typography, Popconfirm, InputNumber, Input, Tooltip, Modal } from 'antd';
+import { getServiceConfAPI } from '@/services/ant-design-pro/colony';
+import { divide } from 'lodash';
+
 
 const ConfigService:React.FC = ()=>{
-    const items = [
-        { label: '菜单项一', key: 'item-1' }, // 菜单项务必填写 key
-        { label: '菜单项二', key: 'item-2' },
-      ];
+    // const items = [
+    //     { label: '菜单项一', key: 'item-1' }, // 菜单项务必填写 key
+    //     { label: '菜单项二', key: 'item-2' },
+    //   ];
+
+    const [form] = Form.useForm()
+    const [addConfigForm] = Form.useForm()
+    const [confListData, setConfListData] = useState<any[]>();
+    const [loading, setLoading] = useState(false);
+    const [serviceId, setServiceId] = useState(null);
+    const [editingKey, setEditingKey] = useState('');
+    const [serviceList, setServiceList] = useState<any[]>();
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    
+    const getData = JSON.parse(sessionStorage.getItem('colonyData') || '{}')
+
+    const serviceData = getData.selectedServiceList.map((sItem: { label: any; id: any; })=>{
+        return {
+            label: sItem.label,
+            key: sItem.id + '',
+            hasEdit: false,
+            confListData:[],
+        }
+    })|| []
+
+    setServiceList(serviceData)
+
+    useEffect(()=>{
+        if(serviceList && serviceList.length>0){
+            setServiceId(serviceList[0].key)
+            const params = {
+                serviceId: serviceList[0].key,
+                inWizard: true
+            }
+            getConfListData(params)
+        }
+    },[])
+    
+
+    const getConfListData = async (params: any) => {
+        const sData = [...(serviceList||[])]
+        const sIndex = sData?.findIndex((sItem: { key: any; })=>{
+            sItem.key == params.serviceId
+        })
+        if(sIndex > -1 && sData[sIndex].confListData.length > 0){ return false }
+        setLoading(true)
+        const result: API.ConfList =  await getServiceConfAPI(params);
+        setLoading(false)
+        setConfListData(result?.data?.confs?.map(item=>{
+            return {
+                sourceValue: item.recommendExpression,
+                ...item,
+            }
+        }))
+
+        // const sData = [...(serviceList||[])]
+        // const sIndex = sData?.findIndex((sItem: { key: any; })=>{
+        //     sItem.key == params.serviceId
+        // })
+        if(sIndex > -1){
+            const item = sData[sIndex];
+            sData.splice(sIndex, 1, {
+                ...item,
+                confListData:confListData,
+            });
+            setServiceList(sData)
+        }
+      };
+
+    const onSelectService = function(value: any){
+        // console.log('value:', value);
+        const params = {
+            serviceId: value.key,
+            inWizard: true
+        }
+        getConfListData(params)
+    }
+
+    const isEditing = (record: Item) => record.name === editingKey;
+
+    const edit = (record: Item) => {
+        form.setFieldsValue({ ...record });
+        setEditingKey(record.name || '');
+    };
+    
+    const cancel = () => {
+        setEditingKey('');
+    };
+    const save = async (key: React.Key) => {
+        console.log('---key: ', key);
+        try {
+            const row = (await form.validateFields()) as Item;
+            const newData = [...(confListData||[])];
+            const index = newData.findIndex(item => key === item.name);
+            if (index > -1) {
+                const item = newData[index];
+                newData.splice(index, 1, {
+                ...item,
+                ...row,
+                });
+                setConfListData(newData);
+                setEditingKey('');
+            }else{
+                newData.push(row);
+                setConfListData(newData);
+                setEditingKey('');
+            }
+
+        } catch (errInfo) {
+            console.log('Validate Failed:', errInfo);
+        }
+    }
+
+    interface Item {
+        name: string;
+        recommendExpression: string;
+        sourceValue: string;
+    }
+
+    interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
+        editing: boolean;
+        dataIndex: string;
+        title: any;
+        inputType: 'number' | 'text';
+        record: Item;
+        index: number;
+        children: React.ReactNode;
+      }
+
+    const EditableCell: React.FC<EditableCellProps> = ({
+        editing,
+        dataIndex,
+        title,
+        inputType,
+        record,
+        index,
+        children,
+        ...restProps
+      }) => {
+        const inputNode = inputType === 'number' ? <InputNumber /> : <Input />;
+      
+        return (
+          <td {...restProps}>
+            {editing ? (
+              <Form.Item
+                name={dataIndex}
+                style={{ margin: 0 }}
+                rules={[
+                  {
+                    required: true,
+                    message: `请输入 ${title}!`,
+                  },
+                ]}
+              >
+                {inputNode}
+              </Form.Item>
+            ) : (
+              children
+            )}
+          </td>
+        );
+      };
+
+    const configColumns = [
+        {
+            title: '配置项',
+            dataIndex: 'name',
+            editable: false,
+        },{
+            title: '值',
+            dataIndex: 'recommendExpression',
+            editable: true,
+            render: (_: any, record: Item) => {
+                // console.log('record',record);
+                const hasEdit = record.sourceValue != record.recommendExpression;
+                return hasEdit ? (
+                    <div style={{position:'relative'}}>
+                        <Tooltip color="volcano" getPopupContainer={(trigger) => trigger.parentNode} autoAdjustOverflow={false} arrowPointAtCenter={true} visible={true} open={true} placement="rightTop" title={()=>{
+                            return (
+                                <div style={{color:'#fff', fontWeight:'500'}}>已修改</div>
+                            )
+                        }}>
+                        {record.recommendExpression}
+                        </Tooltip>
+                    </div>
+                ) : (
+                    <span>{record.recommendExpression}</span>
+                );
+            },
+        },{
+            title: '操作',
+            dataIndex: 'operation',
+            render: (_: any, record: Item) => {
+                // console.log('record',record);
+                const editable = isEditing(record);
+                return editable ? (
+                    <span>
+                    <Typography.Link onClick={() => save(record.name)} style={{ marginRight: 8 }}>
+                        确定
+                    </Typography.Link>
+                    <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
+                        <a>取消</a>
+                    </Popconfirm>
+                    </span>
+                ) : (
+                    <Typography.Link disabled={editingKey !== ''} onClick={() => edit(record)}>
+                    编辑
+                    </Typography.Link>
+                );
+            },
+          },
+    ]
+
+    const mergedColumns = configColumns.map(col => {
+        if (!col.editable) {
+          return col;
+        }
+        return {
+          ...col,
+          onCell: (record: Item) => ({
+            record,
+            inputType: 'text', //col.dataIndex === 'age' ? 'number' : 'text',
+            dataIndex: col.dataIndex,
+            title: col.title,
+            editing: isEditing(record),
+          }),
+        };
+      });
+
+    
+      const handleOk = () => {
+        // console.log(form.getFieldsValue());
+        addConfigForm
+          .validateFields()
+          .then(async (values) => {
+            // const result: API.normalResult = await createNodeAPI({...values, clusterId: getData.clusterId})
+            // if(result && result.success){
+            //   message.success('新增成功');
+            //   getNodeData({ clusterId: getData.clusterId });
+            //   setIsModalOpen(false);
+            //   form.resetFields()
+            // }
+          })
+          .catch((err) => {
+            console.log('err: ', err);
+          });
+      };
+    
+      const handleCancel = () => {
+        addConfigForm.resetFields()
+        setIsModalOpen(false);
+      };
+
     return (
         <div className={styles.CSLayout}>
             <div className={styles.CSLeft}>
-                <Menu items={items} />
+                {serviceList && serviceList[0] && serviceList[0].key && (
+                    <Menu 
+                        mode="inline" 
+                        items={serviceList} 
+                        defaultSelectedKeys={[serviceList[0].key]}
+                        className={styles.CSLeftMenu} 
+                        onSelect={onSelectService} 
+                    />
+                )}
             </div>
             <div className={styles.CSRight}>
-                111
+                <div className={styles.CSBtnWrap}>
+                    <Button 
+                        key="addconfig"
+                        type="primary"
+                        disabled={!serviceId}
+                        onClick={() => {
+                            
+                        }}
+                    >
+                    新增配置项
+                    </Button>
+                </div>
+                <div>
+                <Form form={form} component={false}>
+                    <Table
+                        components={{
+                            body: {
+                                cell: EditableCell,
+                            },
+                        }}
+                        scroll={{
+                            y:'600px'
+                        }}
+                        rowKey="name"
+                        pagination={false}
+                        bordered
+                        loading={loading}
+                        dataSource={confListData}
+                        columns={mergedColumns}
+                        rowClassName="editable-row"
+                    />
+                </Form>
+                </div>
             </div>
+            <Modal
+                key="addconfigmodal"
+                title="新增配置项"
+                forceRender={true}
+                destroyOnClose={true}
+                open={isModalOpen}
+                onOk={handleOk}
+                onCancel={handleCancel}
+                // footer={null}
+            >
+                <div>
+                <Form
+                    form={addConfigForm}
+                    key="addconfigform"
+                    name="新增配置项"
+                    preserve={false}
+                    labelCol={{ span: 8 }}
+                    wrapperCol={{ span: 16 }}
+                    initialValues={{ remember: true }}
+                    // onFinish={onFinish}
+                    autoComplete="off"
+                >
+                    <Form.Item
+                    label="ip"
+                    name="ip"
+                    rules={[{ required: true, message: '请输入ip!' }]}
+                    >
+                    <Input />
+                    </Form.Item>
+
+                    <Form.Item
+                    label="sshUser"
+                    name="sshUser"
+                    rules={[{ required: true, message: '请输入sshUser!' }]}
+                    >
+                    <Input />
+                    </Form.Item>
+
+                    <Form.Item
+                    label="sshPassword"
+                    name="sshPassword"
+                    rules={[{ required: true, message: '请输入sshPassword!' }]}
+                    >
+                    <Input />
+                    </Form.Item>
+
+                    <Form.Item
+                    label="sshPort"
+                    name="sshPort"
+                    rules={[{ required: true, message: 'sshPort!' }]}
+                    >
+                    <Input />
+                    </Form.Item>
+                </Form>
+                </div>
+            </Modal>
         </div>
     )
 }
