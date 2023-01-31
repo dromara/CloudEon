@@ -4,12 +4,22 @@ import { Tree, Table } from 'antd';
 import type { DataNode, TreeProps } from 'antd/es/tree';
 import styles from './AssignRoles.less'
 import { useState, useEffect } from 'react';
+import { getNodeListAPI } from '@/services/ant-design-pro/colony';
 
 const AssignRoles : React.FC<{
     serviceList: any[];
 }> = ({serviceList})=>{
 
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+    const [nodeListData, setNodeListData] = useState<any[]>();
+    const [loading, setLoading] = useState(false);
+
+    const getNodeData = async (params: any) => {
+        setLoading(true)
+        const result: API.NodeList =  await getNodeListAPI(params);
+        setLoading(false)
+        setNodeListData(result.data)
+      };
 
     const treeData = serviceList.map(item=>{
         let itemData = {
@@ -30,29 +40,29 @@ const AssignRoles : React.FC<{
         console.log('selected', selectedKeys, info);
     };
 
-    const dataSource = [
-        {
-          key: '1',
-          name: '测试节点',
-          age: 32,
-        },
-        {
-          key: '2',
-          name: '测试节点',
-          age: 42,
-        },
-    ];
+    // const dataSource = [
+    //     {
+    //       key: '1',
+    //       name: '测试节点',
+    //       age: 32,
+    //     },
+    //     {
+    //       key: '2',
+    //       name: '测试节点',
+    //       age: 42,
+    //     },
+    // ];
 
     const columns = [
         {
             title: '节点',
-            dataIndex: 'name',
-            key: 'name',
+            dataIndex: 'hostname',
+            key: 'hostname',
         },
         {
-            title: '机柜',
-            dataIndex: 'age',
-            key: 'age',
+            title: 'ip地址',
+            dataIndex: 'ip',
+            key: 'ip',
         },
     ];
 
@@ -83,7 +93,7 @@ const AssignRoles : React.FC<{
             <ProCard title="节点分配" headerBordered>
                 <Table 
                     rowSelection={rowSelection} 
-                    dataSource={dataSource} 
+                    dataSource={nodeListData} 
                     columns={columns} 
                 />
             </ProCard>

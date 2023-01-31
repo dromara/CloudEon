@@ -102,7 +102,7 @@ declare namespace API {
   type ServiceItem = {
     label?: string;
     name?: string;
-    id: 1;
+    id: number;
     version?: string;
     description?: string;
     dockerImage?: string;
@@ -114,4 +114,63 @@ declare namespace API {
     message?: string;
     data?: ServiceItem[];
   };
+
+  type ColonyData = {
+    clusterId?: number,
+  }
+
+  type ColonyItem = {
+    id?: number,
+    createBy?: string,
+    createTime?: string,
+    clusterName?: string,
+    clusterCode?: string,
+    stackId?: number
+  }
+
+  type ColonyList = {
+    success?: boolean;
+    message?: string;
+    data?: ColonyItem[];
+  };
+
+  type NodeItem = {
+    id?: number,
+    createTime?: string,
+    hostname?: string,
+    ip?: string,
+    rack?: string,
+    coreNum?: number,
+    totalMem?: number,
+    totalDisk?: number,
+    sshUser?: string,
+    sshPort?: number,
+    clusterId?: number,
+    cpuArchitecture?: string,
+    nodeLabel?: string,
+    serviceRoleNum?: string
+  }
+
+  type NodeList = {
+    success?: boolean;
+    message?: string;
+    data?: NodeItem[];
+  };
+
+  type StackItem = {
+    id?: number,
+    stackCode?: string
+  }
+
+  type StackList = {
+    success?: boolean;
+    message?: string;
+    data?: StackItem[];
+  };
+
+  type normalResult = {
+    success?: boolean;
+    message?: string;
+    data?: any[];
+  }
 }
