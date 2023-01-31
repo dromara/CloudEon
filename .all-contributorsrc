@@ -1,0 +1,25 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "commitConvention": "angular",
+  "contributors": [
+    {
+      "login": "ZMeiMei",
+      "name": "ZMeiMei",
+      "avatar_url": "https://avatars.githubusercontent.com/u/39690226?v=4",
+      "profile": "https://github.com/ZMeiMei",
+      "contributions": [
+        "code"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "skipCi": true,
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "projectName": "e-mapreduce",
+  "projectOwner": "Pandas886"
+}
