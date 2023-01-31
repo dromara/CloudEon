@@ -57,7 +57,7 @@ const ChooseService: React.FC<{
               </div>
               <div className={styles.serviceItemCenter}>
                 <div className={styles.serviceItemDesc}>{item.description}</div>
-                <div className={styles.serviceItemDesc}>dockerImage：{item.dockerImage}</div>
+                <div className={styles.serviceItemDesc}>镜像：{item.dockerImage}</div>
                 <div className={styles.serviceItemDesc}>版本：{item.version}</div>
               </div>
             </div>
@@ -82,6 +82,7 @@ const ChooseService: React.FC<{
           ) : (
             <div
                 className={styles.activeBtn}
+                style={{width:'30px'}}
                 onClick={() => {
                   changeStatus(item.id);
                 }}

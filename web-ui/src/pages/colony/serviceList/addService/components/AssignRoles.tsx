@@ -13,6 +13,7 @@ const AssignRoles : React.FC<{
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
     const [nodeListData, setNodeListData] = useState<any[]>();
     const [loading, setLoading] = useState(false);
+    const getData = JSON.parse(sessionStorage.getItem('colonyData') || '{}')
 
     const getNodeData = async (params: any) => {
         setLoading(true)
@@ -69,12 +70,17 @@ const AssignRoles : React.FC<{
     const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
         console.log('selectedRowKeys changed: ', newSelectedRowKeys);
         setSelectedRowKeys(newSelectedRowKeys);
-      };
+    };
 
     const rowSelection = {
         selectedRowKeys,
         onChange: onSelectChange,
       };
+      
+
+    useEffect(() => {
+        getNodeData({ clusterId: getData.clusterId });
+    }, []);
 
 
 
@@ -92,9 +98,11 @@ const AssignRoles : React.FC<{
             </ProCard>
             <ProCard title="节点分配" headerBordered>
                 <Table 
+                    rowKey="id"
+                    loading={loading}
                     rowSelection={rowSelection} 
-                    dataSource={nodeListData} 
                     columns={columns} 
+                    dataSource={nodeListData} 
                 />
             </ProCard>
             </ProCard>

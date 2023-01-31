@@ -74,12 +74,22 @@ export async function createNodeAPI(options?: { [key: string]: any }) {
 
 // 安装服务校验
 export async function checkServiceAPI(options?: { [key: string]: any }) {
-  return request<API.StackList>('/validInstallServicesDeps', {
-    method: 'GET',
-    data: {
-      ...options,
-    },
+  return request<API.StackList>('/stack/validInstallServicesDeps', {
+    method: 'POST',
+    data: {...(options || {})},
   });
 }
 
+// 服务可配置参数
+export async function getServiceConfAPI(params: {
+  serviceId?: number;
+  inWizard?: boolean;
+}) {
+  return request<API.ConfList>('/stack/listServiceConf', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+  });
+}
 
