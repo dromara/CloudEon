@@ -120,6 +120,19 @@ public class StackController {
     public ResultDTO<Void> validInstallServicesDeps(@RequestBody ValidServicesDepRequest request) {
         // 获取需要安装的服务id
         List<Integer> installStackServiceIds = request.getInstallStackServiceIds();
+        // 校验该集群是否已经安装过相同的服务了
+        String errorServiceInstanceNames = installStackServiceIds.stream().map(id -> {
+            ServiceInstanceEntity sameStackServiceInstance = serviceInstanceRepository.findByClusterIdAndStackServiceId(request.getClusterId(), id);
+            if (sameStackServiceInstance != null) {
+                return sameStackServiceInstance.getServiceName();
+            }
+            return null;
+        }).filter(StrUtil::isNotBlank).collect(Collectors.joining(","));
+
+        if (StrUtil.isNotBlank(errorServiceInstanceNames)) {
+            return ResultDTO.failed("该集群已经安装过相同的服务实例：" + errorServiceInstanceNames);
+        }
+
         // 从数据库查询这些服务
         List<StackServiceEntity> stackServiceEntities = serviceRepository.findAllById(installStackServiceIds);
         // 获取这次要安装的服务名列表

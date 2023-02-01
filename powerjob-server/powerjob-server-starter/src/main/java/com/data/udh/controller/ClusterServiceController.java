@@ -63,10 +63,23 @@ public class ClusterServiceController {
         Integer clusterId = req.getClusterId();
         Integer stackId = req.getStackId();
         List<InitServiceRequest.ServiceInfo> serviceInfos = req.getServiceInfos();
+        // 校验该集群是否已经安装过相同的服务了
+        String errorServiceInstanceNames = serviceInfos.stream().map(info -> {
+            ServiceInstanceEntity sameStackServiceInstance = serviceInstanceRepository.findByClusterIdAndStackServiceId(clusterId, info.getStackServiceId());
+            if (sameStackServiceInstance != null) {
+                return sameStackServiceInstance.getServiceName();
+            }
+            return null;
+        }).filter(StrUtil::isNotBlank).collect(Collectors.joining(","));
 
+        if (StrUtil.isNotBlank(errorServiceInstanceNames)) {
+            return ResultDTO.failed("该集群已经安装过相同的服务实例：" + errorServiceInstanceNames);
+        }
         for (InitServiceRequest.ServiceInfo serviceInfo : serviceInfos) {
+
+            Integer stackServiceId = serviceInfo.getStackServiceId();
             // 查询实例表获取新增的实例序号
-            Integer maxInstanceSeq = (Integer) entityManager.createNativeQuery("select max(instance_sequence) from udh_service_instance where stack_service_id = 1=" + serviceInfo.getStackServiceId()).getSingleResult();
+            Integer maxInstanceSeq = (Integer) entityManager.createNativeQuery("select max(instance_sequence) from udh_service_instance where stack_service_id = 1=" + stackServiceId).getSingleResult();
             if (maxInstanceSeq == null) {
                 maxInstanceSeq = 0;
             }
@@ -81,7 +94,7 @@ public class ClusterServiceController {
             serviceInstanceEntity.setCreateTime(new Date());
             serviceInstanceEntity.setUpdateTime(new Date());
             serviceInstanceEntity.setEnableKerberos(serviceInfo.getEnableKerberos());
-            serviceInstanceEntity.setStackServiceId(serviceInfo.getStackServiceId());
+            serviceInstanceEntity.setStackServiceId(stackServiceId);
             serviceInstanceEntity.setServiceState(ServiceState.OPERATING);
 
             // 持久化service信息
