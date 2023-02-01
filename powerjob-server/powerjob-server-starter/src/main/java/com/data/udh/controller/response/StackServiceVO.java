@@ -14,6 +14,7 @@ public class StackServiceVO {
     private String dockerImage;
     private String iconApp;
     private String iconDanger;
+    private boolean supportKerberos;
     private String iconDefault;
 
     /**
