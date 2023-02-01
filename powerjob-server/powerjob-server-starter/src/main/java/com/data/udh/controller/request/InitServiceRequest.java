@@ -10,11 +10,11 @@ public class InitServiceRequest {
     private List<ServiceInfo> serviceInfos;
     private Integer clusterId;
     private Integer stackId;
+    private Boolean enableKerberos;
 
 
     @Data
     public static class ServiceInfo{
-        private Boolean enableKerberos;
 
         private Integer stackServiceId;
         private String stackServiceName;
@@ -31,7 +31,6 @@ public class InitServiceRequest {
     @Data
     public static class InitServiceRole {
         private String stackRoleName;
-        private Integer stackRoleId;
         private List<Integer> nodeIds;
 
     }
