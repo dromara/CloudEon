@@ -3,12 +3,11 @@ package com.data.udh.controller;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.data.udh.controller.request.InitServiceRequest;
-import com.data.udh.controller.request.ModifyClusterInfoRequest;
+import com.data.udh.controller.response.ServiceInstanceVO;
 import com.data.udh.dao.*;
 import com.data.udh.entity.*;
 import com.data.udh.utils.ServiceRoleState;
 import com.data.udh.utils.ServiceState;
-import org.springframework.beans.BeanUtils;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import tech.powerjob.common.response.ResultDTO;
@@ -20,11 +19,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.data.udh.utils.Constant.AdminUserId;
-import static com.data.udh.utils.Constant.AdminUserName;
-import static com.data.udh.utils.ServiceState.OPERATING;
 
 /**
  * 集群服务相关接口
@@ -54,7 +50,7 @@ public class ClusterServiceController {
     @Resource
     private EntityManager entityManager;
 
-    @Transactional(value = "udhTransactionManager",rollbackFor = Exception.class)
+    @Transactional(value = "udhTransactionManager", rollbackFor = Exception.class)
     @PostMapping("/initService")
     public ResultDTO<Void> initService(@RequestBody InitServiceRequest req) {
         Integer clusterId = req.getClusterId();
@@ -180,7 +176,7 @@ public class ClusterServiceController {
                 public String apply(String depStackServiceName) {
                     //查找集群内该服务依赖的服务实例
                     Integer depServiceInstanceId = serviceInstanceRepository.findByClusterIdAndStackServiceName(clusterId, depStackServiceName);
-                    return depServiceInstanceId+"";
+                    return depServiceInstanceId + "";
                 }
             }).collect(Collectors.toList());
 
@@ -196,5 +192,48 @@ public class ClusterServiceController {
 
 
         return ResultDTO.success(null);
+    }
+
+
+    /**
+     * 校验要安装的服务是否需要Kerberos配置
+     */
+    @PostMapping("/validInstallServiceHasKerberos")
+    ResultDTO<Boolean> installServiceHasKerberos(@RequestBody List<Integer> InstallStackServiceIds) {
+        for (StackServiceEntity stackServiceEntity : stackServiceRepository.findAllById(InstallStackServiceIds)) {
+            if (stackServiceEntity.isSupportKerberos()) {
+                return ResultDTO.success(true);
+            }
+        }
+        return ResultDTO.success(false);
+    }
+
+
+    /**
+     * 服务实例列表
+     */
+    @GetMapping("/listServiceInstance")
+    public ResultDTO<List<ServiceInstanceVO>> listServiceInstance(Integer clusterId) {
+        List<ServiceInstanceVO> result = serviceInstanceRepository.findByClusterId(clusterId).stream().map(instanceEntity -> {
+            ServiceInstanceVO serviceInstanceVO = new ServiceInstanceVO();
+            BeanUtil.copyProperties(instanceEntity, serviceInstanceVO);
+            ServiceState serviceState = instanceEntity.getServiceState();
+            serviceInstanceVO.setServiceStateValue(serviceState.name());
+
+            // 根据状态查询icon
+            StackServiceEntity stackServiceEntity = stackServiceRepository.findById(instanceEntity.getStackServiceId()).get();
+            if (serviceState == ServiceState.OPERATING) {
+                serviceInstanceVO.setIcon(stackServiceEntity.getIconApp());
+            } else if (serviceState == ServiceState.WARN || serviceState == ServiceState.DANGER) {
+                serviceInstanceVO.setIcon(stackServiceEntity.getIconDanger());
+            } else {
+                serviceInstanceVO.setIcon(stackServiceEntity.getIconDefault());
+            }
+
+            return serviceInstanceVO;
+        }).collect(Collectors.toList());
+
+
+        return ResultDTO.success(result);
     }
 }
