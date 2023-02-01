@@ -1,13 +1,6 @@
-create table udh_command
-(
-    id             int auto_increment
-        primary key,
-    name           varchar(255) null,
-    pj_instance_id int          null,
-    pj_job_ids     varchar(255) null,
-    pj_workflow_id int          null,
-    type           varchar(255) null
-);
+
+
+
 
 create table udh_service_instance_config
 (
