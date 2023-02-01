@@ -15,4 +15,6 @@ public interface ServiceInstanceRepository extends JpaRepository<ServiceInstance
 
     ServiceInstanceEntity findByClusterIdAndStackServiceId(Integer clusterId, Integer stackServiceId);
 
+    List<ServiceInstanceEntity> findByClusterId(Integer clusterId);
+
 }
