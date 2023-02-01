@@ -67,6 +67,9 @@ public class StackController {
         result = serviceRepository.findByStackId(stackId).stream().map(e -> {
             StackServiceVO stackServiceVO = new StackServiceVO();
             BeanUtil.copyProperties(e, stackServiceVO);
+            // 查找该集群是否已经安装过该服务
+            ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findByClusterIdAndStackServiceId(clusterId, e.getId());
+            stackServiceVO.setInstalledInCluster(serviceInstanceEntity != null);
             // 查找该服务含的角色
             List<StackServiceRoleEntity> roleEntities = serviceRoleRepository.findByServiceIdAndStackId(e.getId(), stackId);
             List<String> roleNames = roleEntities.stream().map(StackServiceRoleEntity::getName).collect(Collectors.toList());
