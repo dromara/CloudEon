@@ -10,10 +10,7 @@ import com.data.udh.utils.ServiceRoleState;
 import com.data.udh.utils.ServiceState;
 import org.springframework.beans.BeanUtils;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import tech.powerjob.common.response.ResultDTO;
 
 import javax.annotation.Resource;
@@ -93,7 +90,7 @@ public class ClusterServiceController {
             serviceInstanceEntity.setClusterId(clusterId);
             serviceInstanceEntity.setCreateTime(new Date());
             serviceInstanceEntity.setUpdateTime(new Date());
-            serviceInstanceEntity.setEnableKerberos(serviceInfo.getEnableKerberos());
+            serviceInstanceEntity.setEnableKerberos(req.getEnableKerberos());
             serviceInstanceEntity.setStackServiceId(stackServiceId);
             serviceInstanceEntity.setServiceState(ServiceState.OPERATING);
 
@@ -105,8 +102,11 @@ public class ClusterServiceController {
             // 获取service 所有角色
             List<InitServiceRequest.InitServiceRole> roles = serviceInfo.getRoles();
             for (InitServiceRequest.InitServiceRole role : roles) {
-                Integer stackRoleId = role.getStackRoleId();
-                StackServiceRoleEntity stackServiceRoleEntity = stackServiceRoleRepository.findById(stackRoleId).orElseThrow(() -> new IllegalArgumentException("can't find stack service role by id:" + stackRoleId));
+                String stackRoleName = role.getStackRoleName();
+                StackServiceRoleEntity stackServiceRoleEntity = stackServiceRoleRepository.findByServiceIdAndName(stackServiceId, stackRoleName);
+                if (stackServiceRoleEntity == null) {
+                    throw new IllegalArgumentException("can't find stack service role by role name:" + stackRoleName + " and stack service id: " + stackServiceId);
+                }
 
                 // 遍历该角色分布的节点，生成serviceRoleInstanceEntities
                 List<ServiceRoleInstanceEntity> serviceRoleInstanceEntities = role.getNodeIds().stream().map(new Function<Integer, ServiceRoleInstanceEntity>() {
@@ -117,8 +117,8 @@ public class ClusterServiceController {
                         roleInstanceEntity.setCreateTime(new Date());
                         roleInstanceEntity.setUpdateTime(new Date());
                         roleInstanceEntity.setServiceInstanceId(serviceInstanceEntityId);
-                        roleInstanceEntity.setStackServiceRoleId(role.getStackRoleId());
-                        roleInstanceEntity.setServiceRoleName(role.getStackRoleName());
+                        roleInstanceEntity.setStackServiceRoleId(stackServiceRoleEntity.getId());
+                        roleInstanceEntity.setServiceRoleName(stackRoleName);
                         roleInstanceEntity.setServiceRoleState(ServiceRoleState.OPERATING);
                         roleInstanceEntity.setNodeId(nodeId);
                         return roleInstanceEntity;
