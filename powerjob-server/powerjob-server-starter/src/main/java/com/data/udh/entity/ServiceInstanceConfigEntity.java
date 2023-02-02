@@ -27,7 +27,7 @@ public class ServiceInstanceConfigEntity implements Serializable {
     /**
      * 服务实例id
      */
-    private Integer serviceId;
+    private Integer serviceInstanceId;
 
     /**
      * 配置项

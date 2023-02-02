@@ -7,12 +7,12 @@ import javax.persistence.*;
 import java.util.Date;
 
 /**
- * 指令表
+ * 指令任务表
  */
 @Entity
-@Table(name = "udh_command")
+@Table(name = "udh_command_task")
 @Data
-public class CommandEntity {
+public class CommandTaskEntity {
     private static final long serialVersionUID = 1L;
 
     /**
@@ -24,24 +24,20 @@ public class CommandEntity {
     private Integer id;
 
     /**
-     * 指令名称
+     * 任务展示排序
      */
-    private String name;
+    private Integer taskShowSortNum;
 
     /**
-     * 指令类型
+     * 任务名称
      */
-    private String type;
+    private String taskName;
 
     /**
-     * 指令运行状态
+     * 运行状态
      */
     private String commandState;
 
-    /**
-     * 提交时间
-     */
-    private Date submitTime;
 
     /**
      * 开始时间
@@ -53,29 +49,18 @@ public class CommandEntity {
      */
     private Date endTime;
 
-    /**
-     * 总进度
-     */
-    private Integer totalProgress;
 
-
-
+    private Integer commandTaskGroupId;
 
 
     /**
-     * 操作人id
+     * 进度
      */
-    private Integer operateUserId;
+    private Integer progress;
 
-    /**
-     * 工作流实例Id
-     */
-    private Long powerjobWorkflowInstanceId;
+    private Long powerjobInstanceId;
 
-    /**
-     * App Id
-     */
-    private Long powerjobAppId;
-
-    private Integer ClusterId;
 }
+
+
+
