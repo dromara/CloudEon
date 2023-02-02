@@ -1,13 +1,6 @@
-create table udh_command
-(
-    id             int auto_increment
-        primary key,
-    name           varchar(255) null,
-    pj_instance_id int          null,
-    pj_job_ids     varchar(255) null,
-    pj_workflow_id int          null,
-    type           varchar(255) null
-);
+
+
+
 
 create table udh_service_instance_config
 (
@@ -17,7 +10,7 @@ create table udh_service_instance_config
     name              varchar(255) null,
     node_id           int          null,
     recommended_value varchar(255) null,
-    service_id        int          null,
+    service_instance_id        int          null,
     update_time       datetime(6)  null,
     user_id           int          null,
     value             text null
@@ -30,9 +23,9 @@ create table udh_service_instance
     cluster_id                      int          null,
     create_time                     datetime(6)  null,
     dependence_service_instance_ids varchar(255) null,
-    enable_kerberos                 bit          not null,
+    enable_kerberos                 bit           null,
     label                           varchar(255) null,
-    need_restart                    bit          not null,
+    need_restart                    bit           null,
     service_name                    varchar(255) null,
     service_state                   int          null,
     instance_sequence                  int          null,

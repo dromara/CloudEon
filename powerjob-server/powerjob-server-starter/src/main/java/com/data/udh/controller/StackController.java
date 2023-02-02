@@ -10,10 +10,7 @@ import com.data.udh.dao.*;
 import com.data.udh.dto.StackConfiguration;
 import com.data.udh.entity.*;
 import org.springframework.data.domain.Example;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import tech.powerjob.common.response.ResultDTO;
 
 import javax.annotation.Resource;
@@ -70,6 +67,9 @@ public class StackController {
         result = serviceRepository.findByStackId(stackId).stream().map(e -> {
             StackServiceVO stackServiceVO = new StackServiceVO();
             BeanUtil.copyProperties(e, stackServiceVO);
+            // 查找该集群是否已经安装过该服务
+            ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findByClusterIdAndStackServiceId(clusterId, e.getId());
+            stackServiceVO.setInstalledInCluster(serviceInstanceEntity != null);
             // 查找该服务含的角色
             List<StackServiceRoleEntity> roleEntities = serviceRoleRepository.findByServiceIdAndStackId(e.getId(), stackId);
             List<String> roleNames = roleEntities.stream().map(StackServiceRoleEntity::getName).collect(Collectors.toList());
@@ -119,10 +119,23 @@ public class StackController {
      * 解析出依赖：ZK、HDFS
      * 提示：需要先安装ZK
      */
-    @GetMapping("/validInstallServicesDeps")
+    @PostMapping("/validInstallServicesDeps")
     public ResultDTO<Void> validInstallServicesDeps(@RequestBody ValidServicesDepRequest request) {
         // 获取需要安装的服务id
         List<Integer> installStackServiceIds = request.getInstallStackServiceIds();
+        // 校验该集群是否已经安装过相同的服务了
+        String errorServiceInstanceNames = installStackServiceIds.stream().map(id -> {
+            ServiceInstanceEntity sameStackServiceInstance = serviceInstanceRepository.findByClusterIdAndStackServiceId(request.getClusterId(), id);
+            if (sameStackServiceInstance != null) {
+                return sameStackServiceInstance.getServiceName();
+            }
+            return null;
+        }).filter(StrUtil::isNotBlank).collect(Collectors.joining(","));
+
+        if (StrUtil.isNotBlank(errorServiceInstanceNames)) {
+            return ResultDTO.failed("该集群已经安装过相同的服务实例：" + errorServiceInstanceNames);
+        }
+
         // 从数据库查询这些服务
         List<StackServiceEntity> stackServiceEntities = serviceRepository.findAllById(installStackServiceIds);
         // 获取这次要安装的服务名列表
