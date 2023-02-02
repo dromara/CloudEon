@@ -4,7 +4,7 @@ import { BorderOuterOutlined } from '@ant-design/icons';
 import { FormattedMessage, useIntl, history } from 'umi';
 import { useState, useEffect } from 'react';
 import styles from './index.less';
-import { getServiceListAPI, checkServiceAPI } from '@/services/ant-design-pro/colony';
+import { getServiceListAPI, checkServiceAPI, getServiceConfAPI, initServiceAPI, serviceListAPI } from '@/services/ant-design-pro/colony';
 import ChooseService from './components/ChooseService'
 import ConfigSecurity from'./components/ConfigSecurity'
 import AssignRoles from'./components/AssignRoles'
@@ -14,11 +14,14 @@ import ConfigService from'./components/ConfigService'
 
 const serviceAdd: React.FC = () => {
   const intl = useIntl();
+  const colonyData = JSON.parse(sessionStorage.getItem('colonyData') || '{}')
   // 参数：状态初始值比如,传入 0 表示该状态的初始值为 0
   // 返回值：数组,包含两个值：1 状态值（state） 2 修改该状态的函数（setState）
   const [current, setCurrent] = useState(0);
   const [serviceListData, setServiceListData] = useState<any[]>();
   const [loading, setLoading] = useState(false);
+  const [allParams, setSubmitallParams] = useState<API.SubmitServicesParams>();
+  const [serviceInfos, setServiceInfos] = useState<API.ServiceInfosItem[]>()
 
   const checkService = async (params: any) => {
     try {
@@ -49,9 +52,10 @@ const serviceAdd: React.FC = () => {
     setServiceListData(statusData)
   };
 
-  useEffect(() => {
-    getServiceData({ clusterId: 1 });
-  }, []);
+  const getSelectedService = ()=>{
+    const selectList = serviceListData?.filter(item=>{ return item.selected})
+    return selectList
+  }
 
   const changeStatus = (id:number) => {
     const statusData = serviceListData && serviceListData.map(item=>{
@@ -61,11 +65,89 @@ const serviceAdd: React.FC = () => {
       }
     })
     setServiceListData(statusData)
+
+    // 选择服务的数据放到总数据
+    const serList = getSelectedService()
+    let params = {...allParams}
+    serList?.map(sItem=>{
+      const sData = {
+        stackServiceId: sItem.id,
+        stackServiceName: sItem.name,
+        stackServiceLabel: sItem.label,
+        roles: sItem.roles.map((role: any)=>{
+          return {
+            stackRoleName: role,
+            nodeIds:[]
+          }
+        }),
+        presetConfList:[]
+      }
+      const pIndex = params?.serviceInfos?.findIndex(pItem=>{ return pItem.stackServiceId == id })
+      if(pIndex && pIndex == -1){
+        params?.serviceInfos?.push(sData)
+      }
+    })
+    setSubmitallParams(params)
   }
 
-  const getSelectedService = ()=>{
-    const selectList = serviceListData?.filter(item=>{ return item.selected})
-    return selectList
+  // 已选择服务的id集合
+  const selectListIds = getSelectedService()?.map(stem=> { return stem.id })
+
+  // 配置安全的数据放到总数据
+  const setKerberosToParams = (value: boolean) => {
+    let params = {...allParams}
+    if(value){
+      params.enableKerberos = true
+    }
+    setSubmitallParams(params)
+  }
+
+  const setServiceInfosToParams = (value: API.ServiceInfosItem[]) => {
+    let params = {...allParams}
+    if(value){
+      params.serviceInfos = value
+    }
+    setSubmitallParams(params)
+  }
+
+  const setPresetConfListToParams = async() => {
+    const allConfData = JSON.parse(sessionStorage.getItem('allConfData') || '{}')
+    for(let key in allConfData){
+      allConfData[key] = allConfData[key].map((item: { name: any; sourceValue: any; recommendExpression: any; })=>{
+        return {
+          name: item.name,
+          recommendedValue: item.sourceValue,
+          value: item.recommendExpression
+        }
+      })
+    }
+    let params = {...allParams}
+    params?.serviceInfos?.map(async psItem=>{
+      if(psItem.stackServiceId){
+        if(allConfData[psItem.stackServiceId]){
+          psItem.presetConfList = allConfData[psItem.stackServiceId]
+        } else {
+            setLoading(true)
+            const params = {
+                serviceId: psItem.stackServiceId,
+                inWizard: true
+            }
+            const result =  await getServiceConfAPI(params);
+            const confsList = result?.data?.confs || []
+            const confsdata = confsList.map((cItem)=>{
+              return {
+                name: cItem.name,
+                recommendedValue: cItem.recommendExpression,
+                value: cItem.recommendExpression
+              }
+            })
+            setLoading(false)
+            psItem.presetConfList = confsdata
+
+        }
+      }
+    })
+    setSubmitallParams(params)
   }
 
   const checkNext = () => {
@@ -100,12 +182,46 @@ const serviceAdd: React.FC = () => {
     { title: '配置安全', status: '' },
     { title: '分配角色', status: '' },
     { title: '配置服务', status: '' },
-    { title: '服务总览', status: '' },
+    // { title: '服务总览', status: '' },
     { title: '安装', status: '' },
   ];
   const onChange = (value: number) => {
     // setCurrent(value);
   };
+
+  const initServiceInfos = () =>{
+    const serArr = getSelectedService()?.map(item=>{
+        return {
+            stackServiceId: item.id,
+            stackServiceName: item.name,
+            stackServiceLabel: item.label,
+            roles: item.roles.map((role: any)=>{
+                return {
+                    stackRoleName: role,
+                    nodeIds: []
+                }
+            }),
+            presetConfList:[]
+        }
+    })    
+    setServiceInfos(serArr)
+  }
+
+  const installService = async( initParams: API.SubmitServicesParams) =>{
+    setLoading(true)
+    const result = await initServiceAPI(initParams)
+    setLoading(false)
+    if(result?.success){
+      message.success('安装成功！', 3)
+      setTimeout(()=>{
+        history.replace('/colony/serviceList');
+      },3)
+    }
+  }
+
+  useEffect(() => {
+    getServiceData({ clusterId: 1 });
+  }, []);
 
   return (
     <PageContainer header={{ title: '' }}>
@@ -122,11 +238,9 @@ const serviceAdd: React.FC = () => {
           </div>
           <div className={styles.stepsContent}>
             {(current == 0 && serviceListData ) && <ChooseService serviceList={serviceListData} changeStatus={changeStatus} />}
-            { current == 1 && <ConfigSecurity />}
-            { current == 2 && <AssignRoles serviceList={ serviceListData?.filter(item=>{ return item.selected}) || [] } /> }
-            { current == 3 && <ConfigService />}
-            {/* { current == 1 && <ConfigSecurity />}
-            { current == 1 && <ConfigSecurity />} */}
+            { current == 1 && <ConfigSecurity selectListIds={selectListIds || []} setKerberosToParams={setKerberosToParams} />}
+            { current == 2 && <AssignRoles serviceList={ getSelectedService() || [] } sourceServiceInfos={serviceInfos || []} setServiceInfosToParams={setServiceInfosToParams} /> }
+            { current == 3 && <ConfigService setPresetConfListToParams={setPresetConfListToParams} />}
             <div className={styles.stepBottomBtns}>
               <Button style={{ marginRight: '5px' }}               
                 onClick={()=>{
@@ -143,20 +257,27 @@ const serviceAdd: React.FC = () => {
                 disabled={!checkNext()} 
                 onClick={()=>{
                   if(current == 0){
-                    const selectList = getSelectedService()?.map(stem=> { return stem.id })
-                    const getData = JSON.parse(sessionStorage.getItem('colonyData') || '{}')
                     const params = {
-                      "clusterId":getData.clusterId,
-                      "stackId":getData.stackId,
-                      "installStackServiceIds": selectList
+                      "clusterId":colonyData.clusterId,
+                      "stackId":colonyData.stackId,
+                      "installStackServiceIds": selectListIds
                     }
                     checkService(params).then(checkResult=>{
                       if(checkResult) {
-                        sessionStorage.setItem('colonyData',JSON.stringify({...getData , selectedServiceList: getSelectedService()}) )
+                        sessionStorage.setItem('colonyData',JSON.stringify({...colonyData , selectedServiceList: getSelectedService()}) )
                         setCurrent(current + 1);
+                        initServiceInfos()
                       }
                     })
-                  } else if(current == 5){ // 安装
+                  } else if(current == 3){ // 安装
+                    setPresetConfListToParams()
+                    const initParams = {
+                      ...allParams, 
+                      stackId: colonyData?.stackId,
+                      clusterId: colonyData?.clusterId,
+                    }
+                    console.log('--allParams: ', initParams);
+                    installService(initParams)
 
                   }else{
                     setCurrent(current + 1);
