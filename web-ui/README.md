@@ -5,6 +5,7 @@
 2. [Umi3](https://v3.umijs.org/)
 3. [typescript](https://www.typescriptlang.org/zh/docs/)
 4. [React](https://zh-hans.reactjs.org/)
+5. [node](https://github.com/nodejs/node)，版本要在12.0.0 以上 
 
 # 第一次启动项目
 1. cd web-ui
