@@ -1,8 +1,10 @@
 package com.data.udh.entity;
 
 import com.data.udh.utils.ServiceState;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -15,6 +17,9 @@ import java.util.Date;
 @Entity
 @Table(name = "udh_service_instance")
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ServiceInstanceEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -83,7 +88,5 @@ public class ServiceInstanceEntity implements Serializable {
     private Boolean enableKerberos;
 
 
-    public ServiceInstanceEntity() {
 
-    }
 }
