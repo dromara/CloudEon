@@ -67,17 +67,23 @@ const ChooseService: React.FC<{
       <div>
         <div>
           {type == 0 ? (
-            item.selected ? (
-              <div className={styles.disabledBtn}>已添加</div>
-            ) : (
-              <div
-                className={styles.activeBtn}
-                onClick={() => {
-                  changeStatus(item.id);
-                }}
-              >
-                添加
-              </div>
+            item.installedInCluster?(
+              <div className={styles.disabledBtn}>已安装</div>
+            ):(
+
+              item.selected ? (
+                <div className={styles.disabledBtn}>已添加</div>
+              ) : (
+                <div
+                  className={styles.activeBtn}
+                  onClick={() => {
+                    changeStatus(item.id);
+                  }}
+                >
+                  添加
+                </div>
+              )
+
             )
           ) : (
             <div
