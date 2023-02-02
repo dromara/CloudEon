@@ -1,26 +1,29 @@
-# Ant Design Pro
+# 前端项目
 
-This project is initialized with [Ant Design Pro](https://pro.ant.design). Follow is the quick guide for how to use.
+# 使用到的技术
+1. [Ant Design Pro](https://pro.ant.design)
+2. [Umi3](https://v3.umijs.org/)
+3. [typescript](https://www.typescriptlang.org/zh/docs/)
+4. [React](https://zh-hans.reactjs.org/)
+5. [node](https://github.com/nodejs/node)，版本要在12.0.0 以上 
 
-## Environment Prepare
-
-Install `node_modules`:
-
+# 第一次启动项目
+1. cd web-ui
+2. 如果有node_modules和src/.umi文件夹，删除node_modules和src/.umi文件夹
+3. 安装tyarn：
 ```bash
-npm install
+npm install yarn tyarn -g
+```
+4. 用tyarn安装依赖：
+```bash
+tyarn
+```
+5. 启动项目
+```bash
+npm start
 ```
 
-or
-
-```bash
-yarn
-```
-
-## Provided Scripts
-
-Ant Design Pro provides some useful script to help you quick start and build with web project, code style check and test.
-
-Scripts provided in `package.json`. It's safe to modify or add additional script:
+# 其他操作命令
 
 ### Start project
 
@@ -52,6 +55,3 @@ npm run lint:fix
 npm test
 ```
 
-## More
-
-You can view full document on our [official website](https://pro.ant.design). And welcome any feedback in our [github](https://github.com/ant-design/ant-design-pro).

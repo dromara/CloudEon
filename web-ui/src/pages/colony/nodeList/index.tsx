@@ -19,7 +19,7 @@ const nodeList: React.FC = () => {
     setLoading(true)
     const result: API.NodeList =  await getNodeListAPI(params);
     setLoading(false)
-    setNodeListData(result.data)
+    setNodeListData(result?.data)
   };
 
   const getData = JSON.parse(sessionStorage.getItem('colonyData') || '{}')
