@@ -6,39 +6,37 @@ import { getServiceConfAPI } from '@/services/ant-design-pro/colony';
 import { divide } from 'lodash';
 
 
-const ConfigService:React.FC = ()=>{
-    // const items = [
-    //     { label: '菜单项一', key: 'item-1' }, // 菜单项务必填写 key
-    //     { label: '菜单项二', key: 'item-2' },
-    //   ];
+const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( setPresetConfListToParams )=>{
 
     const [form] = Form.useForm()
-    const [addConfigForm] = Form.useForm()
-    const [confListData, setConfListData] = useState<any[]>();
+    const [currentConfList, setCurrentConfList] = useState<any[]>();
     const [loading, setLoading] = useState(false);
     const [serviceId, setServiceId] = useState(null);
     const [editingKey, setEditingKey] = useState('');
-    const [serviceList, setServiceList] = useState<any[]>();
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [confData, setConfData] = useState({});
+    // const [addConfigForm] = Form.useForm()
+    // const [isModalOpen, setIsModalOpen] = useState(false);
     
     const getData = JSON.parse(sessionStorage.getItem('colonyData') || '{}')
 
-    const serviceData = getData.selectedServiceList.map((sItem: { label: any; id: any; })=>{
+    const serviceMenu = getData.selectedServiceList.map((sItem: { label: any; id: any; })=>{
         return {
             label: sItem.label,
             key: sItem.id + '',
-            hasEdit: false,
-            confListData:[],
         }
     })|| []
 
-    setServiceList(serviceData)
+    const updateConfig = (value:any) => {
+        sessionStorage.setItem('allConfData', JSON.stringify(value))
+        setConfData(value)
+    }
+
 
     useEffect(()=>{
-        if(serviceList && serviceList.length>0){
-            setServiceId(serviceList[0].key)
+        if(serviceMenu && serviceMenu.length>0){
+            setServiceId(serviceMenu[0].key)
             const params = {
-                serviceId: serviceList[0].key,
+                serviceId: serviceMenu[0].key,
                 inWizard: true
             }
             getConfListData(params)
@@ -47,37 +45,31 @@ const ConfigService:React.FC = ()=>{
     
 
     const getConfListData = async (params: any) => {
-        const sData = [...(serviceList||[])]
-        const sIndex = sData?.findIndex((sItem: { key: any; })=>{
-            sItem.key == params.serviceId
-        })
-        if(sIndex > -1 && sData[sIndex].confListData.length > 0){ return false }
-        setLoading(true)
-        const result: API.ConfList =  await getServiceConfAPI(params);
-        setLoading(false)
-        setConfListData(result?.data?.confs?.map(item=>{
-            return {
-                sourceValue: item.recommendExpression,
-                ...item,
-            }
-        }))
-
-        // const sData = [...(serviceList||[])]
-        // const sIndex = sData?.findIndex((sItem: { key: any; })=>{
-        //     sItem.key == params.serviceId
-        // })
-        if(sIndex > -1){
-            const item = sData[sIndex];
-            sData.splice(sIndex, 1, {
-                ...item,
-                confListData:confListData,
-            });
-            setServiceList(sData)
+        if(confData && confData[params.serviceId]){
+            setCurrentConfList(confData[params.serviceId])
+            return
+        }else{
+            setLoading(true)
+            const result: API.ConfList =  await getServiceConfAPI(params);
+            setLoading(false)
+            const confs = result?.data?.confs?.map(item=>{
+                    return {
+                        sourceValue: item.recommendExpression,
+                        ...item,
+                    }
+                })
+            setCurrentConfList(confs)
+            let confResult = {...(confData||{}),[params.serviceId]:confs}
+            updateConfig(confResult)
         }
       };
 
     const onSelectService = function(value: any){
-        // console.log('value:', value);
+        // if(serviceId){// 保存切换前的数据
+        //     let confResult = {...confData,[serviceId]:currentConfList}
+        //     updateConfig(confResult)
+        // }
+        setServiceId(value.key)
         const params = {
             serviceId: value.key,
             inWizard: true
@@ -95,11 +87,33 @@ const ConfigService:React.FC = ()=>{
     const cancel = () => {
         setEditingKey('');
     };
-    const save = async (key: React.Key) => {
-        console.log('---key: ', key);
+
+    const resetSource = (record: Item) => {
+        console.log('---record: ', record);
+        const row = {...record, recommendExpression: record.sourceValue}
+        const newData = [...(currentConfList||[])];
+        const index = newData.findIndex(item => row.name === item.name);
+        if (index > -1) {
+            const item = newData[index];
+            newData.splice(index, 1, {
+            ...item,
+            ...row,
+            });
+            setCurrentConfList(newData);
+            setEditingKey('');
+        }else{
+            newData.push(row);
+            setCurrentConfList(newData);
+            setEditingKey('');
+        }
+        let confResult = serviceId ? {...confData,[serviceId]:newData} : {...confData}
+        updateConfig(confResult)
+        
+    }
+    const save = async (key: React.Key) => {        
         try {
             const row = (await form.validateFields()) as Item;
-            const newData = [...(confListData||[])];
+            const newData = [...(currentConfList||[])];
             const index = newData.findIndex(item => key === item.name);
             if (index > -1) {
                 const item = newData[index];
@@ -107,14 +121,15 @@ const ConfigService:React.FC = ()=>{
                 ...item,
                 ...row,
                 });
-                setConfListData(newData);
+                setCurrentConfList(newData);
                 setEditingKey('');
             }else{
                 newData.push(row);
-                setConfListData(newData);
+                setCurrentConfList(newData);
                 setEditingKey('');
             }
-
+            let confResult = serviceId ? {...confData,[serviceId]:newData} : {...confData}
+            updateConfig(confResult)
         } catch (errInfo) {
             console.log('Validate Failed:', errInfo);
         }
@@ -181,7 +196,7 @@ const ConfigService:React.FC = ()=>{
             editable: true,
             render: (_: any, record: Item) => {
                 // console.log('record',record);
-                const hasEdit = record.sourceValue != record.recommendExpression;
+                const hasEdit = (record.sourceValue != record.recommendExpression);
                 return hasEdit ? (
                     <div style={{position:'relative'}}>
                         <Tooltip color="volcano" getPopupContainer={(trigger) => trigger.parentNode} autoAdjustOverflow={false} arrowPointAtCenter={true} visible={true} open={true} placement="rightTop" title={()=>{
@@ -207,14 +222,26 @@ const ConfigService:React.FC = ()=>{
                     <Typography.Link onClick={() => save(record.name)} style={{ marginRight: 8 }}>
                         确定
                     </Typography.Link>
-                    <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
+                    <Typography.Link onClick={() => cancel()}>
+                        取消
+                    </Typography.Link>
+                    {/* <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
                         <a>取消</a>
-                    </Popconfirm>
+                    </Popconfirm> */}
                     </span>
                 ) : (
-                    <Typography.Link disabled={editingKey !== ''} onClick={() => edit(record)}>
-                    编辑
-                    </Typography.Link>
+                    <span>
+                        <Typography.Link disabled={editingKey !== ''} onClick={() => edit(record)}>
+                        编辑
+                        </Typography.Link>
+                        {
+                            (record.sourceValue != record.recommendExpression) && (
+                                <Popconfirm title="确定恢复到初始值吗?" onConfirm={()=>resetSource(record)}>
+                                    <a style={{display:'inline-block',marginLeft: '20px'}}>恢复初始值</a>
+                                </Popconfirm>
+                            )
+                        }
+                    </span>
                 );
             },
           },
@@ -237,44 +264,44 @@ const ConfigService:React.FC = ()=>{
       });
 
     
-      const handleOk = () => {
-        // console.log(form.getFieldsValue());
-        addConfigForm
-          .validateFields()
-          .then(async (values) => {
-            // const result: API.normalResult = await createNodeAPI({...values, clusterId: getData.clusterId})
-            // if(result && result.success){
-            //   message.success('新增成功');
-            //   getNodeData({ clusterId: getData.clusterId });
-            //   setIsModalOpen(false);
-            //   form.resetFields()
-            // }
-          })
-          .catch((err) => {
-            console.log('err: ', err);
-          });
-      };
+    //   const handleOk = () => {
+    //     // console.log(form.getFieldsValue());
+    //     addConfigForm
+    //       .validateFields()
+    //       .then(async (values) => {
+    //         // const result: API.normalResult = await createNodeAPI({...values, clusterId: getData.clusterId})
+    //         // if(result && result.success){
+    //         //   message.success('新增成功');
+    //         //   getNodeData({ clusterId: getData.clusterId });
+    //         //   setIsModalOpen(false);
+    //         //   form.resetFields()
+    //         // }
+    //       })
+    //       .catch((err) => {
+    //         console.log('err: ', err);
+    //       });
+    //   };
     
-      const handleCancel = () => {
-        addConfigForm.resetFields()
-        setIsModalOpen(false);
-      };
+    //   const handleCancel = () => {
+    //     addConfigForm.resetFields()
+    //     setIsModalOpen(false);
+    //   };
 
     return (
         <div className={styles.CSLayout}>
             <div className={styles.CSLeft}>
-                {serviceList && serviceList[0] && serviceList[0].key && (
+                {serviceMenu && serviceMenu[0] && serviceMenu[0].key && (
                     <Menu 
                         mode="inline" 
-                        items={serviceList} 
-                        defaultSelectedKeys={[serviceList[0].key]}
+                        items={serviceMenu} 
+                        defaultSelectedKeys={[serviceMenu[0].key]}
                         className={styles.CSLeftMenu} 
                         onSelect={onSelectService} 
                     />
                 )}
             </div>
             <div className={styles.CSRight}>
-                <div className={styles.CSBtnWrap}>
+                {/* <div className={styles.CSBtnWrap}>
                     <Button 
                         key="addconfig"
                         type="primary"
@@ -283,9 +310,9 @@ const ConfigService:React.FC = ()=>{
                             
                         }}
                     >
-                    新增配置项
+                    自定义配置项
                     </Button>
-                </div>
+                </div> */}
                 <div>
                 <Form form={form} component={false}>
                     <Table
@@ -295,20 +322,20 @@ const ConfigService:React.FC = ()=>{
                             },
                         }}
                         scroll={{
-                            y:'600px'
+                            y:600
                         }}
                         rowKey="name"
                         pagination={false}
                         bordered
                         loading={loading}
-                        dataSource={confListData}
+                        dataSource={currentConfList}
                         columns={mergedColumns}
                         rowClassName="editable-row"
                     />
                 </Form>
                 </div>
             </div>
-            <Modal
+            {/* <Modal
                 key="addconfigmodal"
                 title="新增配置项"
                 forceRender={true}
@@ -363,7 +390,7 @@ const ConfigService:React.FC = ()=>{
                     </Form.Item>
                 </Form>
                 </div>
-            </Modal>
+            </Modal> */}
         </div>
     )
 }

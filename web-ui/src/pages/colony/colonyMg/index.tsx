@@ -23,7 +23,7 @@ const Colony: React.FC = () => {
     setLoading(true)
     const result: API.ColonyList =  await getClusterListAPI(params);
     setLoading(false)
-    setClusterList(result.data)
+    setClusterList(result?.data)
   };
 
   const getStackData = async (params: any) => {

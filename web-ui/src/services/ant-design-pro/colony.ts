@@ -93,3 +93,32 @@ export async function getServiceConfAPI(params: {
   });
 }
 
+// 安装服务校验
+export async function checkKerberosAPI(options?: number[]) {
+  return request<API.normalResult>('/service/validInstallServiceHasKerberos', {
+    method: 'POST',
+    data: options,
+  });
+}
+
+// 添加服务校验
+export async function initServiceAPI(options?: API.SubmitServicesParams) {
+  return request<API.normalResult>('/service/initService', {
+    method: 'POST',
+    data: options,
+  });
+}
+
+// 服务列表
+export async function serviceListAPI(params: {
+  clusterId?: number;
+}) {
+  return request<API.normalResult>('/service/listServiceInstance', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+  });
+}
+
+

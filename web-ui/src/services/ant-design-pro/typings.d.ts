@@ -187,7 +187,31 @@ declare namespace API {
     };
   };
 
+  type RolesItem = {
+    stackRoleName?: string,
+    nodeIds?: number[]
+  }
 
+  type PresetConfListItem = {
+    name?: string,
+    value?: string,
+    recommendedValue?: string
+  }
+
+  type ServiceInfosItem = {
+    stackServiceId?: number,
+    stackServiceName?: string,
+    stackServiceLabel?: string,
+    roles?: RolesItem[],
+    presetConfList?: PresetConfListItem[]
+  }
+
+  type SubmitServicesParams = {
+    stackId?: number,
+    enableKerberos?: boolean,
+    clusterId?: number,
+    serviceInfos?: ServiceInfosItem[]
+  }
 
   type normalResult = {
     success?: boolean;
