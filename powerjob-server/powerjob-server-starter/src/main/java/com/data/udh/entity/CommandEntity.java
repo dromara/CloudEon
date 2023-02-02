@@ -1,5 +1,6 @@
 package com.data.udh.entity;
 
+import com.data.udh.utils.CommandState;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -36,7 +37,8 @@ public class CommandEntity {
     /**
      * 指令运行状态
      */
-    private String commandState;
+    @Enumerated(EnumType.STRING)
+    private CommandState commandState;
 
     /**
      * 提交时间
