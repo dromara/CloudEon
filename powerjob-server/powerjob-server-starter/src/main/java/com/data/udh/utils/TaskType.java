@@ -9,7 +9,7 @@ public enum TaskType {
 
     TAG_HOST(1, "添加k8s节点标签", "", true),
     START_K8S_SERVICE(2, "启动k8s服务", "", false),
-    PULL_IMAGE_FROM_REGISTRY_TO_HOST(3, "拉取docker registry镜像到节点", "", false),
+    PULL_IMAGE_FROM_REGISTRY_TO_HOST(3, "拉取docker registry镜像到节点", "", true),
     INSTALL_ROLE_TO_HOST(4, "安装服务角色到节点", "", true),
     CONFIG_ROLE_TO_HOST(5, "配置服务角色到节点", "", true),
     INIT_HDFS_NAMENODE(6, "初始化NameNode", "", false),
