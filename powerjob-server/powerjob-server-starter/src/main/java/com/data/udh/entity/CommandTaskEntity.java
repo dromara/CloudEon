@@ -56,6 +56,8 @@ public class CommandTaskEntity {
 
     private Integer commandId;
 
+    private Integer serviceInstanceId;
+
 
     /**
      * 进度
