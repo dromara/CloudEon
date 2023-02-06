@@ -9,6 +9,33 @@ import java.util.function.*;
 
 @Slf4j
 public class CompleteFutureTest {
+    @Test
+    public void thenAsync() {
+        CompletableFuture<Void> task1 = CompletableFuture
+                .runAsync(() -> System.out.println(Thread.currentThread().getName()+":task1"));
+
+        CompletableFuture<Void> task2 = task1.thenRunAsync(new Runnable() {
+            @Override
+            public void run() {
+                doSleep(5000);
+                System.out.println(Thread.currentThread().getName()+":task2");
+            }
+        });
+
+        CompletableFuture<Void> task3 = task2.thenRunAsync(new Runnable() {
+            @Override
+            public void run() {
+                doSleep(5000);
+                System.out.println(Thread.currentThread().getName()+":task3");
+            }
+        });
+
+
+//        doSleep(15000);
+
+
+        System.out.println("main");
+    }
 
     @Test
     public void then1() {
