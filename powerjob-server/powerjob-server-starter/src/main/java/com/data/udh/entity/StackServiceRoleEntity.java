@@ -50,6 +50,7 @@ public class StackServiceRoleEntity implements Serializable {
 	private String type;
 
 
+	private Integer sortNum;
 
 
 	private Integer stackId;

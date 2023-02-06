@@ -74,6 +74,7 @@ create table udh_stack_service_role
     jmx_port              varchar(255) null,
     link_expression       varchar(255) null,
     type     varchar(255) null,
+    sort_num              int          null,
     stack_id              int          null
 );
 
