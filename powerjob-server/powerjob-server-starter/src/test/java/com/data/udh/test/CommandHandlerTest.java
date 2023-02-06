@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -55,7 +56,8 @@ public class CommandHandlerTest {
         LinkedHashMap<String, List<NodeInfo>> roles = new LinkedHashMap<>();
         roles.put("Journal Node", Lists.newArrayList(NodeInfo.builder().hostName("node001").build(),NodeInfo.builder().hostName("node002").build(),NodeInfo.builder().hostName("node003").build()));
         roles.put("Name Node", Lists.newArrayList(NodeInfo.builder().hostName("node004").build(),NodeInfo.builder().hostName("node002").build()));
-        roles.put("Data Node", Lists.newArrayList(NodeInfo.builder().hostName("node2").build(),NodeInfo.builder().hostName("node004").build(),NodeInfo.builder().hostName("node006").build()));
+        roles.put("Data Node", Lists.newArrayList(NodeInfo.builder().hostName("node002").build(),NodeInfo.builder().hostName("node004").build(),NodeInfo.builder().hostName("node006").build()));
+        roles.put("HttpFs", Lists.newArrayList(NodeInfo.builder().hostName("node004").build()));
         String hdfsStackServiceName = "HDFS";
         ServiceTaskGroupType hdfsServiceTaskGroupType = ServiceTaskGroupType.builder().serviceName("HDFS1").stackServiceName(hdfsStackServiceName).roleHostMaps(roles)
                 .taskGroupTypes(commandBootstrapHandler.buildTaskGroupTypes(commandType, hdfsStackServiceName)).build();
@@ -63,13 +65,13 @@ public class CommandHandlerTest {
         LinkedHashMap<String, List<NodeInfo>> yanRoles = new LinkedHashMap<>();
         yanRoles.put("Resource Manager", Lists.newArrayList(NodeInfo.builder().hostName("node001").build(),NodeInfo.builder().hostName("node002").build()));
         yanRoles.put("Node Manager", Lists.newArrayList(NodeInfo.builder().hostName("node002").build(),NodeInfo.builder().hostName("node003").build(),NodeInfo.builder().hostName("node006").build()));
-        yanRoles.put("Timeline Server", Lists.newArrayList(NodeInfo.builder().hostName("node2").build()));
+        yanRoles.put("Timeline Server", Lists.newArrayList(NodeInfo.builder().hostName("node002").build()));
         String yarnStackServiceName = "YARN";
         ServiceTaskGroupType yarnServiceTaskGroupType = ServiceTaskGroupType.builder().serviceName("YARN1").stackServiceName(yarnStackServiceName).roleHostMaps(yanRoles)
                 .taskGroupTypes(commandBootstrapHandler.buildTaskGroupTypes(commandType, yarnStackServiceName)).build();
 
         LinkedHashMap<String, List<NodeInfo>> zkRoles = new LinkedHashMap<>();
-        zkRoles.put("Zookeeper Server", Lists.newArrayList(NodeInfo.builder().hostName("node2").build(),NodeInfo.builder().hostName("node004").build(),NodeInfo.builder().hostName("node006").build()));
+        zkRoles.put("Zookeeper Server", Lists.newArrayList(NodeInfo.builder().hostName("node002").build(),NodeInfo.builder().hostName("node004").build(),NodeInfo.builder().hostName("node006").build()));
         String zookeeperStackServiceName = "ZOOKEEPER";
         ServiceTaskGroupType zkServiceTaskGroupType = ServiceTaskGroupType.builder().serviceName("ZOOKEEPER1").stackServiceName(zookeeperStackServiceName).roleHostMaps(zkRoles)
                 .taskGroupTypes(commandBootstrapHandler.buildTaskGroupTypes(commandType, zookeeperStackServiceName)).build();
@@ -80,7 +82,7 @@ public class CommandHandlerTest {
 
         for (Map.Entry<String, List<TaskModel>> stringListEntry : Maps.of(hdfsStackServiceName, hdfsTaskModels, zookeeperStackServiceName, zkTaskModels, yarnStackServiceName, yarnTaskModels).entrySet()) {
             System.out.println("========= "+stringListEntry.getKey()+" =============");
-            stringListEntry.getValue().forEach(e-> System.out.println(e.getTaskName()));
+            stringListEntry.getValue().forEach(e-> System.out.println(e.getTaskId()+" : "+e.getTaskName()));
 
         }
     }
