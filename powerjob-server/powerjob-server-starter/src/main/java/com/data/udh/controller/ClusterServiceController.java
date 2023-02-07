@@ -12,6 +12,7 @@ import com.data.udh.dto.ServiceTaskGroupType;
 import com.data.udh.dto.TaskModel;
 import com.data.udh.entity.*;
 import com.data.udh.processor.InstallTask;
+import com.data.udh.processor.UdhTaskContext;
 import com.data.udh.service.CommandHandler;
 import com.data.udh.utils.*;
 import org.springframework.transaction.annotation.Transactional;
@@ -227,7 +228,8 @@ public class ClusterServiceController {
         List<Runnable> runnableList = taskEntityList.stream().map(new Function<CommandTaskEntity, Runnable>() {
             @Override
             public Runnable apply(CommandTaskEntity commandTaskEntity) {
-                return new InstallTask(commandTaskEntity.getId(), commandTaskEntity.getCommandId(), commandTaskEntity.getServiceInstanceId());
+                UdhTaskContext taskContext = new UdhTaskContext(commandTaskEntity.getId(), commandTaskEntity.getCommandId(), commandTaskEntity.getServiceInstanceId());
+                return new InstallTask(taskContext);
             }
         }).collect(Collectors.toList());
 
@@ -246,6 +248,7 @@ public class ClusterServiceController {
         completableFuture.exceptionally(new Function<Throwable, Void>() {
             @Override
             public Void apply(Throwable throwable) {
+                throwable.printStackTrace();
                 System.out.println("调度程序发现异常：" + throwable.getMessage());
                 return null;
             }
@@ -309,6 +312,7 @@ public class ClusterServiceController {
                 CommandTaskEntity commandTaskEntity = new CommandTaskEntity();
                 commandTaskEntity.setCommandId(commandEntity.getId());
                 commandTaskEntity.setProgress(0);
+                commandTaskEntity.setProcessorClassName(taskModel.getProcessorClassName());
                 commandTaskEntity.setTaskName(taskModel.getTaskName());
                 commandTaskEntity.setTaskShowSortNum(taskModel.getTaskId());
                 commandTaskEntity.setCommandState(CommandState.WAITING);

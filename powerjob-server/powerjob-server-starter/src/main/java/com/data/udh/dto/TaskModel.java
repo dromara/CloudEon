@@ -13,5 +13,6 @@ public class TaskModel {
     private String taskName;
     private Integer taskId;
 
+    private String processorClassName;
 
 }

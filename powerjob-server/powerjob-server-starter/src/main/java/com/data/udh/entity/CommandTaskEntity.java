@@ -34,6 +34,8 @@ public class CommandTaskEntity {
      */
     private String taskName;
 
+    private String processorClassName;
+
     /**
      * 运行状态
      */

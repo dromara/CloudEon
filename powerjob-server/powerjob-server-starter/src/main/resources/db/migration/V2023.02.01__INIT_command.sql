@@ -39,6 +39,7 @@ create table udh_command_task
     powerjob_instance_id  bigint       null,
     progress              int          null,
     service_instance_id              int          null,
+    processor_class_name varchar(255) null,
     start_time            datetime(6)  null,
     task_name             varchar(255) null,
     task_show_sort_num    int          null
