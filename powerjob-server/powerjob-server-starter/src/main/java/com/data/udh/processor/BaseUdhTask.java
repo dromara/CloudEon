@@ -1,25 +1,32 @@
 package com.data.udh.processor;
 
+import ch.qos.logback.classic.ClassicConstants;
 import cn.hutool.extra.spring.SpringUtil;
 import com.data.udh.dao.CommandTaskRepository;
 import com.data.udh.entity.CommandTaskEntity;
 import com.data.udh.utils.CommandState;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 
 import java.util.Date;
-
+@Slf4j
 @Data
 @AllArgsConstructor
 public abstract class BaseUdhTask implements Runnable {
+    public static final String TASKID = "taskId";
+    public static final String TASK_LOG_HOME = "TASK_LOG_HOME";
 
     protected UdhTaskContext taskContext;
     protected CommandTaskRepository commandTaskRepository;
 
     private void init() {
+        MDC.put(TASKID, (taskContext.commandId +"-"+ taskContext.getCommandTaskId()));
+
         commandTaskRepository = SpringUtil.getBean(CommandTaskRepository.class);
+        log.info("command task：" + taskContext.commandTaskId + " 开始, 记录到数据库");
         CommandTaskEntity commandTaskEntity = commandTaskRepository.findById(taskContext.commandTaskId).get();
-        System.out.println("command task：" + taskContext.commandTaskId + " 开始, 记录到数据库");
         commandTaskEntity.setStartTime(new Date());
         commandTaskEntity.setCommandState(CommandState.RUNNING);
         commandTaskRepository.saveAndFlush(commandTaskEntity);
@@ -40,15 +47,21 @@ public abstract class BaseUdhTask implements Runnable {
     }
 
     private void after() {
-        System.out.println("command task：" + taskContext.commandTaskId + " 结束, 记录到数据库");
+        log.info("command task：" + taskContext.commandTaskId + " 结束, 记录到数据库");
         CommandTaskEntity commandTaskEntity = commandTaskRepository.findById(taskContext.commandTaskId).get();
         commandTaskEntity.setEndTime(new Date());
         commandTaskEntity.setCommandState(CommandState.SUCCESS);
         commandTaskRepository.saveAndFlush(commandTaskEntity);
+
+        //主动让SiftingAppender结束文件.
+        log.info(ClassicConstants.FINALIZE_SESSION_MARKER, "close sifting Appender of `{}`", MDC.get(TASKID));
+
+        //清理MDC.
+        MDC.clear();
     }
 
     private void doWhenError(Exception e) {
-        System.out.println(taskContext.commandTaskId + ":发生异常，处理异常。。。"+e.getMessage());
+        log.info(taskContext.commandTaskId + ":发生异常，处理异常。。。"+e.getMessage());
         CommandTaskEntity commandTaskEntity = commandTaskRepository.findById(taskContext.commandTaskId).get();
         commandTaskEntity.setEndTime(new Date());
         commandTaskEntity.setCommandState(CommandState.ERROR);
