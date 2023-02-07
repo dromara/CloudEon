@@ -15,12 +15,14 @@ import com.data.udh.processor.InstallTask;
 import com.data.udh.processor.UdhTaskContext;
 import com.data.udh.service.CommandHandler;
 import com.data.udh.utils.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import tech.powerjob.common.response.ResultDTO;
 
 import javax.annotation.Resource;
 import javax.persistence.EntityManager;
+import java.io.File;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -38,6 +40,9 @@ import static com.data.udh.utils.Constant.AdminUserId;
 public class ClusterServiceController {
 
     ExecutorService flowSchedulerThreadPool = ThreadUtil.newExecutor(5, 10, 1024);
+
+    @Value("${udh.task.log}")
+    private String taskLogPath;
 
 
     @Resource
@@ -266,7 +271,7 @@ public class ClusterServiceController {
         commandEntity.setSubmitTime(new Date());
         commandEntity.setOperateUserId(AdminUserId);
         // 持久化 command
-        commandRepository.save(commandEntity);
+        commandRepository.saveAndFlush(commandEntity);
 
         // todo 根据服务依赖进行调整顺序
         //  遍历command 涉及的服务实例
@@ -317,7 +322,10 @@ public class ClusterServiceController {
                 commandTaskEntity.setTaskShowSortNum(taskModel.getTaskId());
                 commandTaskEntity.setCommandState(CommandState.WAITING);
                 commandTaskEntity.setServiceInstanceId(serviceInstanceEntity.getId());
-                commandTaskRepository.save(commandTaskEntity);
+                commandTaskRepository.saveAndFlush(commandTaskEntity);
+                // 更新日志路径
+                commandTaskEntity.setTaskLogPath(taskLogPath+ File.separator+commandEntity.getId()+"-"+commandTaskEntity.getId());
+                commandTaskRepository.saveAndFlush(commandTaskEntity);
             }
         }
 

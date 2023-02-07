@@ -42,6 +42,8 @@ public class CommandTaskEntity {
     @Enumerated(EnumType.STRING)
     private CommandState commandState;
 
+    private String taskLogPath;
+
 
     /**
      * 开始时间
