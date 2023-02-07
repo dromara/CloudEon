@@ -78,12 +78,12 @@ public class CommandHandler {
                                     Stream<TaskModel> taskModelStream = serviceTaskGroupType.getRoleHostMaps().get(roleName).stream().map(new Function<NodeInfo, TaskModel>() {
                                         @Override
                                         public TaskModel apply(NodeInfo nodeInfo) {
-                                            return TaskModel.builder().taskName(roleName + " :" + taskType.getName() + " (" + nodeInfo.getHostName() + ")").build();
+                                            return TaskModel.builder().processorClassName(taskType.getProcessorClass()).taskName(roleName + " :" + taskType.getName() + " (" + nodeInfo.getHostName() + ")").build();
                                         }
                                     });
                                     return taskModelStream;
                                 } else {
-                                    return Stream.of(TaskModel.builder().taskName(roleName + " :" + taskType.getName()).build());
+                                    return Stream.of(TaskModel.builder().processorClassName(taskType.getProcessorClass()).taskName(roleName + " :" + taskType.getName()).build());
                                 }
                             }
                         });
@@ -92,7 +92,7 @@ public class CommandHandler {
                     taskModelStream = taskGroupType.getTaskTypes().stream().map(new Function<TaskType, TaskModel>() {
                         @Override
                         public TaskModel apply(TaskType taskType) {
-                            return TaskModel.builder().taskName(taskType.getName()).build();
+                            return TaskModel.builder().processorClassName(taskType.getProcessorClass()).taskName(taskType.getName()).build();
                         }
                     });
                 }
