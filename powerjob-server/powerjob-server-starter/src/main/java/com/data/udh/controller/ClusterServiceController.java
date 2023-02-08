@@ -1,9 +1,14 @@
 package com.data.udh.controller;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.lang.Dict;
 import cn.hutool.core.thread.ThreadUtil;
+import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.spring.SpringUtil;
+import cn.hutool.extra.template.Template;
+import cn.hutool.extra.template.TemplateConfig;
+import cn.hutool.extra.template.TemplateEngine;
+import cn.hutool.extra.template.TemplateUtil;
 import com.data.udh.controller.request.InitServiceRequest;
 import com.data.udh.controller.response.ServiceInstanceVO;
 import com.data.udh.dao.*;
@@ -11,7 +16,7 @@ import com.data.udh.dto.NodeInfo;
 import com.data.udh.dto.ServiceTaskGroupType;
 import com.data.udh.dto.TaskModel;
 import com.data.udh.entity.*;
-import com.data.udh.processor.InstallTask;
+import com.data.udh.processor.BaseUdhTask;
 import com.data.udh.processor.UdhTaskContext;
 import com.data.udh.service.CommandHandler;
 import com.data.udh.utils.*;
@@ -108,8 +113,9 @@ public class ClusterServiceController {
 
             ServiceInstanceEntity serviceInstanceEntity = new ServiceInstanceEntity();
             serviceInstanceEntity.setInstanceSequence(newInstanceSeq);
-            serviceInstanceEntity.setSid(serviceInfo.getStackServiceName() + newInstanceSeq);
-            serviceInstanceEntity.setServiceName(serviceInfo.getStackServiceName() + newInstanceSeq);
+            String serviceName = serviceInfo.getStackServiceName() + newInstanceSeq;
+            serviceInstanceEntity.setSid(serviceName);
+            serviceInstanceEntity.setServiceName(serviceName);
             serviceInstanceEntity.setLabel(serviceInfo.getStackServiceLabel());
             serviceInstanceEntity.setClusterId(clusterId);
             serviceInstanceEntity.setCreateTime(new Date());
@@ -117,6 +123,9 @@ public class ClusterServiceController {
             serviceInstanceEntity.setEnableKerberos(req.getEnableKerberos());
             serviceInstanceEntity.setStackServiceId(stackServiceId);
             serviceInstanceEntity.setServiceState(ServiceState.OPERATING);
+            // 生成持久化宿主机路径
+            String persistencePaths = stackServiceRepository.findById(stackServiceId).get().getPersistencePaths();
+            serviceInstanceEntity.setPersistencePaths(genPersistencePaths(persistencePaths,serviceName));
 
             // 持久化service信息
             serviceInstanceRepository.save(serviceInstanceEntity);
@@ -228,13 +237,35 @@ public class ClusterServiceController {
         return ResultDTO.success(null);
     }
 
+    /**
+     * 通过模板生成服务实例持久化到宿主机的目录
+     */
+    private String genPersistencePaths(String persistencePaths,String serviceInstanceId) {
+        TemplateEngine engine = TemplateUtil.createEngine(new TemplateConfig());
+        String result = Arrays.stream(persistencePaths.split(",")).map(new Function<String, String>() {
+            @Override
+            public String apply(String pathTemplate) {
+                Template template = engine.getTemplate(pathTemplate);
+                //Dict本质上为Map，此处可用Map
+                String result = template.render(Dict.create().set("serviceInstanceId", serviceInstanceId.toLowerCase()));
+                return result;
+            }
+        }).collect(Collectors.joining(","));
+
+
+        return result;
+    }
+
     private void executeFlow(Integer commandId) {
         List<CommandTaskEntity> taskEntityList = commandTaskRepository.findByCommandId(commandId);
         List<Runnable> runnableList = taskEntityList.stream().map(new Function<CommandTaskEntity, Runnable>() {
             @Override
             public Runnable apply(CommandTaskEntity commandTaskEntity) {
                 UdhTaskContext taskContext = new UdhTaskContext(commandTaskEntity.getId(), commandTaskEntity.getCommandId(), commandTaskEntity.getServiceInstanceId());
-                return new InstallTask(taskContext);
+                // 反射生成任务对象
+                BaseUdhTask o = ReflectUtil.newInstance(commandTaskEntity.getProcessorClassName());
+                o.setTaskContext(taskContext);
+                return o;
             }
         }).collect(Collectors.toList());
 

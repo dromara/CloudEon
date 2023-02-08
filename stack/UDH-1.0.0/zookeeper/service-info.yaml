@@ -18,7 +18,10 @@ roles:
     type: MASTER
     jmxPort: 9232
 
-
+persistencePaths:
+  - /etc/${serviceInstanceId}/conf
+  - /var/log/${serviceInstanceId}
+  - /var/${serviceInstanceId}
 
 
 customConfigFiles:
