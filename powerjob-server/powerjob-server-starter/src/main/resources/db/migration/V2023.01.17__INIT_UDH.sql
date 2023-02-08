@@ -56,6 +56,7 @@ create table udh_stack_service
     service_configuration_yaml_md5 varchar(255) null,
     service_role_yaml     text null,
     service_role_yaml_md5 varchar(255) null,
+    persistence_paths varchar(1024) null,
     sort_num                       int          null,
     stack_code                     varchar(255) null,
     stack_id                       int          null

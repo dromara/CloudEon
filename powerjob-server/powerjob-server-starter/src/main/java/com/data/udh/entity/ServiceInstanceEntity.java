@@ -87,6 +87,8 @@ public class ServiceInstanceEntity implements Serializable {
      */
     private Boolean enableKerberos;
 
+    private String persistencePaths;
+
 
 
 }

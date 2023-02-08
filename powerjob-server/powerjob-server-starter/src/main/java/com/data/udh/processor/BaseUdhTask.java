@@ -7,6 +7,7 @@ import com.data.udh.entity.CommandTaskEntity;
 import com.data.udh.utils.CommandState;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 
@@ -14,6 +15,7 @@ import java.util.Date;
 @Slf4j
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public abstract class BaseUdhTask implements Runnable {
     public static final String TASKID = "taskId";
     public static final String TASK_LOG_HOME = "TASK_LOG_HOME";
