@@ -18,7 +18,7 @@ import com.data.udh.dto.ServiceTaskGroupType;
 import com.data.udh.dto.TaskModel;
 import com.data.udh.entity.*;
 import com.data.udh.processor.BaseUdhTask;
-import com.data.udh.processor.UdhTaskContext;
+import com.data.udh.processor.TaskParam;
 import com.data.udh.service.CommandHandler;
 import com.data.udh.utils.*;
 import org.springframework.beans.factory.annotation.Value;
@@ -262,14 +262,14 @@ public class ClusterServiceController {
         List<Runnable> runnableList = taskEntityList.stream().map(new Function<CommandTaskEntity, Runnable>() {
             @Override
             public Runnable apply(CommandTaskEntity commandTaskEntity) {
-                UdhTaskContext taskContext = new UdhTaskContext(commandTaskEntity.getId(), commandTaskEntity.getCommandId(), commandTaskEntity.getServiceInstanceId());
                 // 反射生成任务对象
                 BaseUdhTask o = ReflectUtil.newInstance(commandTaskEntity.getProcessorClassName());
-                o.setTaskContext(taskContext);
                 // 更新command状态
                 CommandEntity updateCommandEntity = commandRepository.findById(commandId).get();
                 updateCommandEntity.setCommandState(CommandState.RUNNING);
                 commandRepository.saveAndFlush(updateCommandEntity);
+                // 填充任务参数
+                o.setTaskParam(JSONObject.parseObject(commandTaskEntity.getTaskParam(),TaskParam.class));
                 return o;
             }
         }).collect(Collectors.toList());
@@ -343,7 +343,7 @@ public class ClusterServiceController {
                     .roleHostMaps(roleHostMaps).build();
 
             List<TaskModel> models = commandHandler.buildTaskModels(serviceTaskGroupType).stream().map(e -> {
-                e.setTaskId(taskModelId.getAndIncrement());
+                e.setTaskSortNum(taskModelId.getAndIncrement());
                 return e;
             }).collect(Collectors.toList());
 
@@ -354,18 +354,31 @@ public class ClusterServiceController {
                 commandTaskEntity.setProgress(0);
                 commandTaskEntity.setProcessorClassName(taskModel.getProcessorClassName());
                 commandTaskEntity.setTaskName(taskModel.getTaskName());
-                commandTaskEntity.setTaskParam(JSONObject.toJSONString(taskModel));
-                commandTaskEntity.setTaskShowSortNum(taskModel.getTaskId());
+                commandTaskEntity.setTaskShowSortNum(taskModel.getTaskSortNum());
                 commandTaskEntity.setCommandState(CommandState.WAITING);
                 commandTaskEntity.setServiceInstanceId(serviceInstanceEntity.getId());
                 commandTaskRepository.saveAndFlush(commandTaskEntity);
                 // 更新日志路径
                 commandTaskEntity.setTaskLogPath(taskLogPath+ File.separator+commandEntity.getId()+"-"+commandTaskEntity.getId());
+                // 更新任务参数
+                TaskParam taskParam = buildTaskParam(taskModel, commandEntity, serviceInstanceEntity, commandTaskEntity);
+                commandTaskEntity.setTaskParam(JSONObject.toJSONString(taskParam));
                 commandTaskRepository.saveAndFlush(commandTaskEntity);
             }
         }
 
         return commandEntity.getId();
+    }
+
+    private TaskParam buildTaskParam(TaskModel taskModel, CommandEntity commandEntity,
+                                     ServiceInstanceEntity serviceInstanceEntity, CommandTaskEntity commandTaskEntity) {
+        TaskParam taskParam = new TaskParam();
+        BeanUtil.copyProperties(taskModel, taskParam);
+        taskParam.setCommandTaskId(commandTaskEntity.getId());
+        taskParam.setCommandId(commandEntity.getId());
+        taskParam.setServiceInstanceId(serviceInstanceEntity.getId());
+        taskParam.setStackServiceId(serviceInstanceEntity.getStackServiceId());
+        return taskParam;
     }
 
 
