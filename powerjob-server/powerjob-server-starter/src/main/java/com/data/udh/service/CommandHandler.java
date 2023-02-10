@@ -21,12 +21,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 @Service
 public class CommandHandler {
 
 
     /**
      * 根据框架服务和指令，生成对应服务的TaskGroupType集合
+     *
      * @param commandType
      * @param stackServiceName
      * @return
@@ -78,12 +80,22 @@ public class CommandHandler {
                                     Stream<TaskModel> taskModelStream = serviceTaskGroupType.getRoleHostMaps().get(roleName).stream().map(new Function<NodeInfo, TaskModel>() {
                                         @Override
                                         public TaskModel apply(NodeInfo nodeInfo) {
-                                            return TaskModel.builder().processorClassName(taskType.getProcessorClass()).taskName(roleName + " :" + taskType.getName() + " (" + nodeInfo.getHostName() + ")").build();
+                                            return TaskModel.builder()
+                                                    .processorClassName(taskType.getProcessorClass())
+                                                    .taskName(roleName + " :" + taskType.getName() + " (" + nodeInfo.getHostName() + ")")
+                                                    .hostName(nodeInfo.getHostName())
+                                                    .ip(nodeInfo.getIp())
+                                                    .roleName(roleName)
+                                                    .build();
                                         }
                                     });
                                     return taskModelStream;
                                 } else {
-                                    return Stream.of(TaskModel.builder().processorClassName(taskType.getProcessorClass()).taskName(roleName + " :" + taskType.getName()).build());
+                                    return Stream.of(TaskModel.builder()
+                                            .processorClassName(taskType.getProcessorClass())
+                                            .roleName(roleName)
+                                            .taskName(roleName + " :" + taskType.getName())
+                                            .build());
                                 }
                             }
                         });
@@ -103,7 +115,6 @@ public class CommandHandler {
 
         return taskModelList;
     }
-
 
 
     @Data
