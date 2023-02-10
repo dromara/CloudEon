@@ -9,6 +9,7 @@ import cn.hutool.extra.template.Template;
 import cn.hutool.extra.template.TemplateConfig;
 import cn.hutool.extra.template.TemplateEngine;
 import cn.hutool.extra.template.TemplateUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.data.udh.controller.request.InitServiceRequest;
 import com.data.udh.controller.response.ServiceInstanceVO;
 import com.data.udh.dao.*;
@@ -265,6 +266,10 @@ public class ClusterServiceController {
                 // 反射生成任务对象
                 BaseUdhTask o = ReflectUtil.newInstance(commandTaskEntity.getProcessorClassName());
                 o.setTaskContext(taskContext);
+                // 更新command状态
+                CommandEntity updateCommandEntity = commandRepository.findById(commandId).get();
+                updateCommandEntity.setCommandState(CommandState.RUNNING);
+                commandRepository.saveAndFlush(updateCommandEntity);
                 return o;
             }
         }).collect(Collectors.toList());
@@ -312,7 +317,6 @@ public class ClusterServiceController {
             // 生成TaskGroupTypes
             List<TaskGroupType> taskGroupTypes = commandHandler.buildTaskGroupTypes(CommandType.INSTALL_SERVICE, stackServiceEntity.getName());
 
-            // todo 逻辑错了，角色实例表相同角色会有多条记录
             LinkedHashMap<String, List<NodeInfo>> roleHostMaps = new LinkedHashMap<>();
             // 查出该服务有的角色
             List<StackServiceRoleEntity> stackServiceRoleEntities = stackServiceRoleRepository.findByServiceIdOrderBySortNum(serviceInstanceEntity.getStackServiceId());
@@ -350,6 +354,7 @@ public class ClusterServiceController {
                 commandTaskEntity.setProgress(0);
                 commandTaskEntity.setProcessorClassName(taskModel.getProcessorClassName());
                 commandTaskEntity.setTaskName(taskModel.getTaskName());
+                commandTaskEntity.setTaskParam(JSONObject.toJSONString(taskModel));
                 commandTaskEntity.setTaskShowSortNum(taskModel.getTaskId());
                 commandTaskEntity.setCommandState(CommandState.WAITING);
                 commandTaskEntity.setServiceInstanceId(serviceInstanceEntity.getId());

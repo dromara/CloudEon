@@ -34,6 +34,11 @@ public class CommandTaskEntity {
      */
     private String taskName;
 
+    /**
+     * 任务参数
+     */
+    private String taskParam;
+
     private String processorClassName;
 
     /**

@@ -1,8 +1,11 @@
 package com.data.udh.processor;
 
 import ch.qos.logback.classic.ClassicConstants;
+import cn.hutool.core.math.MathUtil;
 import cn.hutool.extra.spring.SpringUtil;
+import com.data.udh.dao.CommandRepository;
 import com.data.udh.dao.CommandTaskRepository;
+import com.data.udh.entity.CommandEntity;
 import com.data.udh.entity.CommandTaskEntity;
 import com.data.udh.utils.CommandState;
 import lombok.AllArgsConstructor;
@@ -22,6 +25,11 @@ public abstract class BaseUdhTask implements Runnable {
 
     protected UdhTaskContext taskContext;
     protected CommandTaskRepository commandTaskRepository;
+    protected CommandRepository commandRepository;
+
+    public BaseUdhTask(UdhTaskContext taskContext) {
+        this.taskContext = taskContext;
+    }
 
     private void init() {
         MDC.put(TASKID, (taskContext.commandId +"-"+ taskContext.getCommandTaskId()));
@@ -32,6 +40,8 @@ public abstract class BaseUdhTask implements Runnable {
         commandTaskEntity.setStartTime(new Date());
         commandTaskEntity.setCommandState(CommandState.RUNNING);
         commandTaskRepository.saveAndFlush(commandTaskEntity);
+
+         commandRepository = SpringUtil.getBean(CommandRepository.class);
     }
 
     @Override
@@ -60,6 +70,16 @@ public abstract class BaseUdhTask implements Runnable {
 
         //清理MDC.
         MDC.clear();
+
+        // 更新command进度
+        CommandEntity updateCommandEntity = commandRepository.findById(getTaskContext().commandId).get();
+        // 计算进度
+        Integer successTaskCnt = commandTaskRepository.countByCommandStateAndCommandId(CommandState.SUCCESS, getTaskContext().commandId);
+        Integer totalTaskCnt = commandTaskRepository.countByCommandId( getTaskContext().commandId);
+        Double progress = Math.floor(successTaskCnt.doubleValue() / totalTaskCnt.doubleValue() * 100);
+        updateCommandEntity.setTotalProgress(progress.intValue());
+        commandRepository.saveAndFlush(updateCommandEntity);
+
     }
 
     private void doWhenError(Exception e) {
@@ -68,6 +88,11 @@ public abstract class BaseUdhTask implements Runnable {
         commandTaskEntity.setEndTime(new Date());
         commandTaskEntity.setCommandState(CommandState.ERROR);
         commandTaskRepository.saveAndFlush(commandTaskEntity);
+
+        // 更新command状态
+        CommandEntity updateCommandEntity = commandRepository.findById(getTaskContext().commandId).get();
+        updateCommandEntity.setCommandState(CommandState.ERROR);
+        commandRepository.saveAndFlush(updateCommandEntity);
         throw new RuntimeException();
     }
 

@@ -43,6 +43,7 @@ create table udh_command_task
     task_log_path varchar(255) null,
     start_time            datetime(6)  null,
     task_name             varchar(255) null,
+    task_param             text null,
     task_show_sort_num    int          null
 );
 
