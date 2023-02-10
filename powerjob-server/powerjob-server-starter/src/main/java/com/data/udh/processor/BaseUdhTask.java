@@ -3,8 +3,10 @@ package com.data.udh.processor;
 import ch.qos.logback.classic.ClassicConstants;
 import cn.hutool.core.math.MathUtil;
 import cn.hutool.extra.spring.SpringUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.data.udh.dao.CommandRepository;
 import com.data.udh.dao.CommandTaskRepository;
+import com.data.udh.dto.TaskModel;
 import com.data.udh.entity.CommandEntity;
 import com.data.udh.entity.CommandTaskEntity;
 import com.data.udh.utils.CommandState;
@@ -15,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 
 import java.util.Date;
+
 @Slf4j
 @Data
 @AllArgsConstructor
@@ -23,25 +26,24 @@ public abstract class BaseUdhTask implements Runnable {
     public static final String TASKID = "taskId";
     public static final String TASK_LOG_HOME = "TASK_LOG_HOME";
 
-    protected UdhTaskContext taskContext;
     protected CommandTaskRepository commandTaskRepository;
     protected CommandRepository commandRepository;
+    protected TaskParam taskParam;
 
-    public BaseUdhTask(UdhTaskContext taskContext) {
-        this.taskContext = taskContext;
-    }
 
     private void init() {
-        MDC.put(TASKID, (taskContext.commandId +"-"+ taskContext.getCommandTaskId()));
-
+        // 填充数据库操作类
         commandTaskRepository = SpringUtil.getBean(CommandTaskRepository.class);
-        log.info("command task：" + taskContext.commandTaskId + " 开始, 记录到数据库");
-        CommandTaskEntity commandTaskEntity = commandTaskRepository.findById(taskContext.commandTaskId).get();
+        commandRepository = SpringUtil.getBean(CommandRepository.class);
+        // 日志标识
+        MDC.put(TASKID, (taskParam.getCommandId() + "-" + taskParam.getCommandTaskId()));
+        // 记录任务开始时间
+        CommandTaskEntity commandTaskEntity = commandTaskRepository.findById(taskParam.getCommandTaskId()).get();
+        log.info("command task：" + taskParam.getCommandTaskId() + " 开始, 记录到数据库");
         commandTaskEntity.setStartTime(new Date());
         commandTaskEntity.setCommandState(CommandState.RUNNING);
         commandTaskRepository.saveAndFlush(commandTaskEntity);
 
-         commandRepository = SpringUtil.getBean(CommandRepository.class);
     }
 
     @Override
@@ -59,8 +61,8 @@ public abstract class BaseUdhTask implements Runnable {
     }
 
     private void after() {
-        log.info("command task：" + taskContext.commandTaskId + " 结束, 记录到数据库");
-        CommandTaskEntity commandTaskEntity = commandTaskRepository.findById(taskContext.commandTaskId).get();
+        log.info("command task：" + taskParam.getCommandTaskId() + " 结束, 记录到数据库");
+        CommandTaskEntity commandTaskEntity = commandTaskRepository.findById(taskParam.getCommandTaskId()).get();
         commandTaskEntity.setEndTime(new Date());
         commandTaskEntity.setCommandState(CommandState.SUCCESS);
         commandTaskRepository.saveAndFlush(commandTaskEntity);
@@ -72,10 +74,10 @@ public abstract class BaseUdhTask implements Runnable {
         MDC.clear();
 
         // 更新command进度
-        CommandEntity updateCommandEntity = commandRepository.findById(getTaskContext().commandId).get();
+        CommandEntity updateCommandEntity = commandRepository.findById(taskParam.getCommandId()).get();
         // 计算进度
-        Integer successTaskCnt = commandTaskRepository.countByCommandStateAndCommandId(CommandState.SUCCESS, getTaskContext().commandId);
-        Integer totalTaskCnt = commandTaskRepository.countByCommandId( getTaskContext().commandId);
+        Integer successTaskCnt = commandTaskRepository.countByCommandStateAndCommandId(CommandState.SUCCESS, taskParam.getCommandId());
+        Integer totalTaskCnt = commandTaskRepository.countByCommandId(taskParam.getCommandId());
         Double progress = Math.floor(successTaskCnt.doubleValue() / totalTaskCnt.doubleValue() * 100);
         updateCommandEntity.setTotalProgress(progress.intValue());
         commandRepository.saveAndFlush(updateCommandEntity);
@@ -83,14 +85,14 @@ public abstract class BaseUdhTask implements Runnable {
     }
 
     private void doWhenError(Exception e) {
-        log.info(taskContext.commandTaskId + ":发生异常，处理异常。。。"+e.getMessage());
-        CommandTaskEntity commandTaskEntity = commandTaskRepository.findById(taskContext.commandTaskId).get();
+        log.info(taskParam.getCommandTaskId() + ":发生异常，处理异常。。。" + e.getMessage());
+        CommandTaskEntity commandTaskEntity = commandTaskRepository.findById(taskParam.getCommandTaskId()).get();
         commandTaskEntity.setEndTime(new Date());
         commandTaskEntity.setCommandState(CommandState.ERROR);
         commandTaskRepository.saveAndFlush(commandTaskEntity);
 
         // 更新command状态
-        CommandEntity updateCommandEntity = commandRepository.findById(getTaskContext().commandId).get();
+        CommandEntity updateCommandEntity = commandRepository.findById(taskParam.getCommandId()).get();
         updateCommandEntity.setCommandState(CommandState.ERROR);
         commandRepository.saveAndFlush(updateCommandEntity);
         throw new RuntimeException();

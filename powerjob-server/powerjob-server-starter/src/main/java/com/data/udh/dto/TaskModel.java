@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TaskModel {
     private String taskName;
-    private Integer taskId;
+    private Integer taskSortNum;
     private String roleName;
     private String hostName;
     private String ip;

@@ -11,11 +11,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.groovy.util.Maps;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -82,7 +80,7 @@ public class CommandHandlerTest {
 
         for (Map.Entry<String, List<TaskModel>> stringListEntry : Maps.of(hdfsStackServiceName, hdfsTaskModels, zookeeperStackServiceName, zkTaskModels, yarnStackServiceName, yarnTaskModels).entrySet()) {
             System.out.println("========= "+stringListEntry.getKey()+" =============");
-            stringListEntry.getValue().forEach(e-> System.out.println(e.getTaskId()+" : "+e.getTaskName()));
+            stringListEntry.getValue().forEach(e-> System.out.println(e.getTaskSortNum()+" : "+e.getTaskName()));
 
         }
     }
