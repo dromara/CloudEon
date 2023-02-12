@@ -1,4 +1,4 @@
-package com.data.udh.processor;
+package com.data.udh.actor;
 
 import akka.actor.AbstractActor;
 import akka.actor.Props;
@@ -9,6 +9,8 @@ import com.data.udh.dao.CommandRepository;
 import com.data.udh.dao.CommandTaskRepository;
 import com.data.udh.entity.CommandEntity;
 import com.data.udh.entity.CommandTaskEntity;
+import com.data.udh.processor.BaseUdhTask;
+import com.data.udh.processor.TaskParam;
 import com.data.udh.utils.CommandState;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -55,7 +57,7 @@ public class CommandExecuteActor extends AbstractActor {
                 // 反射生成任务对象
                 BaseUdhTask o = ReflectUtil.newInstance(commandTaskEntity.getProcessorClassName());
                 // 填充任务参数
-                o.setTaskParam(JSONObject.parseObject(commandTaskEntity.getTaskParam(),TaskParam.class));
+                o.setTaskParam(JSONObject.parseObject(commandTaskEntity.getTaskParam(), TaskParam.class));
                 return o;
             }
         }).collect(Collectors.toList());
