@@ -79,7 +79,7 @@ public abstract class BaseUdhTask implements Runnable {
         Integer successTaskCnt = commandTaskRepository.countByCommandStateAndCommandId(CommandState.SUCCESS, taskParam.getCommandId());
         Integer totalTaskCnt = commandTaskRepository.countByCommandId(taskParam.getCommandId());
         Double progress = Math.floor(successTaskCnt.doubleValue() / totalTaskCnt.doubleValue() * 100);
-        updateCommandEntity.setTotalProgress(progress.intValue());
+        updateCommandEntity.setCurrentProgress(progress.intValue());
         commandRepository.saveAndFlush(updateCommandEntity);
 
     }

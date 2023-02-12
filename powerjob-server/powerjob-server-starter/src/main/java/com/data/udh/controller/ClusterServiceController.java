@@ -18,7 +18,7 @@ import com.data.udh.dto.NodeInfo;
 import com.data.udh.dto.ServiceTaskGroupType;
 import com.data.udh.dto.TaskModel;
 import com.data.udh.entity.*;
-import com.data.udh.processor.CommandExecuteActor;
+import com.data.udh.actor.CommandExecuteActor;
 import com.data.udh.processor.TaskParam;
 import com.data.udh.service.CommandHandler;
 import com.data.udh.utils.*;
