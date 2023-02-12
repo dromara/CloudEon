@@ -66,6 +66,7 @@ public class CommandTaskEntity {
     private Integer commandId;
 
     private Integer serviceInstanceId;
+    private String serviceInstanceName;
 
 
     /**

@@ -88,7 +88,7 @@ public class ClusterServiceController {
     @Resource
     private ClusterNodeRepository clusterNodeRepository;
 
-    @Transactional(value = "udhTransactionManager", rollbackFor = Exception.class)
+//    @Transactional(value = "udhTransactionManager", rollbackFor = Exception.class)
     @PostMapping("/initService")
     public ResultDTO<Void> initService(@RequestBody InitServiceRequest req) {
         Integer clusterId = req.getClusterId();
@@ -131,7 +131,7 @@ public class ClusterServiceController {
             serviceInstanceEntity.setServiceState(ServiceState.OPERATING);
             // 生成持久化宿主机路径
             String persistencePaths = stackServiceRepository.findById(stackServiceId).get().getPersistencePaths();
-            serviceInstanceEntity.setPersistencePaths(genPersistencePaths(persistencePaths,serviceName));
+            serviceInstanceEntity.setPersistencePaths(genPersistencePaths(persistencePaths, serviceName));
 
             // 持久化service信息
             serviceInstanceRepository.save(serviceInstanceEntity);
@@ -240,7 +240,6 @@ public class ClusterServiceController {
         udhActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
 
 
-
         return ResultDTO.success(null);
     }
 
@@ -262,7 +261,6 @@ public class ClusterServiceController {
 
         return result;
     }
-
 
 
     private Integer buildInstallServiceCommand(List<ServiceInstanceEntity> serviceInstanceEntities, Integer ClusterId) {
@@ -325,9 +323,10 @@ public class ClusterServiceController {
                 commandTaskEntity.setTaskShowSortNum(taskModel.getTaskSortNum());
                 commandTaskEntity.setCommandState(CommandState.WAITING);
                 commandTaskEntity.setServiceInstanceId(serviceInstanceEntity.getId());
+                commandTaskEntity.setServiceInstanceName(serviceInstanceEntity.getServiceName());
                 commandTaskRepository.saveAndFlush(commandTaskEntity);
                 // 更新日志路径
-                commandTaskEntity.setTaskLogPath(taskLogPath+ File.separator+commandEntity.getId()+"-"+commandTaskEntity.getId());
+                commandTaskEntity.setTaskLogPath(taskLogPath + File.separator + commandEntity.getId() + "-" + commandTaskEntity.getId());
                 // 更新任务参数
                 TaskParam taskParam = buildTaskParam(taskModel, commandEntity, serviceInstanceEntity, commandTaskEntity);
                 commandTaskEntity.setTaskParam(JSONObject.toJSONString(taskParam));
