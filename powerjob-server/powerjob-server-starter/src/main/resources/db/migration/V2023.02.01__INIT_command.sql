@@ -11,7 +11,7 @@ create table udh_command
     powerjob_workflow_instance_id bigint       null,
     start_time                    datetime(6)  null,
     submit_time                   datetime(6)  null,
-    total_progress                int          null,
+    current_progress                int          null,
     type                          varchar(255) null
 );
 

@@ -58,7 +58,7 @@ public class CommandEntity {
     /**
      * 总进度
      */
-    private Integer totalProgress;
+    private Integer currentProgress;
 
 
 
@@ -79,5 +79,5 @@ public class CommandEntity {
      */
     private Long powerjobAppId;
 
-    private Integer ClusterId;
+    private Integer clusterId;
 }
