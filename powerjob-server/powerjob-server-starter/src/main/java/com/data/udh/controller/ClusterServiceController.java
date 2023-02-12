@@ -1,9 +1,10 @@
 package com.data.udh.controller;
 
+import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.thread.ThreadUtil;
-import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.template.Template;
 import cn.hutool.extra.template.TemplateConfig;
@@ -17,10 +18,11 @@ import com.data.udh.dto.NodeInfo;
 import com.data.udh.dto.ServiceTaskGroupType;
 import com.data.udh.dto.TaskModel;
 import com.data.udh.entity.*;
-import com.data.udh.processor.BaseUdhTask;
+import com.data.udh.processor.CommandExecuteActor;
 import com.data.udh.processor.TaskParam;
 import com.data.udh.service.CommandHandler;
 import com.data.udh.utils.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +32,6 @@ import javax.annotation.Resource;
 import javax.persistence.EntityManager;
 import java.io.File;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
@@ -43,6 +44,7 @@ import static com.data.udh.utils.Constant.AdminUserId;
  */
 @RestController
 @RequestMapping("/service")
+@Slf4j
 public class ClusterServiceController {
 
     ExecutorService flowSchedulerThreadPool = ThreadUtil.newExecutor(5, 10, 1024);
@@ -79,6 +81,9 @@ public class ClusterServiceController {
 
     @Resource
     private CommandHandler commandHandler;
+
+    @Resource(name = "udhActorSystem")
+    private ActorSystem udhActorSystem;
 
     @Resource
     private ClusterNodeRepository clusterNodeRepository;
@@ -231,8 +236,9 @@ public class ClusterServiceController {
         List<ServiceInstanceEntity> serviceInstanceEntities = serviceInstanceRepository.findAllById(installedServiceInstanceIds);
         Integer commandId = buildInstallServiceCommand(serviceInstanceEntities, clusterId);
 
-        //         和调用workflow
-        executeFlow(commandId);
+        //  调用workflow
+        udhActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
+
 
 
         return ResultDTO.success(null);
@@ -257,51 +263,13 @@ public class ClusterServiceController {
         return result;
     }
 
-    private void executeFlow(Integer commandId) {
-        List<CommandTaskEntity> taskEntityList = commandTaskRepository.findByCommandId(commandId);
-        List<Runnable> runnableList = taskEntityList.stream().map(new Function<CommandTaskEntity, Runnable>() {
-            @Override
-            public Runnable apply(CommandTaskEntity commandTaskEntity) {
-                // 反射生成任务对象
-                BaseUdhTask o = ReflectUtil.newInstance(commandTaskEntity.getProcessorClassName());
-                // 更新command状态
-                CommandEntity updateCommandEntity = commandRepository.findById(commandId).get();
-                updateCommandEntity.setCommandState(CommandState.RUNNING);
-                commandRepository.saveAndFlush(updateCommandEntity);
-                // 填充任务参数
-                o.setTaskParam(JSONObject.parseObject(commandTaskEntity.getTaskParam(),TaskParam.class));
-                return o;
-            }
-        }).collect(Collectors.toList());
 
-        // 根据command task生成flow
-        CompletableFuture<Void> completableFuture = CompletableFuture.runAsync(new Runnable() {
-            @Override
-            public void run() {
-                System.out.println("记录command开始执行时间。。。");
-            }
-        });
-
-        for (Runnable runnable : runnableList) {
-            completableFuture =completableFuture.thenRunAsync(runnable);
-        }
-
-        completableFuture.exceptionally(new Function<Throwable, Void>() {
-            @Override
-            public Void apply(Throwable throwable) {
-                throwable.printStackTrace();
-                System.out.println("调度程序发现异常：" + throwable.getMessage());
-                return null;
-            }
-        });
-
-    }
 
     private Integer buildInstallServiceCommand(List<ServiceInstanceEntity> serviceInstanceEntities, Integer ClusterId) {
         // 创建 command
         CommandEntity commandEntity = new CommandEntity();
         commandEntity.setCommandState(CommandState.RUNNING);
-        commandEntity.setTotalProgress(0);
+        commandEntity.setCurrentProgress(0);
         commandEntity.setClusterId(ClusterId);
         commandEntity.setName(CommandType.INSTALL_SERVICE.getName());
         commandEntity.setSubmitTime(new Date());
