@@ -1,7 +1,9 @@
 package com.data.udh.test;
 
+import com.data.udh.entity.ServiceInstanceEntity;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -366,6 +368,40 @@ public class FreemarkerTest {
         dataModel.put("dependencies", depService);
 
         doRender(config, templateDir, dataModel, sid, serviceRoleMap);
+    }
+
+    @Test
+    public void renderZookeeper2() throws IOException, TemplateException {
+        Configuration config = new Configuration(Configuration.getVersion());
+        File dir = new File("/Volumes/Samsung_T5/opensource/e-mapreduce/stack/UDH-1.0.0/zookeeper/render");
+        config.setDirectoryForTemplateLoading(dir);
+        for (String templateName : dir.list()) {
+            if (templateName.endsWith("ftl")) {
+                Template template = config.getTemplate(templateName);
+                FileWriter out = new FileWriter("/Volumes/Samsung_T5/opensource/e-mapreduce/render_out/demo" + File.separator + StringUtils.substringBeforeLast(templateName, ".ftl"));
+                Map<String, Object> dataModel = new HashMap<>();
+                ServiceInstanceEntity serviceInstanceEntity = new ServiceInstanceEntity();
+                serviceInstanceEntity.setServiceName("ZOOKEEPER1");
+                dataModel.put("service", serviceInstanceEntity);
+                dataModel.put("conf", ImmutableMap.of("zookeeper.client.port","2181",
+                        "zookeeper.peer.communicate.port","2183",
+                        "zookeeper.jmxremote.port","9192",
+                        "zookeeper.container.limits.memory","-1",
+                        "zookeeper.memory.ratio","-1",
+                        "znode.container.checkIntervalMs","1000",
+                        "zookeeper.server.memory","9077",
+                        "zookeeper.leader.elect.port","3231"));
+                ImmutableMap<String, Object> node1 = ImmutableMap.of("hostname", "node001","id",1);
+                ImmutableMap<String, Object> node2 = ImmutableMap.of("hostname", "node002","id",2);
+                ImmutableMap<String, Object> node3 = ImmutableMap.of("hostname", "node003","id",3);
+                dataModel.put("serviceRoles", ImmutableMap.of("ZOOKEEPER",Lists.newArrayList(node1,node2,node3)));
+                dataModel.put("customConfs", ImmutableMap.of("zoo.cfg",ImmutableMap.of("udhzk.container.memory","1024","udhzk.container.cpu",4)));
+                dataModel.put("localhostname", "node001");
+                template.process(dataModel, out);
+                out.close();
+            }
+        }
+
     }
 
     @Data
