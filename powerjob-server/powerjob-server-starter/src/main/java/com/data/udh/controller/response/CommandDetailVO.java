@@ -1,27 +1,25 @@
-package com.data.udh.entity;
+package com.data.udh.controller.response;
 
+import com.data.udh.entity.CommandTaskEntity;
 import com.data.udh.utils.CommandState;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import org.hibernate.annotations.GenericGenerator;
+import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
-/**
- * 指令表
- */
-@Entity
-@Table(name = "udh_command")
 @Data
-public class CommandEntity {
-    private static final long serialVersionUID = 1L;
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class CommandDetailVO {
 
-    /**
-     * 主键
-     */
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
-    @GenericGenerator(name = "native", strategy = "native")
     private Integer id;
 
     /**
@@ -61,23 +59,14 @@ public class CommandEntity {
     private Integer currentProgress;
 
 
-
-
-
     /**
      * 操作人id
      */
     private Integer operateUserId;
 
-    /**
-     * 工作流实例Id
-     */
-    private Long powerjobWorkflowInstanceId;
-
-    /**
-     * App Id
-     */
-    private Long powerjobAppId;
 
     private Integer clusterId;
+
+    Map<String, List<CommandTaskEntity>> tasksMap;
+
 }

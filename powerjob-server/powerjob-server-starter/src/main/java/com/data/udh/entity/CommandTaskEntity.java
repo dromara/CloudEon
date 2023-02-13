@@ -1,5 +1,6 @@
 package com.data.udh.entity;
 
+import com.data.udh.utils.CommandState;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -34,9 +35,19 @@ public class CommandTaskEntity {
     private String taskName;
 
     /**
+     * 任务参数
+     */
+    private String taskParam;
+
+    private String processorClassName;
+
+    /**
      * 运行状态
      */
-    private String commandState;
+    @Enumerated(EnumType.STRING)
+    private CommandState commandState;
+
+    private String taskLogPath;
 
 
     /**
@@ -51,6 +62,11 @@ public class CommandTaskEntity {
 
 
     private Integer commandTaskGroupId;
+
+    private Integer commandId;
+
+    private Integer serviceInstanceId;
+    private String serviceInstanceName;
 
 
     /**

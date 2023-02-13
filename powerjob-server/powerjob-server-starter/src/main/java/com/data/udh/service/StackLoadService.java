@@ -111,6 +111,7 @@ public class StackLoadService implements ApplicationRunner {
                     stackServiceEntity.setDependencies(StrUtil.join(",", serviceInfo.getDependencies()));
                     stackServiceEntity.setCustomConfigFiles(StrUtil.join(",", serviceInfo.getCustomConfigFiles()));
                     stackServiceEntity.setServiceConfigurationYaml(yaml.dump(serviceInfo.getConfigurations()));
+                    stackServiceEntity.setPersistencePaths(StrUtil.join(",", serviceInfo.getPersistencePaths()));
                     // 持久化图标base64
                     stackServiceEntity.setIconDanger(iconDangerStr);
                     stackServiceEntity.setIconDefault(iconDefaultStr);
