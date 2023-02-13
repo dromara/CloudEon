@@ -8,5 +8,6 @@ import java.util.List;
 public interface ClusterNodeRepository extends JpaRepository<ClusterNodeEntity, Integer> {
     Integer countByIp(String ip);
 
+    ClusterNodeEntity findByHostname(String hostname);
     public List<ClusterNodeEntity> findByClusterId(Integer clusterId);
 }
