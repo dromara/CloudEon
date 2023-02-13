@@ -1,10 +1,12 @@
 package com.data.udh;
 
+import akka.actor.ActorSystem;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import tech.powerjob.worker.PowerJobWorker;
 import tech.powerjob.worker.common.PowerJobWorkerConfig;
@@ -19,6 +21,10 @@ public class StartPowerJobWorker implements CommandLineRunner {
     @Value("${server.port}")
     private String powerJobServerPort;
 
+    @Bean("udhActorSystem")
+    public ActorSystem udhActorSystem() {
+        return ActorSystem.create("udhActorSystem");
+    }
     @Override
     public void run(String... args) throws Exception {
         // 1. 创建配置文件

@@ -40,7 +40,7 @@ roles:
     jmxPort: 9232
 
 
-
+persistencePaths: []
 
 customConfigFiles:
   - capacity-scheduler.xml

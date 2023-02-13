@@ -18,4 +18,5 @@ public class StackServiceInfo {
     private List<String> customConfigFiles;
     private List<StackServiceRole> roles;
     private List<StackConfiguration> configurations;
+    private List<String> persistencePaths;
 }

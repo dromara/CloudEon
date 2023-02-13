@@ -9,6 +9,33 @@ import java.util.function.*;
 
 @Slf4j
 public class CompleteFutureTest {
+    @Test
+    public void thenAsync() {
+        CompletableFuture<Void> task1 = CompletableFuture
+                .runAsync(() -> System.out.println(Thread.currentThread().getName() + ":task1"));
+
+        CompletableFuture<Void> task2 = task1.thenRunAsync(new Runnable() {
+            @Override
+            public void run() {
+                doSleep(5000);
+                System.out.println(Thread.currentThread().getName() + ":task2");
+            }
+        });
+
+        CompletableFuture<Void> task3 = task2.thenRunAsync(new Runnable() {
+            @Override
+            public void run() {
+                doSleep(5000);
+                System.out.println(Thread.currentThread().getName() + ":task3");
+            }
+        });
+
+
+//        doSleep(15000);
+
+
+        System.out.println("main");
+    }
 
     @Test
     public void then1() {
@@ -190,24 +217,25 @@ public class CompleteFutureTest {
         }).thenApply(new Function<Integer, Integer>() {
             @Override
             public Integer apply(Integer integer) {
-                return integer / 0;
+//                return integer / 0;
+                return integer / 10;
             }
         }).thenAccept(new Consumer<Integer>() {
             @Override
             public void accept(Integer integer) {
                 System.out.println("计算结果：" + integer);
             }
+        }).whenComplete(new BiConsumer<Void, Throwable>() {
+            @Override
+            public void accept(Void unused, Throwable throwable) {
+                System.out.println("无论是否异常，都会执行。。。。" + throwable);
+            }
         }).exceptionally(new Function<Throwable, Void>() {
             @Override
             public Void apply(Throwable throwable) {
 
-                System.out.println("出现异常");
+                System.out.println("处理异常" + throwable.getMessage());
                 return null;
-            }
-        }).whenComplete(new BiConsumer<Void, Throwable>() {
-            @Override
-            public void accept(Void unused, Throwable throwable) {
-                System.out.println("无论是否异常，都会执行。。。。");
             }
         });
 
