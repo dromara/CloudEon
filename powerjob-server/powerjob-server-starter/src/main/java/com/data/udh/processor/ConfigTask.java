@@ -56,7 +56,8 @@ public class ConfigTask extends BaseUdhTask {
 
         // 创建工作目录  ${workHome}/zookeeper1/node001/conf
         String workHome = udhConfigProp.getWorkHome();
-        String confPath = workHome + File.separator + serviceInstanceEntity.getServiceName() + File.separator + taskParam.getHostName() + File.separator + CONF_DIR;
+        String taskExecuteHostName = taskParam.getHostName();
+        String confPath = workHome + File.separator + serviceInstanceEntity.getServiceName() + File.separator + taskExecuteHostName + File.separator + CONF_DIR;
         // 先删除清空
         FileUtil.del(confPath);
         FileUtil.mkdir(confPath);
@@ -84,7 +85,7 @@ public class ConfigTask extends BaseUdhTask {
             }).collect(Collectors.groupingBy(RoleNodeInfo::getRoleName));
 
             dataModel.put("serviceRoles", serviceRoles);
-            dataModel.put("localhostname", "node001");
+            dataModel.put("localhostname", taskExecuteHostName);
 
             // 获取该服务支持的自定义配置文件名
             String customConfigFiles = stackServiceEntity.getCustomConfigFiles();
@@ -118,10 +119,9 @@ public class ConfigTask extends BaseUdhTask {
                 }
             }
 
-        } catch (IOException e) {
+        } catch (IOException | TemplateException e) {
             e.printStackTrace();
-        } catch (TemplateException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         // ssh上传所有配置文件到指定目录
