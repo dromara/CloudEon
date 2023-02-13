@@ -10,7 +10,9 @@ const { REACT_APP_ENV } = process.env;
 
 export default defineConfig({
   hash: true,
-  antd: {},
+  antd: {
+    dark: false,
+  },
   dva: {
     hmr: true,
   },
