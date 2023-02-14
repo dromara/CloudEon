@@ -129,18 +129,18 @@ public class SshUtils {
         int exitStatus = ce.getExitStatus();
         LOG.info("mina result {}", exitStatus);
         if (exitStatus != 0) {
-            throw new RuntimeException("ssh 执行命令失败："+err.toString());
+            throw new RuntimeException("ssh 执行命令失败：" + err.toString());
         }
         LOG.info("exe cmd return : {}", out);
         return out.toString().trim();
     }
 
     /**
-     * 上传文件,相同路径ui覆盖
+     * 上传单个文件到指定目录,相同路径ui覆盖
      *
-     * @param session    连接
+     * @param session       连接
      * @param remoteDirPath 远程目录地址
-     * @param inputFile  文件 File
+     * @param inputFile     文件 File
      */
     public static boolean uploadFile(ClientSession session, String remoteDirPath, String inputFile) {
         File uploadFile = new File(inputFile);
@@ -156,14 +156,27 @@ public class SshUtils {
             input = Files.newInputStream(uploadFile.toPath());
             Path file = path.resolve(uploadFile.getName());
             if (Files.exists(file)) {
-                LOG.info("delete file  {}", file);
+                LOG.info("delete remote file  {}", file);
                 Files.deleteIfExists(file);
             }
             Files.copy(input, file);
-            LOG.info("file copy success");
+            LOG.info("local file {} copy to remote success " ,uploadFile.toPath());
             return true;
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 将本地目录里所有文件拷贝到远程目录中
+     * @param session
+     * @param remoteDirPath
+     * @param localDir
+     */
+    public static void uploadLocalDirToRemote(ClientSession session, String remoteDirPath, String localDir) {
+        for (String file : new File(localDir).list()) {
+            String localFilePath = localDir + File.separator + file;
+            uploadFile(session, remoteDirPath, localFilePath);
         }
     }
 
@@ -192,8 +205,8 @@ public class SshUtils {
     public static void main(String[] args) throws IOException, InterruptedException {
         ClientSession session = SshUtils.openConnection("localhost", 22, "huzekang",
                 "/Users/huzekang/.ssh/id_rsa");
-            String ls = SshUtils.execCmdWithResult(session, "java -version");
-            System.out.println(ls);
+        String ls = SshUtils.execCmdWithResult(session, "java -version");
+        System.out.println(ls);
 //        boolean dir = MinaUtils.createDir(session,"/home/shinow/test/");
 //        System.out.println(dir);
 //        boolean uploadFile = MinaUtils.uploadFile(session, "/Users/liuxin/opt/test", "/Users/liuxin/Downloads/yarn-default.xml");

@@ -82,6 +82,7 @@ public abstract class BaseUdhTask implements Runnable {
     }
 
     private void doWhenError(Exception e) {
+        e.printStackTrace();
         log.info(taskParam.getCommandTaskId() + ":发生异常，处理异常。。。" + e.getMessage());
         CommandTaskEntity commandTaskEntity = commandTaskRepository.findById(taskParam.getCommandTaskId()).get();
         commandTaskEntity.setEndTime(new Date());
