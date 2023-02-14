@@ -12,4 +12,6 @@ public interface ServiceInstanceConfigRepository extends JpaRepository<ServiceIn
 
     List<ServiceInstanceConfigEntity> findByServiceInstanceIdAndCustomConfFile(Integer serviceInstanceId, String customConfFile);
 
+    int deleteByServiceInstanceId(Integer serviceInstanceId);
+
 }
