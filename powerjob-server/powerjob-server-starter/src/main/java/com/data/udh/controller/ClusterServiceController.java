@@ -88,7 +88,7 @@ public class ClusterServiceController {
     @Resource
     private ClusterNodeRepository clusterNodeRepository;
 
-//    @Transactional(value = "udhTransactionManager", rollbackFor = Exception.class)
+    //    @Transactional(value = "udhTransactionManager", rollbackFor = Exception.class)
     @PostMapping("/initService")
     public ResultDTO<Void> initService(@RequestBody InitServiceRequest req) {
         Integer clusterId = req.getClusterId();
@@ -246,7 +246,7 @@ public class ClusterServiceController {
     /**
      * 通过模板生成服务实例持久化到宿主机的目录
      */
-    private String genPersistencePaths(String persistencePaths,String serviceInstanceId) {
+    private String genPersistencePaths(String persistencePaths, String serviceInstanceId) {
         TemplateEngine engine = TemplateUtil.createEngine(new TemplateConfig());
         String result = Arrays.stream(persistencePaths.split(",")).map(new Function<String, String>() {
             @Override
@@ -389,5 +389,25 @@ public class ClusterServiceController {
 
 
         return ResultDTO.success(result);
+    }
+
+    /**
+     * 删除服务实例
+     */
+    @GetMapping("/deleteServiceInstance")
+    @Transactional(value = "udhTransactionManager", rollbackFor = Exception.class)
+    public ResultDTO<Void> deleteServiceInstance(Integer serviceInstanceId) {
+
+        // 删除服务实例表
+        serviceInstanceRepository.deleteById(serviceInstanceId);
+        // 删除服务角色实例表
+        roleInstanceRepository.deleteByServiceInstanceId(serviceInstanceId);
+        // 删除服务角色配置表
+        serviceInstanceConfigRepository.deleteByServiceInstanceId(serviceInstanceId);
+        // 删除服务ui表
+        serviceInstanceConfigRepository.deleteByServiceInstanceId(serviceInstanceId);
+
+
+        return ResultDTO.success(null);
     }
 }
