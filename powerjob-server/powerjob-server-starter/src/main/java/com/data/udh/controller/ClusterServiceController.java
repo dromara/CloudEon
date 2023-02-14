@@ -6,7 +6,6 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.template.Template;
 import cn.hutool.extra.template.TemplateConfig;
 import cn.hutool.extra.template.TemplateEngine;
 import cn.hutool.extra.template.TemplateUtil;
@@ -22,6 +21,10 @@ import com.data.udh.actor.CommandExecuteActor;
 import com.data.udh.processor.TaskParam;
 import com.data.udh.service.CommandHandler;
 import com.data.udh.utils.*;
+import freemarker.cache.StringTemplateLoader;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +34,9 @@ import tech.powerjob.common.response.ResultDTO;
 import javax.annotation.Resource;
 import javax.persistence.EntityManager;
 import java.io.File;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -251,10 +257,19 @@ public class ClusterServiceController {
         String result = Arrays.stream(persistencePaths.split(",")).map(new Function<String, String>() {
             @Override
             public String apply(String pathTemplate) {
-                Template template = engine.getTemplate(pathTemplate);
-                //Dict本质上为Map，此处可用Map
-                String result = template.render(Dict.create().set("serviceInstanceId", serviceInstanceId.toLowerCase()));
-                return result;
+                Configuration cfg = new Configuration();
+                StringTemplateLoader stringLoader = new StringTemplateLoader();
+                stringLoader.putTemplate("myTemplate",pathTemplate);
+                cfg.setTemplateLoader(stringLoader);
+                try (  Writer out = new StringWriter(2048);){
+                    Template temp = cfg.getTemplate("myTemplate","utf-8");
+                    temp.process(Dict.create().set("serviceInstanceId", serviceInstanceId), out);
+                    return out.toString();
+                } catch (IOException | TemplateException e) {
+                    e.printStackTrace();
+                }
+
+                return null;
             }
         }).collect(Collectors.joining(","));
 

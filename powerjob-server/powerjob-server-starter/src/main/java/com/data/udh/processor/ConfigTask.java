@@ -6,8 +6,7 @@ import com.data.udh.config.UdhConfigProp;
 import com.data.udh.dao.*;
 import com.data.udh.dto.RoleNodeInfo;
 import com.data.udh.entity.*;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
+import com.data.udh.utils.SshUtils;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -15,15 +14,14 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.sshd.client.session.ClientSession;
 
 import java.io.*;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @NoArgsConstructor
 @Slf4j
@@ -57,10 +55,10 @@ public class ConfigTask extends BaseUdhTask {
         // 创建工作目录  ${workHome}/zookeeper1/node001/conf
         String workHome = udhConfigProp.getWorkHome();
         String taskExecuteHostName = taskParam.getHostName();
-        String confPath = workHome + File.separator + serviceInstanceEntity.getServiceName() + File.separator + taskExecuteHostName + File.separator + CONF_DIR;
+        String outputConfPath = workHome + File.separator + serviceInstanceEntity.getServiceName() + File.separator + taskExecuteHostName + File.separator + CONF_DIR;
         // 先删除清空
-        FileUtil.del(confPath);
-        FileUtil.mkdir(confPath);
+        FileUtil.del(outputConfPath);
+        FileUtil.mkdir(outputConfPath);
 
         // 用freemarker在本地生成服务实例的所有配置文件
         // 创建核心配置对象
@@ -68,6 +66,7 @@ public class ConfigTask extends BaseUdhTask {
         // 设置加载的目录
         try {
             String renderDir = udhConfigProp.getStackLoadPath() + File.separator + stackCode + File.separator + stackServiceName + File.separator + RENDER_DIR;
+            log.info("加载配置文件模板目录："+renderDir);
             File renderDirFile = new File(renderDir);
             config.setDirectoryForTemplateLoading(renderDirFile);
             // 构建数据模型
@@ -107,13 +106,17 @@ public class ConfigTask extends BaseUdhTask {
             for (String templateName : renderDirFile.list()) {
                 if (templateName.endsWith(".ftl")) {
                     Template template = config.getTemplate(templateName);
-                    FileWriter out = new FileWriter(confPath + File.separator + StringUtils.substringBeforeLast(templateName, ".ftl"));
+                    String outPutFile = outputConfPath + File.separator + StringUtils.substringBeforeLast(templateName, ".ftl");
+                    FileWriter out = new FileWriter(outPutFile);
                     template.process(dataModel, out);
+                    log.info("完成配置文件生成："+outPutFile);
                     out.close();
                 } else {
                     InputStream fileReader = new FileInputStream(renderDir + File.separator + templateName);
-                    FileOutputStream out = new FileOutputStream(confPath + File.separator + templateName);
+                    String outPutFile = outputConfPath + File.separator + templateName;
+                    FileOutputStream out = new FileOutputStream(outPutFile);
                     IOUtils.copy(fileReader, out);
+                    log.info("完成配置文件生成："+outPutFile);
                     IOUtils.close(fileReader);
                     IOUtils.close(out);
                 }
@@ -125,6 +128,13 @@ public class ConfigTask extends BaseUdhTask {
         }
 
         // ssh上传所有配置文件到指定目录
+        ClusterNodeEntity nodeEntity = clusterNodeRepository.findByHostname(taskParam.getHostName());
+        ClientSession clientSession = SshUtils.openConnectionByPassword(nodeEntity.getIp(), nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getSshPassword());
+        String remoteDirPath = "/opt/udh/" + serviceInstanceEntity.getServiceName() + File.separator + "conf";
+        log.info("拷贝本地配置目录："+outputConfPath+" 到节点"+taskParam.getHostName()+"的："+remoteDirPath);
+        SshUtils.uploadLocalDirToRemote(clientSession, remoteDirPath, outputConfPath);
+        log.info("成功拷贝本地配置目录："+outputConfPath+" 到节点"+taskParam.getHostName()+"的："+remoteDirPath);
+        SshUtils.closeConnection(clientSession);
 
 
     }

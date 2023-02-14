@@ -1,9 +1,14 @@
 package com.data.udh.test;
 
+import cn.hutool.core.lang.Dict;
+import cn.hutool.extra.template.TemplateConfig;
+import cn.hutool.extra.template.TemplateEngine;
+import cn.hutool.extra.template.TemplateUtil;
 import com.data.udh.entity.ServiceInstanceEntity;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import freemarker.cache.StringTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -17,6 +22,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -402,6 +408,36 @@ public class FreemarkerTest {
             }
         }
 
+    }
+
+    @Test
+    public void template() {
+        TemplateEngine engine = TemplateUtil.createEngine(new TemplateConfig());
+        String serviceInstanceId = "zookeeper1";
+        String persistencePaths = "/opt/udh/etc/${serviceInstanceId}/conf,/opt/udh/var/log/${serviceInstanceId},/opt/udh/var/${serviceInstanceId}";
+        String result = Arrays.stream(persistencePaths.split(",")).map(new Function<String, String>() {
+            @Override
+            public String apply(String pathTemplate) {
+                Configuration cfg = new Configuration();
+                StringTemplateLoader stringLoader = new StringTemplateLoader();
+                stringLoader.putTemplate("myTemplate",pathTemplate);
+                cfg.setTemplateLoader(stringLoader);
+                try {
+                    Template temp = cfg.getTemplate("myTemplate","utf-8");
+                    Writer out = new StringWriter(2048);
+                    temp.process(Dict.create().set("serviceInstanceId", serviceInstanceId.toLowerCase()), out);
+                    return out.toString();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (TemplateException e) {
+                    e.printStackTrace();
+                }
+
+
+                return null;
+            }
+        }).collect(Collectors.joining(","));
+        System.out.println(result);
     }
 
     @Data

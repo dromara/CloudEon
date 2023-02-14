@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-export ZOOKEEPER_LOG_DIR=/var/log/${service.serviceName}
-export ZOOKEEPER_DATA_DIR=/var/${service.serviceName}
+export ZOOKEEPER_LOG_DIR=/opt/udh/${service.serviceName}/log
+export ZOOKEEPER_DATA_DIR=/opt/udh/${service.serviceName}/data
 
 export SERVER_JVMFLAGS="-Dcom.sun.management.jmxremote.port=${conf['zookeeper.jmxremote.port']} -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false"
 
@@ -14,7 +14,7 @@ export SERVER_JVMFLAGS="-Dcom.sun.management.jmxremote.port=${conf['zookeeper.jm
 </#if>
 export SERVER_JVMFLAGS="-Xmx${memory?floor}m $SERVER_JVMFLAGS"
 
-export SERVER_JVMFLAGS="-Dzookeeper.log.dir=/var/log/${service.serviceName} -Dzookeeper.root.logger=INFO,ROLLINGFILE $SERVER_JVMFLAGS"
+export SERVER_JVMFLAGS="-Dzookeeper.log.dir=/opt/udh/${service.serviceName}/log -Dzookeeper.root.logger=INFO,ROLLINGFILE $SERVER_JVMFLAGS"
 
 export SERVER_JVMFLAGS="-Dznode.container.checkIntervalMs=${conf['znode.container.checkIntervalMs']} $SERVER_JVMFLAGS"
 
