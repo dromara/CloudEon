@@ -219,4 +219,24 @@ declare namespace API {
     data?: any[];
   }
 
+  type commandResult = {
+    success?: boolean;
+    message?: string;
+    data?: commandType;
+  }
+
+  type commandType = {
+    id: number;
+    name: string;
+    "type": string,
+    "commandState": string,
+    "submitTime": string,
+    "startTime": string,
+    "endTime": string,
+    "currentProgress": number,
+    "operateUserId": number,
+    "clusterId": number,
+    // "tasksMap":
+  }
+
 }
