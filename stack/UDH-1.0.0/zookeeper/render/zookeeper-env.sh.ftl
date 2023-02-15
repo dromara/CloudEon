@@ -2,6 +2,7 @@
 
 export ZOOKEEPER_LOG_DIR=/opt/udh/${service.serviceName}/log
 export ZOOKEEPER_DATA_DIR=/opt/udh/${service.serviceName}/data
+export ZOOPIDFILE="/opt/udh/${service.serviceName}/data/zookeeper-server.pid"
 
 export SERVER_JVMFLAGS="-Dcom.sun.management.jmxremote.port=${conf['zookeeper.jmxremote.port']} -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false"
 
