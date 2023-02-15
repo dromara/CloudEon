@@ -8,7 +8,7 @@ import lombok.Getter;
 public enum TaskType {
 
     TAG_HOST(1, "添加k8s节点标签", "com.data.udh.processor.ExampleTask", true),
-    START_K8S_SERVICE(2, "启动k8s服务", "com.data.udh.processor.ExampleTask", false),
+    START_K8S_SERVICE(2, "启动角色k8s服务", "com.data.udh.processor.StartRoleK8sServiceTask", false),
     PULL_IMAGE_FROM_REGISTRY_TO_HOST(3, "拉取docker registry镜像到节点", "com.data.udh.processor.ExampleTask", true),
     INSTALL_ROLE_TO_HOST(4, "安装服务角色到节点", "com.data.udh.processor.InstallTask", true),
     CONFIG_ROLE_TO_HOST(5, "配置服务角色到节点", "com.data.udh.processor.ConfigTask", true),

@@ -197,6 +197,7 @@ public class ClusterServiceController {
             }
 
             List<InitServiceRequest.InitServicePresetConf> presetConfList = serviceInfo.getPresetConfList();
+            // todo 除初始化时页面上的配置，还得加载框架本身的默认配置
             List<ServiceInstanceConfigEntity> serviceInstanceConfigEntities = presetConfList.stream().map(new Function<InitServiceRequest.InitServicePresetConf, ServiceInstanceConfigEntity>() {
                 @Override
                 public ServiceInstanceConfigEntity apply(InitServiceRequest.InitServicePresetConf initServicePresetConf) {

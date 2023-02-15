@@ -3,14 +3,14 @@ apiVersion: "apps/v1"
 kind: "Deployment"
 metadata:
   labels:
-    name: "zookeeper-server-zookeeper1"
-  name: "zookeeper-server-zookeeper1"
+    name: "zookeeper-server-${service.serviceName}"
+  name: "zookeeper-server-${service.serviceName}"
   namespace: "default"
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: "zookeeper-server-zookeeper1"
+      app: "zookeeper-server-${service.serviceName}"
   strategy:
     type: "RollingUpdate"
     rollingUpdate:
@@ -21,19 +21,19 @@ spec:
   template:
     metadata:
       labels:
-        name: "zookeeper-server-zookeeper1"
-        app: "zookeeper-server-zookeeper1"
-        podConflictName: "zookeeper-server-zookeeper1"
+        name: "zookeeper-server-${service.serviceName}"
+        app: "zookeeper-server-${service.serviceName}"
+        podConflictName: "zookeeper-server-${service.serviceName}"
       annotations:
-        serviceInstanceName: "ZooKeeper1"
+        serviceInstanceName: "${service.serviceName}"
     spec:
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
           - labelSelector:
               matchLabels:
-                name: "zookeeper-server-zookeeper1"
-                podConflictName: "zookeeper-server-zookeeper1"
+                name: "zookeeper-server-${service.serviceName}"
+                podConflictName: "zookeeper-server-${service.serviceName}"
             namespaces:
             - "default"
             topologyKey: "kubernetes.io/hostname"
@@ -44,52 +44,40 @@ spec:
         - "boot.sh"
         - "ZOOKEEPER"
         env:
-        - name: "ZOOKEEPER_CONF_DIR"
-          value: "/etc/zookeeper1/conf"
-        image: "udh/zookeeper:3.5.5"
+        - name: "ZOOCFGDIR"
+          value: "/opt/udh/${service.serviceName}/conf"
+        image: "${dockerImage}"
         imagePullPolicy: "Always"
-        readinessProbe:
-          exec:
-            command:
-            - "/bin/bash"
-            - "-c"
-            - "echo twzkstat | nc localhost 2181 > /tmp/staty; cat /tmp/staty; grep\
-              \ -qE 'Mode: (follower|leader|standalone)' /tmp/staty"
-          failureThreshold: 3
-          initialDelaySeconds: 3
-          periodSeconds: 30
-          successThreshold: 1
-          timeoutSeconds: 15
-        name: "zookeeper-server-zookeeper1"
+        name: "zookeeper-server-${service.serviceName}"
         resources:
           requests: {}
           limits: {}
         securityContext:
           privileged: true
         volumeMounts:
-        - mountPath: "/var/zookeeper1"
+        - mountPath: "/opt/udh/${service.serviceName}/data"
           name: "data"
-        - mountPath: "/var/log/zookeeper1/"
+        - mountPath: "/opt/udh/${service.serviceName}/log"
           name: "log"
         - mountPath: "/etc/localtime"
           name: "timezone"
-        - mountPath: "/etc/zookeeper1/conf"
+        - mountPath: "/opt/udh/${service.serviceName}/conf"
           name: "conf"
 
       nodeSelector:
-        zookeeper-server-zookeeper1: "true"
+        zookeeper-server-${service.serviceName}: "true"
       terminationGracePeriodSeconds: 30
       volumes:
       - hostPath:
-          path: "/var/zookeeper1"
+          path: "/opt/udh/${service.serviceName}/data"
         name: "data"
       - hostPath:
-          path: "/var/log/zookeeper1/"
+          path: "/opt/udh/${service.serviceName}/log"
         name: "log"
       - hostPath:
           path: "/etc/localtime"
         name: "timezone"
       - hostPath:
-          path: "/etc/zookeeper1/conf"
+          path: "/opt/udh/${service.serviceName}/conf"
         name: "conf"
 
