@@ -134,7 +134,17 @@ export async function getCommandListAPI(options?: { [key: string]: any }) {
 
 /** 指令明细 */
 export async function getCommandDetailAPI(options?: { [key: string]: any }) {
-  return request<API.normalResult>('/command/detail', {
+  return request<API.commandResult>('/command/detail', {
+    method: 'GET',
+    params: {
+      ...options,
+    },
+  });
+}
+
+/** 删除服务 */
+export async function deleteServiceAPI(options?: { [key: string]: any }) {
+  return request<API.normalResult>('/service/deleteServiceInstance', {
     method: 'GET',
     params: {
       ...options,
