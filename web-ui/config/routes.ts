@@ -67,6 +67,13 @@
     component: './colony/actionList',
   },
   {
+    name: 'actionDetail',
+    icon: 'smile',
+    hideInMenu: true,
+    path: '/colony/actionList/detail',
+    component: './colony/actionList/detail',
+  },
+  {
     path: '/user',
     layout: false,
     routes: [
