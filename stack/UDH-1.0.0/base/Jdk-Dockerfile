@@ -4,7 +4,7 @@ ENV TZ=Asia/Shanghai
 
 
 # install tools
-RUN  yum  -y install  wget net-tools vim perl which 
+RUN  yum  -y install  wget net-tools vim perl which  nc
 # setup jdk
 ARG JAVA_VERSION=jdk1.8.0_141
 ENV JAVA_HOME /opt/${JAVA_VERSION}
@@ -17,3 +17,28 @@ RUN wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2
 RUN wget https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.14.0/jmx_prometheus_javaagent-0.14.0.jar && mkdir -p /opt/jmx_exporter && mv  jmx_prometheus_javaagent-0.14.0.jar /opt/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar
 
 
+# add user
+RUN useradd -ms /bin/bash  hdfs  && \
+ useradd -ms /bin/bash  yarn && \
+ useradd -ms /bin/bash  hadoop && \
+ useradd -ms /bin/bash  hive && \
+ useradd -ms /bin/bash  spark && \
+ useradd -ms /bin/bash  zookeeper && \
+ useradd -ms /bin/bash  hbase && \
+ useradd -ms /bin/bash  kyuubi  && \
+ useradd -ms /bin/bash  flink
+
+# add group
+RUN groupadd supergroup
+
+# add user to group
+RUN usermod  -aG supergroup  root && \
+ usermod  -aG supergroup  hdfs && \
+ usermod  -aG supergroup  yarn && \
+ usermod  -aG supergroup  hadoop && \
+ usermod  -aG supergroup  hive && \
+ usermod  -aG supergroup  spark && \
+ usermod  -aG supergroup  zookeeper && \
+ usermod  -aG supergroup  hbase && \
+ usermod  -aG supergroup  kyuubi && \
+ usermod  -aG supergroup  flink
