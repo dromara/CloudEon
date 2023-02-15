@@ -17,14 +17,13 @@ public class SshTest {
     @Test
     public void execCmdWithResult() throws IOException {
         ClientSession session = SshUtils.openConnectionByPassword(
-                "fl001",
+                "10.81.16.19",
                 22,
                 "root",
                 "Ltcyhlwylym@admin2021zi!");
 
-        SshUtils.uploadFile(session,"/tmp/hzk-open", "/Users/huzekang/Downloads/apache-zookeeper-3.6.3-bin.tar.gz");
-        SshUtils.execCmdWithResult(session,"tar -zxvf /tmp/hzk-open/apache-zookeeper-3.6.3-bin.tar.gz -C /tmp/hzk-open");
-
+//        SshUtils.uploadFile(session,"/opt/udh/ZOOKEEPER1/conf", "/Users/huzekang/Downloads/apache-zookeeper-3.6.3-bin.tar.gz");
+        SshUtils.uploadLocalDirToRemote(session,"/opt/udh/ZOOKEEPER1/conf","/Volumes/Samsung_T5/opensource/e-mapreduce/work/ZOOKEEPER1/fl001/conf");
     }
 
 

@@ -19,9 +19,9 @@ roles:
     jmxPort: 9232
 
 persistencePaths:
-  - /etc/${serviceInstanceId}/conf
-  - /var/log/${serviceInstanceId}
-  - /var/${serviceInstanceId}
+  - /opt/udh/${serviceInstanceId}/conf
+  - /opt/udh/${serviceInstanceId}/log
+  - /opt/udh/${serviceInstanceId}/data
 
 
 customConfigFiles:
@@ -54,6 +54,7 @@ configurations:
     recommendExpression: 9911
     valueType: PORT
     groups: [ ]
+    configurableInWizard: true
 
 
   - name: tickTime
@@ -142,4 +143,5 @@ configurations:
     recommendExpression: 1000
     valueType: NON_NEG_INT
     groups: [ ]
+    configurableInWizard: true
 

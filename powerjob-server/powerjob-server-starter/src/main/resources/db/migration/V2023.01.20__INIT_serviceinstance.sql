@@ -10,6 +10,7 @@ create table udh_service_instance_config
     name              varchar(255) null,
     node_id           int          null,
     recommended_value varchar(255) null,
+    custom_conf_file varchar(255) null,
     service_instance_id        int          null,
     update_time       datetime(6)  null,
     user_id           int          null,
