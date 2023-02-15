@@ -30,7 +30,7 @@ const Colony: React.FC = () => {
     setStackLoading(true)
     const result: API.StackList =  await getStackListAPI(params);
     setStackLoading(false)
-    setStackList(result.data)
+    setStackList(result?.data)
   };
 
   useEffect(() => {
