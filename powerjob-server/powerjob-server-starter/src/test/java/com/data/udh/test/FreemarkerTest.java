@@ -1,7 +1,14 @@
 package com.data.udh.test;
 
+import cn.hutool.core.lang.Dict;
+import cn.hutool.extra.template.TemplateConfig;
+import cn.hutool.extra.template.TemplateEngine;
+import cn.hutool.extra.template.TemplateUtil;
+import com.data.udh.entity.ServiceInstanceEntity;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import freemarker.cache.StringTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -15,6 +22,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -366,6 +374,70 @@ public class FreemarkerTest {
         dataModel.put("dependencies", depService);
 
         doRender(config, templateDir, dataModel, sid, serviceRoleMap);
+    }
+
+    @Test
+    public void renderZookeeper2() throws IOException, TemplateException {
+        Configuration config = new Configuration(Configuration.getVersion());
+        File dir = new File("/Volumes/Samsung_T5/opensource/e-mapreduce/stack/UDH-1.0.0/zookeeper/render");
+        config.setDirectoryForTemplateLoading(dir);
+        for (String templateName : dir.list()) {
+            if (templateName.endsWith("ftl")) {
+                Template template = config.getTemplate(templateName);
+                FileWriter out = new FileWriter("/Volumes/Samsung_T5/opensource/e-mapreduce/render_out/demo" + File.separator + StringUtils.substringBeforeLast(templateName, ".ftl"));
+                Map<String, Object> dataModel = new HashMap<>();
+                ServiceInstanceEntity serviceInstanceEntity = new ServiceInstanceEntity();
+                serviceInstanceEntity.setServiceName("ZOOKEEPER1");
+                dataModel.put("service", serviceInstanceEntity);
+                dataModel.put("conf", ImmutableMap.of("zookeeper.client.port","2181",
+                        "zookeeper.peer.communicate.port","2183",
+                        "zookeeper.jmxremote.port","9192",
+                        "zookeeper.container.limits.memory","-1",
+                        "zookeeper.memory.ratio","-1",
+                        "znode.container.checkIntervalMs","1000",
+                        "zookeeper.server.memory","9077",
+                        "zookeeper.leader.elect.port","3231"));
+                ImmutableMap<String, Object> node1 = ImmutableMap.of("hostname", "node001","id",1);
+                ImmutableMap<String, Object> node2 = ImmutableMap.of("hostname", "node002","id",2);
+                ImmutableMap<String, Object> node3 = ImmutableMap.of("hostname", "node003","id",3);
+                dataModel.put("serviceRoles", ImmutableMap.of("ZOOKEEPER",Lists.newArrayList(node1,node2,node3)));
+                dataModel.put("customConfs", ImmutableMap.of("zoo.cfg",ImmutableMap.of("udhzk.container.memory","1024","udhzk.container.cpu",4)));
+                dataModel.put("localhostname", "node001");
+                template.process(dataModel, out);
+                out.close();
+            }
+        }
+
+    }
+
+    @Test
+    public void template() {
+        TemplateEngine engine = TemplateUtil.createEngine(new TemplateConfig());
+        String serviceInstanceId = "zookeeper1";
+        String persistencePaths = "/opt/udh/etc/${serviceInstanceId}/conf,/opt/udh/var/log/${serviceInstanceId},/opt/udh/var/${serviceInstanceId}";
+        String result = Arrays.stream(persistencePaths.split(",")).map(new Function<String, String>() {
+            @Override
+            public String apply(String pathTemplate) {
+                Configuration cfg = new Configuration();
+                StringTemplateLoader stringLoader = new StringTemplateLoader();
+                stringLoader.putTemplate("myTemplate",pathTemplate);
+                cfg.setTemplateLoader(stringLoader);
+                try {
+                    Template temp = cfg.getTemplate("myTemplate","utf-8");
+                    Writer out = new StringWriter(2048);
+                    temp.process(Dict.create().set("serviceInstanceId", serviceInstanceId.toLowerCase()), out);
+                    return out.toString();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (TemplateException e) {
+                    e.printStackTrace();
+                }
+
+
+                return null;
+            }
+        }).collect(Collectors.joining(","));
+        System.out.println(result);
     }
 
     @Data

@@ -11,7 +11,7 @@ public class ExampleTask extends BaseUdhTask{
         // todo 日志采集的相关执行
         System.out.println(taskParam.getCommandTaskId() + ":模拟执行。。。。");
         if (taskParam.getCommandTaskId() == 10) {
-            int a = 1 / 0;
+//            int a = 1 / 0;
         }
 
     }
