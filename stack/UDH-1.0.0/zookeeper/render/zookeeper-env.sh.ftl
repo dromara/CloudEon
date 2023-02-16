@@ -13,7 +13,7 @@ export SERVER_JVMFLAGS="-Dcom.sun.management.jmxremote.port=${conf['zookeeper.jm
 <#else>
   <#assign memory = conf['zookeeper.server.memory']?number>
 </#if>
-export SERVER_JVMFLAGS="-Xmx${memory?floor}m $SERVER_JVMFLAGS"
+export SERVER_JVMFLAGS="-Xmx${memory?floor?c}m $SERVER_JVMFLAGS"
 
 export SERVER_JVMFLAGS="-Dzookeeper.log.dir=/opt/udh/${service.serviceName}/log -Dzookeeper.root.logger=INFO,ROLLINGFILE $SERVER_JVMFLAGS"
 

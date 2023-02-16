@@ -33,8 +33,8 @@ import java.util.stream.Stream;
 @Slf4j
 public class FreemarkerTest {
 
-    private static final String RENDER_TEMPLATES_DIR = "/Volumes/Samsung_T5/opensource/PowerJob/render_templates";
-    private static final String RENDER_OUTPUT_DIR = "/Volumes/Samsung_T5/opensource/PowerJob/render_out";
+    private static final String RENDER_TEMPLATES_DIR = "/Volumes/Samsung_T5/opensource/e-mapreduce/render_templates";
+    private static final String RENDER_OUTPUT_DIR = "/Volumes/Samsung_T5/opensource/e-mapreduce/render_out";
     ClusterNode node001 = new ClusterNode("node001", 1);
     ClusterNode node002 = new ClusterNode("node002", 2);
     ClusterNode node003 = new ClusterNode("node003", 3);
@@ -55,6 +55,7 @@ public class FreemarkerTest {
                 new PropertieEntity("fs.defaultFS", "hdfs://node002"),
                 new PropertieEntity("hadoop.tmp.dir", "/tmp/hadoop-${user.name}")
         ));
+        data.put("memory", 1034.4);
 
         // 得到模板对象
         Template template = config.getTemplate("xml.ftl");
