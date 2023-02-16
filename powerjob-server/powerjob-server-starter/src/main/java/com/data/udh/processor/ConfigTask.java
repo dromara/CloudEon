@@ -51,7 +51,7 @@ public class ConfigTask extends BaseUdhTask {
         String stackCode = stackServiceEntity.getStackCode();
         String stackServiceName = stackServiceEntity.getName().toLowerCase();
 
-
+        // todo 加载依赖服务的配置到本地conf目录，例如spark依赖core-site.xml和hdfs-site.xml还有hive-site.xml文件
         // 创建工作目录  ${workHome}/zookeeper1/node001/conf
         String workHome = udhConfigProp.getWorkHome();
         String taskExecuteHostName = taskParam.getHostName();

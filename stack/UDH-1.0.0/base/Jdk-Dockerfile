@@ -26,6 +26,7 @@ RUN useradd -ms /bin/bash  hdfs  && \
  useradd -ms /bin/bash  zookeeper && \
  useradd -ms /bin/bash  hbase && \
  useradd -ms /bin/bash  kyuubi  && \
+ useradd -ms /bin/bash  doris  && \
  useradd -ms /bin/bash  flink
 
 # add group
@@ -41,4 +42,5 @@ RUN usermod  -aG supergroup  root && \
  usermod  -aG supergroup  zookeeper && \
  usermod  -aG supergroup  hbase && \
  usermod  -aG supergroup  kyuubi && \
+ usermod  -aG supergroup  doris && \
  usermod  -aG supergroup  flink
