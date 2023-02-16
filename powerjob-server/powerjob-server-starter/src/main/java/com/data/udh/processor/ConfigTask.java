@@ -24,7 +24,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @NoArgsConstructor
-@Slf4j
 public class ConfigTask extends BaseUdhTask {
 
 
