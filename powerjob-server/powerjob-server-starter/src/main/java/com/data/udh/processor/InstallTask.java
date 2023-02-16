@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.sshd.client.session.ClientSession;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.function.Consumer;
 
@@ -42,6 +43,13 @@ public class InstallTask extends BaseUdhTask {
                 log.info("节点：" + taskParam.getHostName() + " 上创建目录：" + path);
                 // ssh执行创建目录
                 SshUtils.createDir(clientSession, path);
+                try {
+                    String command = "chmod 777 -R " + path;
+                    log.info("执行远程命令："+command);
+                    SshUtils.execCmdWithResult(clientSession, command);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 log.info("成功在节点：" + taskParam.getHostName() + " 上创建目录：" + path);
 
             }
@@ -50,7 +58,6 @@ public class InstallTask extends BaseUdhTask {
 
 
         // todo 服务日志采集的相关执行
-        System.out.println(taskParam.getCommandTaskId() + ":模拟执行。。。。");
 
     }
 }

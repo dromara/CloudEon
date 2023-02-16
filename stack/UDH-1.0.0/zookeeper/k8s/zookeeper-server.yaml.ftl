@@ -7,7 +7,7 @@ metadata:
   name: "${roleServiceFullName}"
   namespace: "default"
 spec:
-  replicas: 3
+  replicas: ${roleNodeCnt}
   selector:
     matchLabels:
       app: "${roleServiceFullName}"

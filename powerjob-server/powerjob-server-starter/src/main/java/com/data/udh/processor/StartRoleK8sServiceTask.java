@@ -34,12 +34,14 @@ public class StartRoleK8sServiceTask extends BaseUdhTask{
         StackServiceRepository stackServiceRepository = SpringUtil.getBean(StackServiceRepository.class);
         ServiceInstanceRepository serviceInstanceRepository = SpringUtil.getBean(ServiceInstanceRepository.class);
         StackServiceRoleRepository stackServiceRoleRepository = SpringUtil.getBean(StackServiceRoleRepository.class);
+        ServiceRoleInstanceRepository serviceRoleInstanceRepository = SpringUtil.getBean(ServiceRoleInstanceRepository.class);
 
         UdhConfigProp udhConfigProp = SpringUtil.getBean(UdhConfigProp.class);
         String workHome = udhConfigProp.getWorkHome();
 
         // 查询框架服务角色名获取模板名
-        StackServiceRoleEntity stackServiceRoleEntity = stackServiceRoleRepository.findByServiceIdAndName(taskParam.getStackServiceId(), taskParam.getRoleName());
+        String roleName = taskParam.getRoleName();
+        StackServiceRoleEntity stackServiceRoleEntity = stackServiceRoleRepository.findByServiceIdAndName(taskParam.getStackServiceId(), roleName);
         String roleFullName = stackServiceRoleEntity.getRoleFullName();
 
         Integer serviceInstanceId = taskParam.getServiceInstanceId();
@@ -63,6 +65,8 @@ public class StartRoleK8sServiceTask extends BaseUdhTask{
         String k8sTemplateDir = udhConfigProp.getStackLoadPath() + File.separator + stackCode + File.separator + stackServiceName + File.separator + K8S_DIR;;
         log.info("加载服务实例角色k8s资源模板目录："+k8sTemplateDir);
 
+        // 查询本服务实例拥有的指定角色节点数
+        int roleNodeCnt = serviceRoleInstanceRepository.countByServiceInstanceIdAndServiceRoleName(serviceInstanceId,roleName);
 
         Template template = null;
         // 创建核心配置对象
@@ -73,6 +77,7 @@ public class StartRoleK8sServiceTask extends BaseUdhTask{
         String roleServiceFullName = roleFullName + "-" + serviceInstanceEntity.getServiceName().toLowerCase();
         dataModel.put("roleServiceFullName", roleServiceFullName);
         dataModel.put("service", serviceInstanceEntity);
+        dataModel.put("roleNodeCnt", roleNodeCnt);
         String outputFileName = null;
         try {
             config.setDirectoryForTemplateLoading(new File(k8sTemplateDir));

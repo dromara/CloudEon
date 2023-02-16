@@ -11,4 +11,6 @@ public interface ServiceRoleInstanceRepository extends JpaRepository<ServiceRole
     List<ServiceRoleInstanceEntity> findByServiceInstanceId(Integer serviceInstanceId);
 
     int deleteByServiceInstanceId(Integer serviceInstanceId);
+
+    int countByServiceInstanceIdAndServiceRoleName(Integer serviceInstanceId, String serviceRoleName);
 }
