@@ -7,6 +7,7 @@ import com.data.udh.dao.*;
 import com.data.udh.entity.ServiceInstanceEntity;
 import com.data.udh.entity.StackServiceEntity;
 import com.data.udh.entity.StackServiceRoleEntity;
+import com.data.udh.utils.ShellCommandExecUtil;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -17,10 +18,13 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-@Slf4j
 @NoArgsConstructor
 public class StartRoleK8sServiceTask extends BaseUdhTask{
     private static final String K8S_DIR = "k8s";
@@ -29,9 +33,6 @@ public class StartRoleK8sServiceTask extends BaseUdhTask{
     public void internalExecute() {
         StackServiceRepository stackServiceRepository = SpringUtil.getBean(StackServiceRepository.class);
         ServiceInstanceRepository serviceInstanceRepository = SpringUtil.getBean(ServiceInstanceRepository.class);
-        ClusterNodeRepository clusterNodeRepository = SpringUtil.getBean(ClusterNodeRepository.class);
-        ServiceRoleInstanceRepository roleInstanceRepository = SpringUtil.getBean(ServiceRoleInstanceRepository.class);
-        ServiceInstanceConfigRepository configRepository = SpringUtil.getBean(ServiceInstanceConfigRepository.class);
         StackServiceRoleRepository stackServiceRoleRepository = SpringUtil.getBean(StackServiceRoleRepository.class);
 
         UdhConfigProp udhConfigProp = SpringUtil.getBean(UdhConfigProp.class);
@@ -69,17 +70,31 @@ public class StartRoleK8sServiceTask extends BaseUdhTask{
         // 构建数据模型
         Map<String, Object> dataModel = new HashMap<>();
         dataModel.put("dockerImage", stackServiceEntity.getDockerImage());
+        String roleServiceFullName = roleFullName + "-" + serviceInstanceEntity.getServiceName().toLowerCase();
+        dataModel.put("roleServiceFullName", roleServiceFullName);
         dataModel.put("service", serviceInstanceEntity);
-
+        String outputFileName = null;
         try {
             config.setDirectoryForTemplateLoading(new File(k8sTemplateDir));
             template = config.getTemplate(k8sTemplateFileName);
-            String outPutFile = k8sResourceOutputPath + File.separator + StringUtils.substringBeforeLast(k8sTemplateFileName, ".ftl");
+            outputFileName=StringUtils.substringBeforeLast(k8sTemplateFileName, ".ftl");
+            String outPutFile = k8sResourceOutputPath + File.separator + outputFileName;
             FileWriter out = new FileWriter(outPutFile);
             template.process(dataModel, out);
             log.info("完成角色k8s资源文件生成："+outPutFile);
             out.close();
         } catch (IOException | TemplateException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+
+        // 调用k8s命令启动资源
+        ShellCommandExecUtil commandExecUtil = ShellCommandExecUtil.builder().log(log).build();
+        String[] command = new String[]{"kubectl", "apply","-f",outputFileName};
+        log.info("本地执行命令："+ Arrays.stream(command).collect(Collectors.joining(" ")));
+        try {
+            commandExecUtil.runShellCommandSync(k8sResourceOutputPath, command, StandardCharsets.UTF_8);
+        } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }

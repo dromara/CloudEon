@@ -21,7 +21,6 @@ import java.util.Arrays;
 import java.util.function.Consumer;
 
 @NoArgsConstructor
-@Slf4j
 public class InstallTask extends BaseUdhTask {
 
 

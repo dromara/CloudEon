@@ -15,7 +15,6 @@ import java.util.Arrays;
 import java.util.function.Consumer;
 
 @NoArgsConstructor
-@Slf4j
 public class PullImageTask extends BaseUdhTask {
 
 
@@ -30,7 +29,7 @@ public class PullImageTask extends BaseUdhTask {
         ClusterNodeEntity nodeEntity = clusterNodeRepository.findByHostname(taskParam.getHostName());
         log.info("节点：" + taskParam.getHostName() + " 上拉取镜像：" + dockerImage);
         // ssh执行拉镜像
-        ClientSession clientSession = SshUtils.openConnectionByPassword(nodeEntity.getHostname(), nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getSshPassword());
+        ClientSession clientSession = SshUtils.openConnectionByPassword(nodeEntity.getIp(), nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getSshPassword());
         try {
             String command = "docker pull " + dockerImage;
             log.info("节点：" + taskParam.getHostName() + " 上执行命令：" + command);

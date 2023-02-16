@@ -3,14 +3,14 @@ apiVersion: "apps/v1"
 kind: "Deployment"
 metadata:
   labels:
-    name: "zookeeper-server-${service.serviceName}"
-  name: "zookeeper-server-${service.serviceName}"
+    name: "${roleServiceFullName}"
+  name: "${roleServiceFullName}"
   namespace: "default"
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: "zookeeper-server-${service.serviceName}"
+      app: "${roleServiceFullName}"
   strategy:
     type: "RollingUpdate"
     rollingUpdate:
@@ -21,9 +21,9 @@ spec:
   template:
     metadata:
       labels:
-        name: "zookeeper-server-${service.serviceName}"
-        app: "zookeeper-server-${service.serviceName}"
-        podConflictName: "zookeeper-server-${service.serviceName}"
+        name: "${roleServiceFullName}"
+        app: "${roleServiceFullName}"
+        podConflictName: "${roleServiceFullName}"
       annotations:
         serviceInstanceName: "${service.serviceName}"
     spec:
@@ -32,8 +32,8 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
           - labelSelector:
               matchLabels:
-                name: "zookeeper-server-${service.serviceName}"
-                podConflictName: "zookeeper-server-${service.serviceName}"
+                name: "${roleServiceFullName}"
+                podConflictName: "${roleServiceFullName}"
             namespaces:
             - "default"
             topologyKey: "kubernetes.io/hostname"
@@ -48,7 +48,7 @@ spec:
           value: "/opt/udh/${service.serviceName}/conf"
         image: "${dockerImage}"
         imagePullPolicy: "Always"
-        name: "zookeeper-server-${service.serviceName}"
+        name: "${roleServiceFullName}"
         resources:
           requests: {}
           limits: {}
@@ -65,7 +65,7 @@ spec:
           name: "conf"
 
       nodeSelector:
-        zookeeper-server-${service.serviceName}: "true"
+        ${roleServiceFullName}: "true"
       terminationGracePeriodSeconds: 30
       volumes:
       - hostPath:
