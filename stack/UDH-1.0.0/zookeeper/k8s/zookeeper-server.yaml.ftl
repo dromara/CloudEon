@@ -40,10 +40,7 @@ spec:
       hostPID: false
       hostNetwork: true
       containers:
-      - args:
-        - "boot.sh"
-        - "ZOOKEEPER"
-        env:
+      - env:
         - name: "ZOOCFGDIR"
           value: "/opt/udh/${service.serviceName}/conf"
         image: "${dockerImage}"
