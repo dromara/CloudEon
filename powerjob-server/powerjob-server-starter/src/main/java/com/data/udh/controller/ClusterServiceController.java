@@ -94,6 +94,9 @@ public class ClusterServiceController {
     @Resource
     private ClusterNodeRepository clusterNodeRepository;
 
+    @Resource
+    private StackServiceConfRepository stackServiceConfRepository;
+
     //    @Transactional(value = "udhTransactionManager", rollbackFor = Exception.class)
     @PostMapping("/initService")
     public ResultDTO<Void> initService(@RequestBody InitServiceRequest req) {
@@ -197,12 +200,16 @@ public class ClusterServiceController {
             }
 
             List<InitServiceRequest.InitServicePresetConf> presetConfList = serviceInfo.getPresetConfList();
-            // todo 除初始化时页面上的配置，还得加载框架本身的默认配置
             List<ServiceInstanceConfigEntity> serviceInstanceConfigEntities = presetConfList.stream().map(new Function<InitServiceRequest.InitServicePresetConf, ServiceInstanceConfigEntity>() {
                 @Override
                 public ServiceInstanceConfigEntity apply(InitServiceRequest.InitServicePresetConf initServicePresetConf) {
                     ServiceInstanceConfigEntity serviceInstanceConfigEntity = new ServiceInstanceConfigEntity();
                     BeanUtil.copyProperties(initServicePresetConf, serviceInstanceConfigEntity);
+                    // 查询框架服务配置，补全属性
+                    StackServiceConfEntity stackServiceConfEntity = stackServiceConfRepository.findByStackIdAndNameAndServiceId(stackId, initServicePresetConf.getName(), stackServiceId);
+                    if (StrUtil.isNotBlank(stackServiceConfEntity.getGroups())) {
+                        serviceInstanceConfigEntity.setCustomConfFile(stackServiceConfEntity.getGroups());
+                    }
                     serviceInstanceConfigEntity.setUpdateTime(new Date());
                     serviceInstanceConfigEntity.setCreateTime(new Date());
                     serviceInstanceConfigEntity.setServiceInstanceId(serviceInstanceEntityId);
@@ -210,8 +217,29 @@ public class ClusterServiceController {
                     return serviceInstanceConfigEntity;
                 }
             }).collect(Collectors.toList());
+            //  除初始化时页面上的配置，还得加载框架本身的默认配置
+            List<StackServiceConfEntity> configNotInWizard = stackServiceConfRepository.findByServiceIdAndConfigurableInWizard(stackServiceId, false);
+            List<ServiceInstanceConfigEntity> instanceConfigEntities = configNotInWizard.stream().map(new Function<StackServiceConfEntity, ServiceInstanceConfigEntity>() {
+                @Override
+                public ServiceInstanceConfigEntity apply(StackServiceConfEntity stackServiceConfEntity) {
+                    ServiceInstanceConfigEntity serviceInstanceConfigEntity = new ServiceInstanceConfigEntity();
+                    serviceInstanceConfigEntity.setName(stackServiceConfEntity.getName());
+                    // 用默认值作为value
+                    serviceInstanceConfigEntity.setValue(stackServiceConfEntity.getRecommendExpression());
+                    serviceInstanceConfigEntity.setRecommendedValue(stackServiceConfEntity.getRecommendExpression());
+                    serviceInstanceConfigEntity.setUpdateTime(new Date());
+                    serviceInstanceConfigEntity.setCreateTime(new Date());
+                    if (StrUtil.isNotBlank(stackServiceConfEntity.getGroups())) {
+                        serviceInstanceConfigEntity.setCustomConfFile(stackServiceConfEntity.getGroups());
+                    }
+                    serviceInstanceConfigEntity.setServiceInstanceId(serviceInstanceEntityId);
+                    serviceInstanceConfigEntity.setUserId(AdminUserId);
+                    return serviceInstanceConfigEntity;
+                }
+            }).collect(Collectors.toList());
 
             // 批量持久化service Conf信息
+            serviceInstanceConfigEntities.addAll(instanceConfigEntities);
             serviceInstanceConfigRepository.saveAll(serviceInstanceConfigEntities);
 
         }
@@ -260,10 +288,10 @@ public class ClusterServiceController {
             public String apply(String pathTemplate) {
                 Configuration cfg = new Configuration();
                 StringTemplateLoader stringLoader = new StringTemplateLoader();
-                stringLoader.putTemplate("myTemplate",pathTemplate);
+                stringLoader.putTemplate("myTemplate", pathTemplate);
                 cfg.setTemplateLoader(stringLoader);
-                try (  Writer out = new StringWriter(2048);){
-                    Template temp = cfg.getTemplate("myTemplate","utf-8");
+                try (Writer out = new StringWriter(2048);) {
+                    Template temp = cfg.getTemplate("myTemplate", "utf-8");
                     temp.process(Dict.create().set("serviceInstanceId", serviceInstanceId), out);
                     return out.toString();
                 } catch (IOException | TemplateException e) {
