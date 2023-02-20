@@ -7,6 +7,7 @@ import com.data.udh.dao.*;
 import com.data.udh.entity.ServiceInstanceEntity;
 import com.data.udh.entity.StackServiceEntity;
 import com.data.udh.entity.StackServiceRoleEntity;
+import com.data.udh.utils.Constant;
 import com.data.udh.utils.ShellCommandExecUtil;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -27,8 +28,6 @@ import java.util.stream.Collectors;
 
 @NoArgsConstructor
 public class StartRoleK8sServiceTask extends BaseUdhTask{
-    private static final String K8S_DIR = "k8s";
-    private static final String K8S_RESOURCE_DIR = "k8s-resource";
     @Override
     public void internalExecute() {
         StackServiceRepository stackServiceRepository = SpringUtil.getBean(StackServiceRepository.class);
@@ -53,7 +52,7 @@ public class StartRoleK8sServiceTask extends BaseUdhTask{
 
 
         // 创建本地k8s资源工作目录  ${workHome}/k8s-resource/ZOOKEEPER1/
-        String k8sResourceOutputPath = workHome + File.separator + K8S_RESOURCE_DIR+File.separator+serviceInstanceEntity.getServiceName() ;
+        String k8sResourceOutputPath = workHome + File.separator + Constant.K8S_RESOURCE_DIR+File.separator+serviceInstanceEntity.getServiceName() ;
         log.info("开始角色k8s资源文件生成："+k8sResourceOutputPath);
         // 先删除清空
         log.info("重置目录："+k8sResourceOutputPath);
@@ -62,7 +61,7 @@ public class StartRoleK8sServiceTask extends BaseUdhTask{
 
         // 渲染生成k8s资源
         String k8sTemplateFileName = roleFullName + ".yaml.ftl";
-        String k8sTemplateDir = udhConfigProp.getStackLoadPath() + File.separator + stackCode + File.separator + stackServiceName + File.separator + K8S_DIR;;
+        String k8sTemplateDir = udhConfigProp.getStackLoadPath() + File.separator + stackCode + File.separator + stackServiceName + File.separator + Constant.K8S_DIR;;
         log.info("加载服务实例角色k8s资源模板目录："+k8sTemplateDir);
 
         // 查询本服务实例拥有的指定角色节点数

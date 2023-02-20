@@ -21,6 +21,7 @@ import com.data.udh.actor.CommandExecuteActor;
 import com.data.udh.processor.TaskParam;
 import com.data.udh.service.CommandHandler;
 import com.data.udh.utils.*;
+import com.google.common.collect.Lists;
 import freemarker.cache.StringTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -269,7 +270,22 @@ public class ClusterServiceController {
 
         //  生成新增服务command
         List<ServiceInstanceEntity> serviceInstanceEntities = serviceInstanceRepository.findAllById(installedServiceInstanceIds);
-        Integer commandId = buildServiceCommand(serviceInstanceEntities, clusterId,CommandType.INSTALL_SERVICE);
+        Integer commandId = buildServiceCommand(serviceInstanceEntities, clusterId, CommandType.INSTALL_SERVICE);
+
+        //  调用workflow
+        udhActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
+
+
+        return ResultDTO.success(null);
+    }
+
+
+    @PostMapping("/stopService")
+    public ResultDTO<Void> stopService(Integer serviceInstanceId) {
+        ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(serviceInstanceId).get();
+        //  生成停止服务command
+        List<ServiceInstanceEntity> serviceInstanceEntities = Lists.newArrayList(serviceInstanceEntity);
+        Integer commandId = buildServiceCommand(serviceInstanceEntities, serviceInstanceEntity.getClusterId(), CommandType.STOP_SERVICE);
 
         //  调用workflow
         udhActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
@@ -371,7 +387,7 @@ public class ClusterServiceController {
                 commandTaskEntity.setServiceInstanceName(serviceInstanceEntity.getServiceName());
                 commandTaskRepository.saveAndFlush(commandTaskEntity);
                 // 更新日志路径
-                commandTaskEntity.setTaskLogPath(taskLogPath + File.separator + commandEntity.getId() + "-" + commandTaskEntity.getId());
+                commandTaskEntity.setTaskLogPath(taskLogPath + File.separator + commandEntity.getId() + "-" + commandTaskEntity.getId() + ".log");
                 // 更新任务参数
                 TaskParam taskParam = buildTaskParam(taskModel, commandEntity, serviceInstanceEntity, commandTaskEntity);
                 commandTaskEntity.setTaskParam(JSONObject.toJSONString(taskParam));
