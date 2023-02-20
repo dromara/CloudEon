@@ -269,7 +269,7 @@ public class ClusterServiceController {
 
         //  生成新增服务command
         List<ServiceInstanceEntity> serviceInstanceEntities = serviceInstanceRepository.findAllById(installedServiceInstanceIds);
-        Integer commandId = buildInstallServiceCommand(serviceInstanceEntities, clusterId);
+        Integer commandId = buildServiceCommand(serviceInstanceEntities, clusterId,CommandType.INSTALL_SERVICE);
 
         //  调用workflow
         udhActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
@@ -307,13 +307,14 @@ public class ClusterServiceController {
     }
 
 
-    private Integer buildInstallServiceCommand(List<ServiceInstanceEntity> serviceInstanceEntities, Integer ClusterId) {
+    private Integer buildServiceCommand(List<ServiceInstanceEntity> serviceInstanceEntities, Integer ClusterId, CommandType commandType) {
+
         // 创建 command
         CommandEntity commandEntity = new CommandEntity();
         commandEntity.setCommandState(CommandState.RUNNING);
         commandEntity.setCurrentProgress(0);
         commandEntity.setClusterId(ClusterId);
-        commandEntity.setName(CommandType.INSTALL_SERVICE.getName());
+        commandEntity.setName(commandType.getName());
         commandEntity.setSubmitTime(new Date());
         commandEntity.setOperateUserId(AdminUserId);
         // 持久化 command
@@ -325,7 +326,7 @@ public class ClusterServiceController {
         for (ServiceInstanceEntity serviceInstanceEntity : serviceInstanceEntities) {
             StackServiceEntity stackServiceEntity = stackServiceRepository.findById(serviceInstanceEntity.getStackServiceId()).get();
             // 生成TaskGroupTypes
-            List<TaskGroupType> taskGroupTypes = commandHandler.buildTaskGroupTypes(CommandType.INSTALL_SERVICE, stackServiceEntity.getName());
+            List<TaskGroupType> taskGroupTypes = commandHandler.buildTaskGroupTypes(commandType, stackServiceEntity.getName());
 
             LinkedHashMap<String, List<NodeInfo>> roleHostMaps = new LinkedHashMap<>();
             // 查出该服务有的角色
