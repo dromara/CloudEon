@@ -51,6 +51,8 @@ public class CommandHandler {
                 return taskGroupTypes;
             case START_SERVICE:
                 return Lists.newArrayList(TaskGroupType.TAG_AND_START_K8S_SERVICE);
+            case RESTART_SERVICE:
+                return Lists.newArrayList(TaskGroupType.CANCEL_TAG_AND_STOP_K8S_SERVICE, TaskGroupType.TAG_AND_START_K8S_SERVICE);
 
             case STOP_SERVICE:
                 return Lists.newArrayList(TaskGroupType.CANCEL_TAG_AND_STOP_K8S_SERVICE);

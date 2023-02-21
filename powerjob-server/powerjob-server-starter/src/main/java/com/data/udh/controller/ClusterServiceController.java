@@ -294,6 +294,19 @@ public class ClusterServiceController {
         return ResultDTO.success(null);
     }
 
+    @PostMapping("/restartService")
+    public ResultDTO<Void> restartService(Integer serviceInstanceId) {
+        ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(serviceInstanceId).get();
+        //  生成重启服务command
+        List<ServiceInstanceEntity> serviceInstanceEntities = Lists.newArrayList(serviceInstanceEntity);
+        Integer commandId = buildServiceCommand(serviceInstanceEntities, serviceInstanceEntity.getClusterId(), CommandType.RESTART_SERVICE);
+
+        //  调用workflow
+        udhActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
+
+        return ResultDTO.success(null);
+    }
+
     @PostMapping("/startService")
     public ResultDTO<Void> startService(Integer serviceInstanceId) {
         ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(serviceInstanceId).get();
