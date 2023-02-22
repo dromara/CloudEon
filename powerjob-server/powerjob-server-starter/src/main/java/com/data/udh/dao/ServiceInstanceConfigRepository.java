@@ -9,6 +9,7 @@ import java.util.List;
 public interface ServiceInstanceConfigRepository extends JpaRepository<ServiceInstanceConfigEntity, Integer> {
 
     List<ServiceInstanceConfigEntity> findByServiceInstanceId(Integer serviceInstanceId);
+    ServiceInstanceConfigEntity findByServiceInstanceIdAndName(Integer serviceInstanceId, String name);
 
     List<ServiceInstanceConfigEntity> findByServiceInstanceIdAndCustomConfFile(Integer serviceInstanceId, String customConfFile);
 

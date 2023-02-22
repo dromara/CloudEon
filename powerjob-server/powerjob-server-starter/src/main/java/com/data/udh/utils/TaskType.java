@@ -16,6 +16,7 @@ public enum TaskType {
     HDFS_MKDIR(7, "HDFS上创建目录", "com.data.udh.processor.ExampleTask", false),
     CANCEL_TAG_HOST(8, "移除节点上的标签", "com.data.udh.processor.CancelHostTagTask", true),
     STOP_K8S_SERVICE(9, "停止K8s服务", "com.data.udh.processor.StopK8sServiceTask", false),
+    REGISTER_BE(10, "注册be节点", "com.data.udh.processor.RegisterBeTask", false),
 
 
     ;
