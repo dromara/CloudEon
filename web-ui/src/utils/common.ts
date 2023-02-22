@@ -4,7 +4,7 @@ formatDate(时间戳, 返回格式)
 formatDate(1640493771000, 'yyyy-MM-dd')
 */
 type oldDateType = string | number
-export function formatDate (oldDate: oldDateType, fmt: string) {
+export function formatDate (oldDate: any, fmt: string) {
     let date = new Date()
     if(!oldDate) return
     if((typeof oldDate ==='string' && oldDate.indexOf('T') > -1)){
