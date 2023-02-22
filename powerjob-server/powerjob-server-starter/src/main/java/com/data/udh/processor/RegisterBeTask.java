@@ -64,6 +64,7 @@ public class RegisterBeTask extends BaseUdhTask {
 
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
 
