@@ -48,6 +48,10 @@ public class CommandHandler {
                 }
 
                 taskGroupTypes.add(TaskGroupType.TAG_AND_START_K8S_SERVICE);
+
+                if (stackServiceName.equals("DORIS")) {
+                    taskGroupTypes.add(TaskGroupType.INIT_DORIS);
+                }
                 return taskGroupTypes;
             case START_SERVICE:
                 return Lists.newArrayList(TaskGroupType.TAG_AND_START_K8S_SERVICE);
