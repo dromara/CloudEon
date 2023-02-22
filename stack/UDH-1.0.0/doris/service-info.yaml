@@ -1,8 +1,8 @@
 name: DORIS
 label: "Doris"
 description: "实时OLAP分析系统"
-version: 1.2.1
-dockerImage: "registry.mufankong.top/udh/doris:1.2.1"
+version: 1.1.5
+dockerImage: "registry.mufankong.top/udh/doris:1.1.5"
 dependencies: []
 
 runAs: doris
@@ -90,6 +90,13 @@ configurations:
     configurableInWizard: true
     label: "BE Rpc端口"
 
+  - name: heartbeat_service_port
+    recommendExpression: 9050
+    valueType: PORT
+    groups: [ "be.conf" ]
+    configurableInWizard: true
+    label: "BE心跳服务端口"
+
   - name: rpc_port
     recommendExpression: 9020
     valueType: PORT
@@ -106,6 +113,22 @@ configurations:
     configurableInWizard: true
     label: "FE节点上MySQL服务器的端口"
     description: "FE 节点上 MySQL 服务器的端口"
+
+  - name: fe_http_port
+    recommendExpression: 18030
+    valueType: PORT
+    groups: [ "fe.conf" ]
+    configurableInWizard: true
+    label: "FE节点上web页面的端口"
+    description: "FE节点上web页面的端口"
+
+  - name: edit_log_port
+    recommendExpression: 9010
+    valueType: PORT
+    groups: [ "fe.conf" ]
+    configurableInWizard: true
+    label: "FE节点上bdbje 的通信端口"
+    description: "FE节点上bdbje 的通信端口"
 
 
   - name: fe_priority_networks
