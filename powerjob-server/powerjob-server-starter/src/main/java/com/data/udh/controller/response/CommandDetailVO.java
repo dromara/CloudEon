@@ -1,5 +1,6 @@
 package com.data.udh.controller.response;
 
+import com.data.udh.dto.ServiceProgress;
 import com.data.udh.entity.CommandTaskEntity;
 import com.data.udh.utils.CommandState;
 import lombok.AllArgsConstructor;
@@ -54,7 +55,7 @@ public class CommandDetailVO {
     private Date endTime;
 
     /**
-     * 总进度
+     * 当前进度 80%
      */
     private Integer currentProgress;
 
@@ -67,6 +68,8 @@ public class CommandDetailVO {
 
     private Integer clusterId;
 
-    Map<String, List<CommandTaskEntity>> tasksMap;
+    private List<ServiceProgress> serviceProgresses;
+
+
 
 }

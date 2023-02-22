@@ -12,4 +12,7 @@ public class Constant {
     public static final String ICON_DEFAULT="default.png";
     public static final String ICON_DANGER="danger.png";
 
+    public static final String K8S_DIR = "k8s";
+    public static final String K8S_RESOURCE_DIR = "k8s-resource";
+
 }

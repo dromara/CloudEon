@@ -2,7 +2,7 @@ name: ZOOKEEPER
 label: "ZooKeeper"
 description: "分布式协调系统"
 version: 3.5.10
-dockerImage: "udh-zookeeper:3.5.10"
+dockerImage: "registry.mufankong.top/udh/zookeeper:3.5.9"
 dependencies: []
 
 runAs: zookeeper
@@ -54,7 +54,6 @@ configurations:
     recommendExpression: 9911
     valueType: PORT
     groups: [ ]
-    configurableInWizard: true
 
 
   - name: tickTime
@@ -139,9 +138,15 @@ configurations:
     groups: [ "zoo.cfg" ]
 
 
+  - name: 4lw.commands.whitelist
+    recommendExpression: mntr
+    valueType: STRING
+    groups: [ "zoo.cfg" ]
+    label: "指令白名单"
+    description: "用于控制指令白名单"
+
   - name: znode.container.checkIntervalMs
     recommendExpression: 1000
     valueType: NON_NEG_INT
     groups: [ ]
-    configurableInWizard: true
 
