@@ -44,7 +44,8 @@ public class ConfigTask extends BaseUdhTask {
         Integer serviceInstanceId = taskParam.getServiceInstanceId();
         ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(serviceInstanceId).get();
         StackServiceEntity stackServiceEntity = stackServiceRepository.findById(serviceInstanceEntity.getStackServiceId()).get();
-        List<ServiceInstanceConfigEntity> configEntityList = configRepository.findByServiceInstanceIdAndCustomConfFile(serviceInstanceId, null);
+        // 查询服务实例所有配置项
+        List<ServiceInstanceConfigEntity> allConfigEntityList = configRepository.findByServiceInstanceId(serviceInstanceId);
         List<ServiceRoleInstanceEntity> roleInstanceEntities = roleInstanceRepository.findByServiceInstanceId(serviceInstanceId);
 
         String stackCode = stackServiceEntity.getStackCode();
@@ -72,7 +73,7 @@ public class ConfigTask extends BaseUdhTask {
             Map<String, Object> dataModel = new HashMap<>();
             dataModel.put("service", serviceInstanceEntity);
 
-            dataModel.put("conf", configEntityList.stream().collect(Collectors.toMap(ServiceInstanceConfigEntity::getName, ServiceInstanceConfigEntity::getValue)));
+            dataModel.put("conf", allConfigEntityList.stream().collect(Collectors.toMap(ServiceInstanceConfigEntity::getName, ServiceInstanceConfigEntity::getValue)));
 
             Map<String, List<RoleNodeInfo>> serviceRoles = roleInstanceEntities.stream().map(new Function<ServiceRoleInstanceEntity, RoleNodeInfo>() {
                 @Override
@@ -134,14 +135,23 @@ public class ConfigTask extends BaseUdhTask {
         SshUtils.uploadLocalDirToRemote(clientSession, remoteConfDirPath, outputConfPath);
         log.info("成功拷贝本地配置目录：" + outputConfPath + " 到节点" + taskParam.getHostName() + "的：" + remoteConfDirPath);
 
+        try {
+            String premissionCommand = "chmod +x " + remoteConfDirPath + "/*.sh";
+            log.info("赋予conf目录下sh脚本执行权限：{}", premissionCommand);
+            SshUtils.execCmdWithResult(clientSession, premissionCommand);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+
 
         // 特殊处理
         if (stackServiceEntity.getName().equals("ZOOKEEPER")) {
             try {
                 String remoteDataDirPath = "/opt/udh/" + serviceInstanceEntity.getServiceName() + File.separator + "data";
                 String command = "mv " + remoteConfDirPath + File.separator + "myid " + remoteDataDirPath;
-                log.info("移动myid文件到data目录 {}",remoteDataDirPath);
-                log.info("ssh执行命令： {}",command);
+                log.info("移动myid文件到data目录 {}", remoteDataDirPath);
+                log.info("ssh执行命令： {}", command);
                 SshUtils.execCmdWithResult(clientSession, command);
             } catch (IOException e) {
                 e.printStackTrace();
