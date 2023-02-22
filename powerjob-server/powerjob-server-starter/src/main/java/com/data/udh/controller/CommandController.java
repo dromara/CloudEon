@@ -37,7 +37,7 @@ public class CommandController {
     @GetMapping("/list")
     public ResultDTO<List<CommandEntity>> listCommand(Integer clusterId) {
         List<CommandEntity> result;
-        result = commandRepository.findByClusterId(clusterId);
+        result = commandRepository.findByClusterIdOrderBySubmitTimeDesc(clusterId);
         return ResultDTO.success(result);
     }
 

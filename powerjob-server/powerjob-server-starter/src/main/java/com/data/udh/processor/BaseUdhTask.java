@@ -43,6 +43,7 @@ public abstract class BaseUdhTask implements Runnable {
         log.info("command task：" + taskParam.getCommandTaskId() + " 开始, 记录到数据库");
         commandTaskEntity.setStartTime(new Date());
         commandTaskEntity.setCommandState(CommandState.RUNNING);
+        commandTaskEntity.setProgress(10);
         commandTaskRepository.saveAndFlush(commandTaskEntity);
 
     }
@@ -66,6 +67,7 @@ public abstract class BaseUdhTask implements Runnable {
         CommandTaskEntity commandTaskEntity = commandTaskRepository.findById(taskParam.getCommandTaskId()).get();
         commandTaskEntity.setEndTime(new Date());
         commandTaskEntity.setCommandState(CommandState.SUCCESS);
+        commandTaskEntity.setProgress(100);
         commandTaskRepository.saveAndFlush(commandTaskEntity);
 
         //主动让SiftingAppender结束文件.
