@@ -85,6 +85,7 @@ public class ConfigTask extends BaseUdhTask {
 
             dataModel.put("serviceRoles", serviceRoles);
             dataModel.put("localhostname", taskExecuteHostName);
+            dataModel.put("localhostip", taskParam.getIp());
 
             // 获取该服务支持的自定义配置文件名
             String customConfigFiles = stackServiceEntity.getCustomConfigFiles();

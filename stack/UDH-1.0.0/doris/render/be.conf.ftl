@@ -12,7 +12,7 @@ webserver_port = ${conf['webserver_port']}
 heartbeat_service_port = ${conf['heartbeat_service_port']}
 brpc_port =  ${conf['brpc_port']}
 
-priority_networks = ${conf['be_priority_networks']}
+priority_networks = ${localhostip}
 
 
 storage_root_path = /opt/udh/${service.serviceName}/data
