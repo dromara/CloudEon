@@ -102,6 +102,16 @@ public class StartRoleK8sServiceTask extends BaseUdhTask{
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+        // 等待资源启动成功
+        // kubectl rollout status deploy/my-deployment
+        try {
+            String[] statusCommand = new String[]{"kubectl", "rollout", "status", "deploy/" + roleServiceFullName};
+            log.info("本地执行命令：" + Arrays.stream(statusCommand).collect(Collectors.joining(" ")));
+            commandExecUtil.runShellCommandSync(k8sResourceOutputPath, statusCommand, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
 
     }
 }
