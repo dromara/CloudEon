@@ -152,4 +152,14 @@ export async function deleteServiceAPI(options?: { [key: string]: any }) {
   });
 }
 
+/** 日志详情 */
+export async function getTaskLogAPI(options?: { [key: string]: any }) {
+  return request<API.logResult>('/log/task', {
+    method: 'GET',
+    params: {
+      ...options,
+    },
+  });
+}
+
 

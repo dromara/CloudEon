@@ -225,18 +225,63 @@ declare namespace API {
     data?: commandType;
   }
 
+  // type commandType = {
+  //   serviceProgresses: any;
+  //   id: number;
+  //   name: string;
+  //   type: string,
+  //   commandState: string,
+  //   submitTime: string,
+  //   startTime: string,
+  //   endTime: string,
+  //   currentProgress: number,
+  //   operateUserId: number,
+  //   clusterId: number,
+  //   // tasksMap:
+  // }
+
+  type taskDetailType = {
+    id?: number,
+    taskShowSortNum?: number,
+    taskName?: string,
+    taskParam?: string,
+    processorClassName?: string,
+    commandState?: string,
+    taskLogPath?: string,
+    startTime?: string,
+    endTime?: string,
+    commandTaskGroupId?: number,
+    commandId?: number,
+    serviceInstanceId?: number,
+    serviceInstanceName?: string,
+    progress?: number,
+    powerjobInstanceId?: number
+  }
+
+  type progressItem = {
+    currentState?: string,
+    serviceInstanceName?: string,
+    taskDetails?: taskDetailType[]
+  }
+
   type commandType = {
-    id: number;
-    name: string;
-    "type": string,
-    "commandState": string,
-    "submitTime": string,
-    "startTime": string,
-    "endTime": string,
-    "currentProgress": number,
-    "operateUserId": number,
-    "clusterId": number,
-    // "tasksMap":
+    id?: number,
+    name?: string,
+    type?: string,
+    commandState?: string,
+    submitTime?: string,
+    startTime?: string,
+    endTime?: string,
+    currentProgress?: number,
+    operateUserId?: number,
+    clusterId?: number,
+    serviceProgresses?: progressItem[]
+  }
+
+  type logResult = {
+    success?: boolean;
+    message?: string;
+    data?: string;
   }
 
 }
