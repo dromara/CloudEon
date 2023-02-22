@@ -8,3 +8,6 @@
     </property>
 </#list>
 </configuration>
+
+
+${memory?floor?c}

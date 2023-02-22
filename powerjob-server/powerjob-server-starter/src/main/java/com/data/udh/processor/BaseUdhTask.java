@@ -11,15 +11,19 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import java.util.Date;
 
-@Slf4j
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public abstract class BaseUdhTask implements Runnable {
+
+    protected Logger log = LoggerFactory.getLogger(getClass().getName());
+
     public static final String TASKID = "taskId";
     public static final String TASK_LOG_HOME = "TASK_LOG_HOME";
 
