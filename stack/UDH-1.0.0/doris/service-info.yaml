@@ -37,14 +37,7 @@ customConfigFiles:
 
 configurations:
 
-  - name: be_priority_networks
-    recommendExpression: 0.0.0.0/24
-    valueType: STRING
-    configurableInWizard: true
-    description: "为那些有多个 IP 地址的服务器声明一个选择策略。
-请注意，最多应该有一个 IP 地址与此列表匹配。这是一个以分号分隔格式的列表，用 CIDR 表示法，例如 10.10.10.0"
-    label: "BE优先网段"
-    groups: ["be.conf" ]
+
 
 
   - name: sys_log_level
@@ -131,14 +124,6 @@ configurations:
     description: "FE节点上bdbje 的通信端口"
 
 
-  - name: fe_priority_networks
-    recommendExpression: "0.0.0.0/24"
-    valueType: STRING
-    groups: [ "fe.conf" ]
-    configurableInWizard: true
-    label: "FE优先网段"
-    description: "为那些有多个 IP 地址的服务器声明一个选择策略。
-请注意，最多应该有一个 IP 地址与此列表匹配。这是一个以分号分隔格式的列表，用 CIDR 表示法，例如 10.10.10.0"
 
 
   - name: cluster_id

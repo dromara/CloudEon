@@ -25,6 +25,6 @@ mysql_service_nio_enabled = true
 audit_log_dir = /opt/udh/${service.serviceName}/log
 sys_log_dir = /opt/udh/${service.serviceName}/log
 
-priority_networks = ${conf['fe_priority_networks']}
+priority_networks = ${localhostip}
 
 
