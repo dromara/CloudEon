@@ -12,15 +12,9 @@ import cn.hutool.extra.template.TemplateEngine;
 import cn.hutool.extra.template.TemplateUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.data.udh.controller.request.InitServiceRequest;
-import com.data.udh.controller.response.ServiceInstanceDetailVO;
-import com.data.udh.controller.response.ServiceInstanceRoleVO;
-import com.data.udh.controller.response.ServiceInstanceVO;
-import com.data.udh.controller.response.StackServiceConfVO;
+import com.data.udh.controller.response.*;
 import com.data.udh.dao.*;
-import com.data.udh.dto.NodeInfo;
-import com.data.udh.dto.ServiceTaskGroupType;
-import com.data.udh.dto.StackConfiguration;
-import com.data.udh.dto.TaskModel;
+import com.data.udh.dto.*;
 import com.data.udh.entity.*;
 import com.data.udh.actor.CommandExecuteActor;
 import com.data.udh.processor.TaskParam;
@@ -499,6 +493,32 @@ public class ClusterServiceController {
     }
 
     /**
+     * 查询服务实例配置
+     */
+    @GetMapping("/listConfs")
+    public ResultDTO<ServiceInstanceConfVO> listConfs(Integer serviceInstanceId) {
+        ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(serviceInstanceId).get();
+        Integer stackServiceId = serviceInstanceEntity.getStackServiceId();
+        ServiceInstanceConfVO result = new ServiceInstanceConfVO();
+        // 数据库中查询服务实例配置
+        List<ServiceConfiguration> serviceConfigurations = serviceInstanceConfigRepository.findByServiceInstanceId(serviceInstanceId)
+                .stream().map(serviceInstanceConfig -> {
+                    ServiceConfiguration serviceConfiguration = new ServiceConfiguration();
+                    BeanUtil.copyProperties(serviceInstanceConfig, serviceConfiguration);
+                    serviceConfiguration.setConfFile(serviceInstanceConfig.getConfFile());
+                    return serviceConfiguration;
+                }).collect(Collectors.toList());
+
+        StackServiceEntity stackServiceEntity = stackServiceRepository.findById(stackServiceId).get();
+        // 查找该服务的自定义配置文件
+        ArrayList<String> customFileNames = ListUtil.toList(stackServiceEntity.getCustomConfigFiles().split(","));
+
+        result.setConfs(serviceConfigurations);
+        result.setCustomFileNames(customFileNames);
+        return ResultDTO.success(result);
+    }
+
+    /**
      * 服务实例详情
      */
     @GetMapping("/serviceInstanceInfo")
@@ -539,7 +559,7 @@ public class ClusterServiceController {
                         .nodeHostname(nodeEntity.getHostname())
                         .nodeId(nodeEntity.getId())
                         // todo 用真实url代替
-                        .uiUrls(Lists.newArrayList(String.format("http://%s:1000/info",nodeEntity.getHostname()),String.format("http://%s:1000/info",nodeEntity.getIp())))
+                        .uiUrls(Lists.newArrayList(String.format("http://%s:1000/info", nodeEntity.getHostname()), String.format("http://%s:1000/info", nodeEntity.getIp())))
                         .name(roleInstanceEntity.getServiceRoleName())
                         .build();
             }
