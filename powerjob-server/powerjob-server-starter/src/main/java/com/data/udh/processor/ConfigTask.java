@@ -11,7 +11,6 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.sshd.client.session.ClientSession;
@@ -89,19 +88,19 @@ public class ConfigTask extends BaseUdhTask {
 
             // 获取该服务支持的自定义配置文件名
             String customConfigFiles = stackServiceEntity.getCustomConfigFiles();
-            Map<String, Map<String, String>> customConfs = new HashMap<>();
+            Map<String, Map<String, String>> confFiles = new HashMap<>();
 
             if (StringUtils.isNoneBlank(customConfigFiles)) {
-                for (String customConfigFileName : customConfigFiles.split(",")) {
-                    List<ServiceInstanceConfigEntity> customConfEntities = configRepository.findByServiceInstanceIdAndCustomConfFile(serviceInstanceId, customConfigFileName);
+                for (String confFileName : customConfigFiles.split(",")) {
+                    List<ServiceInstanceConfigEntity> groupConfEntities = configRepository.findByServiceInstanceIdAndConfFile(serviceInstanceId, confFileName);
                     HashMap<String, String> map = new HashMap<>();
-                    for (ServiceInstanceConfigEntity customConfEntity : customConfEntities) {
-                        map.put(customConfEntity.getName(), customConfEntity.getValue());
+                    for (ServiceInstanceConfigEntity groupConf : groupConfEntities) {
+                        map.put(groupConf.getName(), groupConf.getValue());
                     }
-                    customConfs.put(customConfigFileName, map);
+                    confFiles.put(confFileName, map);
                 }
             }
-            dataModel.put("customConfs", customConfs);
+            dataModel.put("confFiles", confFiles);
 
             // 执行渲染
             for (String templateName : renderDirFile.list()) {

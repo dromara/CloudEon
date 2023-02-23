@@ -20,20 +20,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.nodes.Tag;
 
 import javax.annotation.Resource;
-import javax.transaction.Transactional;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringJoiner;
-import java.util.function.Function;
 
 import static com.data.udh.utils.Constant.*;
 
@@ -141,7 +134,7 @@ public class StackLoadService implements ApplicationRunner {
                         BeanUtil.copyProperties(configuration, stackServiceConfEntity);
                         stackServiceConfEntity.setStackId(stackInfoEntityId);
                         stackServiceConfEntity.setServiceId(stackServiceEntityId);
-                        stackServiceConfEntity.setGroups(StrUtil.join(",", configuration.getGroups()));
+                        stackServiceConfEntity.setConfFile(configuration.getConfFile());
                         stackServiceConfRepository.save(stackServiceConfEntity);
                     }
 

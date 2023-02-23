@@ -3,6 +3,7 @@ package com.data.udh.controller;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
@@ -14,9 +15,11 @@ import com.data.udh.controller.request.InitServiceRequest;
 import com.data.udh.controller.response.ServiceInstanceDetailVO;
 import com.data.udh.controller.response.ServiceInstanceRoleVO;
 import com.data.udh.controller.response.ServiceInstanceVO;
+import com.data.udh.controller.response.StackServiceConfVO;
 import com.data.udh.dao.*;
 import com.data.udh.dto.NodeInfo;
 import com.data.udh.dto.ServiceTaskGroupType;
+import com.data.udh.dto.StackConfiguration;
 import com.data.udh.dto.TaskModel;
 import com.data.udh.entity.*;
 import com.data.udh.actor.CommandExecuteActor;
@@ -210,8 +213,8 @@ public class ClusterServiceController {
                     BeanUtil.copyProperties(initServicePresetConf, serviceInstanceConfigEntity);
                     // 查询框架服务配置，补全属性
                     StackServiceConfEntity stackServiceConfEntity = stackServiceConfRepository.findByStackIdAndNameAndServiceId(stackId, initServicePresetConf.getName(), stackServiceId);
-                    if (StrUtil.isNotBlank(stackServiceConfEntity.getGroups())) {
-                        serviceInstanceConfigEntity.setCustomConfFile(stackServiceConfEntity.getGroups());
+                    if (StrUtil.isNotBlank(stackServiceConfEntity.getConfFile())) {
+                        serviceInstanceConfigEntity.setConfFile(stackServiceConfEntity.getConfFile());
                     }
                     serviceInstanceConfigEntity.setUpdateTime(new Date());
                     serviceInstanceConfigEntity.setCreateTime(new Date());
@@ -232,8 +235,8 @@ public class ClusterServiceController {
                     serviceInstanceConfigEntity.setRecommendedValue(stackServiceConfEntity.getRecommendExpression());
                     serviceInstanceConfigEntity.setUpdateTime(new Date());
                     serviceInstanceConfigEntity.setCreateTime(new Date());
-                    if (StrUtil.isNotBlank(stackServiceConfEntity.getGroups())) {
-                        serviceInstanceConfigEntity.setCustomConfFile(stackServiceConfEntity.getGroups());
+                    if (StrUtil.isNotBlank(stackServiceConfEntity.getConfFile())) {
+                        serviceInstanceConfigEntity.setConfFile(stackServiceConfEntity.getConfFile());
                     }
                     serviceInstanceConfigEntity.setServiceInstanceId(serviceInstanceEntityId);
                     serviceInstanceConfigEntity.setUserId(AdminUserId);

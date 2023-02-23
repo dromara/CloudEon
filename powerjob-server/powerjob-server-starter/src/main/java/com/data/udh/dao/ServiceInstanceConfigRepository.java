@@ -1,6 +1,5 @@
 package com.data.udh.dao;
 
-import com.data.udh.entity.CommandEntity;
 import com.data.udh.entity.ServiceInstanceConfigEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -11,7 +10,7 @@ public interface ServiceInstanceConfigRepository extends JpaRepository<ServiceIn
     List<ServiceInstanceConfigEntity> findByServiceInstanceId(Integer serviceInstanceId);
     ServiceInstanceConfigEntity findByServiceInstanceIdAndName(Integer serviceInstanceId, String name);
 
-    List<ServiceInstanceConfigEntity> findByServiceInstanceIdAndCustomConfFile(Integer serviceInstanceId, String customConfFile);
+    List<ServiceInstanceConfigEntity> findByServiceInstanceIdAndConfFile(Integer serviceInstanceId, String group);
 
     int deleteByServiceInstanceId(Integer serviceInstanceId);
 
