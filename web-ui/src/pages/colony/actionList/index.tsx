@@ -1,4 +1,4 @@
-import { PageContainer, ProCard } from '@ant-design/pro-components';
+import { PageContainer, ProCard, ProTable } from '@ant-design/pro-components';
 import { Space, Card, Table, Tag, Button, Modal, Form, Progress, message, Spin } from 'antd';
 import React, { useState, useEffect, useRef } from 'react';
 import type { FormInstance } from 'antd/es/form';
@@ -7,7 +7,7 @@ import { getCommandListAPI } from '@/services/ant-design-pro/colony';
 import { formatDate } from '@/utils/common'
 import styles from './index.less'
 import { RightOutlined } from '@ant-design/icons';
-import { statusColor } from './common'
+import { statusColor } from '../../../utils/colonyColor'
 
 const actionList: React.FC = () => {
   const intl = useIntl();
@@ -29,7 +29,14 @@ const actionList: React.FC = () => {
 
 
   useEffect(() => {
-    getTableData({ clusterId: getData.clusterId });
+    // getTableData({ clusterId: getData.clusterId });
+   const timer =  setInterval(async()=>{
+      const result: API.normalResult =  await getCommandListAPI({ clusterId: getData.clusterId });
+      setNodeListData(result?.data)
+    },2000)
+    return () =>{
+      clearInterval(timer)
+    }
   }, []);
 
   interface Item {
@@ -66,11 +73,29 @@ const actionList: React.FC = () => {
     {
       title: '状态',
       dataIndex: 'commandState',
-      key: 'commandState',
-      render: (_: any, record: Item) => {
-        return (
-          <div style={{color:statusColor[record.commandState], whiteSpace: 'nowrap'}}> <span style={{backgroundColor: statusColor[record.commandState]}} className={styles.statusCircel}></span>{record.commandState}</div>
-        )
+      key: 'status',
+      // render: (_: any, record: Item) => {
+      //   return (
+      //     <div style={{color:statusColor[record.commandState], whiteSpace: 'nowrap'}}> <span style={{backgroundColor: statusColor[record.commandState]}} className={styles.statusCircel}></span>{record.commandState}</div>
+      //   )
+      // },
+      valueEnum: {
+        0: {
+          text: '未知',
+          status: 'Default',
+        },
+        'RUNNING': {
+          text: '运行中',
+          status: 'Processing',
+        },
+        'SUCCESS': {
+          text: '完成',
+          status: 'Success',
+        },
+        'ERROR': {
+          text: '出错',
+          status: 'Error',
+        },
       },
     },
     {
@@ -155,7 +180,16 @@ const actionList: React.FC = () => {
           </div>
         </div>
       </div> */}
-      <Table loading={loading} rowKey="id" columns={columns} dataSource={actionListData} />
+      <ProTable 
+        search={false} 
+        rowKey="id" 
+        columns={columns} 
+        dataSource={actionListData}
+        request={async (params = {}, sort, filter) => {
+          // console.log(sort, filter);
+          return getCommandListAPI({ clusterId: getData.clusterId });;
+        }}
+      />
     </PageContainer>
   );
 };
