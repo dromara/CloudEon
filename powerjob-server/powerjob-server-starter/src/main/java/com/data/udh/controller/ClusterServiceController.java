@@ -11,6 +11,8 @@ import cn.hutool.extra.template.TemplateEngine;
 import cn.hutool.extra.template.TemplateUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.data.udh.controller.request.InitServiceRequest;
+import com.data.udh.controller.response.ServiceInstanceDetailVO;
+import com.data.udh.controller.response.ServiceInstanceRoleVO;
 import com.data.udh.controller.response.ServiceInstanceVO;
 import com.data.udh.dao.*;
 import com.data.udh.dto.NodeInfo;
@@ -294,6 +296,20 @@ public class ClusterServiceController {
         return ResultDTO.success(null);
     }
 
+    @PostMapping("/upgradeServiceConfig")
+    public ResultDTO<Void> upgradeServiceConfig(Integer serviceInstanceId) {
+        ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(serviceInstanceId).get();
+        //  生成刷新服务配置command
+        List<ServiceInstanceEntity> serviceInstanceEntities = Lists.newArrayList(serviceInstanceEntity);
+        Integer commandId = buildServiceCommand(serviceInstanceEntities, serviceInstanceEntity.getClusterId(), CommandType.UPGRADE_SERVICE_CONFIG);
+
+        //  调用workflow
+        udhActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
+
+
+        return ResultDTO.success(null);
+    }
+
     @PostMapping("/restartService")
     public ResultDTO<Void> restartService(Integer serviceInstanceId) {
         ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(serviceInstanceId).get();
@@ -475,6 +491,56 @@ public class ClusterServiceController {
             return serviceInstanceVO;
         }).collect(Collectors.toList());
 
+
+        return ResultDTO.success(result);
+    }
+
+    /**
+     * 服务实例详情
+     */
+    @GetMapping("/serviceInstanceInfo")
+    public ResultDTO<ServiceInstanceDetailVO> serviceInstanceInfo(Integer serviceInstanceId) {
+
+        ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(serviceInstanceId).get();
+        Integer stackServiceId = serviceInstanceEntity.getStackServiceId();
+        StackServiceEntity stackServiceEntity = stackServiceRepository.findById(stackServiceId).get();
+
+        ServiceInstanceDetailVO instanceDetailVO = ServiceInstanceDetailVO.builder()
+                .id(serviceInstanceEntity.getId())
+                .name(serviceInstanceEntity.getServiceName())
+                .stackServiceDesc(stackServiceEntity.getDescription())
+                .dockerImage(stackServiceEntity.getDockerImage())
+                .stackServiceId(stackServiceId)
+                .stackServiceName(stackServiceEntity.getName())
+                .version(stackServiceEntity.getVersion())
+                .serviceStatus(serviceInstanceEntity.getServiceState().name())
+                .build();
+        return ResultDTO.success(instanceDetailVO);
+    }
+
+    /**
+     * 服务实例角色列表
+     */
+    @GetMapping("/serviceInstanceRoles")
+    public ResultDTO<List<ServiceInstanceRoleVO>> serviceInstanceRoles(Integer serviceInstanceId) {
+
+        List<ServiceInstanceRoleVO> result = roleInstanceRepository.findByServiceInstanceId(serviceInstanceId).stream().map(new Function<ServiceRoleInstanceEntity, ServiceInstanceRoleVO>() {
+            @Override
+            public ServiceInstanceRoleVO apply(ServiceRoleInstanceEntity roleInstanceEntity) {
+                ClusterNodeEntity nodeEntity = clusterNodeRepository.findById(roleInstanceEntity.getNodeId()).get();
+
+                return ServiceInstanceRoleVO.builder()
+                        .roleStatus(roleInstanceEntity.getServiceRoleState().name())
+                        .id(roleInstanceEntity.getId())
+                        .nodeHostIp(nodeEntity.getIp())
+                        .nodeHostname(nodeEntity.getHostname())
+                        .nodeId(nodeEntity.getId())
+                        // todo 用真实url代替
+                        .uiUrls(Lists.newArrayList(String.format("http://%s:1000/info",nodeEntity.getHostname()),String.format("http://%s:1000/info",nodeEntity.getIp())))
+                        .name(roleInstanceEntity.getServiceRoleName())
+                        .build();
+            }
+        }).collect(Collectors.toList());
 
         return ResultDTO.success(result);
     }
