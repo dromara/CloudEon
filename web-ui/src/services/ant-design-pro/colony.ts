@@ -162,4 +162,28 @@ export async function getTaskLogAPI(options?: { [key: string]: any }) {
   });
 }
 
+// 启动服务
+export async function startServiceAPI(options?: { [key: string]: any}) {
+  return request<API.normalResult>('/service/startService', {
+    method: 'POST',
+    params: options,
+  });
+}
+
+// 停止服务
+export async function stopServiceAPI(options?: { [key: string]: any}) {
+  return request<API.normalResult>('/service/stopService', {
+    method: 'POST',
+    params: options,
+  });
+}
+
+// 重启服务
+export async function restartServiceAPI(options?: { [key: string]: any}) {
+  return request<API.normalResult>('/service/restartService', {
+    method: 'POST',
+    params: options,
+  });
+}
+
 
