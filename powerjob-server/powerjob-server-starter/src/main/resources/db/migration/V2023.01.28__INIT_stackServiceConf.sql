@@ -8,7 +8,7 @@ create table udh_stack_service_conf
     value_type    varchar(255) null,
     recommend_expression     text null,
     service_id            int          null,
-    groups                varchar(255) null,
+    conf_file              varchar(255) null,
     configurable_in_wizard   bit null,
     stack_id              int          null
 );

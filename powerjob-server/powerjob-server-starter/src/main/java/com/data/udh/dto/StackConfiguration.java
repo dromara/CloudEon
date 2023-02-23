@@ -11,5 +11,5 @@ public class StackConfiguration {
     private String recommendExpression;
     private String valueType;
     private boolean configurableInWizard;
-    private List<String> groups;
+    private String confFile;
 }

@@ -402,7 +402,7 @@ public class FreemarkerTest {
                 ImmutableMap<String, Object> node2 = ImmutableMap.of("hostname", "node002","id",2);
                 ImmutableMap<String, Object> node3 = ImmutableMap.of("hostname", "node003","id",3);
                 dataModel.put("serviceRoles", ImmutableMap.of("ZOOKEEPER",Lists.newArrayList(node1,node2,node3)));
-                dataModel.put("customConfs", ImmutableMap.of("zoo.cfg",ImmutableMap.of("udhzk.container.memory","1024","udhzk.container.cpu",4)));
+                dataModel.put("groupConfs", ImmutableMap.of("zoo.cfg",ImmutableMap.of("udhzk.container.memory","1024","udhzk.container.cpu",4)));
                 dataModel.put("localhostname", "node001");
                 template.process(dataModel, out);
                 out.close();
