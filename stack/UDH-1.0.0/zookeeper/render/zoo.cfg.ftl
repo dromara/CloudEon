@@ -17,8 +17,8 @@ admin.enableServer=false
 
 
 <#--Take properties from the context-->
-<#list customConfs['zoo.cfg']?keys as key>
-    ${key}=${customConfs['zoo.cfg'][key]}
+<#list confFiles['zoo.cfg']?keys as key>
+    ${key}=${confFiles['zoo.cfg'][key]}
 </#list>
 
 autopurge.purgeInterval=1

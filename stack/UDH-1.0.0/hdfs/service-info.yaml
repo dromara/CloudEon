@@ -53,14 +53,14 @@ configurations:
     recommendExpression: 50070
 
     valueType: PORT
-    groups: [ ]
+
     configurableInWizard: true
 
   - name: namenode.rpc-port
     recommendExpression: 8020
 
     valueType: PORT
-    groups: [ ]
+
     configurableInWizard: true
 
 
@@ -68,7 +68,7 @@ configurations:
     recommendExpression: 50075
 
     valueType: PORT
-    groups: [ ]
+
     configurableInWizard: true
 
 
@@ -76,7 +76,7 @@ configurations:
     recommendExpression: 50010
 
     valueType: PORT
-    groups: [ ]
+
     configurableInWizard: true
 
 
@@ -84,7 +84,7 @@ configurations:
     recommendExpression: 8480
 
     valueType: PORT
-    groups: [ ]
+
     configurableInWizard: true
 
 
@@ -93,96 +93,96 @@ configurations:
   - name: dfs.namenode.name.dir
     recommendExpression: ${hadoop.tmp.dir}/dfs/name
     valueType: COMMA_SEPARATED_ABSOLUTE_PATH
-    groups: [ "hdfs-site.xml" ]
+    confFile:  "hdfs-site.xml"
     configurableInWizard: true
 
   - name: dfs.datanode.data.dir
     recommendExpression: ${hadoop.tmp.dir}/dfs/data
     valueType: COMMA_SEPARATED_ABSOLUTE_PATH
-    groups: [ "hdfs-site.xml" ]
+    confFile:  "hdfs-site.xml"
     configurableInWizard: true
 
   - name: dfs.datanode.failed.volumes.tolerated
     recommendExpression: 0
 
     valueType: NON_NEG_INT
-    groups: [ "hdfs-site.xml" ]
+    confFile:  "hdfs-site.xml"
     configurableInWizard: true
 
   - name: dfs.data.transfer.protection
     recommendExpression: authentication
     valueType: STRING
-    groups: [ "hdfs-site.xml" ]
+    confFile:  "hdfs-site.xml"
 
   - name: dfs.datanode.handler.count
     recommendExpression: 30
 
     valueType: NON_NEG_INT
-    groups: [ "hdfs-site.xml" ]
+    confFile:  "hdfs-site.xml"
 
   - name: dfs.namenode.handler.count
     recommendExpression: 100
 
     valueType: NON_NEG_INT
-    groups: [ "hdfs-site.xml" ]
+    confFile:  "hdfs-site.xml"
 
   - name: dfs.client.read.shortcircuit
     recommendExpression: true
 
     valueType: BOOL
-    groups: [ "hdfs-site.xml" ]
+    confFile:  "hdfs-site.xml"
 
   - name: dfs.client.socket-timeout
     recommendExpression: 120000
 
     valueType: NON_NEG_INT
-    groups: [ "hdfs-site.xml" ]
+    confFile:  "hdfs-site.xml"
 
   - name: dfs.ha.fencing.methods
     recommendExpression: shell(/bin/true)
 
     valueType: STRING
-    groups: [ "core-site.xml" ]
+    confFile:  "core-site.xml"
 
 
   - name: dfs.datanode.data.dir.perm
     recommendExpression: 755
 
     valueType: STRING
-    groups: [ "hdfs-site.xml" ]
+    confFile:  "hdfs-site.xml"
 
 
   - name: dfs.permissions.superusergroup
     recommendExpression: "supergroup"
     valueType: STRING
-    groups: [ "hdfs-site.xml" ]
+    confFile:  "hdfs-site.xml"
 
 
   - name: dfs.namenode.acls.enabled
     recommendExpression: true
 
     valueType: BOOL
-    groups: [ "hdfs-site.xml" ]
+    confFile:  "hdfs-site.xml"
 
   - name: fs.trash.interval
     recommendExpression: 1440
 
     valueType: STRING
-    groups: [ "core-site.xml" ]
+    confFile:  "core-site.xml"
 
 
   - name: namenode.memory
     recommendExpression: 2000
 
     valueType: MB
-    groups: [ ]
+
     configurableInWizard: true
 
   - name: zkfc.memory
     recommendExpression: 1024
 
     valueType: MB
-    groups: [ ]
+
     configurableInWizard: true
 
 
@@ -190,7 +190,7 @@ configurations:
     recommendExpression: 1024
 
     valueType: MB
-    groups: [ ]
+
     configurableInWizard: true
 
 
@@ -198,7 +198,7 @@ configurations:
     recommendExpression: 1024
 
     valueType: MB
-    groups: [ ]
+
     configurableInWizard: true
 
 
@@ -206,7 +206,7 @@ configurations:
     recommendExpression: -1
 
     valueType: FLOAT
-    groups: [ ]
+
     configurableInWizard: true
 
 
@@ -214,7 +214,7 @@ configurations:
     recommendExpression: -1
 
     valueType: FLOAT
-    groups: [ ]
+
     configurableInWizard: true
 
 
@@ -222,7 +222,7 @@ configurations:
     recommendExpression: -1
 
     valueType: FLOAT
-    groups: [ ]
+
     configurableInWizard: true
 
 
@@ -230,7 +230,7 @@ configurations:
     recommendExpression: -1
 
     valueType: FLOAT
-    groups: [ ]
+
     configurableInWizard: true
 
 
@@ -238,7 +238,7 @@ configurations:
     recommendExpression: -1
 
     valueType: FLOAT
-    groups: [ ]
+
     configurableInWizard: true
 
 
@@ -246,7 +246,7 @@ configurations:
     recommendExpression: -1
 
     valueType: FLOAT
-    groups: [ ]
+
     configurableInWizard: true
 
 
@@ -254,7 +254,7 @@ configurations:
     recommendExpression: -1
 
     valueType: FLOAT
-    groups: [ ]
+
     configurableInWizard: true
 
 
@@ -262,7 +262,7 @@ configurations:
     recommendExpression: -1
 
     valueType: FLOAT
-    groups: [ ]
+
     configurableInWizard: true
 
 
@@ -270,7 +270,7 @@ configurations:
     recommendExpression: -1
 
     valueType: FLOAT
-    groups: [ ]
+
     configurableInWizard: true
 
 
@@ -278,7 +278,7 @@ configurations:
     recommendExpression: -1
 
     valueType: FLOAT
-    groups: [ ]
+
     configurableInWizard: true
 
 
@@ -286,7 +286,7 @@ configurations:
     recommendExpression: -1
 
     valueType: FLOAT
-    groups: [ ]
+
     configurableInWizard: true
 
 
@@ -294,7 +294,7 @@ configurations:
     recommendExpression: -1
 
     valueType: FLOAT
-    groups: [ ]
+
     configurableInWizard: true
 
 
@@ -302,7 +302,7 @@ configurations:
     recommendExpression: -1
 
     valueType: FLOAT
-    groups: [ ]
+
     configurableInWizard: true
 
 
@@ -310,7 +310,7 @@ configurations:
     recommendExpression: -1
 
     valueType: FLOAT
-    groups: [ ]
+
     configurableInWizard: true
 
 
@@ -318,7 +318,7 @@ configurations:
     recommendExpression: -1
 
     valueType: FLOAT
-    groups: [ ]
+
     configurableInWizard: true
 
 
@@ -326,7 +326,7 @@ configurations:
     recommendExpression: -1
 
     valueType: FLOAT
-    groups: [ ]
+
     configurableInWizard: true
 
 
@@ -334,7 +334,7 @@ configurations:
     recommendExpression: -1
 
     valueType: FLOAT
-    groups: [ ]
+
     configurableInWizard: true
 
 
@@ -342,7 +342,7 @@ configurations:
     recommendExpression: -1
 
     valueType: FLOAT
-    groups: [ ]
+
     configurableInWizard: true
 
 
@@ -350,7 +350,7 @@ configurations:
     recommendExpression: -1
 
     valueType: FLOAT
-    groups: [ ]
+
     configurableInWizard: true
 
 
@@ -358,7 +358,7 @@ configurations:
     recommendExpression: -1
 
     valueType: FLOAT
-    groups: [ ]
+
     configurableInWizard: true
 
 
@@ -366,7 +366,7 @@ configurations:
     recommendExpression: -1
 
     valueType: FLOAT
-    groups: [ ]
+
     configurableInWizard: true
 
 
@@ -374,7 +374,7 @@ configurations:
     recommendExpression: -1
 
     valueType: FLOAT
-    groups: [ ]
+
     configurableInWizard: true
 
 
@@ -382,7 +382,7 @@ configurations:
     recommendExpression: -1
 
     valueType: FLOAT
-    groups: [ ]
+
     configurableInWizard: true
 
 
@@ -390,7 +390,7 @@ configurations:
     recommendExpression: -1
 
     valueType: FLOAT
-    groups: [ ]
+
     configurableInWizard: true
 
 
@@ -398,7 +398,7 @@ configurations:
     recommendExpression: -1
 
     valueType: FLOAT
-    groups: [ ]
+
     configurableInWizard: true
 
 

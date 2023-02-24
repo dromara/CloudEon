@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface CommandRepository extends JpaRepository<CommandEntity, Integer> {
-    List<CommandEntity> findByClusterId(Integer clusterId);
+    List<CommandEntity> findByClusterIdOrderBySubmitTimeDesc(Integer clusterId);
 }

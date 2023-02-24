@@ -99,8 +99,7 @@ public class StackController {
         List<StackConfiguration> stackConfigurations = stackServiceConfEntities.stream().map(stackServiceConfEntity -> {
             StackConfiguration stackConfiguration = new StackConfiguration();
             BeanUtil.copyProperties(stackServiceConfEntity, stackConfiguration);
-            ArrayList<String> groups = ListUtil.toList(stackServiceConfEntity.getGroups().split(","));
-            stackConfiguration.setGroups(groups);
+            stackConfiguration.setConfFile(stackServiceConfEntity.getConfFile());
             return stackConfiguration;
         }).collect(Collectors.toList());
 

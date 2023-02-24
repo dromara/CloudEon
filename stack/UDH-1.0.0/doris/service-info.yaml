@@ -1,8 +1,8 @@
 name: DORIS
 label: "Doris"
 description: "实时OLAP分析系统"
-version: 1.2.1
-dockerImage: "registry.mufankong.top/udh/doris:1.2.1"
+version: 1.1.5
+dockerImage: "registry.mufankong.top/udh/doris:1.1.5"
 dependencies: []
 
 runAs: doris
@@ -37,40 +37,33 @@ customConfigFiles:
 
 configurations:
 
-  - name: be_priority_networks
-    recommendExpression: 0.0.0.0/24
-    valueType: STRING
-    configurableInWizard: true
-    description: "为那些有多个 IP 地址的服务器声明一个选择策略。
-请注意，最多应该有一个 IP 地址与此列表匹配。这是一个以分号分隔格式的列表，用 CIDR 表示法，例如 10.10.10.0"
-    label: "BE优先网段"
-    groups: ["be.conf" ]
+
 
 
   - name: sys_log_level
     recommendExpression: INFO
     valueType: STRING
-    groups: ["be.conf" ]
+    confFile: "be.conf"
     configurableInWizard: true
     label: "BE服务日志级别"
 
   - name: fragment_pool_queue_size
     recommendExpression: 2048
     valueType: STRING
-    groups: [ "be.conf" ]
+    confFile:  "be.conf"
     label: "单节点上能够处理的查询请求上限"
 
   - name: fragment_pool_thread_num_max
     recommendExpression: 512
     valueType: STRING
-    groups: [ "be.conf" ]
+    confFile:  "be.conf"
     label: "后续查询请求动态创建线程"
     description: "后续查询请求动态创建线程，最大创建512个线程。"
 
   - name: be_port
     recommendExpression: 9060
     valueType: PORT
-    groups: ["be.conf" ]
+    confFile: "be.conf"
     configurableInWizard: true
     label: "BE admin端口"
     description: "BE admin端口"
@@ -79,21 +72,28 @@ configurations:
     recommendExpression: 18040
     configurableInWizard: true
     valueType: PORT
-    groups: [ "be.conf"]
+    confFile:  "be.conf"
     label: "Be web页面访问端口"
 
 
   - name: brpc_port
     recommendExpression: 8060
     valueType: PORT
-    groups: [ "be.conf" ]
+    confFile:  "be.conf"
     configurableInWizard: true
     label: "BE Rpc端口"
+
+  - name: heartbeat_service_port
+    recommendExpression: 9050
+    valueType: PORT
+    confFile:  "be.conf"
+    configurableInWizard: true
+    label: "BE心跳服务端口"
 
   - name: rpc_port
     recommendExpression: 9020
     valueType: PORT
-    groups: [ "fe.conf" ]
+    confFile:  "fe.conf"
     configurableInWizard: true
     label: "FE节点上Thrift服务器的端口"
     description: "FE 节点上 Thrift 服务器的端口。"
@@ -102,26 +102,34 @@ configurations:
   - name: query_port
     recommendExpression: 9030
     valueType: PORT
-    groups: [ "fe.conf" ]
+    confFile:  "fe.conf"
     configurableInWizard: true
     label: "FE节点上MySQL服务器的端口"
     description: "FE 节点上 MySQL 服务器的端口"
 
-
-  - name: fe_priority_networks
-    recommendExpression: "0.0.0.0/24"
-    valueType: STRING
-    groups: [ "fe.conf" ]
+  - name: fe_http_port
+    recommendExpression: 18030
+    valueType: PORT
+    confFile: "fe.conf"
     configurableInWizard: true
-    label: "FE优先网段"
-    description: "为那些有多个 IP 地址的服务器声明一个选择策略。
-请注意，最多应该有一个 IP 地址与此列表匹配。这是一个以分号分隔格式的列表，用 CIDR 表示法，例如 10.10.10.0"
+    label: "FE节点上web页面的端口"
+    description: "FE节点上web页面的端口"
+
+  - name: edit_log_port
+    recommendExpression: 9010
+    valueType: PORT
+    confFile:  "fe.conf"
+    configurableInWizard: true
+    label: "FE节点上bdbje 的通信端口"
+    description: "FE节点上bdbje 的通信端口"
+
+
 
 
   - name: cluster_id
     recommendExpression: 123
     valueType: NON_NEG_INT
-    groups: [ "fe.conf" ]
+    confFile:  "fe.conf"
     configurableInWizard: true
     label: "集群ID"
     description: "如果节点（FE 或 BE）具有相同的集群 id，则将认为它们属于同一个Doris 集群"

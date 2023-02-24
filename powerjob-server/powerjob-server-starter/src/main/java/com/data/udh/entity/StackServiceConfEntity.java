@@ -46,7 +46,7 @@ public class StackServiceConfEntity implements Serializable {
 	private String recommendExpression;
 
 
-	private String groups;
+	private String confFile;
 
 	private Boolean configurableInWizard;
 
