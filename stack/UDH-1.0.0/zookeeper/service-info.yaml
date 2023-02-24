@@ -35,31 +35,27 @@ configurations:
     configurableInWizard: true
     description: ""
     label: ""
-    groups: [ ]
 
 
   - name: zookeeper.client.port
     recommendExpression: 2181
     valueType: PORT
-    groups: [ ]
     configurableInWizard: true
 
   - name: zookeeper.leader.elect.port
     recommendExpression: 3888
     valueType: PORT
-    groups: [ ]
     configurableInWizard: true
 
   - name: zookeeper.jmxremote.port
     recommendExpression: 9911
     valueType: PORT
-    groups: [ ]
 
 
   - name: tickTime
     recommendExpression: 9000
     valueType: MILLISECONDS
-    groups: [ "zoo.cfg" ]
+    confFile: "zoo.cfg"
     configurableInWizard: true
     label: "心跳时间"
     description: "Zookeeper服务器与客户端心跳时间，单位毫秒"
@@ -67,86 +63,78 @@ configurations:
   - name: initLimit
     recommendExpression: 10
     valueType: NON_NEG_INT
-    groups: [ "zoo.cfg" ]
+    confFile: "zoo.cfg"
     configurableInWizard: true
 
 
   - name: syncLimit
     recommendExpression: 5
     valueType: NON_NEG_INT
-    groups: [ "zoo.cfg" ]
+    confFile: "zoo.cfg"
     configurableInWizard: true
 
 
   - name: maxClientCnxns
     recommendExpression: 0
     valueType: NON_NEG_INT
-    groups: [ "zoo.cfg" ]
+    confFile: "zoo.cfg"
 
 
   - name: zookeeper.server.memory
     recommendExpression: 1024
     valueType: MB
-    groups: [ ]
     configurableInWizard: true
 
 
   - name: zookeeper.container.limits.memory
     recommendExpression: -1
     valueType: FLOAT
-    groups: [ ]
     configurableInWizard: true
 
 
   - name: zookeeper.container.limits.cpu
     recommendExpression: -1
     valueType: FLOAT
-    groups: [ ]
     configurableInWizard: true
 
 
   - name: zookeeper.container.requests.memory
     recommendExpression: -1
     valueType: FLOAT
-    groups: [ ]
     configurableInWizard: true
 
 
   - name: zookeeper.container.requests.cpu
     recommendExpression: -1
     valueType: FLOAT
-    groups: [ ]
     configurableInWizard: true
 
 
   - name: zookeeper.memory.ratio
     recommendExpression: -1
     valueType: FLOAT
-    groups: [ ]
     configurableInWizard: true
 
 
   - name: sasl.oauth2.enabled
     recommendExpression: true
     valueType: BOOL
-    groups: [ ]
 
 
   - name: extendedTypesEnabled
     recommendExpression: false
     valueType: BOOL
-    groups: [ "zoo.cfg" ]
+    confFile: "zoo.cfg"
 
 
   - name: 4lw.commands.whitelist
     recommendExpression: mntr
     valueType: STRING
-    groups: [ "zoo.cfg" ]
+    confFile: "zoo.cfg"
     label: "指令白名单"
     description: "用于控制指令白名单"
 
   - name: znode.container.checkIntervalMs
     recommendExpression: 1000
     valueType: NON_NEG_INT
-    groups: [ ]
 

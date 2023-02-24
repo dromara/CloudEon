@@ -22,6 +22,7 @@ public enum CommandType {
     DELETE_ROLE(7,"删除角色"),
 
     RESTART_SERVICE(8,"重启服务"),
+    UPGRADE_SERVICE_CONFIG(9,"刷新服务配置"),
 
 
 

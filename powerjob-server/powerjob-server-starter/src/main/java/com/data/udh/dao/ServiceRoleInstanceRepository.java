@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface ServiceRoleInstanceRepository extends JpaRepository<ServiceRoleInstanceEntity, Integer> {
     List<ServiceRoleInstanceEntity> findByServiceInstanceIdAndStackServiceRoleId(Integer serviceInstanceId, Integer stackServiceRoleId);
+    List<ServiceRoleInstanceEntity> findByServiceInstanceIdAndServiceRoleName(Integer serviceInstanceId, String serviceRoleName);
     List<ServiceRoleInstanceEntity> findByServiceInstanceId(Integer serviceInstanceId);
 
     int deleteByServiceInstanceId(Integer serviceInstanceId);

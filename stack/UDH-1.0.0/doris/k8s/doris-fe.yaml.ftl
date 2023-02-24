@@ -40,7 +40,9 @@ spec:
       hostPID: false
       hostNetwork: true
       containers:
-      - image: "${dockerImage}"
+      - args:
+        - "/home/doris/doris-fe/conf/fe_bootstrap.sh"
+        image: "${dockerImage}"
         imagePullPolicy: "Always"
         name: "${roleServiceFullName}"
         resources:
@@ -55,7 +57,7 @@ spec:
           name: "log"
         - mountPath: "/etc/localtime"
           name: "timezone"
-        - mountPath: "/opt/udh/${service.serviceName}/conf"
+        - mountPath: "/home/doris/doris-fe/conf"
           name: "conf"
 
       nodeSelector:

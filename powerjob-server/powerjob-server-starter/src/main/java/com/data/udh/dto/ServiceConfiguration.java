@@ -2,14 +2,13 @@ package com.data.udh.dto;
 
 import lombok.Data;
 
-import java.util.List;
 @Data
-public class StackConfiguration {
+public class ServiceConfiguration {
     private String name;
     private String description;
     private String label;
     private String recommendExpression;
     private String valueType;
-    private boolean configurableInWizard;
     private String confFile;
+    private boolean isCustomConf;
 }

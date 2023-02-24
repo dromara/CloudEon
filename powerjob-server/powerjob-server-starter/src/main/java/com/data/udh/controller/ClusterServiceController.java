@@ -3,6 +3,7 @@ package com.data.udh.controller;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
@@ -11,11 +12,9 @@ import cn.hutool.extra.template.TemplateEngine;
 import cn.hutool.extra.template.TemplateUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.data.udh.controller.request.InitServiceRequest;
-import com.data.udh.controller.response.ServiceInstanceVO;
+import com.data.udh.controller.response.*;
 import com.data.udh.dao.*;
-import com.data.udh.dto.NodeInfo;
-import com.data.udh.dto.ServiceTaskGroupType;
-import com.data.udh.dto.TaskModel;
+import com.data.udh.dto.*;
 import com.data.udh.entity.*;
 import com.data.udh.actor.CommandExecuteActor;
 import com.data.udh.processor.TaskParam;
@@ -208,8 +207,8 @@ public class ClusterServiceController {
                     BeanUtil.copyProperties(initServicePresetConf, serviceInstanceConfigEntity);
                     // 查询框架服务配置，补全属性
                     StackServiceConfEntity stackServiceConfEntity = stackServiceConfRepository.findByStackIdAndNameAndServiceId(stackId, initServicePresetConf.getName(), stackServiceId);
-                    if (StrUtil.isNotBlank(stackServiceConfEntity.getGroups())) {
-                        serviceInstanceConfigEntity.setCustomConfFile(stackServiceConfEntity.getGroups());
+                    if (StrUtil.isNotBlank(stackServiceConfEntity.getConfFile())) {
+                        serviceInstanceConfigEntity.setConfFile(stackServiceConfEntity.getConfFile());
                     }
                     serviceInstanceConfigEntity.setUpdateTime(new Date());
                     serviceInstanceConfigEntity.setCreateTime(new Date());
@@ -230,8 +229,8 @@ public class ClusterServiceController {
                     serviceInstanceConfigEntity.setRecommendedValue(stackServiceConfEntity.getRecommendExpression());
                     serviceInstanceConfigEntity.setUpdateTime(new Date());
                     serviceInstanceConfigEntity.setCreateTime(new Date());
-                    if (StrUtil.isNotBlank(stackServiceConfEntity.getGroups())) {
-                        serviceInstanceConfigEntity.setCustomConfFile(stackServiceConfEntity.getGroups());
+                    if (StrUtil.isNotBlank(stackServiceConfEntity.getConfFile())) {
+                        serviceInstanceConfigEntity.setConfFile(stackServiceConfEntity.getConfFile());
                     }
                     serviceInstanceConfigEntity.setServiceInstanceId(serviceInstanceEntityId);
                     serviceInstanceConfigEntity.setUserId(AdminUserId);
@@ -286,6 +285,20 @@ public class ClusterServiceController {
         //  生成停止服务command
         List<ServiceInstanceEntity> serviceInstanceEntities = Lists.newArrayList(serviceInstanceEntity);
         Integer commandId = buildServiceCommand(serviceInstanceEntities, serviceInstanceEntity.getClusterId(), CommandType.STOP_SERVICE);
+
+        //  调用workflow
+        udhActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
+
+
+        return ResultDTO.success(null);
+    }
+
+    @PostMapping("/upgradeServiceConfig")
+    public ResultDTO<Void> upgradeServiceConfig(Integer serviceInstanceId) {
+        ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(serviceInstanceId).get();
+        //  生成刷新服务配置command
+        List<ServiceInstanceEntity> serviceInstanceEntities = Lists.newArrayList(serviceInstanceEntity);
+        Integer commandId = buildServiceCommand(serviceInstanceEntities, serviceInstanceEntity.getClusterId(), CommandType.UPGRADE_SERVICE_CONFIG);
 
         //  调用workflow
         udhActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
@@ -475,6 +488,82 @@ public class ClusterServiceController {
             return serviceInstanceVO;
         }).collect(Collectors.toList());
 
+
+        return ResultDTO.success(result);
+    }
+
+    /**
+     * 查询服务实例配置
+     */
+    @GetMapping("/listConfs")
+    public ResultDTO<ServiceInstanceConfVO> listConfs(Integer serviceInstanceId) {
+        ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(serviceInstanceId).get();
+        Integer stackServiceId = serviceInstanceEntity.getStackServiceId();
+        ServiceInstanceConfVO result = new ServiceInstanceConfVO();
+        // 数据库中查询服务实例配置
+        List<ServiceConfiguration> serviceConfigurations = serviceInstanceConfigRepository.findByServiceInstanceId(serviceInstanceId)
+                .stream().map(serviceInstanceConfig -> {
+                    ServiceConfiguration serviceConfiguration = new ServiceConfiguration();
+                    BeanUtil.copyProperties(serviceInstanceConfig, serviceConfiguration);
+                    serviceConfiguration.setConfFile(serviceInstanceConfig.getConfFile());
+                    return serviceConfiguration;
+                }).collect(Collectors.toList());
+
+        StackServiceEntity stackServiceEntity = stackServiceRepository.findById(stackServiceId).get();
+        // 查找该服务的自定义配置文件
+        ArrayList<String> customFileNames = ListUtil.toList(stackServiceEntity.getCustomConfigFiles().split(","));
+
+        result.setConfs(serviceConfigurations);
+        result.setCustomFileNames(customFileNames);
+        return ResultDTO.success(result);
+    }
+
+    /**
+     * 服务实例详情
+     */
+    @GetMapping("/serviceInstanceInfo")
+    public ResultDTO<ServiceInstanceDetailVO> serviceInstanceInfo(Integer serviceInstanceId) {
+
+        ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(serviceInstanceId).get();
+        Integer stackServiceId = serviceInstanceEntity.getStackServiceId();
+        StackServiceEntity stackServiceEntity = stackServiceRepository.findById(stackServiceId).get();
+
+        ServiceInstanceDetailVO instanceDetailVO = ServiceInstanceDetailVO.builder()
+                .id(serviceInstanceEntity.getId())
+                .name(serviceInstanceEntity.getServiceName())
+                .stackServiceDesc(stackServiceEntity.getDescription())
+                .dockerImage(stackServiceEntity.getDockerImage())
+                .stackServiceId(stackServiceId)
+                .stackServiceName(stackServiceEntity.getName())
+                .version(stackServiceEntity.getVersion())
+                .serviceStatus(serviceInstanceEntity.getServiceState().name())
+                .build();
+        return ResultDTO.success(instanceDetailVO);
+    }
+
+    /**
+     * 服务实例角色列表
+     */
+    @GetMapping("/serviceInstanceRoles")
+    public ResultDTO<List<ServiceInstanceRoleVO>> serviceInstanceRoles(Integer serviceInstanceId) {
+
+        List<ServiceInstanceRoleVO> result = roleInstanceRepository.findByServiceInstanceId(serviceInstanceId).stream().map(new Function<ServiceRoleInstanceEntity, ServiceInstanceRoleVO>() {
+            @Override
+            public ServiceInstanceRoleVO apply(ServiceRoleInstanceEntity roleInstanceEntity) {
+                ClusterNodeEntity nodeEntity = clusterNodeRepository.findById(roleInstanceEntity.getNodeId()).get();
+
+                return ServiceInstanceRoleVO.builder()
+                        .roleStatus(roleInstanceEntity.getServiceRoleState().name())
+                        .id(roleInstanceEntity.getId())
+                        .nodeHostIp(nodeEntity.getIp())
+                        .nodeHostname(nodeEntity.getHostname())
+                        .nodeId(nodeEntity.getId())
+                        // todo 用真实url代替
+                        .uiUrls(Lists.newArrayList(String.format("http://%s:1000/info", nodeEntity.getHostname()), String.format("http://%s:1000/info", nodeEntity.getIp())))
+                        .name(roleInstanceEntity.getServiceRoleName())
+                        .build();
+            }
+        }).collect(Collectors.toList());
 
         return ResultDTO.success(result);
     }
