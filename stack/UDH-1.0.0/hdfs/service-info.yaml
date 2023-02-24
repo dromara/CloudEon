@@ -14,21 +14,21 @@ roles:
   - name: HDFS_JOURNALNODE
     label: "Journal Node"
     roleFullName: "hadoop-hdfs-journalnode"
-    linkExpression: "http://${localhostname}:${service['datanode.http-port']}/?user.name=hdfs"
+    linkExpression: "http://${localhostname}:${conf['datanode.http-port']}/?user.name=hdfs"
     sortNum: 1
     type: MASTER
     jmxPort: 9232
   - name: HDFS_NAMENODE
     label: "Name Node"
     roleFullName: "hadoop-hdfs-namenode"
-    linkExpression: "http://${localhostname}:${service['namenode.http-port']}/?user.name=hdfs"
+    linkExpression: "http://${localhostname}:${conf['namenode.http-port']}/?user.name=hdfs"
     sortNum: 2
     type: MASTER
     jmxPort: 9232
   - name: HDFS_DATANODE
     label: "Data Node"
     roleFullName: hadoop-hdfs-datanode
-    linkExpression: "http://${localhostname}:${service['datanode.http-port']}/?user.name=hdfs"
+    linkExpression: "http://${localhostname}:${conf['datanode.http-port']}/?user.name=hdfs"
     sortNum: 3
     type: SLAVE
     jmxPort: 9232

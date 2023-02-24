@@ -7,9 +7,6 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.template.TemplateConfig;
-import cn.hutool.extra.template.TemplateEngine;
-import cn.hutool.extra.template.TemplateUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.data.udh.controller.request.InitServiceRequest;
 import com.data.udh.controller.response.*;
@@ -148,56 +145,6 @@ public class ClusterServiceController {
             Integer serviceInstanceEntityId = serviceInstanceEntity.getId();
             installedServiceInstanceIds.add(serviceInstanceEntityId);
 
-            // 获取service 所有角色
-            List<InitServiceRequest.InitServiceRole> roles = serviceInfo.getRoles();
-            for (InitServiceRequest.InitServiceRole role : roles) {
-                String stackRoleName = role.getStackRoleName();
-                StackServiceRoleEntity stackServiceRoleEntity = stackServiceRoleRepository.findByServiceIdAndName(stackServiceId, stackRoleName);
-                if (stackServiceRoleEntity == null) {
-                    throw new IllegalArgumentException("can't find stack service role by role name:" + stackRoleName + " and stack service id: " + stackServiceId);
-                }
-
-                // 遍历该角色分布的节点，生成serviceRoleInstanceEntities
-                List<ServiceRoleInstanceEntity> serviceRoleInstanceEntities = role.getNodeIds().stream().map(new Function<Integer, ServiceRoleInstanceEntity>() {
-                    @Override
-                    public ServiceRoleInstanceEntity apply(Integer nodeId) {
-                        ServiceRoleInstanceEntity roleInstanceEntity = new ServiceRoleInstanceEntity();
-                        roleInstanceEntity.setClusterId(clusterId);
-                        roleInstanceEntity.setCreateTime(new Date());
-                        roleInstanceEntity.setUpdateTime(new Date());
-                        roleInstanceEntity.setServiceInstanceId(serviceInstanceEntityId);
-                        roleInstanceEntity.setStackServiceRoleId(stackServiceRoleEntity.getId());
-                        roleInstanceEntity.setServiceRoleName(stackRoleName);
-                        roleInstanceEntity.setServiceRoleState(ServiceRoleState.OPERATING);
-                        roleInstanceEntity.setNodeId(nodeId);
-                        return roleInstanceEntity;
-                    }
-                }).collect(Collectors.toList());
-
-                // 批量持久化role实例
-                List<ServiceRoleInstanceEntity> serviceRoleInstanceEntitiesAfter = roleInstanceRepository.saveAllAndFlush(serviceRoleInstanceEntities);
-
-                // 为每个角色分布的节点，都生成service RoleUi地址
-                List<ServiceRoleInstanceWebuisEntity> roleInstanceWebuisEntities = serviceRoleInstanceEntitiesAfter.stream().map(new Function<ServiceRoleInstanceEntity, ServiceRoleInstanceWebuisEntity>() {
-                    @Override
-                    public ServiceRoleInstanceWebuisEntity apply(ServiceRoleInstanceEntity serviceRoleInstanceEntity) {
-                        String roleLinkExpression = stackServiceRoleEntity.getLinkExpression();
-                        // 持久化service Role UI信息
-                        ServiceRoleInstanceWebuisEntity serviceRoleInstanceWebuisEntity = new ServiceRoleInstanceWebuisEntity();
-                        serviceRoleInstanceWebuisEntity.setName("UI地址");
-                        serviceRoleInstanceWebuisEntity.setServiceInstanceId(serviceInstanceEntityId);
-                        serviceRoleInstanceWebuisEntity.setServiceRoleInstanceId(serviceRoleInstanceEntity.getServiceInstanceId());
-                        serviceRoleInstanceWebuisEntity.setWebHostUrl(roleLinkExpression);
-                        serviceRoleInstanceWebuisEntity.setWebIpUrl(roleLinkExpression);
-                        return serviceRoleInstanceWebuisEntity;
-                    }
-                }).collect(Collectors.toList());
-
-                // 批量持久化role web ui
-                roleInstanceWebuisRepository.saveAll(roleInstanceWebuisEntities);
-
-
-            }
 
             List<InitServiceRequest.InitServicePresetConf> presetConfList = serviceInfo.getPresetConfList();
             List<ServiceInstanceConfigEntity> serviceInstanceConfigEntities = presetConfList.stream().map(new Function<InitServiceRequest.InitServicePresetConf, ServiceInstanceConfigEntity>() {
@@ -240,7 +187,61 @@ public class ClusterServiceController {
 
             // 批量持久化service Conf信息
             serviceInstanceConfigEntities.addAll(instanceConfigEntities);
-            serviceInstanceConfigRepository.saveAll(serviceInstanceConfigEntities);
+            serviceInstanceConfigRepository.saveAllAndFlush(serviceInstanceConfigEntities);
+
+            // 获取需要安装的service 所有角色
+            List<InitServiceRequest.InitServiceRole> roles = serviceInfo.getRoles();
+            for (InitServiceRequest.InitServiceRole role : roles) {
+                String stackRoleName = role.getStackRoleName();
+                StackServiceRoleEntity stackServiceRoleEntity = stackServiceRoleRepository.findByServiceIdAndName(stackServiceId, stackRoleName);
+                if (stackServiceRoleEntity == null) {
+                    throw new IllegalArgumentException("can't find stack service role by role name:" + stackRoleName + " and stack service id: " + stackServiceId);
+                }
+
+                // 遍历该角色分布的节点，生成serviceRoleInstanceEntities
+                List<ServiceRoleInstanceEntity> serviceRoleInstanceEntities = role.getNodeIds().stream().map(new Function<Integer, ServiceRoleInstanceEntity>() {
+                    @Override
+                    public ServiceRoleInstanceEntity apply(Integer nodeId) {
+                        ServiceRoleInstanceEntity roleInstanceEntity = new ServiceRoleInstanceEntity();
+                        roleInstanceEntity.setClusterId(clusterId);
+                        roleInstanceEntity.setCreateTime(new Date());
+                        roleInstanceEntity.setUpdateTime(new Date());
+                        roleInstanceEntity.setServiceInstanceId(serviceInstanceEntityId);
+                        roleInstanceEntity.setStackServiceRoleId(stackServiceRoleEntity.getId());
+                        roleInstanceEntity.setServiceRoleName(stackRoleName);
+                        roleInstanceEntity.setServiceRoleState(ServiceRoleState.OPERATING);
+                        roleInstanceEntity.setNodeId(nodeId);
+                        return roleInstanceEntity;
+                    }
+                }).collect(Collectors.toList());
+
+                // 批量持久化role实例
+                List<ServiceRoleInstanceEntity> serviceRoleInstanceEntitiesAfter = roleInstanceRepository.saveAllAndFlush(serviceRoleInstanceEntities);
+
+                // 为每个角色分布的节点，都生成service RoleUi地址
+                List<ServiceRoleInstanceWebuisEntity> roleInstanceWebuisEntities = serviceRoleInstanceEntitiesAfter.stream()
+                        .filter(e -> {
+                            return StrUtil.isNotBlank(stackServiceRoleEntity.getLinkExpression());
+                        }).map(new Function<ServiceRoleInstanceEntity, ServiceRoleInstanceWebuisEntity>() {
+                            @Override
+                            public ServiceRoleInstanceWebuisEntity apply(ServiceRoleInstanceEntity serviceRoleInstanceEntity) {
+                                String roleLinkExpression = stackServiceRoleEntity.getLinkExpression();
+                                // 持久化service Role UI信息
+                                ServiceRoleInstanceWebuisEntity serviceRoleInstanceWebuisEntity = new ServiceRoleInstanceWebuisEntity();
+                                serviceRoleInstanceWebuisEntity.setName(serviceRoleInstanceEntity.getServiceRoleName() + "UI地址");
+                                serviceRoleInstanceWebuisEntity.setServiceInstanceId(serviceInstanceEntityId);
+                                serviceRoleInstanceWebuisEntity.setServiceRoleInstanceId(serviceRoleInstanceEntity.getServiceInstanceId());
+                                serviceRoleInstanceWebuisEntity.setWebHostUrl(genWebUI(roleLinkExpression, serviceInstanceEntityId, serviceRoleInstanceEntity, false));
+                                serviceRoleInstanceWebuisEntity.setWebIpUrl(genWebUI(roleLinkExpression, serviceInstanceEntityId, serviceRoleInstanceEntity, true));
+                                return serviceRoleInstanceWebuisEntity;
+                            }
+                        }).collect(Collectors.toList());
+
+                // 批量持久化role web ui
+                roleInstanceWebuisRepository.saveAll(roleInstanceWebuisEntities);
+
+
+            }
 
         }
 
@@ -276,6 +277,35 @@ public class ClusterServiceController {
 
 
         return ResultDTO.success(null);
+    }
+
+    private String genWebUI(String roleLinkExpression, Integer serviceInstanceEntityId, ServiceRoleInstanceEntity serviceRoleInstanceEntity, boolean isUseIp) {
+        String localhostname = "";
+        // 查询角色的部署节点
+        ClusterNodeEntity clusterNodeEntity = clusterNodeRepository.findById(serviceRoleInstanceEntity.getNodeId()).get();
+        if (isUseIp) {
+            localhostname = clusterNodeEntity.getIp();
+        } else {
+            localhostname = clusterNodeEntity.getHostname();
+        }
+
+        // 查询服务实例所有配置项
+        List<ServiceInstanceConfigEntity> allConfigEntityList = serviceInstanceConfigRepository.findByServiceInstanceId(serviceInstanceEntityId);
+        Map<String, String> confMap = allConfigEntityList.stream().collect(Collectors.toMap(ServiceInstanceConfigEntity::getName, ServiceInstanceConfigEntity::getValue));
+        // 渲染
+        Configuration cfg = new Configuration();
+        StringTemplateLoader stringLoader = new StringTemplateLoader();
+        String template = "webUITemplate";
+        stringLoader.putTemplate(template, roleLinkExpression);
+        cfg.setTemplateLoader(stringLoader);
+        try (Writer out = new StringWriter(2048);) {
+            Template temp = cfg.getTemplate(template, "utf-8");
+            temp.process(Dict.create().set("localhostname", localhostname).set("conf", confMap), out);
+            return out.toString();
+        } catch (IOException | TemplateException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 
@@ -338,7 +368,6 @@ public class ClusterServiceController {
      * 通过模板生成服务实例持久化到宿主机的目录
      */
     private String genPersistencePaths(String persistencePaths, String serviceInstanceId) {
-        TemplateEngine engine = TemplateUtil.createEngine(new TemplateConfig());
         String result = Arrays.stream(persistencePaths.split(",")).map(new Function<String, String>() {
             @Override
             public String apply(String pathTemplate) {
@@ -582,7 +611,7 @@ public class ClusterServiceController {
         // 删除服务角色配置表
         serviceInstanceConfigRepository.deleteByServiceInstanceId(serviceInstanceId);
         // 删除服务ui表
-        serviceInstanceConfigRepository.deleteByServiceInstanceId(serviceInstanceId);
+        roleInstanceWebuisRepository.deleteByServiceInstanceId(serviceInstanceId);
 
 
         return ResultDTO.success(null);
