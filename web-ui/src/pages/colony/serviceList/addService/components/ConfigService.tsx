@@ -3,7 +3,6 @@ import styles from './ConfigService.less'
 import React, { useState, useEffect, useRef } from 'react';
 import { Menu, Form, Table, Button, Typography, Popconfirm, InputNumber, Input, Tooltip, Modal } from 'antd';
 import { getServiceConfAPI } from '@/services/ant-design-pro/colony';
-import { divide } from 'lodash';
 
 
 const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( setPresetConfListToParams )=>{

@@ -34,13 +34,13 @@
   },
   {
     name: 'nodelist',
-    icon: 'smile',
+    icon: 'DeploymentUnitOutlined',
     path: '/colony/nodeList',
     component: './colony/nodeList',
   },
   {
     name: 'servicelist',
-    icon: 'smile',
+    icon: 'ControlOutlined',
     path: '/colony/serviceList',
     component: './colony/serviceList',
   },
@@ -62,7 +62,7 @@
   },
   {
     name: 'actionlist',
-    icon: 'smile',
+    icon: 'CoffeeOutlined',
     path: '/colony/actionList',
     component: './colony/actionList',
   },

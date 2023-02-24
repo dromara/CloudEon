@@ -1,7 +1,7 @@
 import { PageContainer, ProCard } from '@ant-design/pro-components';
 import { Progress, Modal, Spin } from 'antd';
 import styles from './index.less'
-import { /*commandInfos,*/ statusColor,trailColor } from '../common'
+import { /*commandInfos,*/ statusColor,trailColor } from '../../../../utils/colonyColor'
 import { formatDate } from '@/utils/common'
 import { useState, useEffect, ReactChild, ReactFragment, ReactPortal } from 'react';
 import { getCommandDetailAPI, getTaskLogAPI } from '@/services/ant-design-pro/colony';
@@ -29,7 +29,7 @@ const actionDetail: React.FC = () => {
     setLoading(true)
     const result: API.commandResult =  await getCommandDetailAPI(params);
     setLoading(false)
-    if(result && result.success){
+    if(result?.success){
         setCommandInfos(result?.data || {})
     }
   };
@@ -38,7 +38,7 @@ const actionDetail: React.FC = () => {
     setDetailLoading(true)
     const result: API.logResult =  await getTaskLogAPI(params);
     setDetailLoading(false)
-    if(result && result.success){
+    if(result?.success){
         setLogData(result?.data || '')
     }
   }
@@ -67,7 +67,17 @@ const actionDetail: React.FC = () => {
 
   useEffect(() => {
     const { query } = history.location;
-    getTableData({ commandId: query?.commandId });
+    const params = { commandId: query?.commandId }
+    getTableData(params);
+    const timer =  setInterval(async()=>{
+        const result: API.commandResult =  await getCommandDetailAPI(params);
+        if(result?.success){
+            setCommandInfos(result?.data || {})
+        }
+    },2000)
+    return () =>{
+        clearInterval(timer)
+    }
   }, []);
 
     
