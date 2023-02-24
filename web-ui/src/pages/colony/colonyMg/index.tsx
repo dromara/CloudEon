@@ -122,6 +122,7 @@ const Colony: React.FC = () => {
         {clusterList&&clusterList.map(cItem=>{
           return(
               <ProCard
+                hoverable
                 key={cItem.id}
                 style={{ width: 150, height: 150, padding: 0, overflow: 'hidden' }}
                 bodyStyle={{ padding: 0 }}
