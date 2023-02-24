@@ -13,7 +13,7 @@ roles:
   - name: DORIS_FE
     label: "Doris Fe"
     roleFullName: "doris-fe"
-    linkExpression: ""
+    linkExpression: "http://${localhostname}:${conf['http_port']}/"
     sortNum: 1
     type: MASTER
     jmxPort: 9232
@@ -21,7 +21,7 @@ roles:
   - name: DORIS_BE
     label: "Doris Be"
     roleFullName: "doris-be"
-    linkExpression: ""
+    linkExpression: "http://${localhostname}:${conf['webserver_port']}/"
     sortNum: 2
     type: SLAVE
 
@@ -107,7 +107,7 @@ configurations:
     label: "FE节点上MySQL服务器的端口"
     description: "FE 节点上 MySQL 服务器的端口"
 
-  - name: fe_http_port
+  - name: http_port
     recommendExpression: 18030
     valueType: PORT
     confFile: "fe.conf"
