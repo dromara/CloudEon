@@ -30,6 +30,7 @@ const actionDetail: React.FC = () => {
     const result: API.commandResult =  await getCommandDetailAPI(params);
     setLoading(false)
     if(result?.success){
+        setSelectedTask(result?.data?.serviceProgresses && result?.data?.serviceProgresses[0]?.serviceInstanceName ||'')
         setCommandInfos(result?.data || {})
     }
   };
@@ -40,6 +41,8 @@ const actionDetail: React.FC = () => {
     setDetailLoading(false)
     if(result?.success){
         setLogData(result?.data || '')
+    }else{
+        setLogData('')
     }
   }
 

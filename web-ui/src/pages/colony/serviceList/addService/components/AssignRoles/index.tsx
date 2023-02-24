@@ -2,21 +2,22 @@
 import { ProCard } from '@ant-design/pro-components';
 import { Tree, Table } from 'antd';
 import type { DataNode, TreeProps } from 'antd/es/tree';
-import styles from './AssignRoles.less'
+import styles from './index.less'
 import { useState, useEffect } from 'react';
 import { getNodeListAPI } from '@/services/ant-design-pro/colony';
 
 const AssignRoles : React.FC<{
-    serviceList: any[];
-    sourceServiceInfos: API.ServiceInfosItem[],
+    serviceList: any[]; // 原本选中的服务的树结构
+    sourceServiceInfos: API.ServiceInfosItem[], // 原本选中的服务的树结构+节点(包括上一次选中的)
     setServiceInfosToParams: any
 }> = ({serviceList, sourceServiceInfos, setServiceInfosToParams})=>{
 
-    const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+    const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]); // 选中的节点
     const [nodeListData, setNodeListData] = useState<any[]>();
     const [currentSelectRoles, setCurrentSelectRoles] = useState<selectRoleItem>();
     const [loading, setLoading] = useState(false);
     const [serviceInfos, setServiceInfos] = useState<API.ServiceInfosItem[]>();
+    
     const getData = JSON.parse(sessionStorage.getItem('colonyData') || '{}')
 
     type selectRoleItem = {
@@ -33,9 +34,17 @@ const AssignRoles : React.FC<{
       };
 
     const initServiceInfos = () => {
-        console.log('--sourceServiceInfos: ',sourceServiceInfos);
+        if(!sourceServiceInfos) return
         setServiceInfos(sourceServiceInfos)
         setServiceInfosToParams(sourceServiceInfos)
+        const roleData = {
+            stackServiceId: sourceServiceInfos[0].stackServiceId || 0,
+            stackRoleName: sourceServiceInfos[0] && sourceServiceInfos[0].roles && sourceServiceInfos[0].roles[0].stackRoleName || '',
+            nodeIds: sourceServiceInfos[0] && sourceServiceInfos[0].roles && sourceServiceInfos[0].roles[0].nodeIds || []
+        }
+        setCurrentSelectRoles(roleData)
+        const newSelectedRowKeys = getNodeIds(sourceServiceInfos[0].stackServiceId, serviceList[0].roles[0])
+        setSelectedRowKeys(newSelectedRowKeys);
     }
 
     const treeData = serviceList.map(item=>{
@@ -55,7 +64,7 @@ const AssignRoles : React.FC<{
     })
 
     const getNodeIds:any = (stackServiceId:number, stackRoleName:any) => {
-        for (let sItem of serviceInfos||[]) {
+        for (let sItem of (serviceInfos||sourceServiceInfos)) {
             if (sItem.stackServiceId == stackServiceId) {
                 for (let role of sItem.roles||[]) {
                     if(role.stackRoleName == stackRoleName)
@@ -66,18 +75,16 @@ const AssignRoles : React.FC<{
     }
 
     const onSelectTree: TreeProps['onSelect'] = (selectedKeys, info) => {
-        console.log('selected', selectedKeys, info);
+        // console.log('selected', selectedKeys, info);
         const newSelectedRowKeys = getNodeIds(info.selectedNodes[0].stackServiceId, selectedKeys[0])
+        setSelectedRowKeys(newSelectedRowKeys);
         const roleData = {
             stackServiceId: info.selectedNodes[0].stackServiceId,
             stackRoleName: selectedKeys[0],
             nodeIds: newSelectedRowKeys
         }
         setCurrentSelectRoles(roleData)
-        setSelectedRowKeys(newSelectedRowKeys);
-        console.log('--currentSelectRoles:', currentSelectRoles);
-        
-
+        // console.log('--currentSelectRoles:', currentSelectRoles);
     };
 
     const columns = [
@@ -121,7 +128,6 @@ const AssignRoles : React.FC<{
             disabled: !(currentSelectRoles && currentSelectRoles.stackRoleName), 
           }),
       };
-      
 
     useEffect(() => {
         initServiceInfos()
@@ -137,6 +143,8 @@ const AssignRoles : React.FC<{
             <ProCard title="服务列表" colSpan="30%" headerBordered className={styles.rolesLeft}>
             <Tree
                 defaultExpandAll
+                blockNode
+                defaultSelectedKeys={[serviceList[0].roles[0]]}
                 onSelect={onSelectTree}
                 treeData={treeData}
                 style={{background: '#fbfbfe'}}
