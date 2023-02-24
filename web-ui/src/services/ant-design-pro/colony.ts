@@ -186,4 +186,34 @@ export async function restartServiceAPI(options?: { [key: string]: any}) {
   });
 }
 
+// 更新配置
+export async function upgradeServiceAPI(options?: { [key: string]: any}) {
+  return request<API.normalResult>('/service/upgradeServiceConfig', {
+    method: 'POST',
+    params: options,
+  });
+}
+
+/** 服务实例详情 */
+export async function getServiceInfoAPI(options?: { [key: string]: any }) {
+  return request<API.serviceInfosResult>('/service/serviceInstanceInfo', {
+    method: 'GET',
+    params: {
+      ...options,
+    },
+  });
+}
+
+/** 服务实例角色列表 */
+export async function getServiceRolesAPI(options?: { [key: string]: any }) {
+  return request<API.serviceRolesResult>('/service/serviceInstanceRoles', {
+    method: 'GET',
+    params: {
+      ...options,
+    },
+  });
+}
+
+
+
 

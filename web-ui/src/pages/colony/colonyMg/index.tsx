@@ -179,8 +179,8 @@ const Colony: React.FC = () => {
             form={colonyForm}
             name="新增集群"
             preserve={false}
-            labelCol={{ span: 8 }}
-            wrapperCol={{ span: 16 }}
+            labelCol={{ span: 6 }}
+            wrapperCol={{ span: 15 }}
             initialValues={{ remember: true }}
             onFinish={onFinish}
             onFinishFailed={onFinishFailed}

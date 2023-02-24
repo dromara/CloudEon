@@ -1,13 +1,14 @@
 import { PageContainer, ProCard } from '@ant-design/pro-components';
-import { Button, Radio, Typography, Tabs, message } from 'antd';
+import { Button, Radio, Typography, Tabs, message, Spin } from 'antd';
 import type { TabsProps } from 'antd';
 import { PoweroffOutlined, PlayCircleOutlined, ReloadOutlined, ExceptionOutlined, DeleteOutlined  } from '@ant-design/icons';
 import { FormattedMessage, useIntl, history } from 'umi';
 import styles from './index.less'
 import { useState, useEffect } from 'react';
-import { restartServiceAPI, stopServiceAPI, startServiceAPI, deleteServiceAPI } from '@/services/ant-design-pro/colony';
+import { restartServiceAPI, stopServiceAPI, startServiceAPI, deleteServiceAPI, getServiceInfoAPI, getServiceRolesAPI, upgradeServiceAPI } from '@/services/ant-design-pro/colony';
 import StatusTab from './components/StatusTab/index';
 import RoleTab from './components/RoleTab/index'
+import ConfigTab from './components/ConfigTab/index'
 import { dealResult } from '../../../../utils/resultUtil'
 
 const serviceListDetail: React.FC = () => {
@@ -16,23 +17,38 @@ const serviceListDetail: React.FC = () => {
   const [serviceName, setServiceName] = useState<any>('');
   const [selectACT, setSelectACT] = useState<any>('');
   const [btnLoading, setBtnLoading] = useState(false);
+  const [statusInfo, setStatusInfo] = useState<API.serviceInfos>();
+  const [rolesInfo, setRolesInfo] = useState<API.rolesInfos[]>();
+  const [apiLoading, setApiLoading] = useState(false);
+  const [currentTab, setCurrentTab] = useState('StatusTab');
 
   const onChange = (key: string) => {
     console.log(key);
+    setCurrentTab(key)
+    const params = {serviceInstanceId: serviceId}
+    switch(key){
+      case 'StatusTab': getInfos(params);break;
+      case 'RoleTab': getRoles(params) ;break;
+    }
   };
 
-  // const resultMessage = {
-  //   'start':'启动成功',
-  //   'stop':'停止成功',
-  //   'restart':'重启成功',
-  //   'delete':'删除成功',
-  // }
+  const getInfos = async (params:any) =>{
+    setApiLoading(true)
+    const result = await getServiceInfoAPI(params)
+    setApiLoading(false)
+    if(result?.success){
+      setStatusInfo(result?.data)
+    }
+  }
 
-  // const dealResult = (result: API.normalResult, key: string) => {
-  //   if(result?.success && key){
-  //     message.success(resultMessage[key]);
-  //   }
-  // }
+  const getRoles = async (params:any) =>{
+    setApiLoading(true)
+    const result = await getServiceRolesAPI(params)
+    setApiLoading(false)
+    if(result?.success){
+      setRolesInfo(result?.data)
+    }
+  }
 
   const handleACT = async (key: string) => {
     if(!serviceId) return
@@ -57,7 +73,10 @@ const serviceListDetail: React.FC = () => {
         result = await deleteServiceAPI(params)
         dealResult(result, key);
         break;
-      case 'update':;break;
+      case 'update': 
+        result = await upgradeServiceAPI(params)
+        dealResult(result, key);
+        break;
       default:;
     }    
     setBtnLoading(false)
@@ -73,19 +92,19 @@ const serviceListDetail: React.FC = () => {
 
   const items: TabsProps['items'] = [
     {
-      key: '1',
+      key: 'StatusTab',
       label: `状态`,
-      children: <StatusTab/>,
+      children: statusInfo && <StatusTab statusInfo={statusInfo} loading={currentTab == 'StatusTab' && apiLoading}/>,
     },
     {
-      key: '2',
+      key: 'RoleTab',
       label: `角色`,
-      children: <RoleTab/>,
+      children: rolesInfo && <RoleTab rolesInfo={rolesInfo} loading={currentTab == 'RoleTab' && apiLoading}/>,
     },
     {
-      key: '3',
+      key: 'ConfigTab',
       label: `配置`,
-      children: `Content of Tab Pane 3`,
+      children: <ConfigTab serviceId={serviceId}/>,
     },
   ];
 
@@ -93,7 +112,8 @@ const serviceListDetail: React.FC = () => {
     const { query } = history.location;
     setServiceId(query?.id || 0)
     setServiceName(query?.serviceName || '')
-  })
+    getInfos({serviceInstanceId: query?.id || 0})
+  }, [])
 
 
   return (
