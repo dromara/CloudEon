@@ -284,4 +284,37 @@ declare namespace API {
     data?: string;
   }
 
+  type serviceInfos = {
+    name: string,
+    id: number,
+    dockerImage: string,
+    stackServiceName: string,
+    stackServiceId: number,
+    version: string,
+    stackServiceDesc: string,
+    serviceStatus: string
+  }
+
+  type serviceInfosResult = {
+    success?: boolean;
+    message?: string;
+    data?: serviceInfos;
+  }
+
+  type rolesInfos = {
+    name?: string,
+    id?: number,
+    roleStatus?: string,
+    nodeId?: number,
+    nodeHostname?: string,
+    nodeHostIp?: string,
+    uiUrls?: string[]
+  }
+
+  type serviceRolesResult = {
+    success?: boolean;
+    message?: string;
+    data?: rolesInfos[];
+  }
+
 }
