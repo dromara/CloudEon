@@ -319,4 +319,18 @@ declare namespace API {
     data?: rolesInfos[];
   }
 
+  type rolesValid = {
+    stackRoleName?: string,
+    minNum?: number,
+    fixedNum?: number,
+    needOdd?: boolean,
+    nodeIds?: number[]
+  }
+
+  type rolesValidResult = {
+    success?: boolean;
+    message?: string;
+    data?: rolesValid[];
+  }
+
 }

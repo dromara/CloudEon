@@ -4,7 +4,7 @@ import { BorderOuterOutlined } from '@ant-design/icons';
 import { FormattedMessage, useIntl, history } from 'umi';
 import { useState, useEffect } from 'react';
 import styles from './index.less';
-import { getServiceListAPI, checkServiceAPI, getServiceConfAPI, initServiceAPI, serviceListAPI } from '@/services/ant-design-pro/colony';
+import { getServiceListAPI, checkServiceAPI, getServiceConfAPI, initServiceAPI, serviceListAPI, getRolesAllocationAPI } from '@/services/ant-design-pro/colony';
 import ChooseService from './components/ChooseService'
 import ConfigSecurity from'./components/ConfigSecurity'
 import AssignRoles from'./components/AssignRoles'
@@ -15,13 +15,12 @@ import ConfigService from'./components/ConfigService'
 const serviceAdd: React.FC = () => {
   const intl = useIntl();
   const colonyData = JSON.parse(sessionStorage.getItem('colonyData') || '{}')
-  // 参数：状态初始值比如,传入 0 表示该状态的初始值为 0
-  // 返回值：数组,包含两个值：1 状态值（state） 2 修改该状态的函数（setState）
   const [current, setCurrent] = useState(0);
   const [serviceListData, setServiceListData] = useState<any[]>();
   const [loading, setLoading] = useState(false);
   const [allParams, setSubmitallParams] = useState<API.SubmitServicesParams>();
   const [serviceInfos, setServiceInfos] = useState<API.ServiceInfosItem[]>()
+  const [rolesAllNodeIds, setRolesAllNodeIds] = useState<API.rolesValid[]>()
 
   const checkService = async (params: any) => {
     try {
@@ -50,6 +49,13 @@ const serviceAdd: React.FC = () => {
       }
     })
     setServiceListData(statusData)
+  };
+
+  const getRolesAll = async (params: any) => {
+    setLoading(true)
+    const result: API.rolesValidResult =  await getRolesAllocationAPI(params);
+    setLoading(false)
+    setRolesAllNodeIds(result?.data)
   };
 
   const getSelectedService = ()=>{
@@ -246,7 +252,7 @@ const serviceAdd: React.FC = () => {
   }
 
   useEffect(() => {
-    getServiceData({ clusterId: 1 });
+    getServiceData({ clusterId: colonyData.clusterId });
   }, []);
 
   return (
@@ -295,6 +301,10 @@ const serviceAdd: React.FC = () => {
                         initServiceInfos()
                       }
                     })
+                  } else if(current == 1){ // 配置安全下一步
+                    setCurrent(current + 1);
+                    // getRolesAll({ clusterId: colonyData.clusterId, stackServiceId: })
+
                   } else if(current == 3){ // 安装
                     setPresetConfListToParams()
                     const initParams = {

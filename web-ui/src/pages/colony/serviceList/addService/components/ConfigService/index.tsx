@@ -1,7 +1,7 @@
 
 import styles from './index.less'
 import React, { useState, useEffect, useRef } from 'react';
-import { Menu, Form, Table, Button, Typography, Popconfirm, InputNumber, Input, Tooltip, Modal, Select } from 'antd';
+import { Menu, Form, Table, Button, Typography, Popconfirm, InputNumber, Input, Tooltip, Modal, Select, Slider, Switch } from 'antd';
 import { getServiceConfAPI } from '@/services/ant-design-pro/colony';
 const { TextArea } = Input;
 
@@ -174,6 +174,11 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( setPresetConf
     }
 
     interface Item {
+        options: any;
+        unit: string;
+        min: number;
+        max: number;
+        valueType: any;
         name: string;
         recommendExpression: string;
         sourceValue: string;
@@ -186,7 +191,7 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( setPresetConf
         editing: boolean;
         dataIndex: string;
         title: any;
-        inputType: 'number' | 'text';
+        inputType: 'InputNumber' | 'InputString' | 'Slider' | 'Switch' | 'Select';
         record: Item;
         index: number;
         children: React.ReactNode;
@@ -202,10 +207,34 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( setPresetConf
         children,
         ...restProps
       }) => {
-        const inputNode = inputType === 'number' ? <InputNumber /> : <Input />;
+        let inputNode = <Input addonAfter={record?.unit || ''} />
+        // const inputNode = inputType === 'number' ? <InputNumber /> : <Input />;
+        switch(inputType){
+            case 'InputNumber':
+                inputNode = <InputNumber max={record.max || Number.MAX_SAFE_INTEGER} min={record.min || Number.MIN_SAFE_INTEGER} addonAfter={record.unit || ''} />
+                ;break;
+            case 'InputString':;break;
+            case 'Slider':
+                inputNode = <Slider max={record.max || 100} min={record.min || 0} />
+                ;break;
+            case 'Switch':
+                inputNode = <Switch />
+                ;break;
+            case 'Select':
+                inputNode = 
+                        <Select
+                                style={{ width: 120 }}
+                                options={
+                                    record.options.map((opItem: any)=>{
+                                        return { value: opItem, label: opItem }
+                                    })}
+                            />
+                        
+                ;break;
+        }
       
         return (
-          <td {...restProps}>
+          <td {...restProps} className={(record?.sourceValue != record?.recommendExpression && !editing && !record.isCustomConf) ? styles.hasEdited:''}>
             {editing ? (
               <Form.Item
                 name={dataIndex}
@@ -234,6 +263,7 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( setPresetConf
         },{
             title: '配置类型',
             dataIndex: 'isCustomConf',
+            width: 110,
             editable: false,
             render: (_: any, record: Item)=>{
                 return (record.isCustomConf?'自定义配置':'预设配置')
@@ -241,6 +271,7 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( setPresetConf
         },{
             title: '配置文件',
             dataIndex: 'confFile',
+            width: 120,
             editable: false,
         },{
             title: '值',
@@ -248,20 +279,20 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( setPresetConf
             editable: true,
             render: (_: any, record: Item) => {
                 // console.log('record',record);
-                const hasEdit = (record.sourceValue != record.recommendExpression);
-                return hasEdit && !record.isCustomConf ? (
-                    <div style={{position:'relative'}}>
-                        <Tooltip color="volcano" getPopupContainer={(trigger) => trigger.parentNode} autoAdjustOverflow={false} arrowPointAtCenter={true} visible={true} open={true} placement="rightTop" title={()=>{
-                            return (
-                                <div style={{color:'#fff', fontWeight:'500'}}>已修改</div>
-                            )
-                        }}>
-                        {record.recommendExpression}
-                        </Tooltip>
-                    </div>
-                ) : (
-                    <span>{record.recommendExpression}</span>
-                );
+                // const hasEdit = (record.sourceValue != record.recommendExpression);
+                // return hasEdit && !record.isCustomConf ? (
+                //     <div style={{position:'relative'}}>
+                //         <Tooltip color="volcano" getPopupContainer={(trigger) => trigger.parentNode} autoAdjustOverflow={false} arrowPointAtCenter={true} visible={true} open={true} placement="rightTop" title={()=>{
+                //             return (
+                //                 <div style={{color:'#fff', fontWeight:'500'}}>已修改</div>
+                //             )
+                //         }}>
+                //         {record.recommendExpression}
+                //         </Tooltip>
+                //     </div>
+                // ) : (
+                  return  <span>{record.recommendExpression}&nbsp;{record.unit?record.unit:''}</span>
+                // );
             },
         },{
             title: '描述',
@@ -272,6 +303,7 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( setPresetConf
             }
         },{
             title: '操作',
+            width: 120,
             dataIndex: 'operation',
             render: (_: any, record: Item) => {
                 // console.log('record',record);
@@ -289,23 +321,23 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( setPresetConf
                     </Popconfirm> */}
                     </span>
                 ) : (
-                    <span>
-                        <Typography.Link disabled={editingKey !== ''} onClick={() => edit(record)}>
+                    <div className={styles.actionBtnWrap}>
+                        <Typography.Link disabled={editingKey !== ''} style={{marginRight: '20px'}} onClick={() => edit(record)}>
                         编辑
                         </Typography.Link>
                         {
                             !record.isCustomConf?
                             (record.sourceValue != record.recommendExpression) && (
                                 <Popconfirm title="确定恢复到初始值吗?" onConfirm={()=>resetSource(record)}>
-                                    <a style={{display:'inline-block',marginLeft: '20px'}}>恢复初始值</a>
+                                    <a>恢复初始值</a>
                                 </Popconfirm>
                             ):(
                                 <Popconfirm title="确定删除吗?" onConfirm={()=>handleDelete(record)}>
-                                    <a style={{display:'inline-block',marginLeft: '20px'}}>删除</a>
+                                    <a>删除</a>
                                 </Popconfirm>
                             )
                         }
-                    </span>
+                    </div>
                 );
             },
           },
@@ -319,7 +351,7 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( setPresetConf
           ...col,
           onCell: (record: Item) => ({
             record,
-            inputType: 'text', //col.dataIndex === 'age' ? 'number' : 'text',
+            inputType: record.valueType,//'text', //col.dataIndex === 'age' ? 'number' : 'text',
             dataIndex: col.dataIndex,
             title: col.title,
             editing: isEditing(record),
