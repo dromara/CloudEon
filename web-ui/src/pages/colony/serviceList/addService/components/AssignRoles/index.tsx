@@ -4,7 +4,7 @@ import { Tree, Table } from 'antd';
 import type { DataNode, TreeProps } from 'antd/es/tree';
 import styles from './index.less'
 import { useState, useEffect } from 'react';
-import { getNodeListAPI } from '@/services/ant-design-pro/colony';
+import { getNodeListAPI, getRolesAllocationAPI } from '@/services/ant-design-pro/colony';
 
 const AssignRoles : React.FC<{
     serviceList: any[]; // 原本选中的服务的树结构
@@ -131,7 +131,7 @@ const AssignRoles : React.FC<{
 
     useEffect(() => {
         initServiceInfos()
-        getNodeData({ clusterId: getData.clusterId });
+        getNodeData({ clusterId: getData.clusterId })
     }, []);
 
 

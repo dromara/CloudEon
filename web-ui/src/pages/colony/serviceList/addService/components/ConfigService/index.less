@@ -24,4 +24,27 @@
         margin: 0 0 10px;
         justify-content: flex-start;
     }
+    .actionBtnWrap{
+        display: flex;
+        flex-wrap: wrap;
+    }
+    .hasEdited{
+        &::after{
+            content: '已修改';
+            width: 60px;
+            height: 20px;
+            background-color: #fa8c16; // #fa541c
+            position: absolute;
+            top: 0;
+            right: 0;
+            color: #fff;
+            font-size: 12px;
+            z-index: 99;
+            font-weight: 600;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 0 0 0 10px;
+        }
+    }
 }
