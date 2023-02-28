@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.data.udh.dao.StackInfoRepository;
 import com.data.udh.dao.StackServiceConfRepository;
 import com.data.udh.dao.StackServiceRepository;
@@ -15,7 +16,9 @@ import com.data.udh.entity.StackInfoEntity;
 import com.data.udh.entity.StackServiceConfEntity;
 import com.data.udh.entity.StackServiceEntity;
 import com.data.udh.entity.StackServiceRoleEntity;
+import com.data.udh.utils.ConfValueType;
 import com.data.udh.utils.ImageUtil;
+import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
@@ -127,6 +130,7 @@ public class StackLoadService implements ApplicationRunner {
 
                     // 持久化service conf
                     for (StackConfiguration configuration : serviceInfo.getConfigurations()) {
+                        ConfValueType confValueType = ConfValueType.valueOf(configuration.getValueType());
                         StackServiceConfEntity stackServiceConfEntity = stackServiceConfRepository.findByStackIdAndNameAndServiceId(stackInfoEntityId, configuration.getName(), stackServiceEntityId);
                         if (stackServiceConfEntity == null) {
                             stackServiceConfEntity = new StackServiceConfEntity();
@@ -135,6 +139,10 @@ public class StackLoadService implements ApplicationRunner {
                         stackServiceConfEntity.setStackId(stackInfoEntityId);
                         stackServiceConfEntity.setServiceId(stackServiceEntityId);
                         stackServiceConfEntity.setConfFile(configuration.getConfFile());
+                        stackServiceConfEntity.setValueType(confValueType);
+                        if (configuration.getOptions() != null) {
+                            stackServiceConfEntity.setOptions(JSONObject.toJSONString(configuration.getOptions()));
+                        }
                         stackServiceConfRepository.save(stackServiceConfEntity);
                     }
 

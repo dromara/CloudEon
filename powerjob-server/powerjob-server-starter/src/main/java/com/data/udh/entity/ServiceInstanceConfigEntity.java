@@ -70,4 +70,23 @@ public class ServiceInstanceConfigEntity implements Serializable {
 
     private Integer userId;
 
+    private Integer min;
+    private Integer max;
+    /**
+     * 单位
+     */
+    private String unit;
+    /**
+     * 是否密码
+     */
+    private boolean isPassword;
+    /**
+     * 是否多值输入。像多了路径：/hdfs/path1,/hdfs/path2
+     */
+    private boolean isMultiValue;
+    /**
+     * 下拉框的选项值，逗号分隔
+     */
+    private String options;
+
 }

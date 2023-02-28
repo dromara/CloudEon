@@ -7,9 +7,6 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.template.TemplateConfig;
-import cn.hutool.extra.template.TemplateEngine;
-import cn.hutool.extra.template.TemplateUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.data.udh.controller.request.InitServiceRequest;
 import com.data.udh.controller.response.*;
@@ -42,6 +39,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.data.udh.utils.Constant.AdminUserId;
 
@@ -148,7 +146,73 @@ public class ClusterServiceController {
             Integer serviceInstanceEntityId = serviceInstanceEntity.getId();
             installedServiceInstanceIds.add(serviceInstanceEntityId);
 
-            // 获取service 所有角色
+            List<ServiceInstanceConfigEntity> serviceInstanceConfigEntities = new ArrayList<>();
+
+            // 页面上的预设配置
+            List<InitServiceRequest.InitServicePresetConf> presetConfList = serviceInfo.getPresetConfList();
+            List<ServiceInstanceConfigEntity> presetInstanceConfigEntities = presetConfList.stream().map(new Function<InitServiceRequest.InitServicePresetConf, ServiceInstanceConfigEntity>() {
+                @Override
+                public ServiceInstanceConfigEntity apply(InitServiceRequest.InitServicePresetConf initServicePresetConf) {
+                    ServiceInstanceConfigEntity serviceInstanceConfigEntity = new ServiceInstanceConfigEntity();
+                    BeanUtil.copyProperties(initServicePresetConf, serviceInstanceConfigEntity);
+                    // 查询框架服务配置，补全属性
+                    StackServiceConfEntity stackServiceConfEntity = stackServiceConfRepository.findByStackIdAndNameAndServiceId(stackId, initServicePresetConf.getName(), stackServiceId);
+                    if (StrUtil.isNotBlank(stackServiceConfEntity.getConfFile())) {
+                        serviceInstanceConfigEntity.setConfFile(stackServiceConfEntity.getConfFile());
+                    }
+                    if (StrUtil.isNotBlank(stackServiceConfEntity.getOptions())) {
+                        serviceInstanceConfigEntity.setOptions(JSONObject.toJSONString(stackServiceConfEntity.getOptions()));
+                    }
+                    serviceInstanceConfigEntity.setUpdateTime(new Date());
+                    serviceInstanceConfigEntity.setCreateTime(new Date());
+                    serviceInstanceConfigEntity.setServiceInstanceId(serviceInstanceEntityId);
+                    serviceInstanceConfigEntity.setUserId(AdminUserId);
+                    return serviceInstanceConfigEntity;
+                }
+            }).collect(Collectors.toList());
+
+            //  除初始化时页面上的配置，还得加载框架本身的默认配置
+            List<StackServiceConfEntity> configNotInWizard = stackServiceConfRepository.findByServiceIdAndConfigurableInWizard(stackServiceId, false);
+            List<ServiceInstanceConfigEntity> configNotInWizardInstanceConfigEntities = configNotInWizard.stream().map(new Function<StackServiceConfEntity, ServiceInstanceConfigEntity>() {
+                @Override
+                public ServiceInstanceConfigEntity apply(StackServiceConfEntity stackServiceConfEntity) {
+                    ServiceInstanceConfigEntity serviceInstanceConfigEntity = new ServiceInstanceConfigEntity();
+                    serviceInstanceConfigEntity.setName(stackServiceConfEntity.getName());
+                    // 用默认值作为value
+                    serviceInstanceConfigEntity.setValue(stackServiceConfEntity.getRecommendExpression());
+                    serviceInstanceConfigEntity.setRecommendedValue(stackServiceConfEntity.getRecommendExpression());
+                    serviceInstanceConfigEntity.setUpdateTime(new Date());
+                    serviceInstanceConfigEntity.setCreateTime(new Date());
+                    if (StrUtil.isNotBlank(stackServiceConfEntity.getConfFile())) {
+                        serviceInstanceConfigEntity.setConfFile(stackServiceConfEntity.getConfFile());
+                    }
+                    if (StrUtil.isNotBlank(stackServiceConfEntity.getOptions())) {
+                        serviceInstanceConfigEntity.setOptions(JSONObject.toJSONString(stackServiceConfEntity.getOptions()));
+                    }
+                    serviceInstanceConfigEntity.setServiceInstanceId(serviceInstanceEntityId);
+                    serviceInstanceConfigEntity.setUserId(AdminUserId);
+                    return serviceInstanceConfigEntity;
+                }
+            }).collect(Collectors.toList());
+
+            // 用户自定义配置
+            List<InitServiceRequest.InitServiceCustomConf> customConfList = serviceInfo.getCustomConfList();
+            List<ServiceInstanceConfigEntity> customInstanceConfigEntityStream = customConfList.stream().map(new Function<InitServiceRequest.InitServiceCustomConf, ServiceInstanceConfigEntity>() {
+                @Override
+                public ServiceInstanceConfigEntity apply(InitServiceRequest.InitServiceCustomConf initServiceCustomConf) {
+                    ServiceInstanceConfigEntity serviceInstanceConfigEntity = new ServiceInstanceConfigEntity();
+                    BeanUtil.copyProperties(initServiceCustomConf, serviceInstanceConfigEntity);
+                    return serviceInstanceConfigEntity;
+                }
+            }).collect(Collectors.toList());
+
+            // 批量持久化service Conf信息
+            serviceInstanceConfigEntities.addAll(presetInstanceConfigEntities);
+            serviceInstanceConfigEntities.addAll(configNotInWizardInstanceConfigEntities);
+            serviceInstanceConfigEntities.addAll(customInstanceConfigEntityStream);
+            serviceInstanceConfigRepository.saveAllAndFlush(serviceInstanceConfigEntities);
+
+            // 获取需要安装的service 所有角色
             List<InitServiceRequest.InitServiceRole> roles = serviceInfo.getRoles();
             for (InitServiceRequest.InitServiceRole role : roles) {
                 String stackRoleName = role.getStackRoleName();
@@ -178,69 +242,29 @@ public class ClusterServiceController {
                 List<ServiceRoleInstanceEntity> serviceRoleInstanceEntitiesAfter = roleInstanceRepository.saveAllAndFlush(serviceRoleInstanceEntities);
 
                 // 为每个角色分布的节点，都生成service RoleUi地址
-                List<ServiceRoleInstanceWebuisEntity> roleInstanceWebuisEntities = serviceRoleInstanceEntitiesAfter.stream().map(new Function<ServiceRoleInstanceEntity, ServiceRoleInstanceWebuisEntity>() {
-                    @Override
-                    public ServiceRoleInstanceWebuisEntity apply(ServiceRoleInstanceEntity serviceRoleInstanceEntity) {
-                        String roleLinkExpression = stackServiceRoleEntity.getLinkExpression();
-                        // 持久化service Role UI信息
-                        ServiceRoleInstanceWebuisEntity serviceRoleInstanceWebuisEntity = new ServiceRoleInstanceWebuisEntity();
-                        serviceRoleInstanceWebuisEntity.setName("UI地址");
-                        serviceRoleInstanceWebuisEntity.setServiceInstanceId(serviceInstanceEntityId);
-                        serviceRoleInstanceWebuisEntity.setServiceRoleInstanceId(serviceRoleInstanceEntity.getServiceInstanceId());
-                        serviceRoleInstanceWebuisEntity.setWebHostUrl(roleLinkExpression);
-                        serviceRoleInstanceWebuisEntity.setWebIpUrl(roleLinkExpression);
-                        return serviceRoleInstanceWebuisEntity;
-                    }
-                }).collect(Collectors.toList());
+                List<ServiceRoleInstanceWebuisEntity> roleInstanceWebuisEntities = serviceRoleInstanceEntitiesAfter.stream()
+                        .filter(e -> {
+                            return StrUtil.isNotBlank(stackServiceRoleEntity.getLinkExpression());
+                        }).map(new Function<ServiceRoleInstanceEntity, ServiceRoleInstanceWebuisEntity>() {
+                            @Override
+                            public ServiceRoleInstanceWebuisEntity apply(ServiceRoleInstanceEntity serviceRoleInstanceEntity) {
+                                String roleLinkExpression = stackServiceRoleEntity.getLinkExpression();
+                                // 持久化service Role UI信息
+                                ServiceRoleInstanceWebuisEntity serviceRoleInstanceWebuisEntity = new ServiceRoleInstanceWebuisEntity();
+                                serviceRoleInstanceWebuisEntity.setName(serviceRoleInstanceEntity.getServiceRoleName() + "UI地址");
+                                serviceRoleInstanceWebuisEntity.setServiceInstanceId(serviceInstanceEntityId);
+                                serviceRoleInstanceWebuisEntity.setServiceRoleInstanceId(serviceRoleInstanceEntity.getServiceInstanceId());
+                                serviceRoleInstanceWebuisEntity.setWebHostUrl(genWebUI(roleLinkExpression, serviceInstanceEntityId, serviceRoleInstanceEntity, false));
+                                serviceRoleInstanceWebuisEntity.setWebIpUrl(genWebUI(roleLinkExpression, serviceInstanceEntityId, serviceRoleInstanceEntity, true));
+                                return serviceRoleInstanceWebuisEntity;
+                            }
+                        }).collect(Collectors.toList());
 
                 // 批量持久化role web ui
                 roleInstanceWebuisRepository.saveAll(roleInstanceWebuisEntities);
 
 
             }
-
-            List<InitServiceRequest.InitServicePresetConf> presetConfList = serviceInfo.getPresetConfList();
-            List<ServiceInstanceConfigEntity> serviceInstanceConfigEntities = presetConfList.stream().map(new Function<InitServiceRequest.InitServicePresetConf, ServiceInstanceConfigEntity>() {
-                @Override
-                public ServiceInstanceConfigEntity apply(InitServiceRequest.InitServicePresetConf initServicePresetConf) {
-                    ServiceInstanceConfigEntity serviceInstanceConfigEntity = new ServiceInstanceConfigEntity();
-                    BeanUtil.copyProperties(initServicePresetConf, serviceInstanceConfigEntity);
-                    // 查询框架服务配置，补全属性
-                    StackServiceConfEntity stackServiceConfEntity = stackServiceConfRepository.findByStackIdAndNameAndServiceId(stackId, initServicePresetConf.getName(), stackServiceId);
-                    if (StrUtil.isNotBlank(stackServiceConfEntity.getConfFile())) {
-                        serviceInstanceConfigEntity.setConfFile(stackServiceConfEntity.getConfFile());
-                    }
-                    serviceInstanceConfigEntity.setUpdateTime(new Date());
-                    serviceInstanceConfigEntity.setCreateTime(new Date());
-                    serviceInstanceConfigEntity.setServiceInstanceId(serviceInstanceEntityId);
-                    serviceInstanceConfigEntity.setUserId(AdminUserId);
-                    return serviceInstanceConfigEntity;
-                }
-            }).collect(Collectors.toList());
-            //  除初始化时页面上的配置，还得加载框架本身的默认配置
-            List<StackServiceConfEntity> configNotInWizard = stackServiceConfRepository.findByServiceIdAndConfigurableInWizard(stackServiceId, false);
-            List<ServiceInstanceConfigEntity> instanceConfigEntities = configNotInWizard.stream().map(new Function<StackServiceConfEntity, ServiceInstanceConfigEntity>() {
-                @Override
-                public ServiceInstanceConfigEntity apply(StackServiceConfEntity stackServiceConfEntity) {
-                    ServiceInstanceConfigEntity serviceInstanceConfigEntity = new ServiceInstanceConfigEntity();
-                    serviceInstanceConfigEntity.setName(stackServiceConfEntity.getName());
-                    // 用默认值作为value
-                    serviceInstanceConfigEntity.setValue(stackServiceConfEntity.getRecommendExpression());
-                    serviceInstanceConfigEntity.setRecommendedValue(stackServiceConfEntity.getRecommendExpression());
-                    serviceInstanceConfigEntity.setUpdateTime(new Date());
-                    serviceInstanceConfigEntity.setCreateTime(new Date());
-                    if (StrUtil.isNotBlank(stackServiceConfEntity.getConfFile())) {
-                        serviceInstanceConfigEntity.setConfFile(stackServiceConfEntity.getConfFile());
-                    }
-                    serviceInstanceConfigEntity.setServiceInstanceId(serviceInstanceEntityId);
-                    serviceInstanceConfigEntity.setUserId(AdminUserId);
-                    return serviceInstanceConfigEntity;
-                }
-            }).collect(Collectors.toList());
-
-            // 批量持久化service Conf信息
-            serviceInstanceConfigEntities.addAll(instanceConfigEntities);
-            serviceInstanceConfigRepository.saveAll(serviceInstanceConfigEntities);
 
         }
 
@@ -276,6 +300,35 @@ public class ClusterServiceController {
 
 
         return ResultDTO.success(null);
+    }
+
+    private String genWebUI(String roleLinkExpression, Integer serviceInstanceEntityId, ServiceRoleInstanceEntity serviceRoleInstanceEntity, boolean isUseIp) {
+        String localhostname = "";
+        // 查询角色的部署节点
+        ClusterNodeEntity clusterNodeEntity = clusterNodeRepository.findById(serviceRoleInstanceEntity.getNodeId()).get();
+        if (isUseIp) {
+            localhostname = clusterNodeEntity.getIp();
+        } else {
+            localhostname = clusterNodeEntity.getHostname();
+        }
+
+        // 查询服务实例所有配置项
+        List<ServiceInstanceConfigEntity> allConfigEntityList = serviceInstanceConfigRepository.findByServiceInstanceId(serviceInstanceEntityId);
+        Map<String, String> confMap = allConfigEntityList.stream().collect(Collectors.toMap(ServiceInstanceConfigEntity::getName, ServiceInstanceConfigEntity::getValue));
+        // 渲染
+        Configuration cfg = new Configuration();
+        StringTemplateLoader stringLoader = new StringTemplateLoader();
+        String template = "webUITemplate";
+        stringLoader.putTemplate(template, roleLinkExpression);
+        cfg.setTemplateLoader(stringLoader);
+        try (Writer out = new StringWriter(2048);) {
+            Template temp = cfg.getTemplate(template, "utf-8");
+            temp.process(Dict.create().set("localhostname", localhostname).set("conf", confMap), out);
+            return out.toString();
+        } catch (IOException | TemplateException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 
@@ -338,7 +391,6 @@ public class ClusterServiceController {
      * 通过模板生成服务实例持久化到宿主机的目录
      */
     private String genPersistencePaths(String persistencePaths, String serviceInstanceId) {
-        TemplateEngine engine = TemplateUtil.createEngine(new TemplateConfig());
         String result = Arrays.stream(persistencePaths.split(",")).map(new Function<String, String>() {
             @Override
             public String apply(String pathTemplate) {
@@ -582,7 +634,7 @@ public class ClusterServiceController {
         // 删除服务角色配置表
         serviceInstanceConfigRepository.deleteByServiceInstanceId(serviceInstanceId);
         // 删除服务ui表
-        serviceInstanceConfigRepository.deleteByServiceInstanceId(serviceInstanceId);
+        roleInstanceWebuisRepository.deleteByServiceInstanceId(serviceInstanceId);
 
 
         return ResultDTO.success(null);

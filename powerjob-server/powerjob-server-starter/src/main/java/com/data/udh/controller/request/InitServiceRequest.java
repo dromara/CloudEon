@@ -24,6 +24,8 @@ public class InitServiceRequest {
 
         private List<InitServicePresetConf> presetConfList;
 
+        private List<InitServiceCustomConf> customConfList;
+
     }
 
 
@@ -40,6 +42,18 @@ public class InitServiceRequest {
         private String name;
         private String value;
         private String recommendedValue;
+
+    }
+
+    @Data
+    public static class InitServiceCustomConf {
+
+        private String name;
+        private String value;
+        /**
+         * 所属配置文件
+         */
+        private String confFile;
 
     }
 
