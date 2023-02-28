@@ -15,7 +15,13 @@ create table udh_service_instance_config
     update_time       datetime(6)  null,
     is_custom_conf   bit          not null,
     user_id           int          null,
-    value             text null
+    value             text null,
+    min     int          null,
+    max int null ,
+    unit varchar(255) null,
+    options varchar(255) null,
+    is_password  bit          not null,
+    is_multi_value  bit          not null
 );
 
 create table udh_service_instance

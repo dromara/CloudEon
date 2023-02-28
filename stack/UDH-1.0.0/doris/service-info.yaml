@@ -13,7 +13,7 @@ roles:
   - name: DORIS_FE
     label: "Doris Fe"
     roleFullName: "doris-fe"
-    linkExpression: ""
+    linkExpression: "http://${localhostname}:${conf['http_port']}/"
     sortNum: 1
     type: MASTER
     jmxPort: 9232
@@ -21,7 +21,7 @@ roles:
   - name: DORIS_BE
     label: "Doris Be"
     roleFullName: "doris-be"
-    linkExpression: ""
+    linkExpression: "http://${localhostname}:${conf['webserver_port']}/"
     sortNum: 2
     type: SLAVE
 
@@ -42,27 +42,28 @@ configurations:
 
   - name: sys_log_level
     recommendExpression: INFO
-    valueType: STRING
+    valueType: Select
+    options: ["INFO","DEBUG","WARN","ERROR"]
     confFile: "be.conf"
     configurableInWizard: true
     label: "BE服务日志级别"
 
   - name: fragment_pool_queue_size
     recommendExpression: 2048
-    valueType: STRING
+    valueType: InputNumber
     confFile:  "be.conf"
     label: "单节点上能够处理的查询请求上限"
 
   - name: fragment_pool_thread_num_max
     recommendExpression: 512
-    valueType: STRING
+    valueType: InputNumber
     confFile:  "be.conf"
     label: "后续查询请求动态创建线程"
     description: "后续查询请求动态创建线程，最大创建512个线程。"
 
   - name: be_port
     recommendExpression: 9060
-    valueType: PORT
+    valueType: InputNumber
     confFile: "be.conf"
     configurableInWizard: true
     label: "BE admin端口"
@@ -71,28 +72,28 @@ configurations:
   - name: webserver_port
     recommendExpression: 18040
     configurableInWizard: true
-    valueType: PORT
+    valueType: InputNumber
     confFile:  "be.conf"
     label: "Be web页面访问端口"
 
 
   - name: brpc_port
     recommendExpression: 8060
-    valueType: PORT
+    valueType: InputNumber
     confFile:  "be.conf"
     configurableInWizard: true
     label: "BE Rpc端口"
 
   - name: heartbeat_service_port
     recommendExpression: 9050
-    valueType: PORT
+    valueType: InputNumber
     confFile:  "be.conf"
     configurableInWizard: true
     label: "BE心跳服务端口"
 
   - name: rpc_port
     recommendExpression: 9020
-    valueType: PORT
+    valueType: InputNumber
     confFile:  "fe.conf"
     configurableInWizard: true
     label: "FE节点上Thrift服务器的端口"
@@ -101,15 +102,15 @@ configurations:
 
   - name: query_port
     recommendExpression: 9030
-    valueType: PORT
+    valueType: InputNumber
     confFile:  "fe.conf"
     configurableInWizard: true
     label: "FE节点上MySQL服务器的端口"
     description: "FE 节点上 MySQL 服务器的端口"
 
-  - name: fe_http_port
+  - name: http_port
     recommendExpression: 18030
-    valueType: PORT
+    valueType: InputNumber
     confFile: "fe.conf"
     configurableInWizard: true
     label: "FE节点上web页面的端口"
@@ -117,7 +118,7 @@ configurations:
 
   - name: edit_log_port
     recommendExpression: 9010
-    valueType: PORT
+    valueType: InputNumber
     confFile:  "fe.conf"
     configurableInWizard: true
     label: "FE节点上bdbje 的通信端口"
@@ -128,7 +129,7 @@ configurations:
 
   - name: cluster_id
     recommendExpression: 123
-    valueType: NON_NEG_INT
+    valueType: InputNumber
     confFile:  "fe.conf"
     configurableInWizard: true
     label: "集群ID"

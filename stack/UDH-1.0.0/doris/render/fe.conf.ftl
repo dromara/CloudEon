@@ -1,4 +1,4 @@
-cluster_id=${conf['cluster_id']}
+
 
 # the output dir of stderr and stdout
 LOG_DIR = /opt/udh/${service.serviceName}/log
@@ -16,10 +16,11 @@ sys_log_level = INFO
 # store metadata, must be created before start FE.
 meta_dir =  /opt/udh/${service.serviceName}/data
 
-http_port = ${conf['fe_http_port']}
-rpc_port = ${conf['rpc_port']}
-query_port = ${conf['query_port']}
-edit_log_port = ${conf['edit_log_port']}
+<#list confFiles['fe.conf']?keys as key>
+    ${key}=${confFiles['fe.conf'][key]}
+</#list>
+
+
 mysql_service_nio_enabled = true
 
 audit_log_dir = /opt/udh/${service.serviceName}/log
