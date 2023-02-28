@@ -11,8 +11,8 @@ import { FormattedMessage, history, SelectLang, useIntl, useModel } from 'umi';
 import { UnControlled as CodeMirror } from "react-codemirror2";
 import "codemirror/lib/codemirror.css";
 import "codemirror/lib/codemirror.js";
-import 'codemirror/theme/base16-dark.css';
-import 'codemirror/mode/javascript/javascript.js';
+import 'codemirror/theme/midnight.css';
+import 'codemirror/mode/clike/clike.js';
 
 const actionDetail: React.FC = () => {
 
@@ -30,6 +30,7 @@ const actionDetail: React.FC = () => {
     const result: API.commandResult =  await getCommandDetailAPI(params);
     setLoading(false)
     if(result?.success){
+        setSelectedTask(result?.data?.serviceProgresses && result?.data?.serviceProgresses[0]?.serviceInstanceName ||'')
         setCommandInfos(result?.data || {})
     }
   };
@@ -40,6 +41,8 @@ const actionDetail: React.FC = () => {
     setDetailLoading(false)
     if(result?.success){
         setLogData(result?.data || '')
+    }else{
+        setLogData('')
     }
   }
 
@@ -59,7 +62,6 @@ const actionDetail: React.FC = () => {
     if(!id) return
     const codemirrorDom = document.getElementsByClassName('CodeMirror')[0]
     codemirrorDom.setAttribute("style","height: auto")
-    
     setIsModalOpen(true)
     getTaskLog({commandTaskId: id})
   }
@@ -109,7 +111,7 @@ const actionDetail: React.FC = () => {
                                 strokeWidth={20} 
                                 strokeColor={statusColor[commandInfos.commandState ||'DEFAULT']} 
                                 size="small" 
-                                trailColor={trailColor[commandInfos.commandState ||'DEFAULT']}
+                                // trailColor={trailColor[commandInfos.commandState ||'DEFAULT']}
                                 status={commandInfos.commandState=='RUNNING'?"active":'normal'} 
                                 style={{minWidth:'150px'}}
                             />
@@ -152,7 +154,7 @@ const actionDetail: React.FC = () => {
                                                 </div>
                                                 <div className={styles.taskDetailRight}>
                                                     <div className={styles.taskTime}>开始：{formatDate(taskDetail.startTime, 'yyyy-MM-dd hh:mm:ss')}</div>
-                                                    <div className={styles.taskTime}>结束：{formatDate(taskDetail.startTime, 'yyyy-MM-dd hh:mm:ss')}</div>
+                                                    <div className={styles.taskTime}>结束：{formatDate(taskDetail.endTime, 'yyyy-MM-dd hh:mm:ss')}</div>
                                                 </div>
                                                 <div className={styles.taskDetailLog}>
                                                     <a onClick={()=>handleLog(taskDetail.id || 0)}> 日志 </a>
@@ -189,15 +191,16 @@ const actionDetail: React.FC = () => {
                         value={logData || ''}
                         options={{
                             lineNumbers: true,
-                            mode: { name: "text/javascript" },
+                            mode: { name: "text/x-java" },
                             extraKeys: { Ctrl: "autocomplete" },
                             autofocus: false,
                             styleActiveLine: true,
                             lineWrapping: true,
                             foldGutter: false,
+                            indentUnit: 4,// 缩进
                             // gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
                             readOnly: true,
-                            theme: "base16-dark",   
+                            theme: "midnight",   
                             // 设置换行分隔符，null的时候为默认的 \n
                             // lineSeparator: 'a',
                         }}

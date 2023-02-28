@@ -1,5 +1,5 @@
 
-import styles from './ConfigService.less'
+import styles from './index.less'
 import React, { useState, useEffect, useRef } from 'react';
 import { Menu, Form, Table, Button, Typography, Popconfirm, InputNumber, Input, Tooltip, Modal } from 'antd';
 import { getServiceConfAPI } from '@/services/ant-design-pro/colony';
