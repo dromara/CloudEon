@@ -80,7 +80,8 @@ const serviceAdd: React.FC = () => {
             nodeIds:[]
           }
         }),
-        presetConfList:[]
+        presetConfList:[],
+        customConfList:[]
       }
       const pIndex = params?.serviceInfos?.findIndex(pItem=>{ return pItem.stackServiceId == id })
       if(pIndex && pIndex == -1){
@@ -109,23 +110,46 @@ const serviceAdd: React.FC = () => {
     }
     setSubmitallParams(params)
   }
-
+  interface anyKey{
+    [key:number]:any,
+  }
+  
   const setPresetConfListToParams = async() => {
     const allConfData = JSON.parse(sessionStorage.getItem('allConfData') || '{}')
+    let presetConfData:anyKey = {}
+    let customConfData:anyKey = {}
     for(let key in allConfData){
-      allConfData[key] = allConfData[key].map((item: { name: any; sourceValue: any; recommendExpression: any; })=>{
-        return {
-          name: item.name,
-          recommendedValue: item.sourceValue,
-          value: item.recommendExpression
+      presetConfData[key] = []
+      customConfData[key] = []
+      allConfData[key].forEach((item: { isCustomConf: any; name: any; value: any; confFile: any; sourceValue: any; recommendExpression: any; })=>{
+        if(item.isCustomConf){
+          customConfData[key].push({
+            name: item.name,
+            value: item.value,
+            confFile: item.confFile
+          })
+        }else{
+          presetConfData[key].push({
+            name: item.name,
+            recommendedValue: item.sourceValue,
+            value: item.recommendExpression
+          })
         }
       })
+      // allConfData[key] = allConfData[key].map((item: { name: any; sourceValue: any; recommendExpression: any; })=>{
+      //   return {
+      //     name: item.name,
+      //     recommendedValue: item.sourceValue,
+      //     value: item.recommendExpression
+      //   }
+      // })
     }
     let params = {...allParams}
     params?.serviceInfos?.map(async psItem=>{
       if(psItem.stackServiceId){
         if(allConfData[psItem.stackServiceId]){
-          psItem.presetConfList = allConfData[psItem.stackServiceId]
+          psItem.presetConfList = presetConfData[psItem.stackServiceId] //allConfData[psItem.stackServiceId]
+          psItem.customConfList = customConfData[psItem.stackServiceId]
         } else {
             setLoading(true)
             const params = {
@@ -143,6 +167,7 @@ const serviceAdd: React.FC = () => {
             })
             setLoading(false)
             psItem.presetConfList = confsdata
+            psItem.customConfList = []
 
         }
       }
@@ -201,7 +226,8 @@ const serviceAdd: React.FC = () => {
                     nodeIds: []
                 }
             }),
-            presetConfList:[]
+            presetConfList:[],
+            customConfList:[]
         }
     })    
     setServiceInfos(serArr)

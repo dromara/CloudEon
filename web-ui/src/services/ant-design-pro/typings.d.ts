@@ -169,6 +169,7 @@ declare namespace API {
   };
 
   type ConfItem = {
+    isCustomConf: any;
     name?: string,
     description?: string,
     label?: string,
@@ -199,6 +200,7 @@ declare namespace API {
   }
 
   type ServiceInfosItem = {
+    customConfList: any;
     stackServiceId?: number,
     stackServiceName?: string,
     stackServiceLabel?: string,
