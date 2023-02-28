@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 public class StackServiceConfVO {
-    private List<StackConfiguration> confs;
+    private List<ServiceConfVO> confs;
     private List<String> customFileNames;
 
 }
