@@ -3,6 +3,7 @@ package com.data.udh.controller;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.data.udh.controller.request.ValidServicesDepRequest;
 import com.data.udh.controller.response.StackServiceConfVO;
 import com.data.udh.controller.response.StackServiceVO;
@@ -100,6 +101,9 @@ public class StackController {
             StackConfiguration stackConfiguration = new StackConfiguration();
             BeanUtil.copyProperties(stackServiceConfEntity, stackConfiguration);
             stackConfiguration.setConfFile(stackServiceConfEntity.getConfFile());
+            if (StrUtil.isNotBlank(stackServiceConfEntity.getOptions())) {
+                stackConfiguration.setOptions(JSONObject.parseArray(stackServiceConfEntity.getOptions()).toJavaList(String.class));
+            }
             return stackConfiguration;
         }).collect(Collectors.toList());
 

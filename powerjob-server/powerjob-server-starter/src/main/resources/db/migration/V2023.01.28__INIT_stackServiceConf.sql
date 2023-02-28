@@ -10,6 +10,12 @@ create table udh_stack_service_conf
     service_id            int          null,
     conf_file              varchar(255) null,
     configurable_in_wizard   bit null,
-    stack_id              int          null
+    stack_id              int          null,
+    min     int          null,
+    max int null ,
+    unit varchar(255) null,
+    options varchar(255) null,
+    is_password  bit          not null,
+    is_multi_value  bit          not null
 );
 
