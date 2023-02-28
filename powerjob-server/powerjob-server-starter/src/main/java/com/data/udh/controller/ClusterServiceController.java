@@ -202,6 +202,7 @@ public class ClusterServiceController {
                 public ServiceInstanceConfigEntity apply(InitServiceRequest.InitServiceCustomConf initServiceCustomConf) {
                     ServiceInstanceConfigEntity serviceInstanceConfigEntity = new ServiceInstanceConfigEntity();
                     BeanUtil.copyProperties(initServiceCustomConf, serviceInstanceConfigEntity);
+                    serviceInstanceConfigEntity.setCustomConf(true);
                     return serviceInstanceConfigEntity;
                 }
             }).collect(Collectors.toList());

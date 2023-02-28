@@ -18,6 +18,9 @@ roles:
     sortNum: 1
     type: MASTER
     jmxPort: 9232
+    needOdd: true
+    minNum: 3
+
   - name: HDFS_NAMENODE
     label: "Name Node"
     roleFullName: "hadoop-hdfs-namenode"
@@ -25,6 +28,8 @@ roles:
     sortNum: 2
     type: MASTER
     jmxPort: 9232
+    fixedNum: 2
+
   - name: HDFS_DATANODE
     label: "Data Node"
     roleFullName: hadoop-hdfs-datanode
@@ -32,12 +37,15 @@ roles:
     sortNum: 3
     type: SLAVE
     jmxPort: 9232
+    minNum: 3
+
   - name: HDFS_HTTPFS
     label: Httpfs
     roleFullName: hadoop-hdfs-httpfs
     sortNum: 4
     type: SLAVE
     jmxPort: 9232
+    minNum: 1
 
 
 persistencePaths: []
