@@ -1,9 +1,9 @@
 
 import styles from './index.less'
 import React, { useState, useEffect, useRef } from 'react';
-import { Menu, Form, Table, Button, Typography, Popconfirm, InputNumber, Input, Tooltip, Modal } from 'antd';
+import { Menu, Form, Table, Button, Typography, Popconfirm, InputNumber, Input, Tooltip, Modal, Select } from 'antd';
 import { getServiceConfAPI } from '@/services/ant-design-pro/colony';
-
+const { TextArea } = Input;
 
 const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( setPresetConfListToParams )=>{
 
@@ -13,8 +13,10 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( setPresetConf
     const [serviceId, setServiceId] = useState(null);
     const [editingKey, setEditingKey] = useState('');
     const [confData, setConfData] = useState({});
-    // const [addConfigForm] = Form.useForm()
-    // const [isModalOpen, setIsModalOpen] = useState(false);
+    const [addConfigForm] = Form.useForm()
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [customFileNames, setCustomFileNamesData] = useState<any>(); // 当前服务的配置文件
+    const [currentNames, setCurrentNames] = useState<any[]>([]); // 当前服务的所有配置项名称，用来校验新增自定义配置的时候配置项名称重复
     
     const getData = JSON.parse(sessionStorage.getItem('colonyData') || '{}')
 
@@ -31,7 +33,7 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( setPresetConf
     }
 
 
-    useEffect(()=>{
+    useEffect(()=>{        
         if(serviceMenu && serviceMenu.length>0){
             setServiceId(serviceMenu[0].key)
             const params = {
@@ -46,6 +48,9 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( setPresetConf
     const getConfListData = async (params: any) => {
         if(confData && confData[params.serviceId]){
             setCurrentConfList(confData[params.serviceId])
+            setCurrentNames(confData[params.serviceId].map((item: { name: any; })=>{return item.name}))
+            const customFileNamesObj = JSON.parse(sessionStorage.getItem('customFileNamesObj') || '{}') 
+            setCustomFileNamesData(customFileNamesObj[params.serviceId] || [])
             return
         }else{
             setLoading(true)
@@ -58,6 +63,11 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( setPresetConf
                     }
                 })
             setCurrentConfList(confs)
+            setCurrentNames(confs?.map((item2)=>{return item2.name}) || [])
+            const customFileNamesObj = JSON.parse(sessionStorage.getItem('customFileNamesObj') || '{}') 
+            customFileNamesObj[params.serviceId] = result?.data?.customFileNames
+            sessionStorage.setItem('customFileNamesObj', JSON.stringify(customFileNamesObj))
+            setCustomFileNamesData(result?.data?.customFileNames || [])
             let confResult = {...(confData||{}),[params.serviceId]:confs}
             updateConfig(confResult)
         }
@@ -87,16 +97,70 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( setPresetConf
         setEditingKey('');
     };
 
+    const handleDelete = (record: Item) => {
+        const newData = [...(currentConfList||[])];
+        const index = newData.findIndex(item => record.name === item.name);
+        if(index > -1){
+            newData.splice(index,1)
+            setCurrentConfList(newData);
+        }
+    }
+
     const resetSource = (record: Item) => {
         console.log('---record: ', record);
         const row = {...record, recommendExpression: record.sourceValue}
         const newData = [...(currentConfList||[])];
         const index = newData.findIndex(item => row.name === item.name);
+        dealItemData(index,newData,row)
+        // if (index > -1) {
+        //     const item = newData[index];
+        //     newData.splice(index, 1, {
+        //     ...item,
+        //     ...row,
+        //     });
+        //     setCurrentConfList(newData);
+        //     setEditingKey('');
+        // }else{
+        //     newData.push(row);
+        //     setCurrentConfList(newData);
+        //     setEditingKey('');
+        // }
+        // let confResult = serviceId ? {...confData,[serviceId]:newData} : {...confData}
+        // updateConfig(confResult)
+        
+    }
+    const save = async (key: React.Key) => {        
+        try {
+            const row = (await form.validateFields()) as Item;
+            const newData = [...(currentConfList||[])];
+            const index = newData.findIndex(item => key === item.name);
+            dealItemData(index,newData,row)
+            // if (index > -1) {
+            //     const item = newData[index];
+            //     newData.splice(index, 1, {
+            //     ...item,
+            //     ...row,
+            //     });
+            //     setCurrentConfList(newData);
+            //     setEditingKey('');
+            // }else{
+            //     newData.push(row);
+            //     setCurrentConfList(newData);
+            //     setEditingKey('');
+            // }
+            // let confResult = serviceId ? {...confData,[serviceId]:newData} : {...confData}
+            // updateConfig(confResult)
+        } catch (errInfo) {
+            console.log('Validate Failed:', errInfo);
+        }
+    }
+
+    const dealItemData = (index:number,newData:any[],row:any) =>{
         if (index > -1) {
             const item = newData[index];
             newData.splice(index, 1, {
-            ...item,
-            ...row,
+                ...item,
+                ...row,
             });
             setCurrentConfList(newData);
             setEditingKey('');
@@ -107,37 +171,15 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( setPresetConf
         }
         let confResult = serviceId ? {...confData,[serviceId]:newData} : {...confData}
         updateConfig(confResult)
-        
-    }
-    const save = async (key: React.Key) => {        
-        try {
-            const row = (await form.validateFields()) as Item;
-            const newData = [...(currentConfList||[])];
-            const index = newData.findIndex(item => key === item.name);
-            if (index > -1) {
-                const item = newData[index];
-                newData.splice(index, 1, {
-                ...item,
-                ...row,
-                });
-                setCurrentConfList(newData);
-                setEditingKey('');
-            }else{
-                newData.push(row);
-                setCurrentConfList(newData);
-                setEditingKey('');
-            }
-            let confResult = serviceId ? {...confData,[serviceId]:newData} : {...confData}
-            updateConfig(confResult)
-        } catch (errInfo) {
-            console.log('Validate Failed:', errInfo);
-        }
     }
 
     interface Item {
         name: string;
         recommendExpression: string;
         sourceValue: string;
+        isCustomConf: boolean;
+        confFile:string;
+        description: string
     }
 
     interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
@@ -190,13 +232,24 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( setPresetConf
             dataIndex: 'name',
             editable: false,
         },{
+            title: '配置类型',
+            dataIndex: 'isCustomConf',
+            editable: false,
+            render: (_: any, record: Item)=>{
+                return (record.isCustomConf?'自定义配置':'预设配置')
+            }
+        },{
+            title: '配置文件',
+            dataIndex: 'confFile',
+            editable: false,
+        },{
             title: '值',
             dataIndex: 'recommendExpression',
             editable: true,
             render: (_: any, record: Item) => {
                 // console.log('record',record);
                 const hasEdit = (record.sourceValue != record.recommendExpression);
-                return hasEdit ? (
+                return hasEdit && !record.isCustomConf ? (
                     <div style={{position:'relative'}}>
                         <Tooltip color="volcano" getPopupContainer={(trigger) => trigger.parentNode} autoAdjustOverflow={false} arrowPointAtCenter={true} visible={true} open={true} placement="rightTop" title={()=>{
                             return (
@@ -210,6 +263,13 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( setPresetConf
                     <span>{record.recommendExpression}</span>
                 );
             },
+        },{
+            title: '描述',
+            dataIndex: 'description',
+            editable: false,
+            render: (_: any, record: Item)=>{
+                return (record.description||'-')
+            }
         },{
             title: '操作',
             dataIndex: 'operation',
@@ -234,9 +294,14 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( setPresetConf
                         编辑
                         </Typography.Link>
                         {
+                            !record.isCustomConf?
                             (record.sourceValue != record.recommendExpression) && (
                                 <Popconfirm title="确定恢复到初始值吗?" onConfirm={()=>resetSource(record)}>
                                     <a style={{display:'inline-block',marginLeft: '20px'}}>恢复初始值</a>
+                                </Popconfirm>
+                            ):(
+                                <Popconfirm title="确定删除吗?" onConfirm={()=>handleDelete(record)}>
+                                    <a style={{display:'inline-block',marginLeft: '20px'}}>删除</a>
                                 </Popconfirm>
                             )
                         }
@@ -263,28 +328,37 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( setPresetConf
       });
 
     
-    //   const handleOk = () => {
-    //     // console.log(form.getFieldsValue());
-    //     addConfigForm
-    //       .validateFields()
-    //       .then(async (values) => {
-    //         // const result: API.normalResult = await createNodeAPI({...values, clusterId: getData.clusterId})
-    //         // if(result && result.success){
-    //         //   message.success('新增成功');
-    //         //   getNodeData({ clusterId: getData.clusterId });
-    //         //   setIsModalOpen(false);
-    //         //   form.resetFields()
-    //         // }
-    //       })
-    //       .catch((err) => {
-    //         console.log('err: ', err);
-    //       });
-    //   };
+      const handleOk = () => {
+        // console.log(form.getFieldsValue());
+        addConfigForm
+          .validateFields()
+          .then(async (values) => {
+            const row = {...values, isCustomConf: true, recommendExpression: values.value};
+            const newData = [...(currentConfList||[])];
+            const index = newData.findIndex(item => values.name === item.name);
+            if(index == -1){
+                const params = [...currentNames, values.name]
+                setCurrentNames(params)
+            }
+            dealItemData(index,newData,row)
+            setIsModalOpen(false)
+            // const result: API.normalResult = await createNodeAPI({...values, clusterId: getData.clusterId})
+            // if(result && result.success){
+            //   message.success('新增成功');
+            //   getNodeData({ clusterId: getData.clusterId });
+            //   setIsModalOpen(false);
+            //   form.resetFields()
+            // }
+          })
+          .catch((err) => {
+            console.log('err: ', err);
+          });
+      };
     
-    //   const handleCancel = () => {
-    //     addConfigForm.resetFields()
-    //     setIsModalOpen(false);
-    //   };
+      const handleCancel = () => {
+        addConfigForm.resetFields()
+        setIsModalOpen(false);
+      };
 
     return (
         <div className={styles.CSLayout}>
@@ -300,18 +374,19 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( setPresetConf
                 )}
             </div>
             <div className={styles.CSRight}>
-                {/* <div className={styles.CSBtnWrap}>
+                <div className={styles.CSBtnWrap}>
                     <Button 
                         key="addconfig"
                         type="primary"
                         disabled={!serviceId}
                         onClick={() => {
-                            
+                            setIsModalOpen(true)
+                            addConfigForm.resetFields()
                         }}
                     >
-                    自定义配置项
+                        添加自定义配置
                     </Button>
-                </div> */}
+                </div>
                 <div>
                 <Form form={form} component={false}>
                     <Table
@@ -334,9 +409,9 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( setPresetConf
                 </Form>
                 </div>
             </div>
-            {/* <Modal
+            <Modal
                 key="addconfigmodal"
-                title="新增配置项"
+                title="添加自定义配置"
                 forceRender={true}
                 destroyOnClose={true}
                 open={isModalOpen}
@@ -347,49 +422,66 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( setPresetConf
                 <div>
                 <Form
                     form={addConfigForm}
-                    key="addconfigform"
-                    name="新增配置项"
+                    key="addConfigForm"
+                    name="添加自定义配置"
                     preserve={false}
-                    labelCol={{ span: 8 }}
+                    labelCol={{ span: 6 }}
                     wrapperCol={{ span: 16 }}
                     initialValues={{ remember: true }}
                     // onFinish={onFinish}
                     autoComplete="off"
                 >
                     <Form.Item
-                    label="ip"
-                    name="ip"
-                    rules={[{ required: true, message: '请输入ip!' }]}
+                        label="配置项"
+                        name="name"
+                        rules={[
+                            { required: true, message: '请输入配置项!' },
+                            { validator:(rule, value, callback)=>{
+                                try {
+                                    if(currentNames && currentNames.includes(value)){
+                                        // throw new Error('该配置项已存在，请直接修改!');
+                                        return Promise.reject(new Error('该配置项已存在，请直接修改!'));
+                                    }
+                                    return Promise.resolve();
+                                  } catch (err) {
+                                    callback(err);
+                                  }
+                            } }
+                        ]}
                     >
                     <Input />
                     </Form.Item>
 
                     <Form.Item
-                    label="sshUser"
-                    name="sshUser"
-                    rules={[{ required: true, message: '请输入sshUser!' }]}
+                        label="值"
+                        name="value"
+                        rules={[{ required: true, message: '请输入值!' }]}
                     >
                     <Input />
                     </Form.Item>
 
                     <Form.Item
-                    label="sshPassword"
-                    name="sshPassword"
-                    rules={[{ required: true, message: '请输入sshPassword!' }]}
+                        label="配置文件"
+                        name="confFile"
+                        rules={[{ required: true, message: '请选择配置文件!' }]}
                     >
-                    <Input />
+                        <Select>
+                            { customFileNames && customFileNames.map((fileNameItem: any) => {
+                                return (<Select.Option key={fileNameItem} value={fileNameItem}>{fileNameItem}</Select.Option>)
+                            }) }
+                        </Select>
                     </Form.Item>
 
                     <Form.Item
-                    label="sshPort"
-                    name="sshPort"
-                    rules={[{ required: true, message: 'sshPort!' }]}
+                        label="描述"
+                        name="description"
+                        rules={[]}
                     >
-                    <Input />
+                    <TextArea rows={4} placeholder="请输入描述" />
                     </Form.Item>
                 </Form>
                 </div>
-            </Modal> */}
+            </Modal>
         </div>
     )
 }
