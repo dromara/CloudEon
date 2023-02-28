@@ -1,12 +1,13 @@
 import { ProDescriptions } from '@ant-design/pro-components';
-import { Image } from 'antd';
+import { Image, Spin } from 'antd';
 import styles from './index.less'
 import example from '../../../../../../assets/images/1.png';
 import { statusColor } from '../../../../../../utils/colonyColor'
 
-const statusTab:React.FC = () => {
+const statusTab:React.FC<{statusInfo: API.serviceInfos, loading: boolean}> = ({statusInfo, loading}) => {
     return (
         <div className={styles.statusTabLayout}>
+            <Spin tip="Loading" size="small" spinning={!!loading}>
             <div className={styles.statusBar}>
                 <div className={styles.leftBox}>
                     {/* <div>版本：19.6.0ffgfhcvbfghjfghjgh</div>
@@ -16,60 +17,65 @@ const statusTab:React.FC = () => {
                     <div>Kerberos：关闭</div> */}
                     <ProDescriptions
                         title=""
-                        dataSource={{
-                            id: '19.6.0ffgfhcvbfghjfghjgh',
-                            date: '20200809',
-                            money: '1212100',
-                            state: 'all',
-                            state2: 'open',
-                        }}
+                        dataSource={statusInfo}
                         columns={[
                             {
                                 title: '版本',
-                                key: 'text',
-                                dataIndex: 'id',
+                                key: 'version',
+                                dataIndex: 'version',
                                 ellipsis: true,
                                 // copyable: true,
                             },
                             {
-                            title: '监控状态',
-                            key: 'state',
-                            dataIndex: 'state',
-                            valueType: 'select',
-                            valueEnum: {
-                                all: { text: '全部', status: 'Default' },
-                                open: {
-                                    text: '未解决',
-                                    status: 'Error',
+                                title: '服务状态',
+                                key: 'serviceStatus',
+                                dataIndex: 'serviceStatus',
+                                valueType: 'select',
+                                valueEnum: {
+                                    all: { text: '全部', status: 'Default' },
+                                    open: {
+                                        text: '出错',
+                                        status: 'Error',
+                                    },
+                                    closed: {
+                                        text: '运行中',
+                                        status: 'OPERATING',
+                                    },
                                 },
-                                closed: {
-                                    text: '已解决',
-                                    status: 'Success',
-                                },
-                            },
                             },
                             {
-                                title: '状态2',
-                                key: 'state2',
-                                dataIndex: 'state2',
+                                title: '服务实例名',
+                                key: 'name',
+                                dataIndex: 'name',
                             },
                             {
-                                title: '时间',
-                                key: 'date',
-                                dataIndex: 'date',
-                                valueType: 'date',
+                                title: '框架服务名',
+                                key: 'stackServiceName',
+                                dataIndex: 'stackServiceName',
+                                ellipsis: true,
+                                // copyable: true,
                             },
                             {
-                                title: 'money',
-                                key: 'money',
-                                dataIndex: 'money',
-                                valueType: 'money',
-                            },
+                                title: '服务描述',
+                                key: 'stackServiceDesc',
+                                dataIndex: 'stackServiceDesc',
+                                ellipsis: true,
+                                // copyable: true,
+                            }
+                            // {
+                            //     title: '时间',
+                            //     key: 'date',
+                            //     dataIndex: 'date',
+                            //     valueType: 'date',
+                            // },
+                            // {
+                            //     title: 'money',
+                            //     key: 'money',
+                            //     dataIndex: 'money',
+                            //     valueType: 'money',
+                            // },
                         ]}
                         >
-                        <ProDescriptions.Item label="百分比" valueType="percent">
-                            100
-                        </ProDescriptions.Item>
                         </ProDescriptions>
                 </div>
                 <div className={styles.rightBox}>
@@ -107,8 +113,9 @@ const statusTab:React.FC = () => {
                 </div>
             </div>
             <div>
-                <Image width={700} src={example} alt="chucui" />
+                <Image width={'100%'} src={example} alt="chucui" />
             </div>
+            </Spin>
         </div>
     )
 }

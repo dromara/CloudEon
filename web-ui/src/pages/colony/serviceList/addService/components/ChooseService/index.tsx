@@ -1,6 +1,6 @@
 import { BorderOuterOutlined } from '@ant-design/icons';
 import { Image } from 'antd'
-import styles from './ChooseService.less'
+import styles from './index.less'
 
 const ChooseService: React.FC<{
     serviceList: any[];
