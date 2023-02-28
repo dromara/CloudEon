@@ -5,6 +5,7 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.data.udh.controller.request.ValidServicesDepRequest;
+import com.data.udh.controller.response.AllocationRoleVO;
 import com.data.udh.controller.response.ServiceConfVO;
 import com.data.udh.controller.response.StackServiceConfVO;
 import com.data.udh.controller.response.StackServiceVO;
@@ -49,6 +50,9 @@ public class StackController {
     @Resource
     private ServiceInstanceRepository serviceInstanceRepository;
 
+    @Resource
+    private ClusterNodeRepository clusterNodeRepository;
+
 
     @GetMapping("/list")
     public ResultDTO<List<StackInfoEntity>> listStackInfo() {
@@ -80,6 +84,46 @@ public class StackController {
             return stackServiceVO;
         }).collect(Collectors.toList());
         return ResultDTO.success(result);
+    }
+
+    /***
+     * 根据框架服务id和集群id，查询自动分配角色绑定的节点
+     */
+    @GetMapping("/getRolesAllocation")
+    public ResultDTO<List<AllocationRoleVO>> getRolesAllocation(Integer stackServiceId, Integer clusterId) {
+        List<StackServiceRoleEntity> stackServiceRoleEntities = serviceRoleRepository.findByServiceIdOrderBySortNum(stackServiceId);
+        List<AllocationRoleVO> allocationRoleVOS = stackServiceRoleEntities.stream().map(new Function<StackServiceRoleEntity, AllocationRoleVO>() {
+            @Override
+            public AllocationRoleVO apply(StackServiceRoleEntity stackServiceRoleEntity) {
+                AllocationRoleVO allocationRoleVO = new AllocationRoleVO();
+                BeanUtil.copyProperties(stackServiceRoleEntity, allocationRoleVO);
+                allocationRoleVO.setStackRoleName(stackServiceRoleEntity.getName());
+                allocationRoleVO.setNodeIds(assignNode2Role(stackServiceRoleEntity, clusterId));
+                return allocationRoleVO;
+            }
+        }).collect(Collectors.toList());
+
+        return ResultDTO.success(allocationRoleVOS);
+    }
+
+    /**
+     * todo 根据角色的type（master or slave）分配节点
+     */
+    private List<Integer> assignNode2Role(StackServiceRoleEntity stackServiceRoleEntity, Integer clusterId) {
+        List<Integer> result = null;
+        // 查询集群里的节点
+        List<ClusterNodeEntity> clusterNodeEntities = clusterNodeRepository.findByClusterId(clusterId);
+        Integer minNum = stackServiceRoleEntity.getMinNum();
+        Integer fixedNum = stackServiceRoleEntity.getFixedNum();
+        boolean needOdd = stackServiceRoleEntity.isNeedOdd();
+        if (fixedNum != null) {
+            result = clusterNodeEntities.stream().limit(fixedNum).map(ClusterNodeEntity::getId).collect(Collectors.toList());
+        }
+        if (minNum != null) {
+            result = clusterNodeEntities.stream().limit(minNum).map(ClusterNodeEntity::getId).collect(Collectors.toList());
+
+        }
+        return result;
     }
 
     /**
