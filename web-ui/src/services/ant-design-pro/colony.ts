@@ -214,6 +214,18 @@ export async function getServiceRolesAPI(options?: { [key: string]: any }) {
   });
 }
 
+/** 自动分配角色绑定节点 */
+export async function getRolesAllocationAPI(options?: { [key: string]: any }) {
+  return request<API.rolesValidResult>('/stack/getRolesAllocation', {
+    method: 'GET',
+    params: {
+      ...options,
+    },
+  });
+}
+
+
+
 
 
 

@@ -18,42 +18,42 @@ export default {
     },
     '/stack/': {
       // 要代理的地址
-      target: 'http://43bb343d.r7.cpolar.top',
+      target: 'http://10c1e28d.r7.cpolar.top',
       // 配置了这个可以从 http 代理到 https
       // 依赖 origin 的功能可能需要这个，比如 cookie
       changeOrigin: true,
     },
     '/cluster/': {
       // 要代理的地址
-      target: 'http://43bb343d.r7.cpolar.top',
+      target: 'http://10c1e28d.r7.cpolar.top',
       // 配置了这个可以从 http 代理到 https
       // 依赖 origin 的功能可能需要这个，比如 cookie
       changeOrigin: true,
     },
     '/node/': {
       // 要代理的地址
-      target: 'http://43bb343d.r7.cpolar.top',
+      target: 'http://10c1e28d.r7.cpolar.top',
       // 配置了这个可以从 http 代理到 https
       // 依赖 origin 的功能可能需要这个，比如 cookie
       changeOrigin: true,
     },
     '/service/': {
       // 要代理的地址
-      target: 'http://43bb343d.r7.cpolar.top',
+      target: 'http://10c1e28d.r7.cpolar.top',
       // 配置了这个可以从 http 代理到 https
       // 依赖 origin 的功能可能需要这个，比如 cookie
       changeOrigin: true,
     },
     '/command/': {
       // 要代理的地址
-      target: 'http://43bb343d.r7.cpolar.top',//'http://127.0.0.1:4523/m1/2330621-0-default',
+      target: 'http://10c1e28d.r7.cpolar.top',//'http://127.0.0.1:4523/m1/2330621-0-default',
       // 配置了这个可以从 http 代理到 https
       // 依赖 origin 的功能可能需要这个，比如 cookie
       changeOrigin: true,
     },
     '/log/': {
       // 要代理的地址
-      target: 'http://43bb343d.r7.cpolar.top',//'http://127.0.0.1:4523/m1/2330621-0-default',
+      target: 'http://10c1e28d.r7.cpolar.top',//'http://127.0.0.1:4523/m1/2330621-0-default',
       // 配置了这个可以从 http 代理到 https
       // 依赖 origin 的功能可能需要这个，比如 cookie
       changeOrigin: true,
