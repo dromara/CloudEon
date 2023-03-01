@@ -38,7 +38,6 @@ create table udh_service_instance
     service_state                   int          null,
     instance_sequence                  int          null,
     persistence_paths varchar(1024) null,
-    sid                             varchar(255) null,
     stack_service_id                int          null,
     update_time                     datetime(6)  null
 );
