@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.data.udh.controller.request.RoleAllocationRequest;
 import com.data.udh.controller.request.ValidServicesDepRequest;
 import com.data.udh.controller.response.AllocationRoleVO;
 import com.data.udh.controller.response.ServiceConfVO;
@@ -17,9 +18,8 @@ import org.springframework.web.bind.annotation.*;
 import tech.powerjob.common.response.ResultDTO;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -89,21 +89,32 @@ public class StackController {
     /***
      * 根据框架服务id和集群id，查询自动分配角色绑定的节点
      */
-    @GetMapping("/getRolesAllocation")
-    public ResultDTO<List<AllocationRoleVO>> getRolesAllocation(Integer stackServiceId, Integer clusterId) {
-        List<StackServiceRoleEntity> stackServiceRoleEntities = serviceRoleRepository.findByServiceIdOrderBySortNum(stackServiceId);
-        List<AllocationRoleVO> allocationRoleVOS = stackServiceRoleEntities.stream().map(new Function<StackServiceRoleEntity, AllocationRoleVO>() {
+    @PostMapping("/getRolesAllocation")
+    public ResultDTO<Map<Integer, List<AllocationRoleVO>>> getRolesAllocation(@RequestBody RoleAllocationRequest roleAllocationRequest) {
+        Map<Integer, List<AllocationRoleVO>> result = new HashMap<>();
+        List<Integer> stackServiceIds = roleAllocationRequest.getStackServiceIds();
+        Integer clusterId = roleAllocationRequest.getClusterId();
+        stackServiceIds.stream().forEach(new Consumer<Integer>() {
             @Override
-            public AllocationRoleVO apply(StackServiceRoleEntity stackServiceRoleEntity) {
-                AllocationRoleVO allocationRoleVO = new AllocationRoleVO();
-                BeanUtil.copyProperties(stackServiceRoleEntity, allocationRoleVO);
-                allocationRoleVO.setStackRoleName(stackServiceRoleEntity.getName());
-                allocationRoleVO.setNodeIds(assignNode2Role(stackServiceRoleEntity, clusterId));
-                return allocationRoleVO;
+            public void accept(Integer stackServiceId) {
+                // 查出该框架服务的角色
+                List<StackServiceRoleEntity> stackServiceRoleEntities = serviceRoleRepository.findByServiceIdOrderBySortNum(stackServiceId);
+                // 为该角色分配节点
+                List<AllocationRoleVO> allocationRoleVOS = stackServiceRoleEntities.stream().map(new Function<StackServiceRoleEntity, AllocationRoleVO>() {
+                    @Override
+                    public AllocationRoleVO apply(StackServiceRoleEntity stackServiceRoleEntity) {
+                        AllocationRoleVO allocationRoleVO = new AllocationRoleVO();
+                        BeanUtil.copyProperties(stackServiceRoleEntity, allocationRoleVO);
+                        allocationRoleVO.setStackRoleName(stackServiceRoleEntity.getName());
+                        allocationRoleVO.setNodeIds(assignNode2Role(stackServiceRoleEntity, clusterId));
+                        return allocationRoleVO;
+                    }
+                }).collect(Collectors.toList());
+                result.put(stackServiceId, allocationRoleVOS);
             }
-        }).collect(Collectors.toList());
+        });
 
-        return ResultDTO.success(allocationRoleVOS);
+        return ResultDTO.success(result);
     }
 
     /**
