@@ -203,6 +203,10 @@ public class ClusterServiceController {
                     ServiceInstanceConfigEntity serviceInstanceConfigEntity = new ServiceInstanceConfigEntity();
                     BeanUtil.copyProperties(initServiceCustomConf, serviceInstanceConfigEntity);
                     serviceInstanceConfigEntity.setCustomConf(true);
+                    serviceInstanceConfigEntity.setCreateTime(new Date());
+                    serviceInstanceConfigEntity.setUpdateTime(new Date());
+                    serviceInstanceConfigEntity.setServiceInstanceId(serviceInstanceEntityId);
+                    serviceInstanceConfigEntity.setUserId(AdminUserId);
                     return serviceInstanceConfigEntity;
                 }
             }).collect(Collectors.toList());
