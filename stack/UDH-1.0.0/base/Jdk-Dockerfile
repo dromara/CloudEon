@@ -44,3 +44,18 @@ RUN usermod  -aG supergroup  root && \
  usermod  -aG supergroup  kyuubi && \
  usermod  -aG supergroup  doris && \
  usermod  -aG supergroup  flink
+
+# set password
+RUN echo 'root' |passwd --stdin root && \
+    echo 'hdfs' |passwd --stdin hdfs && \
+    echo 'yarn' |passwd --stdin yarn && \
+    echo 'hadoop' |passwd --stdin hadoop && \
+    echo 'hive' |passwd --stdin hive && \
+    echo 'spark' |passwd --stdin spark && \
+    echo 'zookeeper' |passwd --stdin zookeeper && \
+    echo 'hbase' |passwd --stdin hbase && \
+    echo 'kyuubi' |passwd --stdin kyuubi && \
+    echo 'doris' |passwd --stdin doris && \
+    echo 'flink' |passwd --stdin flink
+
+RUN chmod  777 /home/*
