@@ -169,6 +169,7 @@ declare namespace API {
   };
 
   type ConfItem = {
+    isCustomConf: any;
     name?: string,
     description?: string,
     label?: string,
@@ -199,6 +200,7 @@ declare namespace API {
   }
 
   type ServiceInfosItem = {
+    customConfList: any;
     stackServiceId?: number,
     stackServiceName?: string,
     stackServiceLabel?: string,
@@ -315,6 +317,20 @@ declare namespace API {
     success?: boolean;
     message?: string;
     data?: rolesInfos[];
+  }
+
+  type rolesValid = {
+    stackRoleName?: string,
+    minNum?: number,
+    fixedNum?: number,
+    needOdd?: boolean,
+    nodeIds?: number[]
+  }
+
+  type rolesValidResult = {
+    success?: boolean;
+    message?: string;
+    data?: rolesValid[];
   }
 
 }
