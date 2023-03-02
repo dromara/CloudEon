@@ -44,7 +44,10 @@ export default defineConfig({
     // 如果不想要 configProvide 动态设置主题需要把这个设置为 default
     // 只有设置为 variable， 才能使用 configProvide 动态设置主色调
     // https://ant.design/docs/react/customize-theme-variable-cn
-    'root-entry-name': 'variable',
+    'root-entry-name': 'default',
+    "primary-color": "#fa8c16",// 全局主色  绿色 #1DA57A ； 橙色 #fa8c16  
+    // 'link-color': '#fa8c16', // 链接色
+    // '--ant-primary-color-hover': '#fa8c16',
   },
   // esbuild is father build tools
   // https://umijs.org/plugins/plugin-esbuild
