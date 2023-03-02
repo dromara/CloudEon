@@ -371,7 +371,7 @@ const serviceAdd: React.FC = () => {
                   } else if(current == 2){ // 分配角色下一步
                     // 校验节点
                     serviceInfos && checkAllRolesRules(serviceInfos)
-                    
+                    setCurrent(current + 1);
                     
                     
                   } else if(current == 3){ // 安装
@@ -381,8 +381,24 @@ const serviceAdd: React.FC = () => {
                       stackId: colonyData?.stackId,
                       clusterId: colonyData?.clusterId,
                     }
-                    console.log('--allParams: ', initParams);
+                    console.log('--allParams: ', allParams);
+                    if(initParams.serviceInfos){
+                      initParams.serviceInfos = allParams?.serviceInfos?.map(sItem=>{
+                        let roles = sItem.roles?.map(roleItem=>{
+                          return {
+                            nodeIds: roleItem.nodeIds,
+                            stackRoleName: roleItem.stackRoleName
+                          }
+                        })
+                        return {
+                          ...sItem,
+                          roles
+                        }
+                      })
+                    }
                     installService(initParams)
+                    // console.log('--initParams: ', initParams);
+                    
 
                   }else{
                     setCurrent(current + 1);

@@ -197,7 +197,7 @@ declare namespace API {
   }
 
   type RolesItem = {
-    validRule: validRuleItem;
+    validRule?: validRuleItem;
     stackRoleName?: string,
     nodeIds?: number[]
   }
