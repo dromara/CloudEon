@@ -271,9 +271,7 @@ public class ClusterServiceController {
                 if (StrUtil.isNotBlank(stackServiceConfEntity.getConfFile())) {
                     serviceInstanceConfigEntity.setConfFile(stackServiceConfEntity.getConfFile());
                 }
-                if (StrUtil.isNotBlank(stackServiceConfEntity.getOptions())) {
-                    serviceInstanceConfigEntity.setOptions(JSONObject.toJSONString(stackServiceConfEntity.getOptions()));
-                }
+
                 serviceInstanceConfigEntity.setUpdateTime(new Date());
                 serviceInstanceConfigEntity.setCreateTime(new Date());
                 serviceInstanceConfigEntity.setServiceInstanceId(serviceInstanceEntityId);
@@ -297,9 +295,7 @@ public class ClusterServiceController {
                 if (StrUtil.isNotBlank(stackServiceConfEntity.getConfFile())) {
                     serviceInstanceConfigEntity.setConfFile(stackServiceConfEntity.getConfFile());
                 }
-                if (StrUtil.isNotBlank(stackServiceConfEntity.getOptions())) {
-                    serviceInstanceConfigEntity.setOptions(JSONObject.toJSONString(stackServiceConfEntity.getOptions()));
-                }
+
                 serviceInstanceConfigEntity.setServiceInstanceId(serviceInstanceEntityId);
                 serviceInstanceConfigEntity.setUserId(AdminUserId);
                 return serviceInstanceConfigEntity;
@@ -580,9 +576,13 @@ public class ClusterServiceController {
         // 数据库中查询服务实例配置
         List<ServiceConfiguration> serviceConfigurations = serviceInstanceConfigRepository.findByServiceInstanceId(serviceInstanceId)
                 .stream().map(serviceInstanceConfig -> {
+                    // 查询框架服务配置补全校验
+                    StackServiceConfEntity stackConfEntity = stackServiceConfRepository.findByNameAndServiceId(serviceInstanceConfig.getName(), stackServiceId);
                     ServiceConfiguration serviceConfiguration = new ServiceConfiguration();
                     BeanUtil.copyProperties(serviceInstanceConfig, serviceConfiguration);
+                    BeanUtil.copyProperties(stackConfEntity, serviceConfiguration);
                     serviceConfiguration.setConfFile(serviceInstanceConfig.getConfFile());
+                    serviceConfiguration.setOptions(JSONObject.parseArray(stackConfEntity.getOptions(),String.class));
                     return serviceConfiguration;
                 }).collect(Collectors.toList());
 
