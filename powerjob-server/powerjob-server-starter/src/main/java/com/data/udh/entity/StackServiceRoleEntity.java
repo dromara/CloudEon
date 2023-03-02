@@ -68,4 +68,8 @@ public class StackServiceRoleEntity implements Serializable {
 	 */
 	private String frontendOperations;
 
+	private Integer minNum;
+	private Integer fixedNum;
+	private boolean needOdd;
+
 }

@@ -17,6 +17,7 @@ roles:
     sortNum: 1
     type: MASTER
     jmxPort: 9232
+    fixedNum : 1
 
   - name: DORIS_BE
     label: "Doris Be"
@@ -24,6 +25,7 @@ roles:
     linkExpression: "http://${localhostname}:${conf['webserver_port']}/"
     sortNum: 2
     type: SLAVE
+    minNum: 3
 
 persistencePaths:
   - /opt/udh/${serviceInstanceId}/conf
