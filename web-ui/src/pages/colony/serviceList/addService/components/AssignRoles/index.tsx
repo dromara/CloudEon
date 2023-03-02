@@ -1,16 +1,17 @@
 
 import { ProCard } from '@ant-design/pro-components';
-import { Tree, Table } from 'antd';
+import { Tree, Table, notification, Alert } from 'antd';
 import type { DataNode, TreeProps } from 'antd/es/tree';
 import styles from './index.less'
-import { useState, useEffect } from 'react';
-import { getNodeListAPI, getRolesAllocationAPI } from '@/services/ant-design-pro/colony';
+import { useState, useEffect, useRef } from 'react';
+import { getNodeListAPI } from '@/services/ant-design-pro/colony';
 
 const AssignRoles : React.FC<{
     serviceList: any[]; // 原本选中的服务的树结构
     sourceServiceInfos: API.ServiceInfosItem[], // 原本选中的服务的树结构+节点(包括上一次选中的)
-    setServiceInfosToParams: any
-}> = ({serviceList, sourceServiceInfos, setServiceInfosToParams})=>{
+    setServiceInfosToParams: any,
+    checkAllRolesRules:any,
+}> = ({serviceList, sourceServiceInfos, setServiceInfosToParams, checkAllRolesRules})=>{
 
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]); // 选中的节点
     const [nodeListData, setNodeListData] = useState<any[]>();
@@ -20,7 +21,10 @@ const AssignRoles : React.FC<{
     
     const getData = JSON.parse(sessionStorage.getItem('colonyData') || '{}')
 
+    type NotificationType = 'success' | 'info' | 'warning' | 'error';
+
     type selectRoleItem = {
+        validRule: any;
         stackServiceId: number,
         stackRoleName: any,
         nodeIds: any[]
@@ -40,7 +44,8 @@ const AssignRoles : React.FC<{
         const roleData = {
             stackServiceId: sourceServiceInfos[0].stackServiceId || 0,
             stackRoleName: sourceServiceInfos[0] && sourceServiceInfos[0].roles && sourceServiceInfos[0].roles[0].stackRoleName || '',
-            nodeIds: sourceServiceInfos[0] && sourceServiceInfos[0].roles && sourceServiceInfos[0].roles[0].nodeIds || []
+            nodeIds: sourceServiceInfos[0] && sourceServiceInfos[0].roles && sourceServiceInfos[0].roles[0].nodeIds || [],
+            validRule: sourceServiceInfos[0] && sourceServiceInfos[0].roles && sourceServiceInfos[0].roles[0].validRule || {},
         }
         setCurrentSelectRoles(roleData)
         const newSelectedRowKeys = getNodeIds(sourceServiceInfos[0].stackServiceId, serviceList[0].roles[0])
@@ -74,14 +79,26 @@ const AssignRoles : React.FC<{
         }      
     }
 
+    const getRoleRule:any = (stackServiceId:number, stackRoleName:any) => {
+        for (let sItem of (serviceInfos||sourceServiceInfos)) {
+            if (sItem.stackServiceId == stackServiceId) {
+                for (let role of sItem.roles||[]) {
+                    if(role.stackRoleName == stackRoleName)
+                    return role.validRule||{}
+                }
+            }
+        }      
+    }
+
     const onSelectTree: TreeProps['onSelect'] = (selectedKeys, info) => {
-        // console.log('selected', selectedKeys, info);
+        console.log('selected', selectedKeys, info);
         const newSelectedRowKeys = getNodeIds(info.selectedNodes[0].stackServiceId, selectedKeys[0])
         setSelectedRowKeys(newSelectedRowKeys);
         const roleData = {
             stackServiceId: info.selectedNodes[0].stackServiceId,
             stackRoleName: selectedKeys[0],
-            nodeIds: newSelectedRowKeys
+            nodeIds: newSelectedRowKeys,
+            validRule: getRoleRule(info.selectedNodes[0].stackServiceId, selectedKeys[0]),
         }
         setCurrentSelectRoles(roleData)
         // console.log('--currentSelectRoles:', currentSelectRoles);
@@ -100,9 +117,71 @@ const AssignRoles : React.FC<{
         },
     ];
 
+    const [api, contextHolder] = notification.useNotification();
 
-    const onSelectChange = (newSelectedRowKeys: number[]) => {
-        console.log('selectedRowKeys changed: ', newSelectedRowKeys);
+    // const openNotificationWithIcon = (type: NotificationType, str: string) => {
+    //     api[type]({
+    //     message: str,
+    //     description:'',
+    //     duration:null
+    //     });
+    // };
+
+    const openNotificationWithIcon = (errList:string[]) =>{
+        if(!errList || errList.length == 0) return
+        const errDom = errList.map(item=>{
+            return (<Alert type="error" message={item} banner />)
+        })
+        notification.open({
+            message: '温馨提示',
+            description:<>{errDom}</>,
+            duration:null,
+            style: {
+                width: 500
+            }
+            // onClick: () => {
+            //   console.log('Notification Clicked!');
+            // },
+          });
+    }
+
+    // 检验是否符合节点选择规则
+    // const checkRule = (newSelectedRowKeys: number[], currentSelectRoles: selectRoleItem | undefined) => {
+    //     if(!currentSelectRoles || !newSelectedRowKeys) return
+    //     notification.destroy()
+    //     if(currentSelectRoles?.validRule){
+    //         // minNum为至少要选的节点数
+    //         // fixedNum为固定的节点数，不能多不能少
+    //         // needOdd 为节点数是否需要是奇数
+    //         let {fixedNum, minNum,needOdd} = currentSelectRoles?.validRule
+    //         let errList = []
+    //         if(fixedNum && newSelectedRowKeys.length != fixedNum){
+    //             errList.push(`${currentSelectRoles.stackRoleName} 要求选择${fixedNum}个节点数`) 
+    //             // setErrInfo({[currentSelectRoles.stackRoleName]: errList})
+    //         }
+    //         if(minNum && newSelectedRowKeys.length < minNum){
+    //             errList.push(`${currentSelectRoles.stackRoleName} 建议至少选择${minNum}个节点数`)
+    //             // setWarnInfo({[currentSelectRoles.stackRoleName]: warnStr})
+    //         }
+    //         if(needOdd && newSelectedRowKeys.length%2 == 0){
+    //             errList.push(`${currentSelectRoles.stackRoleName} 建议选择奇数个节点数`)
+    //             // setErrInfo({[currentSelectRoles.stackRoleName]: errList})
+    //         }            
+    //         if(errList && errList.length > 0){
+    //             openNotificationWithIcon(errList)
+    //             checkRoleNext(false)
+    //         }else{
+    //             checkRoleNext(true)
+    //         }
+    //     }
+    // }
+
+
+    const onSelectChange = (newSelectedRowKeys: number[]) => { // 节点勾选触发的函数
+        console.log('---onSelectChange:', newSelectedRowKeys, currentSelectRoles);
+        // checkRule( newSelectedRowKeys, currentSelectRoles)
+        
+        
         setSelectedRowKeys(newSelectedRowKeys);
         let roles = {...currentSelectRoles}
         const newServiceInfos = [...(serviceInfos||[])]
@@ -116,9 +195,8 @@ const AssignRoles : React.FC<{
             }
         } 
         setServiceInfos(newServiceInfos)
+        checkAllRolesRules(newServiceInfos)
         setServiceInfosToParams(newServiceInfos)
-        console.log('--serviceInfos:',serviceInfos);
-        
     };
 
     const rowSelection = {
@@ -150,7 +228,8 @@ const AssignRoles : React.FC<{
                 style={{background: '#fbfbfe'}}
             />
             </ProCard>
-            <ProCard title="节点分配" headerBordered>
+            <ProCard title="节点分配" headerBordered className={styles.nodeWrap}>
+            {contextHolder}
                 <Table 
                     rowKey="id"
                     loading={loading}
