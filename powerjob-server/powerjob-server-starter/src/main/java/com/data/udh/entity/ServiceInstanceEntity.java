@@ -31,10 +31,6 @@ public class ServiceInstanceEntity implements Serializable {
     @GenericGenerator(name = "native", strategy = "native")
     private Integer id;
 
-    /**
-     * 服务实例编码
-     */
-    private String sid;
 
 
 

@@ -76,6 +76,9 @@ create table udh_stack_service_role
     link_expression       varchar(255) null,
     type     varchar(255) null,
     sort_num              int          null,
+    min_num              int          null,
+    fixed_num              int          null,
+    need_odd              bit          not null,
     stack_id              int          null
 );
 

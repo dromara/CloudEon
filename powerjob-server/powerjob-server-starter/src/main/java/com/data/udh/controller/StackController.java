@@ -4,7 +4,9 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.data.udh.controller.request.RoleAllocationRequest;
 import com.data.udh.controller.request.ValidServicesDepRequest;
+import com.data.udh.controller.response.AllocationRoleVO;
 import com.data.udh.controller.response.ServiceConfVO;
 import com.data.udh.controller.response.StackServiceConfVO;
 import com.data.udh.controller.response.StackServiceVO;
@@ -16,9 +18,8 @@ import org.springframework.web.bind.annotation.*;
 import tech.powerjob.common.response.ResultDTO;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -48,6 +49,9 @@ public class StackController {
 
     @Resource
     private ServiceInstanceRepository serviceInstanceRepository;
+
+    @Resource
+    private ClusterNodeRepository clusterNodeRepository;
 
 
     @GetMapping("/list")
@@ -80,6 +84,57 @@ public class StackController {
             return stackServiceVO;
         }).collect(Collectors.toList());
         return ResultDTO.success(result);
+    }
+
+    /***
+     * 根据框架服务id和集群id，查询自动分配角色绑定的节点
+     */
+    @PostMapping("/getRolesAllocation")
+    public ResultDTO<Map<Integer, List<AllocationRoleVO>>> getRolesAllocation(@RequestBody RoleAllocationRequest roleAllocationRequest) {
+        Map<Integer, List<AllocationRoleVO>> result = new HashMap<>();
+        List<Integer> stackServiceIds = roleAllocationRequest.getStackServiceIds();
+        Integer clusterId = roleAllocationRequest.getClusterId();
+        stackServiceIds.stream().forEach(new Consumer<Integer>() {
+            @Override
+            public void accept(Integer stackServiceId) {
+                // 查出该框架服务的角色
+                List<StackServiceRoleEntity> stackServiceRoleEntities = serviceRoleRepository.findByServiceIdOrderBySortNum(stackServiceId);
+                // 为该角色分配节点
+                List<AllocationRoleVO> allocationRoleVOS = stackServiceRoleEntities.stream().map(new Function<StackServiceRoleEntity, AllocationRoleVO>() {
+                    @Override
+                    public AllocationRoleVO apply(StackServiceRoleEntity stackServiceRoleEntity) {
+                        AllocationRoleVO allocationRoleVO = new AllocationRoleVO();
+                        BeanUtil.copyProperties(stackServiceRoleEntity, allocationRoleVO);
+                        allocationRoleVO.setStackRoleName(stackServiceRoleEntity.getName());
+                        allocationRoleVO.setNodeIds(assignNode2Role(stackServiceRoleEntity, clusterId));
+                        return allocationRoleVO;
+                    }
+                }).collect(Collectors.toList());
+                result.put(stackServiceId, allocationRoleVOS);
+            }
+        });
+
+        return ResultDTO.success(result);
+    }
+
+    /**
+     * todo 根据角色的type（master or slave）分配节点
+     */
+    private List<Integer> assignNode2Role(StackServiceRoleEntity stackServiceRoleEntity, Integer clusterId) {
+        List<Integer> result = null;
+        // 查询集群里的节点
+        List<ClusterNodeEntity> clusterNodeEntities = clusterNodeRepository.findByClusterId(clusterId);
+        Integer minNum = stackServiceRoleEntity.getMinNum();
+        Integer fixedNum = stackServiceRoleEntity.getFixedNum();
+        boolean needOdd = stackServiceRoleEntity.isNeedOdd();
+        if (fixedNum != null) {
+            result = clusterNodeEntities.stream().limit(fixedNum).map(ClusterNodeEntity::getId).collect(Collectors.toList());
+        }
+        if (minNum != null) {
+            result = clusterNodeEntities.stream().limit(minNum).map(ClusterNodeEntity::getId).collect(Collectors.toList());
+
+        }
+        return result;
     }
 
     /**
