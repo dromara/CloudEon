@@ -1,4 +1,5 @@
 import { Settings as LayoutSettings } from '@ant-design/pro-components';
+import example from '../src/assets/images/ic_launcher.png';
 
 const Settings: LayoutSettings & {
   pwa?: boolean;
@@ -14,7 +15,7 @@ const Settings: LayoutSettings & {
   colorWeak: false,
   title: 'E-Mapreduce',
   pwa: false,
-  logo: 'https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg',
+  logo: '../src/assets/images/ic_launcher.png',//'https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg',
   iconfontUrl: '',
 };
 
