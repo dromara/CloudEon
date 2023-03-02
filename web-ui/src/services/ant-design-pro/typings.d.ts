@@ -188,7 +188,16 @@ declare namespace API {
     };
   };
 
+  type validRuleItem = {
+    fixedNum?: null,
+    minNum?:number,
+    needOdd?:boolean,
+    nodeIds?:number[],
+    stackRoleName?:string
+  }
+
   type RolesItem = {
+    validRule?: validRuleItem;
     stackRoleName?: string,
     nodeIds?: number[]
   }
@@ -330,7 +339,7 @@ declare namespace API {
   type rolesValidResult = {
     success?: boolean;
     message?: string;
-    data?: rolesValid[];
+    data?: {[key:string]: rolesValid[]};
   }
 
 }
