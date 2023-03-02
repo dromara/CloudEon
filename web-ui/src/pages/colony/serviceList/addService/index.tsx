@@ -1,8 +1,8 @@
 import { PageContainer, ProCard } from '@ant-design/pro-components';
-import { Space, Steps, Button, Spin, message } from 'antd';
+import { Space, Steps, Button, Spin, message, notification, Alert } from 'antd';
 import { BorderOuterOutlined } from '@ant-design/icons';
 import { FormattedMessage, useIntl, history } from 'umi';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, SetStateAction } from 'react';
 import styles from './index.less';
 import { getServiceListAPI, checkServiceAPI, getServiceConfAPI, initServiceAPI, serviceListAPI, getRolesAllocationAPI } from '@/services/ant-design-pro/colony';
 import ChooseService from './components/ChooseService'
@@ -18,9 +18,12 @@ const serviceAdd: React.FC = () => {
   const [current, setCurrent] = useState(0);
   const [serviceListData, setServiceListData] = useState<any[]>();
   const [loading, setLoading] = useState(false);
-  const [allParams, setSubmitallParams] = useState<API.SubmitServicesParams>();
+  const [allParams, setSubmitallParams] = useState<API.SubmitServicesParams>(); // 安装提交的params
   const [serviceInfos, setServiceInfos] = useState<API.ServiceInfosItem[]>()
-  const [rolesAllNodeIds, setRolesAllNodeIds] = useState<API.rolesValid[]>()
+  const [rolesAllNodeIds, setRolesAllNodeIds] = useState<API.rolesValidResult>() //获取所有角色的推荐节点
+  const [checkRoleParNext, setCheckRoleParNext] = useState(true); // 判断分配角色的按钮是否disabled
+  // const [warnInfo, setWarnInfo] = useState<any[]>([]); // 校验角色配置选择
+  const [errInfo, setErrInfo] = useState<any[]>([]); // 校验角色配置选择
 
   const checkService = async (params: any) => {
     try {
@@ -116,6 +119,7 @@ const serviceAdd: React.FC = () => {
     }
     setSubmitallParams(params)
   }
+
   interface anyKey{
     [key:number]:any,
   }
@@ -181,6 +185,10 @@ const serviceAdd: React.FC = () => {
     setSubmitallParams(params)
   }
 
+  // const checkRoleNext = (value:boolean) =>{
+  //   setCheckRoleParNext(value)
+  // }
+
   const checkNext = () => {
     switch(current){
       case 0:
@@ -191,7 +199,7 @@ const serviceAdd: React.FC = () => {
         return true
       ;break;
       case 2:
-        return true
+        return checkRoleParNext
       ;break;
       case 3:
         return true
@@ -220,16 +228,20 @@ const serviceAdd: React.FC = () => {
     // setCurrent(value);
   };
 
-  const initServiceInfos = () =>{
+  const initServiceInfos = () =>{    
     const serArr = getSelectedService()?.map(item=>{
         return {
             stackServiceId: item.id,
             stackServiceName: item.name,
             stackServiceLabel: item.label,
             roles: item.roles.map((role: any)=>{
+              let roles = rolesAllNodeIds && rolesAllNodeIds[item.id].filter((roleItem: { stackRoleName: any; })=>{ return roleItem.stackRoleName == role}) 
+              let nodeIds = roles && roles.length>0 && roles[0].nodeIds || []
+              let validRule = roles[0]
                 return {
                     stackRoleName: role,
-                    nodeIds: []
+                    nodeIds: nodeIds,//[]
+                    validRule: validRule, // 角色选择节点的校验规则
                 }
             }),
             presetConfList:[],
@@ -249,6 +261,55 @@ const serviceAdd: React.FC = () => {
         history.replace('/colony/serviceList');
       },3)
     }
+  }
+
+  // 弹框角色分配校验结果
+  const [api, contextHolder] = notification.useNotification();
+  const openNotificationWithIcon = (errList:string[]) =>{
+      notification.destroy()
+      if(!errList || errList.length == 0) return
+      const errDom = errList.map(item=>{
+          return (<Alert type="error" key={item} message={item} banner />)
+      })
+      notification.open({
+          message: '温馨提示',
+          description:<>{errDom}</>,
+          duration:null,
+          style: {
+              width: 500
+          }
+        });
+  }
+
+  // 角色分配校验
+  const checkAllRolesRules = (serviceInfos:API.ServiceInfosItem[]) => {
+    if(!serviceInfos || serviceInfos.length == 0) return
+    setErrInfo([])
+    let errStr = ''
+    let errList:any[] = []
+    serviceInfos.forEach(item=>{
+      item.roles?.forEach(roleItem=>{
+        let { nodeIds } = roleItem
+        let {fixedNum, minNum, needOdd, stackRoleName} = roleItem.validRule
+        if(roleItem.validRule && stackRoleName){
+          if(minNum && (!nodeIds || nodeIds.length < minNum)){
+            errStr = `${stackRoleName} 要求至少选择${minNum}个节点数`
+            errList.push(errStr)
+          }
+          if(fixedNum && (!nodeIds || nodeIds.length != fixedNum)){
+            errStr = `${stackRoleName} 要求选择${fixedNum}个节点数`
+            errList.push(errStr)
+          }
+          if(needOdd && (!nodeIds || nodeIds.length%2 == 0)){
+            errStr = `${stackRoleName} 要求选择奇数个节点数`
+            errList.push(errStr)
+          }
+        }        
+      })
+    })
+    setCheckRoleParNext(errList && errList.length > 0 ? false : true)
+    setErrInfo(errList)
+    openNotificationWithIcon(errList)
   }
 
   useEffect(() => {
@@ -271,7 +332,7 @@ const serviceAdd: React.FC = () => {
           <div className={styles.stepsContent}>
             {(current == 0 && serviceListData ) && <ChooseService serviceList={serviceListData} changeStatus={changeStatus} />}
             { current == 1 && <ConfigSecurity selectListIds={selectListIds || []} setKerberosToParams={setKerberosToParams} />}
-            { current == 2 && <AssignRoles serviceList={ getSelectedService() || [] } sourceServiceInfos={serviceInfos || []} setServiceInfosToParams={setServiceInfosToParams} /> }
+            { current == 2 && <AssignRoles serviceList={ getSelectedService() || [] } sourceServiceInfos={serviceInfos || []} setServiceInfosToParams={setServiceInfosToParams} checkAllRolesRules={checkAllRolesRules} /> }
             { current == 3 && <ConfigService setPresetConfListToParams={setPresetConfListToParams} />}
             <div className={styles.stepBottomBtns}>
               <Button style={{ marginRight: '5px' }}               
@@ -285,6 +346,7 @@ const serviceAdd: React.FC = () => {
               >
                 {current == 0 ? '取消' : '上一步'}
               </Button>
+              {contextHolder}
               <Button type="primary" 
                 disabled={!checkNext()} 
                 onClick={()=>{
@@ -298,13 +360,20 @@ const serviceAdd: React.FC = () => {
                       if(checkResult) {
                         sessionStorage.setItem('colonyData',JSON.stringify({...colonyData , selectedServiceList: getSelectedService()}) )
                         setCurrent(current + 1);
-                        initServiceInfos()
+                        const ids = serviceListData?.map(sItem=>{return sItem.id})
+                        getRolesAll({ clusterId: colonyData.clusterId, stackServiceIds: ids})
                       }
                     })
                   } else if(current == 1){ // 配置安全下一步
                     setCurrent(current + 1);
-                    // getRolesAll({ clusterId: colonyData.clusterId, stackServiceId: })
+                    initServiceInfos()
 
+                  } else if(current == 2){ // 分配角色下一步
+                    // 校验节点
+                    serviceInfos && checkAllRolesRules(serviceInfos)
+                    setCurrent(current + 1);
+                    
+                    
                   } else if(current == 3){ // 安装
                     setPresetConfListToParams()
                     const initParams = {
@@ -312,8 +381,24 @@ const serviceAdd: React.FC = () => {
                       stackId: colonyData?.stackId,
                       clusterId: colonyData?.clusterId,
                     }
-                    console.log('--allParams: ', initParams);
+                    console.log('--allParams: ', allParams);
+                    if(initParams.serviceInfos){
+                      initParams.serviceInfos = allParams?.serviceInfos?.map(sItem=>{
+                        let roles = sItem.roles?.map(roleItem=>{
+                          return {
+                            nodeIds: roleItem.nodeIds,
+                            stackRoleName: roleItem.stackRoleName
+                          }
+                        })
+                        return {
+                          ...sItem,
+                          roles
+                        }
+                      })
+                    }
                     installService(initParams)
+                    // console.log('--initParams: ', initParams);
+                    
 
                   }else{
                     setCurrent(current + 1);
