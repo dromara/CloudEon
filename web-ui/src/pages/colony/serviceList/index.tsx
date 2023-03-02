@@ -98,7 +98,7 @@ const serviceList: React.FC = () => {
           (serviceList && serviceList.length > 0) ? (
             serviceList.map(sItem=>{
               return (
-                <Spin tip="Loading" key={sItem.serviceName} size="small" spinning={btnLoadingStatus(sItem.id)}>
+                <Spin tip="Loading" key={sItem.serviceName+'spin'} size="small" spinning={btnLoadingStatus(sItem.id)}>
                   <Card
                     hoverable
                     key={sItem.serviceName}
