@@ -2,6 +2,7 @@ import type { ProColumns } from '@ant-design/pro-components';
 import { ProTable, TableDropdown } from '@ant-design/pro-components';
 import { Spin } from 'antd';
 import { useState, useEffect } from 'react';
+import styles from './index.less'
 
 // export type TableListItem = {
 //     key: number;
@@ -39,11 +40,13 @@ const roleTab:React.FC<{rolesInfo: API.rolesInfos[], loading: Boolean}> = ({role
     const columns: ProColumns<API.rolesInfos>[] = [
         {
             title: '名称',
+            key:'name',
             dataIndex: 'name',
             // render: (_) => <a>{_}</a>,
         },
         {
             title: '状态',
+            key:'roleStatus',
             dataIndex: 'roleStatus',
             initialValue: 'all',
             valueEnum: {
@@ -56,22 +59,51 @@ const roleTab:React.FC<{rolesInfo: API.rolesInfos[], loading: Boolean}> = ({role
         },
         {
             title: '主机名称',
+            key:'nodeHostname',
             dataIndex: 'nodeHostname',
             align: 'left'
         },
         {
             title: '主机ip',
+            key:'nodeHostIp',
             dataIndex: 'nodeHostIp',
             align: 'left'
         },
         {
             title: 'ui地址',
+            key:'uiUrls',
             dataIndex: 'uiUrls',
-            align: 'left'
+            align: 'left',
+            render: (_, record) => {
+                return (
+                    <>
+                        {
+                            record?.uiUrls?.map((urlItem,index)=>{
+                                return (
+                                    <div 
+                                        key={index.toString()} 
+                                        style={{width:'200px', whiteSpace: 'pre-wrap'}} 
+                                        className={styles.urlLinkWrap} >
+                                            <a 
+                                                key={'url'+index.toString()} 
+                                                className={styles.urlLinkWrap}  
+                                                target="_blank" 
+                                                href={urlItem}
+                                                >
+                                                    {urlItem}
+                                            </a>
+                                    </div>
+                                )
+                            })
+                        }
+                    </>
+                )
+            }
         },
         {
             title: '操作',
             key: 'option',
+            dataIndex: 'option',
             valueType: 'option',
             render: () => [
                 <a key="link">启动</a>,
@@ -93,7 +125,7 @@ const roleTab:React.FC<{rolesInfo: API.rolesInfos[], loading: Boolean}> = ({role
             <Spin tip="Loading" size="small" spinning={!!loading}>
                 <ProTable
                     dataSource={rolesInfo}
-                    rowKey="key"
+                    rowKey="id"
                     pagination={{
                         showQuickJumper: true,
                     }}
