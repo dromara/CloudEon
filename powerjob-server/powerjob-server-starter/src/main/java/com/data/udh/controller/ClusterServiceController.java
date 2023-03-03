@@ -576,13 +576,19 @@ public class ClusterServiceController {
         // 数据库中查询服务实例配置
         List<ServiceConfiguration> serviceConfigurations = serviceInstanceConfigRepository.findByServiceInstanceId(serviceInstanceId)
                 .stream().map(serviceInstanceConfig -> {
-                    // 查询框架服务配置补全校验
-                    StackServiceConfEntity stackConfEntity = stackServiceConfRepository.findByNameAndServiceId(serviceInstanceConfig.getName(), stackServiceId);
                     ServiceConfiguration serviceConfiguration = new ServiceConfiguration();
                     BeanUtil.copyProperties(serviceInstanceConfig, serviceConfiguration);
-                    BeanUtil.copyProperties(stackConfEntity, serviceConfiguration);
-                    serviceConfiguration.setConfFile(serviceInstanceConfig.getConfFile());
-                    serviceConfiguration.setOptions(JSONObject.parseArray(stackConfEntity.getOptions(),String.class));
+                    // 查询框架服务配置补全校验
+                    StackServiceConfEntity stackConfEntity = stackServiceConfRepository.findByNameAndServiceId(serviceInstanceConfig.getName(), stackServiceId);
+                    if (stackConfEntity != null) {
+                        BeanUtil.copyProperties(stackConfEntity, serviceConfiguration);
+                        serviceConfiguration.setConfFile(serviceInstanceConfig.getConfFile());
+                        serviceConfiguration.setOptions(JSONObject.parseArray(stackConfEntity.getOptions(), String.class));
+                    }
+                    // 为自定义配置添加默认valueType
+                    if (serviceInstanceConfig.isCustomConf()) {
+                        serviceConfiguration.setValueType(ConfValueType.InputString.name());
+                    }
                     return serviceConfiguration;
                 }).collect(Collectors.toList());
 
