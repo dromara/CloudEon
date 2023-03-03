@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface StackServiceConfRepository extends JpaRepository<StackServiceConfEntity, Integer> {
     public StackServiceConfEntity findByStackIdAndNameAndServiceId(Integer stackId, String name, Integer serviceId);
+    public StackServiceConfEntity findByNameAndServiceId(String name, Integer serviceId);
 
     List<StackServiceConfEntity> findByServiceIdAndConfigurableInWizard(Integer serviceId, Boolean configurableInWizard);
     List<StackServiceConfEntity> findByServiceId(Integer serviceId);
