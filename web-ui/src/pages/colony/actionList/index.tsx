@@ -137,7 +137,7 @@ const actionList: React.FC = () => {
         return (
           <Progress 
             percent={record.currentProgress} 
-            strokeWidth={12} 
+            strokeWidth={8} 
             strokeColor={statusColor[record.commandState]} 
             size="small" 
             status={record.commandState=='RUNNING'?"active":'normal'} 

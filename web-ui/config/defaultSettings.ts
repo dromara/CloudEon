@@ -1,9 +1,16 @@
 import { Settings as LayoutSettings } from '@ant-design/pro-components';
-import example from '../src/assets/images/ic_launcher.png';
+import { Button, Image, Space } from 'antd';
+import { divide } from 'lodash';
+import React, { ReactNode } from 'react';
+import logoImg from '../src/assets/images/ic_launcher.png';
+
+// const logoImgDom:React.FC = () => { 
+//   return (<Image />)
+// }
 
 const Settings: LayoutSettings & {
   pwa?: boolean;
-  logo?: string;
+  logo?: ReactNode;
 } = {
   navTheme: 'light',
   // 拂晓蓝

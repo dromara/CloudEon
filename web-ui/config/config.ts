@@ -46,6 +46,7 @@ export default defineConfig({
     // https://ant.design/docs/react/customize-theme-variable-cn
     'root-entry-name': 'default',
     "primary-color": "#fa8c16",// 全局主色  绿色 #1DA57A ； 橙色 #fa8c16  
+    '--ant-primary-1': "#fa8c16",
     // 'link-color': '#fa8c16', // 链接色
     // '--ant-primary-color-hover': '#fa8c16',
   },
