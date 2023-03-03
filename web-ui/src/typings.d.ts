@@ -16,9 +16,8 @@ declare module '@antv/data-set';
 declare module 'mockjs';
 declare module 'react-fittext';
 declare module 'bizcharts-plugin-slider';
-declare module 'codemirror/lib/codemirror.js'
-declare module 'codemirror/mode/sql/sql.js'
-declare module 'codemirror/mode/javascript/javascript.js'
+declare module 'react-syntax-highlighter';
+declare module 'react-syntax-highlighter/dist/esm/styles/hljs';
 
 // preview.pro.ant.design only do not use in your production ;
 // preview.pro.ant.design Dedicated environment variable, please do not use it in your project.

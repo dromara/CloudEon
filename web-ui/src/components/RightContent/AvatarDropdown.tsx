@@ -8,6 +8,7 @@ import React, { useCallback } from 'react';
 import { history, useModel } from 'umi';
 import HeaderDropdown from '../HeaderDropdown';
 import styles from './index.less';
+import userImg from '../../assets/images/user.png'
 
 export type GlobalHeaderRightProps = {
   menu?: boolean;
@@ -101,7 +102,8 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) => {
   return (
     <HeaderDropdown overlay={menuHeaderDropdown}>
       <span className={`${styles.action} ${styles.account}`}>
-        <Avatar size="small" className={styles.avatar} src={currentUser.avatar} alt="avatar" />
+      {/* currentUser.avatar */}
+        <Avatar size="small" className={styles.avatar} src={userImg} alt="avatar" />
         <span className={`${styles.name} anticon`}>{currentUser.name}</span>
       </span>
     </HeaderDropdown>

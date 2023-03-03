@@ -504,13 +504,13 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( setPresetConf
                         </Select>
                     </Form.Item>
 
-                    <Form.Item
+                    {/* <Form.Item
                         label="描述"
                         name="description"
                         rules={[]}
                     >
                     <TextArea rows={4} placeholder="请输入描述" />
-                    </Form.Item>
+                    </Form.Item> */}
                 </Form>
                 </div>
             </Modal>
