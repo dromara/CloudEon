@@ -5,9 +5,11 @@ import type { Settings as LayoutSettings } from '@ant-design/pro-components';
 import { PageLoading, SettingDrawer } from '@ant-design/pro-components';
 import type { RunTimeLayoutConfig } from 'umi';
 import { history, RequestConfig } from 'umi';
-import { message, theme } from 'antd';
+import { message, Image } from 'antd';
 import defaultSettings from '../config/defaultSettings';
 import { currentUser as queryCurrentUser } from './services/ant-design-pro/api';
+import logoImg from '../src/assets/images/ic_launcher.png';
+import userImg from '../src/assets/images/user.png'
 
 
 const isDev = process.env.NODE_ENV === 'development';
@@ -151,5 +153,6 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
       );
     },
     ...initialState?.settings,
+    logo:<><Image src={logoImg}/></>
   };
 };

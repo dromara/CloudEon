@@ -222,6 +222,16 @@ export async function getRolesAllocationAPI(options?: { [key: string]: any }) {
   });
 }
 
+/** 查询服务实例配置 */
+export async function getListConfsAPI(options?: { [key: string]: any }) {
+  return request<API.serviceRolesResult>('/service/listConfs', {
+    method: 'GET',
+    params: {
+      ...options,
+    },
+  });
+}
+
 
 
 

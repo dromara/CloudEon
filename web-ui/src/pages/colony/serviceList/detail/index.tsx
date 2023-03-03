@@ -119,15 +119,11 @@ const serviceListDetail: React.FC = () => {
   return (
     <div className={styles.pageContentLayout}>
       <PageContainer
+      key='serviceDetailPage'
       header={ {
           title: <>{serviceName}</>,
           extra: [
-            <div className={styles.btnsWrap}>
-              {/* <Radio.Group value={selectACT} onChange={(e) => setSelectACT(e.target.value)}>
-                <Radio.Button value="1"  onClick={()=> handleACT('start')}>启动</Radio.Button>
-                <Radio.Button value="2" onClick={()=> handleACT('stop')}>停止</Radio.Button>
-                <Radio.Button value="3" onClick={()=> handleACT('restart')}>重启</Radio.Button>
-              </Radio.Group> */}
+            <div className={styles.btnsWrap} key="serviceDetailPageBtns" >
               <Button 
                 key="start" 
                 type="primary"
@@ -135,7 +131,7 @@ const serviceListDetail: React.FC = () => {
                 loading={btnLoadingStatus('start')} 
                 disabled={btnDisabledStatus('start')} 
                 onClick={()=> handleACT('start')}
-                icon={<PlayCircleOutlined/>}
+                icon={<PlayCircleOutlined key="startIcon"/>}
               >
                 启动
               </Button>
@@ -146,7 +142,7 @@ const serviceListDetail: React.FC = () => {
                 loading={btnLoadingStatus('stop')} 
                 disabled={btnDisabledStatus('stop')}  
                 onClick={()=> handleACT('stop')}
-                icon={<PoweroffOutlined />}
+                icon={<PoweroffOutlined key="stopIcon" />}
               >
                 停止
               </Button>
@@ -157,7 +153,7 @@ const serviceListDetail: React.FC = () => {
                 loading={btnLoadingStatus('restart')} 
                 disabled={btnDisabledStatus('restart')}  
                 onClick={()=> handleACT('restart')}
-                icon={<ReloadOutlined />}
+                icon={<ReloadOutlined key="restartIcon" />}
               >
                 重启
               </Button>
@@ -168,7 +164,7 @@ const serviceListDetail: React.FC = () => {
                 loading={btnLoadingStatus('update')} 
                 disabled={btnDisabledStatus('update')}  
                 onClick={()=> handleACT('update')}
-                icon={<ExceptionOutlined />}
+                icon={<ExceptionOutlined key="updateIcon"  />}
               >
                   更新配置
               </Button>
@@ -179,45 +175,14 @@ const serviceListDetail: React.FC = () => {
                 loading={btnLoadingStatus('delete')} 
                 disabled={btnDisabledStatus('delete')}  
                 onClick={()=> handleACT('delete')}
-                icon={<DeleteOutlined />}
+                icon={<DeleteOutlined key="deleteIcon" />}
               >
                 删除
               </Button>
             </div> 
           ]
       }}
-      // tabList={[
-      //   {
-      //     tab: '状态',
-      //     key: '1',
-      //   },
-      //   {
-      //     tab: '角色',
-      //     key: '2',
-      //   },
-      //   {
-      //     tab: '配置',
-      //     key: '3',
-      //   },
-      // ]}
-      // tabProps={{
-      //   type: 'card',
-      //   hideAdd: true,
-      //   onEdit: (e, action) => console.log(e, action),
-      //   onChange: onChange
-      // }}
       >
-        {/* <div className={styles.headerInfos}>
-          <div className={styles.title}> {serviceName} </div>
-          
-          <div className={styles.btnsWrap}>
-            <Button key="1">启动</Button>
-            <Button key="2">停止</Button>
-            <Button key="3">重启</Button>
-            <Button key="4">更新配置</Button>
-            <Button key="5">删除</Button>
-          </div>
-        </div> */}
         <Tabs
           onChange={onChange}
           type="card"

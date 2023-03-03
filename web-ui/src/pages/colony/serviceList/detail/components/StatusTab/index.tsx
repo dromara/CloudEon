@@ -26,23 +26,23 @@ const statusTab:React.FC<{statusInfo: API.serviceInfos, loading: boolean}> = ({s
                                 ellipsis: true,
                                 // copyable: true,
                             },
-                            {
-                                title: '服务状态',
-                                key: 'serviceStatus',
-                                dataIndex: 'serviceStatus',
-                                valueType: 'select',
-                                valueEnum: {
-                                    all: { text: '全部', status: 'Default' },
-                                    open: {
-                                        text: '出错',
-                                        status: 'Error',
-                                    },
-                                    closed: {
-                                        text: '运行中',
-                                        status: 'OPERATING',
-                                    },
-                                },
-                            },
+                            // {
+                            //     title: '服务状态',
+                            //     key: 'serviceStatus',
+                            //     dataIndex: 'serviceStatus',
+                            //     valueType: 'select',
+                            //     valueEnum: {
+                            //         all: { text: '全部', status: 'Default' },
+                            //         open: {
+                            //             text: '出错',
+                            //             status: 'Error',
+                            //         },
+                            //         closed: {
+                            //             text: '运行中',
+                            //             status: 'OPERATING',
+                            //         },
+                            //     },
+                            // },
                             {
                                 title: '服务实例名',
                                 key: 'name',
@@ -59,6 +59,13 @@ const statusTab:React.FC<{statusInfo: API.serviceInfos, loading: boolean}> = ({s
                                 title: '服务描述',
                                 key: 'stackServiceDesc',
                                 dataIndex: 'stackServiceDesc',
+                                ellipsis: true,
+                                // copyable: true,
+                            },
+                            {
+                                title: '镜像',
+                                key: 'dockerImage',
+                                dataIndex: 'dockerImage',
                                 ellipsis: true,
                                 // copyable: true,
                             }
@@ -80,10 +87,13 @@ const statusTab:React.FC<{statusInfo: API.serviceInfos, loading: boolean}> = ({s
                 </div>
                 <div className={styles.rightBox}>
                     <div style={{whiteSpace: 'nowrap'}}> 
-                        <span style={{backgroundColor: statusColor['SUCCESS']}} 
-                            className={styles.statusCircel}>
-                        </span>
-                        健康
+                        <div>服务状态：</div>
+                        <div className={styles.statusTitle}>
+                            <span style={{backgroundColor: statusColor['SUCCESS']}} 
+                                className={styles.statusCircel}>
+                            </span>
+                            健康
+                        </div>
                     </div>
                 {/* <ProDescriptions
                     title=""
