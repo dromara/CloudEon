@@ -8,10 +8,11 @@
         padding: 5px 10px;
         font-size: 16px;
         font-weight: 500;
-        background-color: #9cabc6;
-        color: #fff;
+        // background-color: #9cabc6;
+        color: #000;
         display: flex;
         align-items: center;
+        border-bottom: 1px solid #f3f1f1;
     }
     .content{
         border-top: 1px solid rgb(224, 223, 223);
@@ -29,12 +30,12 @@
                     cursor: pointer;
                     &:hover{
                         color: @primary-color;
-                        background-color: var(--ant-primary-1);
+                        background-color: #fff7e6;
                     }
                 }
                 .activetaskmenu{
                     color: @primary-color;
-                    background-color: var(--ant-primary-1);
+                    background-color: #fff7e6;
                 }
             }
             .contentRight{
@@ -94,7 +95,8 @@
     }
     .titleWrap{
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
+        align-items: center;
         padding: 20px 40px;
         .title{
             display: flex;
@@ -106,8 +108,8 @@
             flex: 1;
             flex-wrap: wrap;
             .otherInfoItem{
-                margin: 8px 0;
-                width: 300px;
+                margin: 0 0 8px;
+                width: 260px;
             }
         }
         .allProcessBar{

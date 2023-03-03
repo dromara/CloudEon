@@ -6,13 +6,9 @@ import { formatDate } from '@/utils/common'
 import { useState, useEffect, ReactChild, ReactFragment, ReactPortal } from 'react';
 import { getCommandDetailAPI, getTaskLogAPI } from '@/services/ant-design-pro/colony';
 import { FormattedMessage, history, SelectLang, useIntl, useModel } from 'umi';
-// import CodeMirror from 'react-codemirror';
-// import CodeMirror1 from 'codemirror';
-import { UnControlled as CodeMirror } from "react-codemirror2";
-import "codemirror/lib/codemirror.css";
-import "codemirror/lib/codemirror.js";
-import 'codemirror/theme/midnight.css';
-import 'codemirror/mode/clike/clike.js';
+
+import SyntaxHighlighter from 'react-syntax-highlighter';
+import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 
 const actionDetail: React.FC = () => {
 
@@ -60,8 +56,8 @@ const actionDetail: React.FC = () => {
 
   const handleLog = (id: number) => {
     if(!id) return
-    const codemirrorDom = document.getElementsByClassName('CodeMirror')[0]
-    codemirrorDom.setAttribute("style","height: auto")
+    // const codemirrorDom = document.getElementsByClassName('CodeMirror')[0]
+    // codemirrorDom.setAttribute("style","height: auto")
     setIsModalOpen(true)
     getTaskLog({commandTaskId: id})
   }
@@ -88,9 +84,25 @@ const actionDetail: React.FC = () => {
             <Spin tip="Loading" size="small" spinning={loading} style={{height:'100%',width:'100%'}}>
             {commandInfos?.id && (
             <div className={styles.commandLayout}>
-                <div className={styles.titleBar}>{commandInfos.name}{`( ${commandInfos.currentProgress}/100) `}</div>
+                <div className={styles.titleBar}>{commandInfos.name}</div>
                     <div className={styles.titleWrap}>
                         {/* <div className={styles.titleBar}>{commandInfos.name}</div> */}
+
+                        <div className={styles.allProcessBar}>
+                            {/* <div style={{width:'60px'}}>总进度：</div> */}
+                            <Progress 
+                                percent={commandInfos.currentProgress} 
+                                strokeWidth={10} 
+                                width={70}
+                                type="circle"
+                                // format={percent => `总进度：${commandInfos.currentProgress}%`}
+                                strokeColor={statusColor[commandInfos.commandState ||'DEFAULT']} 
+                                size="small" 
+                                // trailColor={trailColor[commandInfos.commandState ||'DEFAULT']}
+                                status={commandInfos.commandState=='RUNNING'?"active":'normal'} 
+                                style={{minWidth:'120px'}}
+                            />
+                        </div>
                         <div className={styles.otherInfo}>
                             <div className={styles.otherInfoItem}>
                                 状态：
@@ -100,21 +112,10 @@ const actionDetail: React.FC = () => {
                                     {commandInfos.commandState}
                                 </div>
                             </div>
-                            <div className={styles.otherInfoItem}>提交时间：{formatDate(commandInfos.submitTime, 'yyyy-MM-dd hh:mm:ss')}</div>
                             <div className={styles.otherInfoItem}>开始时间：{formatDate(commandInfos.startTime, 'yyyy-MM-dd hh:mm:ss')}</div>
                             <div className={styles.otherInfoItem}>结束时间：{formatDate(commandInfos.endTime, 'yyyy-MM-dd hh:mm:ss')}</div>
+                            <div className={styles.otherInfoItem}>提交时间：{formatDate(commandInfos.submitTime, 'yyyy-MM-dd hh:mm:ss')}</div>
                             <div className={styles.otherInfoItem}>操作人：{commandInfos.operateUserId}</div>
-                        </div>
-                        <div className={styles.allProcessBar}><div style={{width:'60px'}}>进度：</div>
-                            <Progress 
-                                percent={commandInfos.currentProgress} 
-                                strokeWidth={20} 
-                                strokeColor={statusColor[commandInfos.commandState ||'DEFAULT']} 
-                                size="small" 
-                                // trailColor={trailColor[commandInfos.commandState ||'DEFAULT']}
-                                status={commandInfos.commandState=='RUNNING'?"active":'normal'} 
-                                style={{minWidth:'150px'}}
-                            />
                         </div>
                     </div>
                     <div className={styles.content}>
@@ -144,7 +145,7 @@ const actionDetail: React.FC = () => {
                                                     <div className={styles.taskTimeWrap}>
                                                         <Progress 
                                                             percent={taskDetail.progress} 
-                                                            strokeWidth={10} 
+                                                            strokeWidth={8} 
                                                             strokeColor={statusColor[taskDetail.commandState||'DEFAULT']} 
                                                             size="small" 
                                                             status={taskDetail.commandState=='RUNNING'?"active":'normal'} 
@@ -187,24 +188,9 @@ const actionDetail: React.FC = () => {
                 >
                     {/* <div dangerouslySetInnerHTML={{__html:logData}} /> */}
                     <Spin tip="Loading" size="small" spinning={detailLoading}>
-                    <CodeMirror
-                        value={logData || ''}
-                        options={{
-                            lineNumbers: true,
-                            mode: { name: "text/x-java" },
-                            extraKeys: { Ctrl: "autocomplete" },
-                            autofocus: false,
-                            styleActiveLine: true,
-                            lineWrapping: true,
-                            foldGutter: false,
-                            indentUnit: 4,// 缩进
-                            // gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
-                            readOnly: true,
-                            theme: "midnight",   
-                            // 设置换行分隔符，null的时候为默认的 \n
-                            // lineSeparator: 'a',
-                        }}
-                        />
+                    <SyntaxHighlighter language="yaml" style={tomorrow} showLineNumbers>
+                        {logData}
+                    </SyntaxHighlighter>
                     </Spin>
                 </Modal>
         </PageContainer>
