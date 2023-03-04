@@ -6,6 +6,7 @@ import lombok.Data;
 public class ServiceCustomConf {
 
     private String name;
+    private Integer id;
     private String value;
     /**
      * 所属配置文件

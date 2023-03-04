@@ -162,7 +162,7 @@ public class ClusterServiceController {
             List<ServicePresetConf> presetConfList = serviceInfo.getPresetConfList();
             // 用户自定义配置
             List<ServiceCustomConf> customConfList = serviceInfo.getCustomConfList();
-            fillInstanceConfigEntities(stackId, stackServiceId, serviceInstanceEntityId, serviceInstanceConfigEntities, presetConfList, customConfList);
+            fillInstanceConfigEntities(stackId, stackServiceId, serviceInstanceEntityId, serviceInstanceConfigEntities, presetConfList, customConfList,true);
             serviceInstanceConfigRepository.saveAllAndFlush(serviceInstanceConfigEntities);
 
             // 获取需要安装的service 所有角色
@@ -260,7 +260,7 @@ public class ClusterServiceController {
      */
     private void fillInstanceConfigEntities(Integer stackId, Integer stackServiceId, Integer serviceInstanceEntityId,
                                             List<ServiceInstanceConfigEntity> serviceInstanceConfigEntities, List<ServicePresetConf> presetConfList,
-                                            List<ServiceCustomConf> customConfList) {
+                                            List<ServiceCustomConf> customConfList, boolean isInit) {
         List<ServiceInstanceConfigEntity> presetInstanceConfigEntities = presetConfList.stream().map(new Function<ServicePresetConf, ServiceInstanceConfigEntity>() {
             @Override
             public ServiceInstanceConfigEntity apply(ServicePresetConf initServicePresetConf) {
@@ -280,28 +280,30 @@ public class ClusterServiceController {
             }
         }).collect(Collectors.toList());
 
-        //  除初始化时页面上的配置，还得加载框架本身的默认配置
-        List<StackServiceConfEntity> configNotInWizard = stackServiceConfRepository.findByServiceIdAndConfigurableInWizard(stackServiceId, false);
-        List<ServiceInstanceConfigEntity> configNotInWizardInstanceConfigEntities = configNotInWizard.stream().map(new Function<StackServiceConfEntity, ServiceInstanceConfigEntity>() {
-            @Override
-            public ServiceInstanceConfigEntity apply(StackServiceConfEntity stackServiceConfEntity) {
-                ServiceInstanceConfigEntity serviceInstanceConfigEntity = new ServiceInstanceConfigEntity();
-                serviceInstanceConfigEntity.setName(stackServiceConfEntity.getName());
-                // 用默认值作为value
-                serviceInstanceConfigEntity.setValue(stackServiceConfEntity.getRecommendExpression());
-                serviceInstanceConfigEntity.setRecommendedValue(stackServiceConfEntity.getRecommendExpression());
-                serviceInstanceConfigEntity.setUpdateTime(new Date());
-                serviceInstanceConfigEntity.setCreateTime(new Date());
-                if (StrUtil.isNotBlank(stackServiceConfEntity.getConfFile())) {
-                    serviceInstanceConfigEntity.setConfFile(stackServiceConfEntity.getConfFile());
+        if (isInit) {
+            //  除初始化时页面上的配置，还得加载框架本身的默认配置
+            List<StackServiceConfEntity> configNotInWizard = stackServiceConfRepository.findByServiceIdAndConfigurableInWizard(stackServiceId, false);
+            List<ServiceInstanceConfigEntity> configNotInWizardInstanceConfigEntities = configNotInWizard.stream().map(new Function<StackServiceConfEntity, ServiceInstanceConfigEntity>() {
+                @Override
+                public ServiceInstanceConfigEntity apply(StackServiceConfEntity stackServiceConfEntity) {
+                    ServiceInstanceConfigEntity serviceInstanceConfigEntity = new ServiceInstanceConfigEntity();
+                    serviceInstanceConfigEntity.setName(stackServiceConfEntity.getName());
+                    // 用默认值作为value
+                    serviceInstanceConfigEntity.setValue(stackServiceConfEntity.getRecommendExpression());
+                    serviceInstanceConfigEntity.setRecommendedValue(stackServiceConfEntity.getRecommendExpression());
+                    serviceInstanceConfigEntity.setUpdateTime(new Date());
+                    serviceInstanceConfigEntity.setCreateTime(new Date());
+                    if (StrUtil.isNotBlank(stackServiceConfEntity.getConfFile())) {
+                        serviceInstanceConfigEntity.setConfFile(stackServiceConfEntity.getConfFile());
+                    }
+
+                    serviceInstanceConfigEntity.setServiceInstanceId(serviceInstanceEntityId);
+                    serviceInstanceConfigEntity.setUserId(AdminUserId);
+                    return serviceInstanceConfigEntity;
                 }
-
-                serviceInstanceConfigEntity.setServiceInstanceId(serviceInstanceEntityId);
-                serviceInstanceConfigEntity.setUserId(AdminUserId);
-                return serviceInstanceConfigEntity;
-            }
-        }).collect(Collectors.toList());
-
+            }).collect(Collectors.toList());
+            serviceInstanceConfigEntities.addAll(configNotInWizardInstanceConfigEntities);
+        }
 
         List<ServiceInstanceConfigEntity> customInstanceConfigEntityStream = customConfList.stream().map(new Function<ServiceCustomConf, ServiceInstanceConfigEntity>() {
             @Override
@@ -319,7 +321,6 @@ public class ClusterServiceController {
 
         // 批量持久化service Conf信息
         serviceInstanceConfigEntities.addAll(presetInstanceConfigEntities);
-        serviceInstanceConfigEntities.addAll(configNotInWizardInstanceConfigEntities);
         serviceInstanceConfigEntities.addAll(customInstanceConfigEntityStream);
     }
 
@@ -577,7 +578,7 @@ public class ClusterServiceController {
         List<ServiceConfiguration> serviceConfigurations = serviceInstanceConfigRepository.findByServiceInstanceId(serviceInstanceId)
                 .stream().map(serviceInstanceConfig -> {
                     ServiceConfiguration serviceConfiguration = new ServiceConfiguration();
-                    BeanUtil.copyProperties(serviceInstanceConfig, serviceConfiguration);
+
                     // 查询框架服务配置补全校验
                     StackServiceConfEntity stackConfEntity = stackServiceConfRepository.findByNameAndServiceId(serviceInstanceConfig.getName(), stackServiceId);
                     if (stackConfEntity != null) {
@@ -585,6 +586,7 @@ public class ClusterServiceController {
                         serviceConfiguration.setConfFile(serviceInstanceConfig.getConfFile());
                         serviceConfiguration.setOptions(JSONObject.parseArray(stackConfEntity.getOptions(), String.class));
                     }
+                    BeanUtil.copyProperties(serviceInstanceConfig, serviceConfiguration);
                     // 为自定义配置添加默认valueType
                     if (serviceInstanceConfig.isCustomConf()) {
                         serviceConfiguration.setValueType(ConfValueType.InputString.name());
@@ -681,7 +683,9 @@ public class ClusterServiceController {
         Integer stackServiceId = serviceInstanceEntity.getStackServiceId();
         Integer stackId = stackServiceRepository.findById(stackServiceId).get().getStackId();
         List<ServiceInstanceConfigEntity> serviceInstanceConfigEntities = new ArrayList<>();
-        fillInstanceConfigEntities(stackId, stackServiceId, serviceInstanceId, serviceInstanceConfigEntities, serviceConfUpgradeRequest.getPresetConfList(), serviceConfUpgradeRequest.getCustomConfList());
+        List<ServiceCustomConf> customConfList = serviceConfUpgradeRequest.getCustomConfList();
+        List<ServicePresetConf> presetConfList = serviceConfUpgradeRequest.getPresetConfList();
+        fillInstanceConfigEntities(stackId, stackServiceId, serviceInstanceId, serviceInstanceConfigEntities, presetConfList, customConfList,false);
         serviceInstanceConfigRepository.saveAllAndFlush(serviceInstanceConfigEntities);
         return ResultDTO.success(null);
     }
