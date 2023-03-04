@@ -7,6 +7,7 @@ import java.util.List;
 @Data
 public class ServiceConfiguration {
     private String name;
+    private Integer id;
     private String description;
     private String label;
     private String recommendExpression;
