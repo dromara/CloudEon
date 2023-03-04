@@ -169,6 +169,7 @@ declare namespace API {
   };
 
   type ConfItem = {
+    value: string;
     isCustomConf: any;
     name?: string,
     description?: string,

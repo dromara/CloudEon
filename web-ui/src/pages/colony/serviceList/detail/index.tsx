@@ -128,6 +128,7 @@ const serviceListDetail: React.FC = () => {
                 key="start" 
                 type="primary"
                 size='small'
+                className={styles.btnStart}
                 loading={btnLoadingStatus('start')} 
                 disabled={btnDisabledStatus('start')} 
                 onClick={()=> handleACT('start')}
@@ -138,7 +139,8 @@ const serviceListDetail: React.FC = () => {
               <Button 
                 key="stop" 
                 size='small'
-                type="primary" danger
+                type="primary" 
+                className={styles.btnStop}
                 loading={btnLoadingStatus('stop')} 
                 disabled={btnDisabledStatus('stop')}  
                 onClick={()=> handleACT('stop')}

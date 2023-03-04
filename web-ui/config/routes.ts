@@ -1,4 +1,5 @@
-﻿export default [
+﻿
+export default [
   // {
   //   path: '/colony',
   //   layout: true,
@@ -14,7 +15,7 @@
   //       // hideInMenu: true,
   //     },
   //     {
-  //       name: '节点列表',
+  //       name: '节点',
   //       icon: 'smile',
   //       path: '/colony/nodeList',
   //       component: './colony/nodeList',
@@ -37,12 +38,14 @@
     icon: 'DeploymentUnitOutlined',
     path: '/colony/nodeList',
     component: './colony/nodeList',
+    footerRender: false, // 不展示页脚
   },
   {
     name: 'servicelist',
     icon: 'ControlOutlined',
     path: '/colony/serviceList',
     component: './colony/serviceList',
+    footerRender: false, // 不展示页脚
   },
   {
     name: 'addService',

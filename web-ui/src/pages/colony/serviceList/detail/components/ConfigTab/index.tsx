@@ -1,149 +1,200 @@
 
 import styles from './index.less'
 import React, { useState, useEffect, useRef } from 'react';
-import { Menu, Form, Table, Button, Typography, Popconfirm, InputNumber, Input, Tooltip, Modal, Select, Slider, Switch } from 'antd';
-import { getServiceConfAPI } from '@/services/ant-design-pro/colony';
+import { Menu, Form, Table, Button, Typography, Popconfirm, InputNumber, Input, Tooltip, Modal, Select, Slider, Switch, message } from 'antd';
+import { getServiceConfAPI, getListConfsAPI, saveServiceConfAPI } from '@/services/ant-design-pro/colony';
 const { TextArea } = Input;
+import {cloneDeep} from 'lodash'
 
-const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( setPresetConfListToParams )=>{
+const ConfigService:React.FC<{serviceId: number}> = ( {serviceId} )=>{
 
     const [form] = Form.useForm()
+    const [initConfList, setInitConfList] = useState<any[]>();
     const [currentConfList, setCurrentConfList] = useState<any[]>();
     const [loading, setLoading] = useState(false);
-    const [serviceId, setServiceId] = useState(null);
+    // const [serviceId, setServiceId] = useState(null);
     const [editingKey, setEditingKey] = useState('');
-    const [confData, setConfData] = useState({});
+    const [isEditMode, setIsEditMode] = useState(false);
+    // const [confData, setConfData] = useState({});
     const [addConfigForm] = Form.useForm()
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [customFileNames, setCustomFileNamesData] = useState<any>(); // 当前服务的配置文件
     const [currentNames, setCurrentNames] = useState<any[]>([]); // 当前服务的所有配置项名称，用来校验新增自定义配置的时候配置项名称重复
     
-    const getData = JSON.parse(sessionStorage.getItem('colonyData') || '{}')
+    // const getData = JSON.parse(sessionStorage.getItem('colonyData') || '{}')
 
-    const serviceMenu = getData.selectedServiceList.map((sItem: { label: any; id: any; })=>{
-        return {
-            label: sItem.label,
-            key: sItem.id + '',
-        }
-    })|| []
+    // const serviceMenu = getData.selectedServiceList.map((sItem: { label: any; id: any; })=>{
+    //     return {
+    //         label: sItem.label,
+    //         key: sItem.id + '',
+    //     }
+    // })|| []
 
-    const updateConfig = (value:any) => {
-        sessionStorage.setItem('allConfData', JSON.stringify(value))
-        setConfData(value)
-    }
+    // const updateConfig = (value:any) => {
+    //     sessionStorage.setItem('allConfData', JSON.stringify(value))
+    //     setConfData(value)
+    // }
 
 
-    useEffect(()=>{        
-        if(serviceMenu && serviceMenu.length>0){
-            setServiceId(serviceMenu[0].key)
-            const params = {
-                serviceId: serviceMenu[0].key,
-                inWizard: true
-            }
-            getConfListData(params)
-        }
+    useEffect(()=>{
+        getConfListData()
     },[])
     
 
-    const getConfListData = async (params: any) => {
-        if(confData && confData[params.serviceId]){
-            setCurrentConfList(confData[params.serviceId])
-            setCurrentNames(confData[params.serviceId].map((item: { name: any; })=>{return item.name}))
-            const customFileNamesObj = JSON.parse(sessionStorage.getItem('customFileNamesObj') || '{}') 
-            setCustomFileNamesData(customFileNamesObj[params.serviceId] || [])
-            return
-        }else{
+    const getConfListData = async () => {
+        const params = {serviceInstanceId: serviceId}
+        // if(confData && confData[params.serviceId]){
+        //     setCurrentConfList(confData[params.serviceId])
+        //     setCurrentNames(confData[params.serviceId].map((item: { name: any; })=>{return item.name}))
+        //     const customFileNamesObj = JSON.parse(sessionStorage.getItem('customFileNamesObj') || '{}') 
+        //     setCustomFileNamesData(customFileNamesObj[params.serviceId] || [])
+        //     return
+        // }else{
             setLoading(true)
-            const result: API.ConfList =  await getServiceConfAPI(params);
+            const result: API.ConfList =  await getListConfsAPI(params);
             setLoading(false)
-            const confs = result?.data?.confs?.map(item=>{
+            const confs = result?.data?.confs?.map((item,index)=>{
                     return {
-                        sourceValue: item.recommendExpression,
+                        sourceValue: item.valueType == "Switch" ? eval(item.recommendExpression||'') : item.recommendExpression,
                         ...item,
+                        value: item.valueType == "Switch" ? eval(item.value) : item.value,
+                        recommendExpression: item.valueType == "Switch" ? eval(item.recommendExpression||'') : item.recommendExpression,
                     }
                 })
-            setCurrentConfList(confs)
+            // const deepCf = JSON.parse(JSON.stringify(confs))
+            setInitConfList(cloneDeep(confs))
+            setCurrentConfList(cloneDeep(confs))
             setCurrentNames(confs?.map((item2)=>{return item2.name}) || [])
-            const customFileNamesObj = JSON.parse(sessionStorage.getItem('customFileNamesObj') || '{}') 
-            customFileNamesObj[params.serviceId] = result?.data?.customFileNames
-            sessionStorage.setItem('customFileNamesObj', JSON.stringify(customFileNamesObj))
-            setCustomFileNamesData(result?.data?.customFileNames || [])
-            let confResult = {...(confData||{}),[params.serviceId]:confs}
-            updateConfig(confResult)
-        }
+            const customFileNames = result?.data?.customFileNames
+            setCustomFileNamesData(customFileNames)
+            // const customFileNamesObj = JSON.parse(sessionStorage.getItem('customFileNamesObj') || '{}') 
+            // customFileNamesObj[params.serviceId] = result?.data?.customFileNames
+            // sessionStorage.setItem('customFileNamesObj', JSON.stringify(customFileNamesObj))
+            // setCustomFileNamesData(result?.data?.customFileNames || [])
+            // let confResult = {...(confData||{}),[params.serviceId]:confs}
+            // updateConfig(confResult)
+        // }
       };
 
-    const onSelectService = function(value: any){
-        // if(serviceId){// 保存切换前的数据
-        //     let confResult = {...confData,[serviceId]:currentConfList}
-        //     updateConfig(confResult)
-        // }
-        setServiceId(value.key)
-        const params = {
-            serviceId: value.key,
-            inWizard: true
-        }
-        getConfListData(params)
-    }
+    // const onSelectService = function(value: any){
+    //     // if(serviceId){// 保存切换前的数据
+    //     //     let confResult = {...confData,[serviceId]:currentConfList}
+    //     //     updateConfig(confResult)
+    //     // }
+    //     setServiceId(value.key)
+    //     const params = {
+    //         serviceId: value.key,
+    //         inWizard: true
+    //     }
+    //     getConfListData(params)
+    // }
 
-    const isEditing = (record: Item) => record.name === editingKey;
+    // const isEditing = (record: Item) => record.name === editingKey;
 
-    const edit = (record: Item) => {
-        form.setFieldsValue({ ...record });
-        setEditingKey(record.name || '');
-    };
+    // const edit = (record: Item) => {
+    //     form.setFieldsValue({ ...record });
+    //     setEditingKey(record.name || '');
+    // };
     
-    const cancel = () => {
-        setEditingKey('');
-    };
+    // const cancel = () => {
+    //     setEditingKey('');
+    // };
 
     const handleDelete = (record: Item) => {
-        const newData = [...(currentConfList||[])];
+        const newData = [...(JSON.parse(JSON.stringify(currentConfList))||[])];
         const index = newData.findIndex(item => record.name === item.name);
         if(index > -1){
             newData.splice(index,1)
+            console.log('--newData: ', newData);
+            
             setCurrentConfList(newData);
         }
     }
 
-    const resetSource = (record: Item) => {
+    const resetSource = (record: Item, index:number) => {
         console.log('---record: ', record);
-        const row = {...record, recommendExpression: record.sourceValue}
-        const newData = [...(currentConfList||[])];
-        const index = newData.findIndex(item => row.name === item.name);
-        dealItemData(index,newData,row)
+        record.value = record.recommendExpression
+        setCurrentConfList(JSON.parse(JSON.stringify(currentConfList)));
+        console.log('---currentConfList: ', currentConfList);
+        form.setFieldValue(`${index}-value`, record.recommendExpression)
+        // const row = {...record, value: record.recommendExpression}
+        // const newData = [...(currentConfList||[])];
+        // const index = newData.findIndex(item => row.name === item.name);
+        // dealItemData(index,newData,row)
         
     }
-    const save = async (key: React.Key) => {        
-        try {
-            const row = (await form.validateFields()) as Item;
-            const newData = [...(currentConfList||[])];
-            const index = newData.findIndex(item => key === item.name);
-            dealItemData(index,newData,row)
-        } catch (errInfo) {
-            console.log('Validate Failed:', errInfo);
+
+    // const addRow = (row:any) => {
+    //     let newData = [...(currentConfList||[])];
+    //     newData.push(row)
+    //     setCurrentConfList(newData);
+    // }
+
+    const submitEdit = async() => {
+        const presetConfList = currentConfList?.filter(f=> !f.isCustomConf).map(item=>{
+            return {
+                name: item.name,
+                value: item.value,
+                id: item.id,
+            }
+        })
+        const customConfList = currentConfList?.filter(f=> f.isCustomConf).map(item=>{
+            return {
+                name: item.name,
+                value: item.value,
+                confFile: item.confFile,
+                id: item.id,
+            }
+        })
+
+        const params = {
+            serviceInstanceId: serviceId,
+            presetConfList,
+            customConfList
         }
+        console.log('---params:', params);
+        
+        const result = await saveServiceConfAPI(params)
+        if(result && result.success){
+            message.success('保存成功')
+            setIsEditMode(false)
+            getConfListData()
+          }
+
     }
 
-    const dealItemData = (index:number,newData:any[],row:any) =>{
-        if (index > -1) {
-            const item = newData[index];
-            newData.splice(index, 1, {
-                ...item,
-                ...row,
-            });
-            setCurrentConfList(newData);
-            setEditingKey('');
-        }else{
-            newData.push(row);
-            setCurrentConfList(newData);
-            setEditingKey('');
-        }
-        let confResult = serviceId ? {...confData,[serviceId]:newData} : {...confData}
-        updateConfig(confResult)
-    }
+    // const save = async (key: React.Key) => {        
+    //     try {
+    //         const row = (await form.validateFields()) as Item;
+    //         const newData = [...(currentConfList||[])];
+    //         const index = newData.findIndex(item => key === item.name);
+    //         dealItemData(index,newData,row)
+    //     } catch (errInfo) {
+    //         console.log('Validate Failed:', errInfo);
+    //     }
+    // }
+
+    // const dealItemData = (index:number,newData:any[],row:any) =>{
+    //     if (index > -1) {
+    //         const item = newData[index];
+    //         newData.splice(index, 1, {
+    //             ...item,
+    //             ...row,
+    //         });
+    //         setCurrentConfList(newData);
+    //         setEditingKey('');
+    //     }else{
+    //         newData.push(row);
+    //         setCurrentConfList(newData);
+    //         setEditingKey('');
+    //     }
+    //     // let confResult = serviceId ? {...confData,[serviceId]:newData} : {...confData}
+    //     // updateConfig(confResult)
+    // }
 
     interface Item {
+        id?: number;
+        value?: any;
         options: any;
         unit: string;
         min: number;
@@ -157,73 +208,83 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( setPresetConf
         description: string
     }
 
-    interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
-        editing: boolean;
-        dataIndex: string;
-        title: any;
-        inputType: 'InputNumber' | 'InputString' | 'Slider' | 'Switch' | 'Select';
-        record: Item;
-        index: number;
-        children: React.ReactNode;
-      }
+    // interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
+    //     editing: boolean;
+    //     dataIndex: string;
+    //     title: any;
+    //     inputType: 'InputNumber' | 'InputString' | 'Slider' | 'Switch' | 'Select';
+    //     record: Item;
+    //     index: number;
+    //     children: React.ReactNode;
+    //   }
 
-    const EditableCell: React.FC<EditableCellProps> = ({
-        editing,
-        dataIndex,
-        title,
-        inputType,
-        record,
-        index,
-        children,
-        ...restProps
-      }) => {
-        let inputNode = <Input addonAfter={record?.unit || ''} />
-        // const inputNode = inputType === 'number' ? <InputNumber /> : <Input />;
-        switch(inputType){
-            case 'InputNumber':
-                inputNode = <InputNumber max={record.max || Number.MAX_SAFE_INTEGER} min={record.min || Number.MIN_SAFE_INTEGER} addonAfter={record.unit || ''} />
-                ;break;
-            case 'InputString':;break;
-            case 'Slider':
-                inputNode = <Slider max={record.max || 100} min={record.min || 0} />
-                ;break;
-            case 'Switch':
-                inputNode = <Switch />
-                ;break;
-            case 'Select':
-                inputNode = 
-                        <Select
-                                style={{ width: 120 }}
-                                options={
-                                    record.options.map((opItem: any)=>{
-                                        return { value: opItem, label: opItem }
-                                    })}
-                            />
+    // const EditableCell: React.FC<EditableCellProps> = ({
+    //     editing,
+    //     dataIndex,
+    //     title,
+    //     inputType,
+    //     record,
+    //     index,
+    //     children,
+    //     ...restProps
+    //   }) => {
+    //     let inputNode = <Input addonAfter={record?.unit || ''} />
+    //     // const inputNode = inputType === 'number' ? <InputNumber /> : <Input />;
+    //     switch(inputType){
+    //         case 'InputNumber':
+    //             inputNode = <InputNumber max={record.max || Number.MAX_SAFE_INTEGER} min={record.min || Number.MIN_SAFE_INTEGER} addonAfter={record.unit || ''} />
+    //             ;break;
+    //         case 'InputString':;break;
+    //         case 'Slider':
+    //             inputNode = <Slider max={record.max || 100} min={record.min || 0} />
+    //             ;break;
+    //         case 'Switch':
+    //             inputNode = <Switch />
+    //             ;break;
+    //         case 'Select':
+    //             inputNode = 
+    //                     <Select
+    //                             style={{ width: 120 }}
+    //                             options={
+    //                                 record.options.map((opItem: any)=>{
+    //                                     return { value: opItem, label: opItem }
+    //                                 })}
+    //                         />
                         
-                ;break;
-        }
+    //             ;break;
+    //     }
       
-        return (
-          <td {...restProps} className={(record?.sourceValue != record?.recommendExpression && !editing && !record.isCustomConf) ? styles.hasEdited:''}>
-            {editing ? (
-              <Form.Item
-                name={dataIndex}
-                style={{ margin: 0 }}
-                rules={[
-                  {
-                    required: true,
-                    message: `请输入 ${title}!`,
-                  },
-                ]}
-              >
-                {inputNode}
-              </Form.Item>
-            ) : (
-              children
-            )}
-          </td>
-        );
-      };
+    //     return (
+    //       <td {...restProps} className={(record?.sourceValue != record?.recommendExpression && !editing && !record.isCustomConf) ? styles.hasEdited:''}>
+    //         {editing ? (
+    //           <Form.Item
+    //             name={dataIndex}
+    //             style={{ margin: 0 }}
+    //             rules={[
+    //               {
+    //                 required: true,
+    //                 message: `请输入 ${title}!`,
+    //               },
+    //             ]}
+    //           >
+    //             {inputNode}
+    //           </Form.Item>
+    //         ) : (
+    //           children
+    //         )}
+    //       </td>
+    //     );
+    //   };
+
+    // const actionBlur = (e:any, record: Item)=>{
+    //     console.log(e.target.value)
+    //     record.value = e.target.value
+    // }
+    const actionOnChange = (val:any, record: Item) => {
+        record.value = val
+        let cdata = currentConfList ? JSON.parse(JSON.stringify(currentConfList)) :[]
+        cdata && setCurrentConfList(cdata)
+    }
 
     const configColumns = [
         {
@@ -245,10 +306,51 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( setPresetConf
             editable: false,
         },{
             title: '值',
-            dataIndex: 'recommendExpression',
+            dataIndex: 'value',
             editable: true,
-            render: (_: any, record: Item) => {
-                  return  <span>{record.recommendExpression}&nbsp;{record.unit?record.unit:''}</span>
+            render: (_: any, record: Item, index: any) => {
+                <span>{record.value}&nbsp;{record.unit?record.unit:''}</span>
+                let inputNode = <Input onChange={(e)=>actionOnChange(e,record)} addonAfter={record?.unit || ''} />
+                // const inputNode = inputType === 'number' ? <InputNumber /> : <Input />;
+                switch(record.valueType){
+                    case 'InputNumber':
+                        inputNode = <InputNumber onChange={(e)=>actionOnChange(e,record)} max={record.max || Number.MAX_SAFE_INTEGER} min={record.min || Number.MIN_SAFE_INTEGER} addonAfter={record.unit || ''} />
+                        ;break;
+                    case 'InputString':;break;
+                    case 'Slider':
+                        inputNode = <Slider onChange={(e)=>actionOnChange(e,record)} max={record.max || 100} min={record.min || 0} />
+                        ;break;
+                    case 'Switch':
+                        inputNode = <Switch checked={record.value} onChange={(e)=>actionOnChange(e,record)} />
+                        ;break;
+                    case 'Select':
+                        inputNode = 
+                                <Select onChange={(e)=>actionOnChange(e,record)}
+                                        style={{ width: 120 }}
+                                        options={
+                                            record.options.map((opItem: any)=>{
+                                                return { value: opItem, label: opItem }
+                                            })}
+                                    />
+                                
+                        ;break;
+                }
+                  return  isEditMode?(
+                    <Form.Item
+                        name={`${index}-value`}
+                        initialValue={record.value}
+                        // key={record.name}
+                        style={{ margin: 0 }}
+                        rules={[
+                        {
+                            required: true,
+                            message: `请输入值/选择值!`,
+                        },
+                        ]}
+                    >
+                        {inputNode}
+                    </Form.Item>                    
+                  ):(<> <span>{record.valueType == "Switch" ?record.value.toString() : record.value}&nbsp;{record.unit?record.unit:''}</span> </>)
             },
         },{
             title: '描述',
@@ -261,40 +363,63 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( setPresetConf
             title: '操作',
             width: 120,
             dataIndex: 'operation',
-            render: (_: any, record: Item) => {
-                // console.log('record',record);
-                const editable = isEditing(record);
-                return editable ? (
-                    <span>
-                    <Typography.Link onClick={() => save(record.name)} style={{ marginRight: 8 }}>
-                        确定
-                    </Typography.Link>
-                    <Typography.Link onClick={() => cancel()}>
-                        取消
-                    </Typography.Link>
-                    {/* <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
-                        <a>取消</a>
-                    </Popconfirm> */}
-                    </span>
-                ) : (
-                    <div className={styles.actionBtnWrap}>
-                        <Typography.Link disabled={editingKey !== ''} style={{marginRight: '20px'}} onClick={() => edit(record)}>
-                        编辑
-                        </Typography.Link>
-                        {
-                            !record.isCustomConf?
-                            (record.sourceValue != record.recommendExpression) && (
-                                <Popconfirm title="确定恢复到初始值吗?" onConfirm={()=>resetSource(record)}>
-                                    <a>恢复初始值</a>
-                                </Popconfirm>
-                            ):(
+            render: (_: any, record: Item, index:any) => {
+                let resultDom1 = <></>
+                let resultDom2 = <></>
+                const formData = form.getFieldsValue(true)
+                if(isEditMode){
+                    if(formData[`${index}-value`] != record.recommendExpression && !record.isCustomConf){
+                        resultDom1 = (<div style={{marginRight: '5px'}}>
+                            <Popconfirm title="确定恢复到初始值吗?" onConfirm={()=>resetSource(record,index)}>
+                                <a >恢复初始值</a>
+                            </Popconfirm>
+                        </div>)
+                    }
+                    if(record.isCustomConf){
+                        resultDom2 = (
+                            <div>
                                 <Popconfirm title="确定删除吗?" onConfirm={()=>handleDelete(record)}>
                                     <a>删除</a>
                                 </Popconfirm>
-                            )
-                        }
-                    </div>
-                );
+                            </div>
+                            
+                        )
+                    }
+                }
+                return <>{resultDom1}{resultDom2}</>
+                // console.log('record',record);
+                // const editable = isEditing(record);
+                // return editable ? (
+                //     <span>
+                //     <Typography.Link onClick={() => save(record.name)} style={{ marginRight: 8 }}>
+                //         确定
+                //     </Typography.Link>
+                //     <Typography.Link onClick={() => cancel()}>
+                //         取消
+                //     </Typography.Link>
+                //     {/* <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
+                //         <a>取消</a>
+                //     </Popconfirm> */}
+                //     </span>
+                // ) : (
+                //     <div className={styles.actionBtnWrap}>
+                //         <Typography.Link disabled={editingKey !== ''} style={{marginRight: '20px'}} onClick={() => edit(record)}>
+                //         编辑
+                //         </Typography.Link>
+                //         {
+                //             !record.isCustomConf?
+                //             (record.sourceValue != record.recommendExpression) && (
+                //                 <Popconfirm title="确定恢复到初始值吗?" onConfirm={()=>resetSource(record)}>
+                //                     <a>恢复初始值</a>
+                //                 </Popconfirm>
+                //             ):(
+                //                 <Popconfirm title="确定删除吗?" onConfirm={()=>handleDelete(record)}>
+                //                     <a>删除</a>
+                //                 </Popconfirm>
+                //             )
+                //         }
+                //     </div>
+                // );
             },
           },
     ]
@@ -305,13 +430,13 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( setPresetConf
         }
         return {
           ...col,
-          onCell: (record: Item) => ({
-            record,
-            inputType: record.valueType,//'text', //col.dataIndex === 'age' ? 'number' : 'text',
-            dataIndex: col.dataIndex,
-            title: col.title,
-            editing: isEditing(record),
-          }),
+        //   onCell: (record: Item) => ({
+        //     record,
+        //     inputType: record.valueType,//'text', //col.dataIndex === 'age' ? 'number' : 'text',
+        //     dataIndex: col.dataIndex,
+        //     title: col.title,
+        //     editing: isEditMode,//isEditing(record),
+        //   }),
         };
       });
 
@@ -322,13 +447,15 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( setPresetConf
           .validateFields()
           .then(async (values) => {
             const row = {...values, isCustomConf: true, recommendExpression: values.value};
-            const newData = [...(currentConfList||[])];
+            const newData = currentConfList||[];
             const index = newData.findIndex(item => values.name === item.name);
             if(index == -1){
                 const params = [...currentNames, values.name]
                 setCurrentNames(params)
             }
-            dealItemData(index,newData,row)
+            // dealItemData(index,newData,row)
+            newData.push(row)
+            setCurrentConfList(newData);
             setIsModalOpen(false)
           })
           .catch((err) => {
@@ -341,8 +468,21 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( setPresetConf
         setIsModalOpen(false);
       };
 
+    const getFormInitData = (listdata: any[]) => {
+        let formList:{ [key: string]: any } = {}
+        for(let i =0;i<listdata.length;i++){
+            formList[`${i}-value`] = listdata[i].value
+        }
+        return formList
+        // let formList = []
+        // for(let i =0;i<listdata.length;i++){
+        //     formList.push(listdata[i].value)
+        // }
+        // return formList
+    }
+
     return (
-        <div className={styles.CSLayout}>
+        <div className={styles.ConfigTabLayout}>
             {/* <div className={styles.CSLeft}>
                 {serviceMenu && serviceMenu[0] && serviceMenu[0].key && (
                     <Menu 
@@ -355,27 +495,70 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( setPresetConf
                 )}
             </div> */}
             <div className={styles.CSRight}>
-                <div className={styles.CSBtnWrap}>
-                    <Button 
-                        key="addconfig"
-                        type="primary"
-                        disabled={!serviceId}
-                        onClick={() => {
-                            setIsModalOpen(true)
-                            addConfigForm.resetFields()
-                        }}
-                    >
-                        添加自定义配置
-                    </Button>
+                <div className={styles.btnsBar}>
+                    {
+                        !isEditMode?(
+                        <>
+                            <Button 
+                                key="editBtn"
+                                type="primary"
+                                disabled={!serviceId || loading}
+                                onClick={() => {
+                                    setIsEditMode(true)
+                                }}
+                            >
+                                编辑配置项
+                            </Button>
+                        </>):(
+                        <>
+                            <Button 
+                                key="saveBtn"
+                                type="primary"
+                                disabled={!serviceId || loading}
+                                onClick={() => {
+                                    console.log('--currentConfList: ', currentConfList, form.getFieldsValue(true));
+                                    submitEdit()
+                                }}
+                            >
+                                保存
+                            </Button>
+                            <Button 
+                                key="cancelBtn"
+                                type="primary"
+                                disabled={!serviceId || loading}
+                                onClick={() => {
+                                    setCurrentConfList(cloneDeep(initConfList))
+                                    // console.log('--initConfList:', initConfList, getFormInitData(initConfList||[]));
+                                    form.setFieldsValue(getFormInitData(initConfList||[]))
+                                    // form.resetFields();
+                                    setIsEditMode(false)
+                                }}
+                            >
+                                取消
+                            </Button>
+                           
+                            <Button 
+                                key="addconfig"
+                                type="primary"
+                                disabled={!serviceId || loading}
+                                onClick={() => {
+                                    setIsModalOpen(true)
+                                    addConfigForm.resetFields()
+                                }}
+                            >
+                                添加自定义配置
+                            </Button>
+                        </>)
+                    }
                 </div>
                 <div>
                 <Form form={form} component={false}>
                     <Table
-                        components={{
-                            body: {
-                                cell: EditableCell,
-                            },
-                        }}
+                        // components={{
+                        //     body: {
+                        //         cell: EditableCell,
+                        //     },
+                        // }}
                         scroll={{
                             y:600
                         }}
@@ -425,7 +608,7 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( setPresetConf
                                     }
                                     return Promise.resolve();
                                   } catch (err) {
-                                    callback(err);
+                                    console.log(err);
                                   }
                             } }
                         ]}
@@ -453,13 +636,13 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( setPresetConf
                         </Select>
                     </Form.Item>
 
-                    <Form.Item
+                    {/* <Form.Item
                         label="描述"
                         name="description"
                         rules={[]}
                     >
                     <TextArea rows={4} placeholder="请输入描述" />
-                    </Form.Item>
+                    </Form.Item> */}
                 </Form>
                 </div>
             </Modal>

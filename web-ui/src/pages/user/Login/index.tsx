@@ -89,10 +89,10 @@ const Login: React.FC = () => {
       <div className={styles.loginContent}>
         <div className={styles.loginLeft}>
           <div className={styles.title}>
-            E-Mapreduce
+            CloudEon
           </div>
           <div className={styles.subTitle}>
-            E-Mapreduce的一句话介绍XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+            基于k8s安装和运维大数据集群。
           </div>
         </div>
         <div className={styles.loginRight}>
