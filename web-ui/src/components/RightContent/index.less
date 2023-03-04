@@ -5,13 +5,15 @@
 .mgColonyBtn {
   display: flex;
   align-items: center;
-  color: #fff;
+  color: var(--cloudeon-header-text-color);
+  // color: #252a3d;
   cursor: pointer;
   transition: all 0.3s;
   padding-left: 5px;
   &:hover {
     // color: @primary-color;
-    background: #252a3d;
+    // background: #252a3d;
+    background: var(--cloudeon-header-vant-1);
   }
 }
 
@@ -66,10 +68,12 @@
 .dark {
   .action {
     &:hover {
-      background: #252a3d;
+      // background: #252a3d;
+      background: var(--cloudeon-primary-vant-1);
     }
     &:global(.opened) {
-      background: #252a3d;
+      // background: #252a3d;
+      background: var(--cloudeon-primary-vant-1);
     }
   }
 }

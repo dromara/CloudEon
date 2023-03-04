@@ -1,10 +1,10 @@
 export default {
   'menu.colony': '集群管理',
   'menu.addService': '新增服务',
-  'menu.nodelist': '节点列表',
-  'menu.servicelist': '服务列表',
+  'menu.nodelist': '节点',
+  'menu.servicelist': '服务',
   'menu.serviceListDetail': '服务详情',
-  'menu.actionlist': '指令列表',
+  'menu.actionlist': '指令',
   'menu.actionDetail':'指令详情',
   'menu.welcome': '欢迎',
   'menu.more-blocks': '更多区块',

@@ -16,8 +16,8 @@ const Footer: React.FC = () => {
       copyright={`${currentYear} ${defaultMessage}`}
       links={[
         {
-          key: 'E-Mapreduce',
-          title: 'E-Mapreduce',
+          key: 'CloudEon',
+          title: 'CloudEon',
           href: 'https://pro.ant.design',
           blankTarget: true,
         },

@@ -14,7 +14,7 @@ export async function getClusterListAPI(params: {
   });
 }
 
-// 节点列表
+// 节点
 export async function getNodeListAPI(params: {
   // query
   /** 集群id */
@@ -28,7 +28,7 @@ export async function getNodeListAPI(params: {
   });
 }
 
-// 服务列表
+// 服务
 export async function getServiceListAPI(params: {
   // query
   /** 集群id */
@@ -109,7 +109,7 @@ export async function initServiceAPI(options?: API.SubmitServicesParams) {
   });
 }
 
-// 服务列表
+// 服务
 export async function serviceListAPI(params: {
   clusterId?: number;
 }) {
@@ -122,7 +122,7 @@ export async function serviceListAPI(params: {
 }
 
 // /command/list?clusterId=1
-/** 指令列表 */
+/** 指令 */
 export async function getCommandListAPI(options?: { [key: string]: any }) {
   return request<API.normalResult>('/command/list', {
     method: 'GET',
@@ -224,7 +224,7 @@ export async function getRolesAllocationAPI(options?: { [key: string]: any }) {
 
 /** 查询服务实例配置 */
 export async function getListConfsAPI(options?: { [key: string]: any }) {
-  return request<API.serviceRolesResult>('/service/listConfs', {
+  return request<API.ConfList>('/service/listConfs', {
     method: 'GET',
     params: {
       ...options,
@@ -234,6 +234,13 @@ export async function getListConfsAPI(options?: { [key: string]: any }) {
 
 
 
+/** 保存服务实例配置 */
+export async function saveServiceConfAPI(options?: { [key: string]: any }) {
+  return request<API.normalResult>('/service/serviceInstanceSaveConf', {
+    method: 'POST',
+    data: options,
+  });
+}
 
 
 

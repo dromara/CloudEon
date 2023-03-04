@@ -5,7 +5,7 @@ import { Menu, Form, Table, Button, Typography, Popconfirm, InputNumber, Input, 
 import { getServiceConfAPI } from '@/services/ant-design-pro/colony';
 const { TextArea } = Input;
 
-const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( setPresetConfListToParams )=>{
+const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( {setPresetConfListToParams} )=>{
 
     const [form] = Form.useForm()
     const [currentConfList, setCurrentConfList] = useState<any[]>();
