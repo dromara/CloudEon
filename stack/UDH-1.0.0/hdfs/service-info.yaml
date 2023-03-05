@@ -2,13 +2,19 @@ name: HDFS
 label: "HDFS"
 description: "分布式大数据存储"
 version: 3.3.3
-dockerImage: "udh-hadoop-hdfs:3.3.3"
+dockerImage: "registry.mufankong.top/udh/hadoop:3.3.4"
 dependencies:
   - "ZOOKEEPER"
 
 runAs: hdfs
 
 supportKerberos: true
+
+persistencePaths:
+  - /opt/udh/${serviceInstanceId}/conf
+  - /opt/udh/${serviceInstanceId}/log
+  - /opt/udh/${serviceInstanceId}/data
+
 
 roles:
   - name: HDFS_JOURNALNODE
@@ -48,15 +54,20 @@ roles:
     minNum: 1
 
 
-persistencePaths: []
+
 
 customConfigFiles:
-  - capacity-scheduler.xml
-  - mapred-site.xml
-  - yarn-site.xml
+  - core-site.xml
+  - hdfs-site.xml
+  - httpfs-site.xml
 
 
 configurations:
+  - name: nameservices
+    recommendExpression: hadoopcluster1
+    valueType: InputString
+    configurableInWizard: true
+
   - name: namenode.http-port
     recommendExpression: 50070
     valueType: InputNumber
@@ -79,26 +90,32 @@ configurations:
     valueType: InputNumber
     configurableInWizard: true
 
+  - name: datanode.ipc-port
+    recommendExpression: 50020
+    valueType: InputNumber
+    configurableInWizard: true
 
   - name: journalnode.http-port
     recommendExpression: 8480
     valueType: InputNumber
     configurableInWizard: true
 
-
-
-
-  - name: dfs.namenode.name.dir
-    recommendExpression: ${hadoop.tmp.dir}/dfs/name
-    valueType: InputString
-    confFile:  "hdfs-site.xml"
+  - name: journalnode.rpc-port
+    recommendExpression: 8480
+    valueType: InputNumber
     configurableInWizard: true
 
-  - name: dfs.datanode.data.dir
-    recommendExpression: ${hadoop.tmp.dir}/dfs/data
-    valueType: InputString
-    confFile:  "hdfs-site.xml"
+  - name: journalnode.use.wildcard
+    recommendExpression: true
+    valueType: Switch
     configurableInWizard: true
+
+  - name: datanode.use.wildcard
+    recommendExpression: true
+    valueType: Switch
+    configurableInWizard: true
+
+
 
   - name: dfs.datanode.failed.volumes.tolerated
     recommendExpression: 0
