@@ -10,10 +10,34 @@ import defaultSettings from '../config/defaultSettings';
 import { currentUser as queryCurrentUser } from './services/ant-design-pro/api';
 import logoImg from '../src/assets/images/ic_launcher.png';
 import userImg from '../src/assets/images/user.png'
+import React from 'react';
+import * as Icon from '@ant-design/icons';
+import {
+  RobotOutlined,
+} from '@ant-design/icons';
 
 
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
+
+
+const menuIcons = {
+  '节点':'RobotOutlined',
+  '服务':'CloudServerOutlined',
+  '指令':'AimOutlined'
+}
+// antd4中动态创建icon
+const createIcon = (key: string) => {
+  console.log('--key:', key);
+  
+  const icon = React.createElement(
+    Icon[menuIcons[key]],
+    {
+      style:{ fontSize: '24px'}
+    }
+  )
+  return icon
+}
 
 
 // 接口请求全局配置
@@ -153,6 +177,25 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
       );
     },
     ...initialState?.settings,
-    logo:<><Image src={logoImg}/></>
+    logo:<><Image src={logoImg}/></>,
+    // layout: 'side',
+    breakpoint: true,
+    fixedHeader:true,
+    collapsed:false,
+    collapsedButtonRender: false,
+    menuFooterRender:()=><></>,
+    menuItemRender: (itemProps: any, defaultDom: any, props: any) => (
+
+      <div style={{height:'80px',display:'flex',justifyContent: 'center',flexDirection:'column', alignItems:'center',width:'100%'}} 
+        onClick={() => {
+          history.push(itemProps.path);
+        }}>
+            <div style={{display:'inline-flex',lineHeight:'30px', fontSize: '24px'}}>
+              {/* {itemProps.icon} */}
+              {createIcon(itemProps.name)}
+            </div>
+            <div style={{lineHeight:'20px',fontSize:'12px'}}>{itemProps.name}</div>
+      </div>
+    )
   };
 };

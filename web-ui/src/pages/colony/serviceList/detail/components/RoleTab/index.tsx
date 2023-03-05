@@ -4,38 +4,7 @@ import { Spin } from 'antd';
 import { useState, useEffect } from 'react';
 import styles from './index.less'
 
-// export type TableListItem = {
-//     key: number;
-//     name: string;
-//     containers: string;
-//     creator: string;
-//     status: string;
-//     createdAt: number;
-//     memo: string;
-//   };
-
 const roleTab:React.FC<{rolesInfo: API.rolesInfos[], loading: Boolean}> = ({rolesInfo, loading}) => {
-
-    // const [tableData, setTableData] = useState<API.rolesInfos[]>([
-    //     {
-    //         "name": "DORIS_FE",
-    //         "id": 101,
-    //         "roleStatus": "OPERATING",
-    //         "nodeId": 1,
-    //         "nodeHostname": "fl001",
-    //         "nodeHostIp": "10.81.16.19",
-    //         "uiUrls": [
-    //             "http://fl001:1000/info",
-    //             "http://10.81.16.19:1000/info"
-    //         ]
-    //     }
-    // ]);
-
-    // useEffect(()=>{
-    //     if(rolesInfo) setTableData(rolesInfo)
-    // },[])
-
-
 
     const columns: ProColumns<API.rolesInfos>[] = [
         {
@@ -102,13 +71,13 @@ const roleTab:React.FC<{rolesInfo: API.rolesInfos[], loading: Boolean}> = ({role
         },
         {
             title: '操作',
-            key: 'option',
-            dataIndex: 'option',
+            key: 'actionBtns',
+            dataIndex: 'actionBtns',
             valueType: 'option',
             render: () => [
                 <a key="link">启动</a>,
                 <a key="link2">停止</a>,
-                <a key="link3">删除</a>,
+                <a key="link5">删除</a>,
                 // <TableDropdown
                 //     key="actionGroup"
                 //     menus={[
