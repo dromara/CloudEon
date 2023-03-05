@@ -218,7 +218,7 @@ const AssignRoles : React.FC<{
     return (
         <>
         <ProCard split="vertical" bordered>
-            <ProCard title="服务列表" colSpan="30%" headerBordered className={styles.rolesLeft}>
+            <ProCard title="服务" colSpan="30%" headerBordered className={styles.rolesLeft}>
             <Tree
                 defaultExpandAll
                 blockNode

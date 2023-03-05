@@ -64,7 +64,7 @@
       justify-content: center;
       // box-shadow: 1px 4px 8px 0 rgba(255, 255, 255, 0.2), 0 6px 20px 0 rgba(255, 255, 255, 0.19);
       .inputItem{
-        min-width: 200px;
+        width: 200px;
         border-radius: 20px;
       }
       .btnWrap{
@@ -75,6 +75,12 @@
       .btnItem{
         min-width: 150px;
         border-radius: 20px;
+      }
+      :global{
+        .ant-form-item{
+          display: flex;
+          justify-content: center;
+        }
       }
     }
   }

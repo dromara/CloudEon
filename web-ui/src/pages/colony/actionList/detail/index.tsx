@@ -187,11 +187,18 @@ const actionDetail: React.FC = () => {
                     footer={null}
                 >
                     {/* <div dangerouslySetInnerHTML={{__html:logData}} /> */}
-                    <Spin tip="Loading" size="small" spinning={detailLoading}>
-                    <SyntaxHighlighter language="yaml" style={tomorrow} showLineNumbers>
-                        {logData}
-                    </SyntaxHighlighter>
-                    </Spin>
+                    <div>
+                        <Spin tip="Loading" size="small" spinning={detailLoading}>
+                        <SyntaxHighlighter 
+                            language="yaml" 
+                            style={tomorrow} 
+                            showLineNumbers 
+                            customStyle={{height:'60vh',overflow:'auto'}}
+                        >
+                            {logData}
+                        </SyntaxHighlighter>
+                        </Spin>
+                    </div>
                 </Modal>
         </PageContainer>
     )

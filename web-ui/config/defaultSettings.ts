@@ -20,7 +20,7 @@ const Settings: LayoutSettings & {
   fixedHeader: false,
   fixSiderbar: true,
   colorWeak: false,
-  title: 'E-Mapreduce',
+  title: 'CloudEon',
   pwa: false,
   logo: '../src/assets/images/ic_launcher.png',//'https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg',
   iconfontUrl: '',
