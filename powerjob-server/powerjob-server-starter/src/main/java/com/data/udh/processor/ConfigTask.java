@@ -7,6 +7,7 @@ import com.data.udh.dao.*;
 import com.data.udh.dto.RoleNodeInfo;
 import com.data.udh.entity.*;
 import com.data.udh.utils.SshUtils;
+import com.google.common.collect.ImmutableMap;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -16,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.sshd.client.session.ClientSession;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,16 +73,12 @@ public class ConfigTask extends BaseUdhTask {
             // 构建数据模型
             Map<String, Object> dataModel = new HashMap<>();
             dataModel.put("service", serviceInstanceEntity);
+            buildDependenceServiceInModel(dataModel, serviceInstanceEntity.getDependenceServiceInstanceIds().split(","),
+                    stackServiceRepository, serviceInstanceRepository, roleInstanceRepository, clusterNodeRepository,configRepository);
 
             dataModel.put("conf", allConfigEntityList.stream().collect(Collectors.toMap(ServiceInstanceConfigEntity::getName, ServiceInstanceConfigEntity::getValue)));
 
-            Map<String, List<RoleNodeInfo>> serviceRoles = roleInstanceEntities.stream().map(new Function<ServiceRoleInstanceEntity, RoleNodeInfo>() {
-                @Override
-                public RoleNodeInfo apply(ServiceRoleInstanceEntity serviceRoleInstanceEntity) {
-                    ClusterNodeEntity nodeEntity = clusterNodeRepository.findById(serviceRoleInstanceEntity.getNodeId()).get();
-                    return new RoleNodeInfo(nodeEntity.getId(), nodeEntity.getHostname(), serviceRoleInstanceEntity.getServiceRoleName());
-                }
-            }).collect(Collectors.groupingBy(RoleNodeInfo::getRoleName));
+            Map<String, List<RoleNodeInfo>> serviceRoles = getServiceRoles(roleInstanceEntities, clusterNodeRepository);
 
             dataModel.put("serviceRoles", serviceRoles);
             dataModel.put("localhostname", taskExecuteHostName);
@@ -160,6 +158,45 @@ public class ConfigTask extends BaseUdhTask {
         }
 
         SshUtils.closeConnection(clientSession);
+    }
+
+    /**
+     * 构建依赖服务进入Model中
+     */
+    private void buildDependenceServiceInModel(Map<String, Object> dataModel, String[] depServiceInstanceIds,
+                                               StackServiceRepository stackServiceRepository,
+                                               ServiceInstanceRepository serviceInstanceRepository,
+                                               ServiceRoleInstanceRepository roleInstanceRepository, ClusterNodeRepository clusterNodeRepository, ServiceInstanceConfigRepository configRepository) {
+        Map<String, Object> services = new HashMap<>();
+        Arrays.stream(depServiceInstanceIds).forEach(id -> {
+            Integer serviceInstanceId = Integer.valueOf(id);
+            ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(serviceInstanceId).get();
+            Integer stackServiceId = serviceInstanceEntity.getStackServiceId();
+            String stackServiceName = stackServiceRepository.findById(stackServiceId).get().getName();
+
+            // 查询服务实例所有配置项
+            List<ServiceInstanceConfigEntity> allConfigEntityList = configRepository.findByServiceInstanceId(serviceInstanceId);
+            // 查出所有角色
+            List<ServiceRoleInstanceEntity> roleInstanceEntities = roleInstanceRepository.findByServiceInstanceId(serviceInstanceId);
+            Map<String, List<RoleNodeInfo>> serviceRoles = getServiceRoles(roleInstanceEntities, clusterNodeRepository);
+            services.put(stackServiceName, ImmutableMap.of(
+                    "conf",allConfigEntityList.stream().collect(Collectors.toMap(ServiceInstanceConfigEntity::getName, ServiceInstanceConfigEntity::getValue)),
+                    "serviceRoles",serviceRoles,
+                    "service",serviceInstanceEntity));
+        });
+
+        dataModel.put("dependencies", services);
+    }
+
+    private Map<String, List<RoleNodeInfo>> getServiceRoles(List<ServiceRoleInstanceEntity> roleInstanceEntities, ClusterNodeRepository clusterNodeRepository) {
+        Map<String, List<RoleNodeInfo>> serviceRoles = roleInstanceEntities.stream().map(new Function<ServiceRoleInstanceEntity, RoleNodeInfo>() {
+            @Override
+            public RoleNodeInfo apply(ServiceRoleInstanceEntity serviceRoleInstanceEntity) {
+                ClusterNodeEntity nodeEntity = clusterNodeRepository.findById(serviceRoleInstanceEntity.getNodeId()).get();
+                return new RoleNodeInfo(nodeEntity.getId(), nodeEntity.getHostname(), serviceRoleInstanceEntity.getServiceRoleName());
+            }
+        }).collect(Collectors.groupingBy(RoleNodeInfo::getRoleName));
+        return serviceRoles;
     }
 
 }
