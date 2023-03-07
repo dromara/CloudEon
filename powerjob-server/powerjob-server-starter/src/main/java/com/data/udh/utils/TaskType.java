@@ -12,7 +12,7 @@ public enum TaskType {
     PULL_IMAGE_FROM_REGISTRY_TO_HOST(3, "拉取docker registry镜像到节点", "com.data.udh.processor.PullImageTask", true),
     INSTALL_ROLE_TO_HOST(4, "安装服务角色到节点", "com.data.udh.processor.InstallTask", true),
     CONFIG_ROLE_TO_HOST(5, "配置服务角色到节点", "com.data.udh.processor.ConfigTask", true),
-    INIT_HDFS_NAMENODE(6, "初始化NameNode", "com.data.udh.processor.ExampleTask", false),
+    INIT_HDFS_NAMENODE(6, "初始化NameNode", "com.data.udh.processor.HdfsZkfcFormatTask", false),
     HDFS_MKDIR(7, "HDFS上创建目录", "com.data.udh.processor.ExampleTask", false),
     CANCEL_TAG_HOST(8, "移除节点上的标签", "com.data.udh.processor.CancelHostTagTask", true),
     STOP_K8S_SERVICE(9, "停止K8s服务", "com.data.udh.processor.StopK8sServiceTask", false),

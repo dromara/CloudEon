@@ -13,6 +13,8 @@ import com.data.udh.entity.ClusterNodeEntity;
 import com.data.udh.entity.StackInfoEntity;
 import com.data.udh.utils.SshUtils;
 import org.apache.sshd.client.session.ClientSession;
+import org.apache.sshd.sftp.client.SftpClientFactory;
+import org.apache.sshd.sftp.client.fs.SftpFileSystem;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -71,7 +73,8 @@ public class NodeController {
     public CheckHostInfo checkHostInfo(String sshHost, Integer sshPort, String sshUser, String password) throws IOException {
 
         ClientSession session = SshUtils.openConnectionByPassword(sshHost, sshPort, sshUser, password);
-        SshUtils.uploadFile(session, "/tmp/", remoteScriptPath + FileUtil.FILE_SEPARATOR + "host-info-collect.sh");
+        SftpFileSystem sftp = SftpClientFactory.instance().createSftpFileSystem(session);
+        SshUtils.uploadFile(session, "/tmp/", remoteScriptPath + FileUtil.FILE_SEPARATOR + "host-info-collect.sh",sftp);
         String result = SshUtils.execCmdWithResult(session, "sh /tmp/host-info-collect.sh");
         CheckHostInfo checkHostInfo = JSONObject.parseObject(result, CheckHostInfo.class);
         session.close();
