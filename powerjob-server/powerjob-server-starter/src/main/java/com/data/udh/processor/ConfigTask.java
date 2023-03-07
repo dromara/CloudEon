@@ -1,6 +1,7 @@
 package com.data.udh.processor;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import com.data.udh.config.UdhConfigProp;
 import com.data.udh.dao.*;
@@ -73,8 +74,12 @@ public class ConfigTask extends BaseUdhTask {
             // 构建数据模型
             Map<String, Object> dataModel = new HashMap<>();
             dataModel.put("service", serviceInstanceEntity);
-            buildDependenceServiceInModel(dataModel, serviceInstanceEntity.getDependenceServiceInstanceIds().split(","),
-                    stackServiceRepository, serviceInstanceRepository, roleInstanceRepository, clusterNodeRepository,configRepository);
+            String dependenceServiceInstanceIds = serviceInstanceEntity.getDependenceServiceInstanceIds();
+            if (StrUtil.isNotBlank(dependenceServiceInstanceIds)) {
+                buildDependenceServiceInModel(dataModel, dependenceServiceInstanceIds.split(","),
+                        stackServiceRepository, serviceInstanceRepository, roleInstanceRepository, clusterNodeRepository,configRepository);
+            }
+
 
             dataModel.put("conf", allConfigEntityList.stream().collect(Collectors.toMap(ServiceInstanceConfigEntity::getName, ServiceInstanceConfigEntity::getValue)));
 
@@ -193,7 +198,7 @@ public class ConfigTask extends BaseUdhTask {
             @Override
             public RoleNodeInfo apply(ServiceRoleInstanceEntity serviceRoleInstanceEntity) {
                 ClusterNodeEntity nodeEntity = clusterNodeRepository.findById(serviceRoleInstanceEntity.getNodeId()).get();
-                return new RoleNodeInfo(nodeEntity.getId(), nodeEntity.getHostname(), serviceRoleInstanceEntity.getServiceRoleName());
+                return new RoleNodeInfo(serviceRoleInstanceEntity.getId(), nodeEntity.getHostname(), serviceRoleInstanceEntity.getServiceRoleName());
             }
         }).collect(Collectors.groupingBy(RoleNodeInfo::getRoleName));
         return serviceRoles;
