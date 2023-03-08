@@ -206,7 +206,7 @@ public class ClusterServiceController {
                                 ServiceRoleInstanceWebuisEntity serviceRoleInstanceWebuisEntity = new ServiceRoleInstanceWebuisEntity();
                                 serviceRoleInstanceWebuisEntity.setName(serviceRoleInstanceEntity.getServiceRoleName() + "UI地址");
                                 serviceRoleInstanceWebuisEntity.setServiceInstanceId(serviceInstanceEntityId);
-                                serviceRoleInstanceWebuisEntity.setServiceRoleInstanceId(serviceRoleInstanceEntity.getServiceInstanceId());
+                                serviceRoleInstanceWebuisEntity.setServiceRoleInstanceId(serviceRoleInstanceEntity.getId());
                                 serviceRoleInstanceWebuisEntity.setWebHostUrl(genWebUI(roleLinkExpression, serviceInstanceEntityId, serviceRoleInstanceEntity, false));
                                 serviceRoleInstanceWebuisEntity.setWebIpUrl(genWebUI(roleLinkExpression, serviceInstanceEntityId, serviceRoleInstanceEntity, true));
                                 return serviceRoleInstanceWebuisEntity;
@@ -636,7 +636,8 @@ public class ClusterServiceController {
             @Override
             public ServiceInstanceRoleVO apply(ServiceRoleInstanceEntity roleInstanceEntity) {
                 ClusterNodeEntity nodeEntity = clusterNodeRepository.findById(roleInstanceEntity.getNodeId()).get();
-
+                // 查找该角色实例绑定的web地址
+                ServiceRoleInstanceWebuisEntity webuisEntity = roleInstanceWebuisRepository.findByServiceRoleInstanceId(roleInstanceEntity.getId());
                 return ServiceInstanceRoleVO.builder()
                         .roleStatus(roleInstanceEntity.getServiceRoleState().name())
                         .id(roleInstanceEntity.getId())
@@ -644,7 +645,7 @@ public class ClusterServiceController {
                         .nodeHostname(nodeEntity.getHostname())
                         .nodeId(nodeEntity.getId())
                         // todo 用真实url代替
-                        .uiUrls(Lists.newArrayList(String.format("http://%s:1000/info", nodeEntity.getHostname()), String.format("http://%s:1000/info", nodeEntity.getIp())))
+                        .uiUrls(Lists.newArrayList(webuisEntity.getWebHostUrl(), webuisEntity.getWebIpUrl()))
                         .name(roleInstanceEntity.getServiceRoleName())
                         .build();
             }
