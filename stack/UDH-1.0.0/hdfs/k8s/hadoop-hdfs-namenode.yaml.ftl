@@ -41,7 +41,7 @@ spec:
       hostNetwork: true
       containers:
       - args:
-        - "/opt/udh/${service.serviceName}/conf/conf/namenode-bootstrap.sh"
+        - "/opt/udh/${service.serviceName}/conf/namenode-bootstrap.sh"
         image: "${dockerImage}"
         imagePullPolicy: "Always"
         name: "${roleServiceFullName}"
@@ -57,7 +57,7 @@ spec:
           name: "log"
         - mountPath: "/etc/localtime"
           name: "timezone"
-        - mountPath: "/home/doris/doris-be/conf"
+        - mountPath: "/opt/udh/${service.serviceName}/conf"
           name: "conf"
 
       nodeSelector:

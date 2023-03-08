@@ -41,11 +41,12 @@ public class HdfsZkfcFormatTask extends BaseUdhTask {
         ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(serviceInstanceId).get();
         StackServiceEntity stackServiceEntity = stackServiceRepository.findById(serviceInstanceEntity.getStackServiceId()).get();
         String serviceName = serviceInstanceEntity.getServiceName();
+        // hdfs 这个zkfc format命令每次执行都会删除然后创建的。todo 能捕获到执行日志吗？
         String cmd = String.format("sudo docker  run --net=host -v /opt/udh/%s/conf:/opt/udh/%s/conf  %s sh -c \"  yes Y| hdfs --config  /opt/udh/%s/conf zkfc -formatZK \"   ",
                 serviceName,serviceName,stackServiceEntity.getDockerImage(),serviceName);
 
         // 选择namenode所在节点执行
-        List<ServiceRoleInstanceEntity> roleInstanceEntities = roleInstanceRepository.findByServiceInstanceIdAndServiceRoleName(serviceInstanceId,"hadoop-hdfs-namenode");
+        List<ServiceRoleInstanceEntity> roleInstanceEntities = roleInstanceRepository.findByServiceInstanceIdAndServiceRoleName(serviceInstanceId,"HDFS_NAMENODE");
         ServiceRoleInstanceEntity firstNamenode = roleInstanceEntities.get(0);
         Integer nodeId = firstNamenode.getNodeId();
         ClusterNodeEntity nodeEntity = clusterNodeRepository.findById(nodeId).get();

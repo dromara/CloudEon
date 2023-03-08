@@ -27,7 +27,6 @@
     <@property "dfs.namenode.rpc-address." + ns + ".nn2" nn2 + ":" + nn_rpc_port/>
     <@property "dfs.namenode.http-address." + ns + ".nn1" nn1 + ":" + nn_http_port/>
     <@property "dfs.namenode.http-address." + ns + ".nn2" nn2 + ":" + nn_http_port/>
-    <@property "dfs.ha.automatic-failover.enabled." + ns "true"/>
     <#assign
         default_jn_rpc_port=conf['journalnode.rpc-port']
         journalnodes=serviceRoles['HDFS_JOURNALNODE']
@@ -36,10 +35,10 @@
     <#list journalnodes as jn>
         <#assign jn_withport += [(jn.hostname + ":" + conf['journalnode.rpc-port']!default_jn_rpc_port)]>
     </#list>
-    <@property "dfs.namenode.shared.edits.dir." + ns "qjournal://" + jn_withport?join(";") + "/" + ns/>
+    <@property "dfs.namenode.shared.edits.dir"  "qjournal://" + jn_withport?join(";") + "/" + ns/>
 
     <@property "dfs.client.failover.proxy.provider." + ns "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider"/>
-    <@property "dfs.ha.automatic-failover.enabled." + ns "true"/>
+    <@property "dfs.ha.automatic-failover.enabled"  "true"/>
 <#else>
     <#assign nn=serviceRoles['HDFS_NAMENODE'][0].hostname
     nn_rpc_port=conf['namenode.rpc-port']
@@ -48,8 +47,10 @@
     <@property "dfs.namenode.http-address." + ns nn_http_port/>
 </#if>
 
-
-
+<#--handle data dir-->
+<@property "dfs.datanode.data.dir" "/opt/udh/${serviceName}/data/datanode"/>
+<@property "dfs.namenode.name.dir" "/opt/udh/${serviceName}/data/namenode"/>
+<@property "dfs.journalnode.edits.dir" "/opt/udh/${serviceName}/data/journal"/>
 
 <#--handle journalnode-->
 <#assign useWildcard=conf['journalnode.use.wildcard']
@@ -66,8 +67,10 @@
     <@property "dfs.datanode.ipc.address" hostname + ":" + conf["datanode.ipc-port"]/>
 <#--handleOther-->
     <@property "dfs.hosts.exclude" "/opt/udh/${serviceName}/conf/dfs.exclude"/>
-    <@property "dfs.domain.socket.path" "/opt/udh/${serviceName}/data/dn_socket"/>
-    <@property "dfs.journalnode.edits.dir" "/opt/udh/${serviceName}/data/journal"/>
+
+<#--    dn_socket需要其父目录权限为755，否则会报错   -->
+<#--    <@property "dfs.domain.socket.path" "/opt/udh/${serviceName}/data/dn_socket"/>-->
+
 <#--Take properties from the context-->
 <#list confFiles['hdfs-site.xml'] as key, value>
     <@property key value/>

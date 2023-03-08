@@ -107,6 +107,7 @@ public class StartRoleK8sServiceTask extends BaseUdhTask{
         try {
             String[] statusCommand = new String[]{"kubectl", "rollout", "status", "deploy/" + roleServiceFullName};
             log.info("本地执行命令：" + Arrays.stream(statusCommand).collect(Collectors.joining(" ")));
+            // todo 设置超时时间中断，抛出异常
             commandExecUtil.runShellCommandSync(k8sResourceOutputPath, statusCommand, StandardCharsets.UTF_8);
         } catch (IOException e) {
             e.printStackTrace();

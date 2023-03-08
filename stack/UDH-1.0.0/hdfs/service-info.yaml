@@ -48,6 +48,7 @@ roles:
   - name: HDFS_HTTPFS
     label: Httpfs
     roleFullName: hadoop-hdfs-httpfs
+    linkExpression: "http://${localhostname}:${conf['httpfs.http-port']}/webhdfs/v1?op=gethomedirectory&user.name=hive"
     sortNum: 4
     type: SLAVE
     jmxPort: 9232
@@ -78,6 +79,11 @@ configurations:
     valueType: InputNumber
     configurableInWizard: true
 
+  - name: httpfs.http-port
+    recommendExpression: 14000
+    valueType: InputNumber
+    configurableInWizard: true
+
 
   - name: datanode.http-port
     recommendExpression: 50075
@@ -101,7 +107,7 @@ configurations:
     configurableInWizard: true
 
   - name: journalnode.rpc-port
-    recommendExpression: 8480
+    recommendExpression: 8485
     valueType: InputNumber
     configurableInWizard: true
 
@@ -139,7 +145,7 @@ configurations:
     confFile:  "hdfs-site.xml"
 
   - name: dfs.client.read.shortcircuit
-    recommendExpression: true
+    recommendExpression: fasle
     valueType: Switch
     confFile:  "hdfs-site.xml"
 
