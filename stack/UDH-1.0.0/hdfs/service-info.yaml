@@ -160,6 +160,12 @@ configurations:
     valueType: InputString
     confFile:  "core-site.xml"
 
+  - name: hadoop.http.staticuser.user
+    recommendExpression: hdfs
+    valueType: InputString
+    description: WebHDFS页面上访问的静态用户名
+    confFile: "core-site.xml"
+
 
   - name: dfs.datanode.data.dir.perm
     recommendExpression: 755
