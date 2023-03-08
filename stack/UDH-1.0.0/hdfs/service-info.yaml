@@ -65,7 +65,7 @@ customConfigFiles:
 
 configurations:
   - name: nameservices
-    recommendExpression: hadoopcluster1
+    recommendExpression: hdfscluster1
     valueType: InputString
     configurableInWizard: true
 

@@ -644,7 +644,6 @@ public class ClusterServiceController {
                         .nodeHostIp(nodeEntity.getIp())
                         .nodeHostname(nodeEntity.getHostname())
                         .nodeId(nodeEntity.getId())
-                        // todo 用真实url代替
                         .uiUrls(Lists.newArrayList(webuisEntity.getWebHostUrl(), webuisEntity.getWebIpUrl()))
                         .name(roleInstanceEntity.getServiceRoleName())
                         .build();
