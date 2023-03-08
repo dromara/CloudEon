@@ -4,6 +4,7 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import com.data.udh.config.UdhConfigProp;
 import com.data.udh.dao.*;
+import com.data.udh.entity.ServiceInstanceConfigEntity;
 import com.data.udh.entity.ServiceInstanceEntity;
 import com.data.udh.entity.StackServiceEntity;
 import com.data.udh.entity.StackServiceRoleEntity;
@@ -23,6 +24,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -34,6 +36,7 @@ public class StartRoleK8sServiceTask extends BaseUdhTask{
         ServiceInstanceRepository serviceInstanceRepository = SpringUtil.getBean(ServiceInstanceRepository.class);
         StackServiceRoleRepository stackServiceRoleRepository = SpringUtil.getBean(StackServiceRoleRepository.class);
         ServiceRoleInstanceRepository serviceRoleInstanceRepository = SpringUtil.getBean(ServiceRoleInstanceRepository.class);
+        ServiceInstanceConfigRepository configRepository = SpringUtil.getBean(ServiceInstanceConfigRepository.class);
 
         UdhConfigProp udhConfigProp = SpringUtil.getBean(UdhConfigProp.class);
         String workHome = udhConfigProp.getWorkHome();
@@ -50,14 +53,16 @@ public class StartRoleK8sServiceTask extends BaseUdhTask{
         String stackCode = stackServiceEntity.getStackCode();
         String stackServiceName = stackServiceEntity.getName().toLowerCase();
 
-
+        // 查询服务实例所有配置项
+        List<ServiceInstanceConfigEntity> allConfigEntityList = configRepository.findByServiceInstanceId(serviceInstanceId);
         // 创建本地k8s资源工作目录  ${workHome}/k8s-resource/ZOOKEEPER1/
         String k8sResourceOutputPath = workHome + File.separator + Constant.K8S_RESOURCE_DIR+File.separator+serviceInstanceEntity.getServiceName() ;
         log.info("开始角色k8s资源文件生成："+k8sResourceOutputPath);
-        // 先删除清空
-        log.info("重置目录："+k8sResourceOutputPath);
-        FileUtil.del(k8sResourceOutputPath);
-        FileUtil.mkdir(k8sResourceOutputPath);
+
+        if (!FileUtil.exist(k8sResourceOutputPath)) {
+            log.info("目录{}不存在，创建目录...",k8sResourceOutputPath);
+            FileUtil.mkdir(k8sResourceOutputPath);
+        }
 
         // 渲染生成k8s资源
         String k8sTemplateFileName = roleFullName + ".yaml.ftl";
@@ -77,6 +82,8 @@ public class StartRoleK8sServiceTask extends BaseUdhTask{
         dataModel.put("roleServiceFullName", roleServiceFullName);
         dataModel.put("service", serviceInstanceEntity);
         dataModel.put("roleNodeCnt", roleNodeCnt);
+        dataModel.put("conf", allConfigEntityList.stream().collect(Collectors.toMap(ServiceInstanceConfigEntity::getName, ServiceInstanceConfigEntity::getValue)));
+
         String outputFileName = null;
         try {
             config.setDirectoryForTemplateLoading(new File(k8sTemplateDir));
