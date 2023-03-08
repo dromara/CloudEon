@@ -22,7 +22,7 @@
 # remote nodes.
 
 # The java implementation to use.
-export JAVA_HOME=${r"${JAVA_HOME}"}/bin
+export JAVA_HOME=${r"${JAVA_HOME}"}
 
 # The jsvc implementation to use. Jsvc is required to run secure datanodes.
 
@@ -130,39 +130,39 @@ export HADOOP_SECURE_DN_PID_DIR=${r"${HADOOP_PID_DIR}"}
 # A string representing this instance of hadoop. $USER by default.
 #export HADOOP_IDENT_STRING=$USER
 
-export CLUSTER=${service.serviceName}
+<#--export CLUSTER=${service.serviceName}-->
 
-<#assign namenodes=serviceRoles["HDFS_NAMENODE"]>
-<#if namenodes?size == 1>
-    <#if namenodes[0].hostname == .data_model["localhostname"]>
-        export NAMENODE_NAMESERVICE=${service.serviceName}
-        export HDFS_HA=false
-    </#if>
-<#elseif namenodes?size == 2>
-    <#if namenodes[0].id lt namenodes[1].id>
-        <#assign nn1=namenodes[0]>
-        <#assign nn2=namenodes[1]>
-    <#else>
-        <#assign nn1=namenodes[1]>
-        <#assign nn2=namenodes[0]>
-    </#if>
+<#--<#assign namenodes=serviceRoles["HDFS_NAMENODE"]>-->
+<#--<#if namenodes?size == 1>-->
+<#--    <#if namenodes[0].hostname == .data_model["localhostname"]>-->
+<#--        export NAMENODE_NAMESERVICE=${service.serviceName}-->
+<#--        export HDFS_HA=false-->
+<#--    </#if>-->
+<#--<#elseif namenodes?size == 2>-->
+<#--    <#if namenodes[0].id lt namenodes[1].id>-->
+<#--        <#assign nn1=namenodes[0]>-->
+<#--        <#assign nn2=namenodes[1]>-->
+<#--    <#else>-->
+<#--        <#assign nn1=namenodes[1]>-->
+<#--        <#assign nn2=namenodes[0]>-->
+<#--    </#if>-->
 
-    <#if nn1.hostname == .data_model["localhostname"]>
-        export NAMENODE_NAMESERVICE=${service.serviceName}
-        export HDFS_HA=true
-        export NAMENODE_ORDINAL=0
-    <#elseif nn2.hostname == .data_model["localhostname"]>
-        export NAMENODE_NAMESERVICE=${service.serviceName}
-        export HDFS_HA=true
-        export NAMENODE_ORDINAL=1
-        <#if conf["namenode.http-port"]??>
-            <#assign nn1HttpPort=conf["namenode.http-port"]>
-        </#if>
-        export NAMENODE_PRIMARY_JMX_URL=http://${nn1.hostname}:${nn1HttpPort}/jmx
-    </#if>
-<#else>
-    <#stop "more than 2 NameNodes in the same NameService not supported">
-</#if>
+<#--    <#if nn1.hostname == .data_model["localhostname"]>-->
+<#--        export NAMENODE_NAMESERVICE=${service.serviceName}-->
+<#--        export HDFS_HA=true-->
+<#--        export NAMENODE_ORDINAL=0-->
+<#--    <#elseif nn2.hostname == .data_model["localhostname"]>-->
+<#--        export NAMENODE_NAMESERVICE=${service.serviceName}-->
+<#--        export HDFS_HA=true-->
+<#--        export NAMENODE_ORDINAL=1-->
+<#--        <#if conf["namenode.http-port"]??>-->
+<#--            <#assign nn1HttpPort=conf["namenode.http-port"]>-->
+<#--        </#if>-->
+<#--        export NAMENODE_PRIMARY_JMX_URL=http://${nn1.hostname}:${nn1HttpPort}/jmx-->
+<#--    </#if>-->
+<#--<#else>-->
+<#--    <#stop "more than 2 NameNodes in the same NameService not supported">-->
+<#--</#if>-->
 
 
 

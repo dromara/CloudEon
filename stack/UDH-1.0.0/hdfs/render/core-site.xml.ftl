@@ -21,9 +21,9 @@
     namenodeport=conf['namenode.rpc-port']
     fs_default_uri = "hdfs://" + namenode + ":" + namenodeport
     >
-    <@property "fs.defaultFS" fs_default_uri/>
 </#if>
 
+<@property "fs.defaultFS" fs_default_uri/>
 
 <#--handle dependent.zookeeper-->
 <#if dependencies.ZOOKEEPER??>

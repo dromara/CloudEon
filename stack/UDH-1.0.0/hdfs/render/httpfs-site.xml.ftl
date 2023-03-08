@@ -9,6 +9,7 @@
 <configuration>
 
     <@property "httpfs.hadoop.config.dir" "/opt/udh/${service.serviceName}/conf"/>
+    <@property "httpfs.http.port" "${conf['httpfs.http-port']}"/>
 
 
     <#assign services=["root","yarn","hadoop","spark","zookeeper","kyuubi","flink","hdfs","hbase","hive", "hue", "httpfs"]>
