@@ -44,6 +44,18 @@ spec:
         - "/opt/udh/${service.serviceName}/conf/datanode-bootstrap.sh"
         image: "${dockerImage}"
         imagePullPolicy: "Always"
+        readinessProbe:
+          exec:
+            command:
+            - "/bin/bash"
+            - "-c"
+            - "curl --fail --connect-timeout 15 --max-time 15 \"http://`hostname`:${conf['datanode.http-port']}/?user.name=hdfs\"\
+            \n"
+          failureThreshold: 3
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
         name: "${roleServiceFullName}"
         resources:
           requests: {}

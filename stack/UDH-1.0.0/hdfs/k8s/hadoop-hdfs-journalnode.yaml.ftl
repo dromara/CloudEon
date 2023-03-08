@@ -44,6 +44,14 @@ spec:
         - "/opt/udh/${service.serviceName}/conf/journalnode-bootstrap.sh"
         image: "${dockerImage}"
         imagePullPolicy: "Always"
+        readinessProbe:
+          tcpSocket:
+            port: ${conf['journalnode.rpc-port']}
+          failureThreshold: 3
+          initialDelaySeconds: 3
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
         name: "${roleServiceFullName}"
         resources:
           requests: {}

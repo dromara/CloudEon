@@ -44,6 +44,17 @@ spec:
         - "/opt/udh/${service.serviceName}/conf/httpfs-bootstrap.sh"
         image: "${dockerImage}"
         imagePullPolicy: "Always"
+        readinessProbe:
+          exec:
+            command:
+            - "/bin/bash"
+            - "-c"
+            - "netstat -an | grep ${conf['httpfs.http-port']} | grep LISTEN >/dev/null"
+          failureThreshold: 3
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
         name: "${roleServiceFullName}"
         resources:
           requests: {}

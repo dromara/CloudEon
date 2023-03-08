@@ -39,12 +39,36 @@ spec:
             topologyKey: "kubernetes.io/hostname"
       hostPID: false
       hostNetwork: true
+      initContainers:
+        - name: namenode-format
+          image: "${dockerImage}"
+          args:
+            - "/opt/udh/${service.serviceName}/conf/namenode-format.sh"
+          volumeMounts:
+            - mountPath: "/opt/udh/${service.serviceName}/data"
+              name: "data"
+            - mountPath: "/opt/udh/${service.serviceName}/log"
+              name: "log"
+            - mountPath: "/etc/localtime"
+              name: "timezone"
+            - mountPath: "/opt/udh/${service.serviceName}/conf"
+              name: "conf"
       containers:
       - args:
         - "/opt/udh/${service.serviceName}/conf/namenode-bootstrap.sh"
         image: "${dockerImage}"
         imagePullPolicy: "Always"
         name: "${roleServiceFullName}"
+        readinessProbe:
+          httpGet:
+            path: "/jmx?qry=Hadoop:service=NameNode,name=NameNodeInfo&&user.name=hdfs"
+            port: ${conf['namenode.http-port']}
+            scheme: "HTTP"
+          failureThreshold: 3
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
         resources:
           requests: {}
           limits: {}
