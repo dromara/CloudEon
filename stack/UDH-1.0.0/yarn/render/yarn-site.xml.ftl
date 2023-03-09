@@ -18,17 +18,22 @@
 <configuration>
 
 
-
+    <@property "yarn.nodemanager.local-dirs" "/opt/udh/${service.serviceName}/data/local"/>
+    <@property "yarn.nodemanager.log-dirs" "/opt/udh/${service.serviceName}/log"/>
+    <#--handle dependencies.hdfs-->
+    <#assign hdfs=dependencies.HDFS >
+    <@property "yarn.nodemanager.remote-app-log-dir" "hdfs://${hdfs.conf['nameservices']}/var/log/hadoop-yarn/apps"/>
+    <@property "yarn.app.mapreduce.am.staging-dir" "hdfs://${hdfs.conf['nameservices']}/user"/>
 
 <#if serviceRoles['YARN_RESOURCEMANAGER']?? && serviceRoles['YARN_RESOURCEMANAGER']?size gt 1>
     <@property "yarn.resourcemanager.ha.enabled" "true"/>
     <@property "yarn.resourcemanager.recovery.enabled" "true"/>
     <@property "yarn.resourcemanager.store.class" "org.apache.hadoop.yarn.server.resourcemanager.recovery.ZKRMStateStore"/>
-    <#--handle dependent.zookeeper-->
+    <#--handle dependencies.zookeeper-->
     <#if dependencies.ZOOKEEPER??>
         <#assign zookeeper=dependencies.ZOOKEEPER quorums=[]>
         <#list zookeeper.serviceRoles['ZOOKEEPER'] as role>
-            <#assign quorums += [role.hostname + ":" + zookeeper["zookeeper.client.port"]]>
+            <#assign quorums += [role.hostname + ":" + zookeeper.conf["zookeeper.client.port"]]>
         </#list>
         <#assign quorum = quorums?join(",")>
     </#if>
@@ -71,12 +76,12 @@
     <#assign timelineServer=serviceRoles['YARN_TIMELINESERVER'][0]['hostname']>
     <@property "yarn.timeline-service.hostname" timelineServer/>
     <@property "yarn.timeline-service.webapp.https.address" timelineServer + ":8190"/>
-    <@property "yarn.timeline-service.webapp.address" timelineServer + ":8188"/>
+    <@property "yarn.timeline-service.webapp.address" timelineServer + ":${conf['timelineserver.http.port']}"/>
 </#if>
 
     <@property "yarn.resourcemanager.nodes.exclude-path" "/opt/udh/" + serviceName + "/conf/yarn.exclude"/>
 <#--Take properties from the context-->
-<#list service['yarn-site.xml'] as key, value>
+<#list confFiles['yarn-site.xml'] as key, value>
     <@property key value/>
 </#list>
 </configuration>

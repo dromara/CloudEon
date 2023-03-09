@@ -167,6 +167,7 @@ configurations:
     valueType: Slider
     unit: MB
     confFile: "mapred-site.xml"
+    configurableInWizard: true
   - name: raidnode.files.fix.per.job
     recommendExpression: 500
     valueType: InputNumber
@@ -193,27 +194,35 @@ configurations:
   - name: resourcemanager.admin.port
     recommendExpression: 8033
     valueType: InputNumber
+    configurableInWizard: true
   - name: resourcemanager.port
     recommendExpression: 8032
     valueType: InputNumber
+    configurableInWizard: true
   - name: resourcemanager.resource-tracker.port
     recommendExpression: 8031
     valueType: InputNumber
+    configurableInWizard: true
   - name: resourcemanager.scheduler.port
     recommendExpression: 8030
     valueType: InputNumber
+    configurableInWizard: true
   - name: resourcemanager.webapp.port
     recommendExpression: 8088
     valueType: InputNumber
+    configurableInWizard: true
   - name: nodemanager.webapp.port
     recommendExpression: 8042
     valueType: InputNumber
+    configurableInWizard: true
   - name: timelineserver.port
     recommendExpression: 10021
     valueType: InputNumber
+    configurableInWizard: true
   - name: timelineserver.http.port
     recommendExpression: 8188
     valueType: InputNumber
+    configurableInWizard: true
   - name: mapreduce.shuffle.port
     recommendExpression: 13562
     valueType: InputNumber
@@ -229,6 +238,7 @@ configurations:
     valueType: Slider
     unit: MB
     confFile: "yarn-site.xml"
+    configurableInWizard: true
   - name: yarn.scheduler.maximum-allocation-vcores
     recommendExpression: 96
     min: 10
@@ -236,6 +246,7 @@ configurations:
     valueType: Slider
     unit: core
     confFile: "yarn-site.xml"
+    configurableInWizard: true
   - name: yarn.nodemanager.vmem-check-enabled
     recommendExpression: false
     valueType: Switch
@@ -263,6 +274,7 @@ configurations:
     valueType: Slider
     unit: core
     confFile: "yarn-site.xml"
+    configurableInWizard: true
   - name: yarn.nodemanager.resource.memory-mb
     recommendExpression: 65536
     min: 1024
@@ -270,6 +282,7 @@ configurations:
     valueType: Slider
     unit: MB
     confFile: "yarn-site.xml"
+    configurableInWizard: true
   - name: yarn.nodemanager.delete.debug-delay-sec
     recommendExpression: 86400
     min: 1
@@ -295,18 +308,21 @@ configurations:
     max: 65536
     valueType: Slider
     unit: MB
+    configurableInWizard: true
   - name: historyserver.memory
     recommendExpression: 1024
     min: 1024
     max: 65536
     valueType: Slider
     unit: MB
+    configurableInWizard: true
   - name: timelineserver.memory
     recommendExpression: 1024
     min: 1024
     max: 65536
     valueType: Slider
     unit: MB
+    configurableInWizard: true
   - name: resourcemanager.container.limits.memory
     recommendExpression: -1
     min: -1
