@@ -145,7 +145,7 @@ configurations:
     confFile:  "hdfs-site.xml"
 
   - name: dfs.client.read.shortcircuit
-    recommendExpression: fasle
+    recommendExpression: false
     valueType: Switch
     confFile:  "hdfs-site.xml"
 
