@@ -1,0 +1,424 @@
+name: YARN
+label: "YARN"
+description: "分布式计算资源调度"
+version: 3.3.4
+dockerImage: "registry.mufankong.top/udh/hadoop:3.3.4"
+dependencies:
+  - "ZOOKEEPER"
+  - "HDFS"
+
+runAs: yarn
+
+supportKerberos: true
+
+persistencePaths:
+  - /opt/udh/${serviceInstanceId}/conf
+  - /opt/udh/${serviceInstanceId}/log
+  - /opt/udh/${serviceInstanceId}/data
+
+
+roles:
+  - name: YARN_RESOURCEMANAGER
+    label: Resource Manager
+    roleFullName: hadoop-yarn-resourcemanager
+    linkExpression: "http://${localhostname}:${service['resourcemanager.webapp.port']}/?user.name=yarn"
+    sortNum: 1
+    type: MASTER
+    jmxPort: 9232
+    minNum: 1
+
+  - name: YARN_NODEMANAGER
+    label: "Node Manager"
+    roleFullName: "hadoop-yarn-nodemanager"
+    linkExpression: "http://${service['yarn.nodemanager.webapp.address']?replace(r'${yarn.nodemanager.hostname}', localhostname)}/?user.name=yarn"
+    sortNum: 2
+    type: SLAVE
+    jmxPort: 9232
+    minNum: 1
+
+  - name: YARN_HISTORYSERVER
+    label: "History Server"
+    roleFullName: hadoop-yarn-historyserver
+    linkExpression: "http://${localhostname}:${service['timelineserver.http.port']}"
+    sortNum: 3
+    type: MASTER
+    jmxPort: 9232
+    minNum: 0
+
+  - name: YARN_TIMELINESERVER
+    label: "Timeline Server"
+    roleFullName: hadoop-yarn-timelineserver
+    linkExpression: "http://${localhostname}:${service['timelineserver.http.port']}"
+    sortNum: 4
+    type: MASTER
+    jmxPort: 9232
+    minNum: 0
+
+
+
+
+
+customConfigFiles:
+  - capacity-scheduler.xml
+  - mapred-site.xml
+  - yarn-site.xml
+
+
+
+configurations:
+  - name: yarn.scheduler.capacity.root.default.acl_submit_applications
+    recommendExpression: "*"
+    valueType: InputString
+    confFile:  "capacity-scheduler.xml"
+  - name: yarn.scheduler.capacity.maximum-applications
+    recommendExpression: 10000
+    valueType: InputNumber
+    confFile:  "capacity-scheduler.xml"
+  - name: yarn.scheduler.capacity.root.maximum-capacity
+    recommendExpression: 100
+    valueType: InputNumber
+    confFile: "capacity-scheduler.xml"
+  - name: yarn.scheduler.capacity.root.maximum-am-resource-percent
+    recommendExpression: 0.1
+    valueType: InputNumber
+    confFile: "capacity-scheduler.xml"
+  - name: yarn.scheduler.capacity.root.user-limit-factor
+    recommendExpression: 1
+    valueType: InputNumber
+    confFile: "capacity-scheduler.xml"
+  - name: yarn.scheduler.capacity.root.state
+    recommendExpression: RUNNING
+    valueType: InputString
+    confFile: "capacity-scheduler.xml"
+  - name: yarn.scheduler.capacity.root.acl_administer_queue
+    recommendExpression: "*"
+    valueType: InputString
+    confFile: "capacity-scheduler.xml"
+  - name: yarn.scheduler.capacity.node-locality-delay
+    recommendExpression: -1
+    valueType: InputNumber
+    confFile: "capacity-scheduler.xml"
+  - name: yarn.scheduler.capacity.root.queues
+    recommendExpression: default
+    valueType: InputString
+    confFile: "capacity-scheduler.xml"
+  - name: org.apache.hadoop.yarn.util.resource.DominantResourceCalculator
+    recommendExpression: default
+    valueType: InputString
+    confFile: "capacity-scheduler.xml"
+  - name: yarn.scheduler.capacity.root.default.user-limit-factor
+    recommendExpression: 1
+    valueType: InputNumber
+    confFile: "capacity-scheduler.xml"
+  - name: yarn.scheduler.capacity.root.default.maximum-capacity
+    recommendExpression: 100
+    valueType: InputNumber
+    confFile: "capacity-scheduler.xml"
+  - name: yarn.scheduler.capacity.root.default.capacity
+    recommendExpression: 100
+    valueType: InputNumber
+    confFile: "capacity-scheduler.xml"
+  - name: yarn.scheduler.capacity.root.default.state
+    recommendExpression: RUNNING
+    valueType: InputString
+    confFile: "capacity-scheduler.xml"
+  - name: yarn.scheduler.capacity.root.maximum-applications
+    recommendExpression: 10000
+    valueType: InputNumber
+    confFile: "capacity-scheduler.xml"
+  - name: yarn.scheduler.capacity.maximum-am-resource-percent
+    recommendExpression: 0.1
+    valueType: InputNumber
+    confFile: "capacity-scheduler.xml"
+  - name: yarn.scheduler.capacity.root.acl_submit_applications
+    recommendExpression: "*"
+    valueType: InputString
+    confFile: "capacity-scheduler.xml"
+  - name: yarn.scheduler.capacity.root.default.acl_administer_queue
+    recommendExpression: "*"
+    valueType: InputString
+    confFile: "capacity-scheduler.xml"
+  - name: yarn.scheduler.capacity.root.capacity
+    recommendExpression: 100
+    valueType: InputNumber
+    confFile: "capacity-scheduler.xml"
+
+
+  - name: mapreduce.job.max.split.locations
+    recommendExpression: 500
+    valueType: InputNumber
+    confFile: "mapred-site.xml"
+  - name: mapreduce.framework.name
+    recommendExpression: yarn
+    valueType: InputString
+    confFile: "mapred-site.xml"
+  - name: mapreduce.map.speculative
+    recommendExpression: true
+    valueType: Switch
+    confFile: "mapred-site.xml"
+  - name: raid.distraid.max.files
+    recommendExpression: 300
+    valueType: InputNumber
+    confFile: "mapred-site.xml"
+  - name: mapred.child.heapsize
+    recommendExpression: 2048
+    min: 1024
+    max: 65536
+    valueType: Slider
+    unit: MB
+    confFile: "mapred-site.xml"
+  - name: raidnode.files.fix.per.job
+    recommendExpression: 500
+    valueType: InputNumber
+    confFile: "mapred-site.xml"
+  - name: mapreduce.job.reduce.slowstart.completedmaps
+    recommendExpression: 1
+    valueType: InputNumber
+    confFile: "mapred-site.xml"
+  - name: mapreduce.job.maps
+    recommendExpression: 1
+    valueType: InputNumber
+    confFile: "mapred-site.xml"
+  - name: mapreduce.reduce.speculative
+    recommendExpression: false
+    valueType: Switch
+    confFile: "mapred-site.xml"
+  - name: raid.distraid.max.jobs
+    recommendExpression: 10
+    valueType: InputNumber
+    confFile: "mapred-site.xml"
+
+
+
+  - name: resourcemanager.admin.port
+    recommendExpression: 8033
+    valueType: InputNumber
+  - name: resourcemanager.port
+    recommendExpression: 8032
+    valueType: InputNumber
+  - name: resourcemanager.resource-tracker.port
+    recommendExpression: 8031
+    valueType: InputNumber
+  - name: resourcemanager.scheduler.port
+    recommendExpression: 8030
+    valueType: InputNumber
+  - name: resourcemanager.webapp.port
+    recommendExpression: 8088
+    valueType: InputNumber
+  - name: nodemanager.webapp.port
+    recommendExpression: 8042
+    valueType: InputNumber
+  - name: timelineserver.port
+    recommendExpression: 10021
+    valueType: InputNumber
+  - name: timelineserver.http.port
+    recommendExpression: 8188
+    valueType: InputNumber
+  - name: mapreduce.shuffle.port
+    recommendExpression: 13562
+    valueType: InputNumber
+
+
+
+
+
+  - name: yarn.scheduler.maximum-allocation-mb
+    recommendExpression: 98304
+    min: 1024
+    max: 98304
+    valueType: Slider
+    unit: MB
+    confFile: "yarn-site.xml"
+  - name: yarn.scheduler.maximum-allocation-vcores
+    recommendExpression: 96
+    min: 10
+    max: 100
+    valueType: Slider
+    unit: core
+    confFile: "yarn-site.xml"
+  - name: yarn.nodemanager.vmem-check-enabled
+    recommendExpression: false
+    valueType: Switch
+    confFile: "yarn-site.xml"
+  - name: yarn.resourcemanager.scheduler.class
+    recommendExpression: org.apache.hadoop.yarn.server.resourcemanager.scheduler.capacity.CapacityScheduler
+    valueType: InputString
+    confFile: "yarn-site.xml"
+  - name: yarn.nodemanager.aux-services.mapreduce_shuffle.class
+    recommendExpression: org.apache.hadoop.mapred.ShuffleHandler
+    valueType: InputString
+    confFile: "yarn-site.xml"
+  - name: yarn.nodemanager.pmem-check-enabled
+    recommendExpression: false
+    valueType: Switch
+    confFile: "yarn-site.xml"
+  - name: yarn.nodemanager.aux-services
+    recommendExpression: mapreduce_shuffle
+    valueType: InputString
+    confFile: "yarn-site.xml"
+  - name: yarn.nodemanager.resource.cpu-vcores
+    recommendExpression: 6
+    min: 2
+    max: 64
+    valueType: Slider
+    unit: core
+    confFile: "yarn-site.xml"
+  - name: yarn.nodemanager.resource.memory-mb
+    recommendExpression: 65536
+    min: 1024
+    max: 165536
+    valueType: Slider
+    unit: MB
+    confFile: "yarn-site.xml"
+  - name: yarn.nodemanager.delete.debug-delay-sec
+    recommendExpression: 86400
+    min: 1
+    max: 165536
+    valueType: Slider
+    unit: SECONDS
+    confFile: "yarn-site.xml"
+  - name: yarn.log-aggregation-enable
+    recommendExpression: false
+    valueType: Switch
+    confFile: "yarn-site.xml"
+
+
+  - name: historyserver.port
+    recommendExpression: 10020
+    valueType: InputNumber
+  - name: historyserver.http-port
+    recommendExpression: 19888
+    valueType: InputNumber
+  - name: resourcemanager.memory
+    recommendExpression: 1024
+    min: 1024
+    max: 65536
+    valueType: Slider
+    unit: MB
+  - name: historyserver.memory
+    recommendExpression: 1024
+    min: 1024
+    max: 65536
+    valueType: Slider
+    unit: MB
+  - name: timelineserver.memory
+    recommendExpression: 1024
+    min: 1024
+    max: 65536
+    valueType: Slider
+    unit: MB
+  - name: resourcemanager.container.limits.memory
+    recommendExpression: -1
+    min: -1
+    max: 65536
+    valueType: Slider
+    unit: MB
+  - name: resourcemanager.container.limits.cpu
+    recommendExpression: -1
+    min: -1
+    max: 256
+    valueType: Slider
+    unit: core
+  - name: resourcemanager.container.requests.memory
+    recommendExpression: -1
+    min: -1
+    max: 65536
+    valueType: Slider
+    unit: MB
+  - name: resourcemanager.container.requests.cpu
+    recommendExpression: -1
+    min: -1
+    max: 256
+    valueType: Slider
+    unit: core
+  - name: resourcemanager.memory.ratio
+    recommendExpression: -1
+    valueType: InputNumber
+
+  - name: nodemanager.container.limits.memory
+    recommendExpression: -1
+    min: -1
+    max: 65536
+    valueType: Slider
+    unit: MB
+  - name: nodemanager.container.limits.cpu
+    recommendExpression: -1
+    min: -1
+    max: 256
+    valueType: Slider
+    unit: core
+  - name: nodemanager.container.requests.memory
+    recommendExpression: -1
+    min: -1
+    max: 65536
+    valueType: Slider
+    unit: MB
+  - name: nodemanager.container.requests.cpu
+    recommendExpression: -1
+    min: -1
+    max: 256
+    valueType: Slider
+    unit: core
+  - name: nodemanager.memory.ratio
+    recommendExpression: -1
+    valueType: InputNumber
+
+  - name: historyserver.container.limits.memory
+    recommendExpression: -1
+    min: -1
+    max: 65536
+    valueType: Slider
+    unit: MB
+  - name: historyserver.container.limits.cpu
+    recommendExpression: -1
+    min: -1
+    max: 256
+    valueType: Slider
+    unit: core
+  - name: historyserver.container.requests.memory
+    recommendExpression: -1
+    min: -1
+    max: 65536
+    valueType: Slider
+    unit: MB
+  - name: historyserver.container.requests.cpu
+    recommendExpression: -1
+    min: -1
+    max: 256
+    valueType: Slider
+    unit: core
+  - name: historyserver.memory.ratio
+    recommendExpression: -1
+    valueType: InputNumber
+
+  - name: timelineserver.container.limits.memory
+    recommendExpression: -1
+    min: -1
+    max: 65536
+    valueType: Slider
+    unit: MB
+  - name: timelineserver.container.limits.cpu
+    recommendExpression: -1
+    min: -1
+    max: 256
+    valueType: Slider
+    unit: core
+  - name: timelineserver.container.requests.memory
+    recommendExpression: -1
+    min: -1
+    max: 65536
+    valueType: Slider
+    unit: MB
+  - name: timelineserver.container.requests.cpu
+    recommendExpression: -1
+    min: -1
+    max: 256
+    valueType: Slider
+    unit: core
+  - name: timelineserver.memory.ratio
+    recommendExpression: -1
+    valueType: InputNumber
+
+
+
+

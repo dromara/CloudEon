@@ -1,7 +1,7 @@
 name: HDFS
 label: "HDFS"
 description: "分布式大数据存储"
-version: 3.3.3
+version: 3.3.4
 dockerImage: "registry.mufankong.top/udh/hadoop:3.3.4"
 dependencies:
   - "ZOOKEEPER"
@@ -20,7 +20,7 @@ roles:
   - name: HDFS_JOURNALNODE
     label: "Journal Node"
     roleFullName: "hadoop-hdfs-journalnode"
-    linkExpression: "http://${localhostname}:${conf['datanode.http-port']}/?user.name=hdfs"
+    linkExpression: "http://${localhostname}:${conf['journalnode.http-port']}/?user.name=hdfs"
     sortNum: 1
     type: MASTER
     jmxPort: 9232
