@@ -48,7 +48,7 @@ spec:
           tcpSocket:
             port: ${conf['journalnode.rpc-port']}
           failureThreshold: 3
-          initialDelaySeconds: 3
+          initialDelaySeconds: 60
           periodSeconds: 30
           successThreshold: 1
           timeoutSeconds: 15

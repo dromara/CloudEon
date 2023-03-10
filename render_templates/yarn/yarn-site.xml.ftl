@@ -95,7 +95,7 @@
 
     <@property "yarn.resourcemanager.nodes.exclude-path" "/etc/" + sid + "/conf/yarn.exclude"/>
 <#--Take properties from the context-->
-<#list service['yarn-site.xml'] as key, value>
+<#list confFiles['yarn-site.xml'] as key, value>
     <@property key value/>
 </#list>
 </configuration>
