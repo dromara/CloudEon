@@ -142,12 +142,10 @@ public class SshUtils {
      * @param remoteDirPath 远程目录地址
      * @param inputFile     文件 File
      */
-    public static boolean uploadFile(ClientSession session, String remoteDirPath, String inputFile) {
+    public static boolean uploadFile(ClientSession session, String remoteDirPath, String inputFile,SftpFileSystem sftp) {
         File uploadFile = new File(inputFile);
         InputStream input = null;
-        SftpFileSystem sftp = null;
         try {
-            sftp = SftpClientFactory.instance().createSftpFileSystem(session);
             Path path = sftp.getDefaultDir().resolve(remoteDirPath);
             if (!Files.exists(path)) {
                 LOG.info("create pathHome {} ", path);
@@ -174,10 +172,16 @@ public class SshUtils {
      * @param localDir
      */
     public static void uploadLocalDirToRemote(ClientSession session, String remoteDirPath, String localDir) {
-        for (String file : new File(localDir).list()) {
-            String localFilePath = localDir + File.separator + file;
-            uploadFile(session, remoteDirPath, localFilePath);
+        try {
+            SftpFileSystem sftp = SftpClientFactory.instance().createSftpFileSystem(session);
+            for (String file : new File(localDir).list()) {
+                String localFilePath = localDir + File.separator + file;
+                uploadFile(session, remoteDirPath, localFilePath,sftp);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
     }
 
     /**

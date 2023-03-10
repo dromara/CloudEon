@@ -22,12 +22,11 @@
 # remote nodes.
 
 # The java implementation to use.
-# export JAVA_HOME=${r"${JAVA_HOME}"}/bin
-export JAVA_HOME=/usr/java/latest
+export JAVA_HOME=${r"${JAVA_HOME}"}
 
 # The jsvc implementation to use. Jsvc is required to run secure datanodes.
 
-export HADOOP_CONF_DIR=/etc/${service.sid}/conf
+export HADOOP_CONF_DIR=/opt/udh/${service.serviceName}/conf
 
 
 # Extra Java CLASSPATH elements.  Automatically insert capacity-scheduler.
@@ -49,65 +48,65 @@ export HADOOP_OPTS="$HADOOP_OPTS -Djava.net.preferIPv4Stack=true $HADOOP_CLIENT_
 
 # Command specific options appended to HADOOP_OPTS when specified
 # Export namenode memory
-<#if service['namenode.container.limits.memory'] != "-1" && service['namenode.memory.ratio'] != "-1">
-  <#assign limitsMemory = service['namenode.container.limits.memory']?number
-    memoryRatio = service['namenode.memory.ratio']?number
+<#if conf['namenode.container.limits.memory'] != "-1" && conf['namenode.memory.ratio'] != "-1">
+  <#assign limitsMemory = conf['namenode.container.limits.memory']?number
+    memoryRatio = conf['namenode.memory.ratio']?number
     namenodeMemory = limitsMemory * memoryRatio * 1024>
 <#else>
-  <#if service[.data_model["localhostname"]]?? && service[.data_model["localhostname"]]['namenode.memory']??>
-    <#assign namenodeMemory=service[.data_model["localhostname"]]['namenode.memory']?trim?number>
+  <#if conf['namenode.memory']??>
+    <#assign namenodeMemory=conf['namenode.memory']?trim?number>
   <#else>
     <#assign namenodeMemory=24000>
   </#if>
 </#if>
-export NAMENODE_MEMORY=${namenodeMemory?floor}m
-export HADOOP_NAMENODE_OPTS="-Xmx${namenodeMemory?floor}m -XX:+UseConcMarkSweepGC -XX:+ExplicitGCInvokesConcurrent -Dcom.sun.management.jmxremote $HADOOP_NAMENODE_OPTS"
-export HADOOP_SECONDARYNAMENODE_OPTS="-Xmx${namenodeMemory?floor}m -Dcom.sun.management.jmxremote $HADOOP_SECONDARYNAMENODE_OPTS"
+export NAMENODE_MEMORY=${namenodeMemory?floor?c}m
+export HADOOP_NAMENODE_OPTS="-Xmx${namenodeMemory?floor?c}m -XX:+UseConcMarkSweepGC -XX:+ExplicitGCInvokesConcurrent -Dcom.sun.management.jmxremote $HADOOP_NAMENODE_OPTS"
+export HADOOP_SECONDARYNAMENODE_OPTS="-Xmx${namenodeMemory?floor?c}m -Dcom.sun.management.jmxremote $HADOOP_SECONDARYNAMENODE_OPTS"
 
 # Export zkfc memory
-<#if service['zkfc.container.limits.memory'] != "-1" && service['zkfc.memory.ratio'] != "-1">
-  <#assign limitsMemory = service['zkfc.container.limits.memory']?number
-    memoryRatio = service['zkfc.memory.ratio']?number
+<#if conf['zkfc.container.limits.memory'] != "-1" && conf['zkfc.memory.ratio'] != "-1">
+  <#assign limitsMemory = conf['zkfc.container.limits.memory']?number
+    memoryRatio = conf['zkfc.memory.ratio']?number
     zkfcMemory = limitsMemory * memoryRatio * 1024>
 <#else>
-  <#if service[.data_model["localhostname"]]?? && service[.data_model["localhostname"]]['zkfc.memory']??>
-    <#assign zkfcMemory=service[.data_model["localhostname"]]['zkfc.memory']?trim?number>
+  <#if  conf['zkfc.memory']??>
+    <#assign zkfcMemory=conf['zkfc.memory']?trim?number>
   <#else>
     <#assign zkfcMemory=1024>
   </#if>
 </#if>
-export ZKFC_MEMORY=${zkfcMemory?floor}m
-export HADOOP_ZKFC_OPTS="-Xmx${zkfcMemory?floor}m $HADOOP_ZKFC_OPTS"
+export ZKFC_MEMORY=${zkfcMemory?floor?c}m
+export HADOOP_ZKFC_OPTS="-Xmx${zkfcMemory?floor?c}m $HADOOP_ZKFC_OPTS"
 
 # Export datanode memory
-<#if service['datanode.container.limits.memory'] != "-1" && service['datanode.memory.ratio'] != "-1">
-    <#assign limitsMemory = service['datanode.container.limits.memory']?number
-    memoryRatio = service['datanode.memory.ratio']?number
+<#if conf['datanode.container.limits.memory'] != "-1" && conf['datanode.memory.ratio'] != "-1">
+    <#assign limitsMemory = conf['datanode.container.limits.memory']?number
+    memoryRatio = conf['datanode.memory.ratio']?number
     datanodeMemory = limitsMemory * memoryRatio * 1024>
 <#else>
-    <#if service[.data_model["localhostname"]]?? && service[.data_model["localhostname"]]['datanode.memory']??>
-        <#assign datanodeMemory=service[.data_model["localhostname"]]['datanode.memory']?trim?number>
+    <#if  conf['datanode.memory']??>
+        <#assign datanodeMemory=conf['datanode.memory']?trim?number>
     <#else>
         <#assign datanodeMemory=8192>
     </#if>
 </#if>
-export DATANODE_MEMORY=${datanodeMemory?floor}m
-export HADOOP_DATANODE_OPTS="-Xmx${datanodeMemory?floor}m -Dcom.sun.management.jmxremote $HADOOP_DATANODE_OPTS"
+export DATANODE_MEMORY=${datanodeMemory?floor?c}m
+export HADOOP_DATANODE_OPTS="-Xmx${datanodeMemory?floor?c}m -Dcom.sun.management.jmxremote $HADOOP_DATANODE_OPTS"
 
 # Export journalnode memory
-<#if service['journalnode.container.limits.memory'] != "-1" && service['journalnode.memory.ratio'] != "-1">
-  <#assign limitsMemory = service['journalnode.container.limits.memory']?number
-    memoryRatio = service['journalnode.memory.ratio']?number
+<#if conf['journalnode.container.limits.memory'] != "-1" && conf['journalnode.memory.ratio'] != "-1">
+  <#assign limitsMemory = conf['journalnode.container.limits.memory']?number
+    memoryRatio = conf['journalnode.memory.ratio']?number
     journalnodeMemory = limitsMemory * memoryRatio * 1024>
 <#else>
-  <#if service[.data_model["localhostname"]]?? && service[.data_model["localhostname"]]['journalnode.memory']??>
-    <#assign journalnodeMemory=service[.data_model["localhostname"]]['journalnode.memory']?trim?number>
+  <#if conf['journalnode.memory']??>
+    <#assign journalnodeMemory=conf['journalnode.memory']?trim?number>
   <#else>
     <#assign journalnodeMemory=4096>
   </#if>
 </#if>
-export JOURNALNODE_MEMORY=${journalnodeMemory?floor}m
-export HADOOP_JOURNALNODE_OPTS="-Xmx${journalnodeMemory?floor}m $HADOOP_JOURNALNODE_OPTS"
+export JOURNALNODE_MEMORY=${journalnodeMemory?floor?c}m
+export HADOOP_JOURNALNODE_OPTS="-Xmx${journalnodeMemory?floor?c}m $HADOOP_JOURNALNODE_OPTS"
 
 export HADOOP_BALANCER_OPTS="-Xmx4096m -Dcom.sun.management.jmxremote $HADOOP_BALANCER_OPTS"
 
@@ -119,88 +118,64 @@ export HADOOP_BALANCER_OPTS="-Xmx4096m -Dcom.sun.management.jmxremote $HADOOP_BA
 export HADOOP_SECURE_DN_USER=${r"${HADOOP_SECURE_DN_USER}"}
 
 # Where log files are stored.  $HADOOP_HOME/logs by default.
-export HADOOP_LOG_DIR=/var/log/${service.sid}
+export HADOOP_LOG_DIR=/opt/udh/${service.serviceName}/log
 
 # Where log files are stored in the secure data environment.
 export HADOOP_SECURE_DN_LOG_DIR=${r"${HADOOP_LOG_DIR}"}
 
 # The directory where pid files are stored. /tmp by default.
-export HADOOP_PID_DIR=/var/run/${service.sid}
+export HADOOP_PID_DIR=/opt/udh/${service.serviceName}/data
 export HADOOP_SECURE_DN_PID_DIR=${r"${HADOOP_PID_DIR}"}
 
 # A string representing this instance of hadoop. $USER by default.
 #export HADOOP_IDENT_STRING=$USER
 
-export CLUSTER=${service.sid}
+<#--export CLUSTER=${service.serviceName}-->
 
-<#if service.nameservices??>
-  <#list service.nameservices as nameservice>
-    <#assign namenodes=service[nameservice]["HDFS_NAMENODE"]>
-    <#if namenodes?size == 1>
-      <#if namenodes[0].hostname == .data_model["localhostname"]>
-export NAMENODE_NAMESERVICE=${nameservice}
-export HDFS_HA=false
-      </#if>
-    <#elseif namenodes?size == 2>
-      <#if namenodes[0].id lt namenodes[1].id>
-        <#assign nn1=namenodes[0]>
-        <#assign nn2=namenodes[1]>
-      <#else>
-        <#assign nn1=namenodes[1]>
-        <#assign nn2=namenodes[0]>
-      </#if>
+<#--<#assign namenodes=serviceRoles["HDFS_NAMENODE"]>-->
+<#--<#if namenodes?size == 1>-->
+<#--    <#if namenodes[0].hostname == .data_model["localhostname"]>-->
+<#--        export NAMENODE_NAMESERVICE=${service.serviceName}-->
+<#--        export HDFS_HA=false-->
+<#--    </#if>-->
+<#--<#elseif namenodes?size == 2>-->
+<#--    <#if namenodes[0].id lt namenodes[1].id>-->
+<#--        <#assign nn1=namenodes[0]>-->
+<#--        <#assign nn2=namenodes[1]>-->
+<#--    <#else>-->
+<#--        <#assign nn1=namenodes[1]>-->
+<#--        <#assign nn2=namenodes[0]>-->
+<#--    </#if>-->
 
-      <#if nn1.hostname == .data_model["localhostname"]>
-export NAMENODE_NAMESERVICE=${nameservice}
-export HDFS_HA=true
-export NAMENODE_ORDINAL=0
-      <#elseif nn2.hostname == .data_model["localhostname"]>
-export NAMENODE_NAMESERVICE=${nameservice}
-export HDFS_HA=true
-export NAMENODE_ORDINAL=1
-        <#if service["namenode.http-port"]??>
-          <#assign nn1HttpPort=service["namenode.http-port"]>
-        </#if>
-export NAMENODE_PRIMARY_JMX_URL=http://${nn1.hostname}:${nn1HttpPort}/jmx
-      </#if>
-    <#else>
-      <#stop "more than 2 NameNodes in the same NameService not supported">
-    </#if>
-  </#list>
-</#if>
+<#--    <#if nn1.hostname == .data_model["localhostname"]>-->
+<#--        export NAMENODE_NAMESERVICE=${service.serviceName}-->
+<#--        export HDFS_HA=true-->
+<#--        export NAMENODE_ORDINAL=0-->
+<#--    <#elseif nn2.hostname == .data_model["localhostname"]>-->
+<#--        export NAMENODE_NAMESERVICE=${service.serviceName}-->
+<#--        export HDFS_HA=true-->
+<#--        export NAMENODE_ORDINAL=1-->
+<#--        <#if conf["namenode.http-port"]??>-->
+<#--            <#assign nn1HttpPort=conf["namenode.http-port"]>-->
+<#--        </#if>-->
+<#--        export NAMENODE_PRIMARY_JMX_URL=http://${nn1.hostname}:${nn1HttpPort}/jmx-->
+<#--    </#if>-->
+<#--<#else>-->
+<#--    <#stop "more than 2 NameNodes in the same NameService not supported">-->
+<#--</#if>-->
 
-<#if service["HDFS_NAMENODE"]??>
-export HDFS_HA=false
-</#if>
+
 
 # Export journalnode config
 <#if service['journalnode.http-port']??>
-export JOURNALNODE_HTTP_PORT=${service['journalnode.http-port']}
-export JOURNALNODE_RPC_PORT=${service['journalnode.rpc-port']}
-# export HDFS_JOURNAL_NODE_COUNT=${service.roles.HDFS_JOURNALNODE?size}
+export JOURNALNODE_HTTP_PORT=${conf['journalnode.http-port']}
+export JOURNALNODE_RPC_PORT=${conf['journalnode.rpc-port']}
+# export HDFS_JOURNAL_NODE_COUNT=${serviceRoles.HDFS_JOURNALNODE?size}
 </#if>
 
 # Export dfs.datanode.data.dir
-<#if service[.data_model["localhostname"]]?? && service[.data_model["localhostname"]]['dfs.datanode.data.dir']??>
-export DATANODE_DATA_DIRS=${service[.data_model["localhostname"]]['dfs.datanode.data.dir']}
-</#if>
+export DATANODE_DATA_DIRS=/opt/udh/${service.serviceName}/data/datanode
 
 # Export dfs.namenode.name.dir
-<#if service[.data_model["localhostname"]]?? && service[.data_model["localhostname"]]['dfs.namenode.name.dir']??>
-export NAMENODE_DATA_DIRS=${service[.data_model["localhostname"]]['dfs.namenode.name.dir']}
-</#if>
+export NAMENODE_DATA_DIRS=/opt/udh/${service.serviceName}/data/namenode
 
-<#if service.plugins?seq_contains("guardian")>
-cp /etc/${service.sid}/conf/krb5.conf /etc
-export MASTERPRINCIPAL=hdfs/${localhostname}
-export KEYTAB=/etc/${service.sid}/conf/hdfs.keytab
-export KRB_PLUGIN_ENABLE=true
-</#if>
-
-<#if service.auth = "kerberos">
-cp /etc/${service.sid}/conf/krb5.conf /etc/
-export MASTERPRINCIPAL=hdfs/${localhostname}
-export KEYTAB=/etc/${service.sid}/conf/hdfs.keytab
-export KRB_PLUGIN_ENABLE=true
-export ZKFC_OPTS="-Djava.security.auth.login.config=/etc/${service.sid}/conf/jaas.conf"
-</#if>

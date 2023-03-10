@@ -6,6 +6,7 @@ import lombok.Data;
 public  class ServicePresetConf {
 
     private String name;
+    private Integer id;
     private String value;
     private String recommendedValue;
 
