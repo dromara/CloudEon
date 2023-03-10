@@ -126,9 +126,10 @@ const serviceListDetail: React.FC = () => {
             <div className={styles.btnsWrap} key="serviceDetailPageBtns" >
               <Button 
                 key="start" 
-                type="primary"
                 size='small'
-                className={styles.btnStart}
+                type="primary" ghost
+                // type="primary"
+                // className={styles.btnStart}
                 loading={btnLoadingStatus('start')} 
                 disabled={btnDisabledStatus('start')} 
                 onClick={()=> handleACT('start')}
@@ -139,8 +140,9 @@ const serviceListDetail: React.FC = () => {
               <Button 
                 key="stop" 
                 size='small'
-                type="primary" 
-                className={styles.btnStop}
+                type="primary" ghost
+                // type="primary" 
+                // className={styles.btnStop}
                 loading={btnLoadingStatus('stop')} 
                 disabled={btnDisabledStatus('stop')}  
                 onClick={()=> handleACT('stop')}
@@ -162,7 +164,8 @@ const serviceListDetail: React.FC = () => {
               <Button 
                 key="update" 
                 size='small'
-                className={styles.btnUpdate}
+                type="primary" ghost
+                // className={styles.btnUpdate}
                 loading={btnLoadingStatus('update')} 
                 disabled={btnDisabledStatus('update')}  
                 onClick={()=> handleACT('update')}
@@ -173,7 +176,8 @@ const serviceListDetail: React.FC = () => {
               <Button 
                 key="delete" 
                 size='small'
-                danger
+                type="primary" ghost
+                // danger
                 loading={btnLoadingStatus('delete')} 
                 disabled={btnDisabledStatus('delete')}  
                 onClick={()=> handleACT('delete')}

@@ -54,11 +54,12 @@ const ConfigService:React.FC<{serviceId: number}> = ( {serviceId} )=>{
             const result: API.ConfList =  await getListConfsAPI(params);
             setLoading(false)
             const confs = result?.data?.confs?.map((item,index)=>{
+                // console.log('item: ', item, 'index:', index);
                     return {
-                        sourceValue: item.valueType == "Switch" ? eval(item.recommendExpression||'') : item.recommendExpression,
+                        sourceValue: item.valueType == "Switch" ? eval(item.recommendExpression||'false') : item.recommendExpression,
                         ...item,
-                        value: item.valueType == "Switch" ? eval(item.value) : item.value,
-                        recommendExpression: item.valueType == "Switch" ? eval(item.recommendExpression||'') : item.recommendExpression,
+                        value: item.valueType == "Switch" ? eval(item.value||'false') : item.value,
+                        recommendExpression: item.valueType == "Switch" ? eval(item.recommendExpression||'false') : item.recommendExpression,
                     }
                 })
             // const deepCf = JSON.parse(JSON.stringify(confs))
