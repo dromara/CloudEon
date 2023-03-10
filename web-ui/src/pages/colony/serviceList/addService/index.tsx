@@ -9,6 +9,7 @@ import ChooseService from './components/ChooseService'
 import ConfigSecurity from'./components/ConfigSecurity'
 import AssignRoles from'./components/AssignRoles'
 import ConfigService from'./components/ConfigService'
+import {cloneDeep} from 'lodash'
 // import ConfigSecurity from'./components/ConfigSecurity'
 
 
@@ -97,6 +98,7 @@ const serviceAdd: React.FC = () => {
         params?.serviceInfos?.push(sData)
       }
     })
+    
     setSubmitallParams(params)
   }
 
@@ -154,35 +156,39 @@ const serviceAdd: React.FC = () => {
       //   }
       // })
     }
-    let params = {...allParams}
-    params?.serviceInfos?.map(async psItem=>{
-      if(psItem.stackServiceId){
-        if(allConfData[psItem.stackServiceId]){
-          psItem.presetConfList = presetConfData[psItem.stackServiceId] //allConfData[psItem.stackServiceId]
-          psItem.customConfList = customConfData[psItem.stackServiceId]
-        } else {
-            setLoading(true)
-            const params = {
-                serviceId: psItem.stackServiceId,
-                inWizard: true
-            }
-            const result =  await getServiceConfAPI(params);
-            const confsList = result?.data?.confs || []
-            const confsdata = confsList.map((cItem)=>{
-              return {
-                name: cItem.name,
-                recommendedValue: cItem.recommendExpression,
-                value: cItem.recommendExpression
+    let params = cloneDeep(allParams)
+    if(params?.serviceInfos?.length){
+      for(let i=0; i < params.serviceInfos.length; i++){
+        let psItem = params.serviceInfos[i]
+        if(psItem.stackServiceId){
+          if(allConfData[psItem.stackServiceId]){
+            psItem.presetConfList = presetConfData[psItem.stackServiceId] //allConfData[psItem.stackServiceId]
+            psItem.customConfList = customConfData[psItem.stackServiceId]
+          } else {
+              setLoading(true)
+              const params = {
+                  serviceId: psItem.stackServiceId,
+                  inWizard: true
               }
-            })
-            setLoading(false)
-            psItem.presetConfList = confsdata
-            psItem.customConfList = []
-
+              const result =  await getServiceConfAPI(params);
+              const confsList = result?.data?.confs || []
+              const confsdata = confsList.map((cItem)=>{
+                return {
+                  name: cItem.name,
+                  recommendedValue: cItem.recommendExpression,
+                  value: cItem.recommendExpression
+                }
+              })
+              setLoading(false)
+              psItem.presetConfList = confsdata
+              psItem.customConfList = []
+  
+          }
         }
       }
-    })
+    }
     setSubmitallParams(params)
+    return params
   }
 
   // const checkRoleNext = (value:boolean) =>{
@@ -349,7 +355,8 @@ const serviceAdd: React.FC = () => {
               {contextHolder}
               <Button type="primary" 
                 disabled={!checkNext()} 
-                onClick={()=>{
+                loading={loading}
+                onClick={async ()=>{
                   if(current == 0){
                     const params = {
                       "clusterId":colonyData.clusterId,
@@ -373,32 +380,34 @@ const serviceAdd: React.FC = () => {
                     serviceInfos && checkAllRolesRules(serviceInfos)
                     setCurrent(current + 1);
                     
-                    
                   } else if(current == 3){ // 安装
-                    setPresetConfListToParams()
-                    const initParams = {
-                      ...allParams, 
+                    const resultParams = await setPresetConfListToParams()
+                    console.log('---resultParams: ', resultParams);
+                    
+                    let initParams = {
+                      ...resultParams, 
                       stackId: colonyData?.stackId,
                       clusterId: colonyData?.clusterId,
                     }
-                    console.log('--allParams: ', allParams);
                     if(initParams.serviceInfos){
-                      initParams.serviceInfos = allParams?.serviceInfos?.map(sItem=>{
+                      initParams.serviceInfos = resultParams?.serviceInfos?.map(sItem=>{                        
                         let roles = sItem.roles?.map(roleItem=>{
                           return {
                             nodeIds: roleItem.nodeIds,
                             stackRoleName: roleItem.stackRoleName
                           }
                         })
+                        // console.log('--sItem.presetConfList:', sItem.presetConfList);
+                        
                         return {
                           ...sItem,
+                          presetConfList: sItem.presetConfList,
                           roles
                         }
                       })
                     }
                     installService(initParams)
                     // console.log('--initParams: ', initParams);
-                    
 
                   }else{
                     setCurrent(current + 1);
