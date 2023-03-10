@@ -297,14 +297,14 @@ declare namespace API {
   }
 
   type serviceInfos = {
-    name: string,
-    id: number,
-    dockerImage: string,
-    stackServiceName: string,
-    stackServiceId: number,
-    version: string,
-    stackServiceDesc: string,
-    serviceStatus: string
+    name?: string,
+    id?: number,
+    dockerImage?: string,
+    stackServiceName?: string,
+    stackServiceId?: number,
+    version?: string,
+    stackServiceDesc?: string,
+    serviceStatus?: string
   }
 
   type serviceInfosResult = {

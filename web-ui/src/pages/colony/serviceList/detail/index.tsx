@@ -94,12 +94,12 @@ const serviceListDetail: React.FC = () => {
     {
       key: 'StatusTab',
       label: `状态`,
-      children: statusInfo && <StatusTab statusInfo={statusInfo} loading={currentTab == 'StatusTab' && apiLoading}/>,
+      children: <StatusTab statusInfo={statusInfo || {}} loading={currentTab == 'StatusTab' && apiLoading}/>,
     },
     {
       key: 'RoleTab',
       label: `角色`,
-      children: rolesInfo && <RoleTab rolesInfo={rolesInfo} loading={currentTab == 'RoleTab' && apiLoading}/>,
+      children: <RoleTab rolesInfo={rolesInfo || []} loading={currentTab == 'RoleTab' && apiLoading}/>,
     },
     {
       key: 'ConfigTab',

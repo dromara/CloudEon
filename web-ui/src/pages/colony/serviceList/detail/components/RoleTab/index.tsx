@@ -1,6 +1,6 @@
 import type { ProColumns } from '@ant-design/pro-components';
 import { ProTable, TableDropdown } from '@ant-design/pro-components';
-import { Spin } from 'antd';
+import { Spin, Tooltip } from 'antd';
 import { useState, useEffect } from 'react';
 import styles from './index.less'
 
@@ -46,16 +46,44 @@ const roleTab:React.FC<{rolesInfo: API.rolesInfos[], loading: Boolean}> = ({role
             render: (_, record) => {
                 return (
                     <>
-                        {
+                    {record.uiUrls && 
+                    <Tooltip 
+                    overlayStyle={{maxWidth:'1000px'}} overlayInnerStyle={{width:'auto'}}  color="#fff"
+                    title={()=>{
+                       return  record?.uiUrls?.map((urlItem,index)=>{
+                            return (
+                                <div 
+                                    key={index.toString()} 
+                                    style={{width:'auto'}} 
+                                    // className={styles.urlLinkWrap} 
+                                    >
+                                        <a 
+                                            key={'url'+index.toString()} 
+                                            // className={styles.urlLinkWrap}  
+                                            target="_blank" 
+                                            href={urlItem}
+                                            >
+                                                {urlItem}
+                                        </a>
+                                </div>
+                            )
+                        })
+                    }}
+                            placement="top">                                                
+                        <a>查看</a>
+                    </Tooltip>
+            }
+                        {/* {
                             record?.uiUrls?.map((urlItem,index)=>{
                                 return (
                                     <div 
                                         key={index.toString()} 
-                                        style={{width:'200px', whiteSpace: 'pre-wrap'}} 
-                                        className={styles.urlLinkWrap} >
+                                        style={{width:'200px', whiteSpace:'break-spaces'}} 
+                                        // className={styles.urlLinkWrap} 
+                                        >
                                             <a 
                                                 key={'url'+index.toString()} 
-                                                className={styles.urlLinkWrap}  
+                                                // className={styles.urlLinkWrap}  
                                                 target="_blank" 
                                                 href={urlItem}
                                                 >
@@ -64,7 +92,7 @@ const roleTab:React.FC<{rolesInfo: API.rolesInfos[], loading: Boolean}> = ({role
                                     </div>
                                 )
                             })
-                        }
+                        } */}
                     </>
                 )
             }
@@ -90,7 +118,11 @@ const roleTab:React.FC<{rolesInfo: API.rolesInfos[], loading: Boolean}> = ({role
     ];
 
     return (
-        <div style={{minHeight:'200px'}}>
+        <div style={{minHeight:'200px'}} className={styles.roleTab}>
+            {/* <Tooltip open={true} overlayStyle={{maxWidth:'1000px'}} overlayInnerStyle={{width:'auto'}}  color="#fff"
+            title={<a>Tooltip will show on mouse enter.</a>}>
+                <a>Tooltip will show on mouse enter.</a>
+            </Tooltip> */}
             <Spin tip="Loading" size="small" spinning={!!loading}>
                 <ProTable
                     dataSource={rolesInfo}
