@@ -28,7 +28,7 @@ const menuIcons = {
 }
 // antd4中动态创建icon
 const createIcon = (key: string) => {
-  console.log('--key:', key);
+  // console.log('--key:', key);
   
   const icon = React.createElement(
     Icon[menuIcons[key]],
@@ -186,7 +186,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     menuFooterRender:()=><></>,
     menuItemRender: (itemProps: any, defaultDom: any, props: any) => (
 
-      <div style={{height:'80px',display:'flex',justifyContent: 'center',flexDirection:'column', alignItems:'center',width:'100%'}} 
+      <div style={{height:'100%',display:'flex',justifyContent: 'center',flexDirection:'column', alignItems:'center',width:'100%'}} 
         onClick={() => {
           history.push(itemProps.path);
         }}>
