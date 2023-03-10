@@ -22,6 +22,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.data.udh.utils.Constant.HDFS_SERVICE_NAME;
+import static com.data.udh.utils.Constant.YARN_SERVICE_NAME;
+
 @Service
 public class CommandHandler {
 
@@ -40,10 +43,10 @@ public class CommandHandler {
                 taskGroupTypes.add(TaskGroupType.PULL_IMAGE_FROM_REGISTRY);
                 taskGroupTypes.add(TaskGroupType.INSTALL_SERVICE);
                 taskGroupTypes.add(TaskGroupType.CONFIG_SERVICE);
-                if (stackServiceName.equals("HDFS")) {
+                if (stackServiceName.equals(HDFS_SERVICE_NAME)) {
                     taskGroupTypes.add(TaskGroupType.INIT_HDFS);
                 }
-                if (stackServiceName.equals("YARN")) {
+                if (stackServiceName.equals(YARN_SERVICE_NAME)) {
                     taskGroupTypes.add(TaskGroupType.INIT_YARN);
                 }
 

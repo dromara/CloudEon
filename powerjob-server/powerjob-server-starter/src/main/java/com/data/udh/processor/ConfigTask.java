@@ -7,6 +7,7 @@ import com.data.udh.config.UdhConfigProp;
 import com.data.udh.dao.*;
 import com.data.udh.dto.RoleNodeInfo;
 import com.data.udh.entity.*;
+import com.data.udh.utils.Constant;
 import com.data.udh.utils.SshUtils;
 import com.google.common.collect.ImmutableMap;
 import freemarker.template.Configuration;
@@ -23,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @NoArgsConstructor
@@ -76,8 +78,11 @@ public class ConfigTask extends BaseUdhTask {
             dataModel.put("service", serviceInstanceEntity);
             String dependenceServiceInstanceIds = serviceInstanceEntity.getDependenceServiceInstanceIds();
             if (StrUtil.isNotBlank(dependenceServiceInstanceIds)) {
-                buildDependenceServiceInModel(dataModel, dependenceServiceInstanceIds.split(","),
-                        stackServiceRepository, serviceInstanceRepository, roleInstanceRepository, clusterNodeRepository,configRepository);
+                String[] depServiceInstanceIds = dependenceServiceInstanceIds.split(",");
+                buildDependenceServiceInModel(dataModel, depServiceInstanceIds,
+                        stackServiceRepository, serviceInstanceRepository, roleInstanceRepository, clusterNodeRepository, configRepository);
+                // 拷贝依赖服务指定配置到当前服务实例配置目录中
+                copyDependenceServiceConf(stackServiceName, depServiceInstanceIds, outputConfPath, serviceInstanceRepository, stackServiceRepository, workHome);
             }
 
 
@@ -149,7 +154,7 @@ public class ConfigTask extends BaseUdhTask {
 
 
         // 特殊处理
-        if (stackServiceEntity.getName().equals("ZOOKEEPER")) {
+        if (stackServiceEntity.getName().equals(Constant.ZOOKEEPER_SERVICE_NAME)) {
             try {
                 String remoteDataDirPath = "/opt/udh/" + serviceInstanceEntity.getServiceName() + File.separator + "data";
                 String command = "mv " + remoteConfDirPath + File.separator + "myid " + remoteDataDirPath;
@@ -163,6 +168,55 @@ public class ConfigTask extends BaseUdhTask {
         }
 
         SshUtils.closeConnection(clientSession);
+    }
+
+    /**
+     * 拷贝依赖服务指定配置到当前服务实例配置目录中
+     */
+    private void copyDependenceServiceConf(String stackServiceName, String[] depServiceInstanceIds, String outputConfPath,
+                                           ServiceInstanceRepository serviceInstanceRepository, StackServiceRepository stackServiceRepository, String workHome) {
+        if (stackServiceName.equalsIgnoreCase(Constant.YARN_SERVICE_NAME)) {
+            List<Integer> instanceIds = Arrays.stream(depServiceInstanceIds).map(new Function<String, Integer>() {
+                @Override
+                public Integer apply(String s) {
+                    return Integer.valueOf(s);
+                }
+            }).collect(Collectors.toList());
+            // 找出依赖的HDFS服务的实例名
+            String hdfsServiceInstanceName = serviceInstanceRepository.findAllById(instanceIds).stream()
+                    .filter(new Predicate<ServiceInstanceEntity>() {
+                        @Override
+                        public boolean test(ServiceInstanceEntity serviceInstanceEntity) {
+                            // 过滤出框架服务名为HDFS的服务实例
+                            Integer stackServiceId = serviceInstanceEntity.getStackServiceId();
+                            StackServiceEntity stackServiceEntity = stackServiceRepository.findById(stackServiceId).get();
+                            return stackServiceEntity.getName().equals(Constant.HDFS_SERVICE_NAME);
+                        }
+                    }).map(new Function<ServiceInstanceEntity, String>() {
+                        @Override
+                        public String apply(ServiceInstanceEntity serviceInstanceEntity) {
+                            return serviceInstanceEntity.getServiceName();
+                        }
+                    }).findFirst().get();
+            // 拷贝core-site和hdfs-site
+            String depServiceDir = workHome + File.separator + hdfsServiceInstanceName;
+            if (FileUtil.exist(depServiceDir) && FileUtil.isDirectory(depServiceDir)) {
+                File file = new File(depServiceDir);
+                // todo 写死用第一个节点的配置 /work/hdfs1/fl001/conf
+                String firstNodeDir = Arrays.stream(file.list()).findFirst().get();
+                String depServiceDirConf = depServiceDir + File.separator + firstNodeDir + File.separator + CONF_DIR;
+
+                String coreSiteFile = "core-site.xml";
+                FileUtil.copy(depServiceDirConf + File.separator + coreSiteFile, outputConfPath, true);
+                log.info("拷贝依赖服务HDFS的配置文件{}到配置目录",coreSiteFile);
+
+                String hdfsSiteFile = "hdfs-site.xml";
+                FileUtil.copy(depServiceDirConf + File.separator + hdfsSiteFile, outputConfPath, true);
+                log.info("拷贝依赖服务HDFS的配置文件{}到配置目录",hdfsSiteFile);
+            }
+
+
+        }
     }
 
     /**
@@ -185,9 +239,9 @@ public class ConfigTask extends BaseUdhTask {
             List<ServiceRoleInstanceEntity> roleInstanceEntities = roleInstanceRepository.findByServiceInstanceId(serviceInstanceId);
             Map<String, List<RoleNodeInfo>> serviceRoles = getServiceRoles(roleInstanceEntities, clusterNodeRepository);
             services.put(stackServiceName, ImmutableMap.of(
-                    "conf",allConfigEntityList.stream().collect(Collectors.toMap(ServiceInstanceConfigEntity::getName, ServiceInstanceConfigEntity::getValue)),
-                    "serviceRoles",serviceRoles,
-                    "service",serviceInstanceEntity));
+                    "conf", allConfigEntityList.stream().collect(Collectors.toMap(ServiceInstanceConfigEntity::getName, ServiceInstanceConfigEntity::getValue)),
+                    "serviceRoles", serviceRoles,
+                    "service", serviceInstanceEntity));
         });
 
         dataModel.put("dependencies", services);
