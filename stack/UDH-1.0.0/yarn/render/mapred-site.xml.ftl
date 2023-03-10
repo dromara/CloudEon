@@ -12,6 +12,7 @@
     <#assign historyServer=serviceRoles['YARN_HISTORYSERVER'][0]['hostname']>
     <@property "mapreduce.jobhistory.address" historyServer + ":${conf['historyserver.port']}"/>
     <@property "mapreduce.jobhistory.webapp.address" historyServer + ":${conf['historyserver.http-port']}"/>
+    <@property "mapreduce.jobhistory.admin.address" historyServer + ":${conf['historyserver.admin-port']}"/>
     </#if>
 
 

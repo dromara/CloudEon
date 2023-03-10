@@ -32,7 +32,7 @@
     <#--handle dependencies.zookeeper-->
     <#if dependencies.ZOOKEEPER??>
         <#assign zookeeper=dependencies.ZOOKEEPER quorums=[]>
-        <#list zookeeper.serviceRoles['ZOOKEEPER'] as role>
+        <#list zookeeper.serviceRoles['ZOOKEEPER_SERVER'] as role>
             <#assign quorums += [role.hostname + ":" + zookeeper.conf["zookeeper.client.port"]]>
         </#list>
         <#assign quorum = quorums?join(",")>

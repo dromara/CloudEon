@@ -21,16 +21,16 @@ roles:
   - name: YARN_RESOURCEMANAGER
     label: Resource Manager
     roleFullName: hadoop-yarn-resourcemanager
-    linkExpression: "http://${localhostname}:${service['resourcemanager.webapp.port']}/?user.name=yarn"
+    linkExpression: "http://${localhostname}:${conf['resourcemanager.webapp.port']}/?user.name=yarn"
     sortNum: 1
     type: MASTER
     jmxPort: 9232
-    minNum: 1
+    minNum: 2
 
   - name: YARN_NODEMANAGER
     label: "Node Manager"
     roleFullName: "hadoop-yarn-nodemanager"
-    linkExpression: "http://${service['yarn.nodemanager.webapp.address']?replace(r'${yarn.nodemanager.hostname}', localhostname)}/?user.name=yarn"
+    linkExpression: "http://${localhostname}:${conf['nodemanager.webapp.port']}/node/allApplications/?user.name=yarn"
     sortNum: 2
     type: SLAVE
     jmxPort: 9232
@@ -39,20 +39,20 @@ roles:
   - name: YARN_HISTORYSERVER
     label: "History Server"
     roleFullName: hadoop-yarn-historyserver
-    linkExpression: "http://${localhostname}:${service['timelineserver.http.port']}"
+    linkExpression: "http://${localhostname}:${conf['historyserver.http-port']}"
     sortNum: 3
     type: MASTER
     jmxPort: 9232
-    minNum: 0
+    minNum: 1
 
   - name: YARN_TIMELINESERVER
     label: "Timeline Server"
     roleFullName: hadoop-yarn-timelineserver
-    linkExpression: "http://${localhostname}:${service['timelineserver.http.port']}"
+    linkExpression: "http://${localhostname}:${conf['timelineserver.http.port']}"
     sortNum: 4
     type: MASTER
     jmxPort: 9232
-    minNum: 0
+    minNum: 1
 
 
 
@@ -299,9 +299,15 @@ configurations:
   - name: historyserver.port
     recommendExpression: 10020
     valueType: InputNumber
+    configurableInWizard: true
+  - name: historyserver.admin-port
+    recommendExpression: 10033
+    valueType: InputNumber
+    configurableInWizard: true
   - name: historyserver.http-port
     recommendExpression: 19888
     valueType: InputNumber
+    configurableInWizard: true
   - name: resourcemanager.memory
     recommendExpression: 1024
     min: 1024
