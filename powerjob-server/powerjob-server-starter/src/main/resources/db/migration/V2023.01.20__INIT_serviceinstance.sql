@@ -9,7 +9,7 @@ create table udh_service_instance_config
     create_time       datetime(6)  null,
     name              varchar(255) null,
     node_id           int          null,
-    recommended_value varchar(255) null,
+    recommended_value text null,
     conf_file varchar(255) null,
     service_instance_id        int          null,
     update_time       datetime(6)  null,
