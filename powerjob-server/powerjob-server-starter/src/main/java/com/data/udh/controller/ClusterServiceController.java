@@ -117,7 +117,10 @@ public class ClusterServiceController {
         if (StrUtil.isNotBlank(errorServiceInstanceNames)) {
             return ResultDTO.failed("该集群已经安装过相同的服务实例：" + errorServiceInstanceNames);
         }
-        for (InitServiceRequest.ServiceInfo serviceInfo : serviceInfos) {
+        // 根据服务间依赖关系调整安装顺序
+        List<InitServiceRequest.ServiceInfo> sortedServiceInfos = changeInstallSortByDependence(req);
+
+        for (InitServiceRequest.ServiceInfo serviceInfo : sortedServiceInfos) {
 
             Integer stackServiceId = serviceInfo.getStackServiceId();
             // 查询实例表获取新增的实例序号
@@ -244,8 +247,8 @@ public class ClusterServiceController {
         }
 
 
-        //  生成新增服务command
-        List<ServiceInstanceEntity> serviceInstanceEntities = serviceInstanceRepository.findAllById(installedServiceInstanceIds);
+        //  生成新增服务command （按照安装服务间的依赖生成）
+        List<ServiceInstanceEntity> serviceInstanceEntities = installedServiceInstanceIds.stream().map(e -> serviceInstanceRepository.findById(e).get()).collect(Collectors.toList());
         Integer commandId = buildServiceCommand(serviceInstanceEntities, clusterId, CommandType.INSTALL_SERVICE);
 
         //  调用workflow
@@ -253,6 +256,45 @@ public class ClusterServiceController {
 
 
         return ResultDTO.success(null);
+    }
+
+    /**
+     * 根据服务间依赖关系调整安装顺序
+     */
+    private List<InitServiceRequest.ServiceInfo> changeInstallSortByDependence(InitServiceRequest req) {
+        List<InitServiceRequest.ServiceInfo> sortedServiceInfos = new LinkedList<>();
+        // 根据服务间依赖构建Dag图
+        DAG<String, Object, Object> dag = new DAG<>();
+        List<InitServiceRequest.ServiceInfo> serviceInfos = req.getServiceInfos();
+        List<Integer> stackServiceIds = serviceInfos.stream().map(InitServiceRequest.ServiceInfo::getStackServiceId).collect(Collectors.toList());
+        // 构建node
+        List<StackServiceEntity> stackServiceEntities = stackServiceRepository.findAllById(stackServiceIds);
+        stackServiceEntities.forEach(stackServiceEntity -> {
+            String stackServiceEntityName = stackServiceEntity.getName();
+            dag.addNode(stackServiceEntityName, null);
+            log.info("Dag添加node：{}",stackServiceEntityName);
+        });
+        // 构建边
+        stackServiceEntities.forEach(stackServiceEntity -> {
+            String stackServiceEntityName = stackServiceEntity.getName();
+            String dependencies = stackServiceEntity.getDependencies();
+            if (StrUtil.isNotBlank(dependencies)) {
+                for (String depServiceName : dependencies.split(",")) {
+                    dag.addEdge(depServiceName, stackServiceEntityName);
+                    log.info("Dag添加边：{} -> {}",depServiceName,stackServiceEntityName);
+                }
+            }
+        });
+        try {
+            List<String> stackServiceNameOrderByDependence = dag.topologicalSort();
+            Map<String, InitServiceRequest.ServiceInfo> map = serviceInfos.stream().collect(Collectors.toMap(InitServiceRequest.ServiceInfo::getStackServiceName, e -> e, (k1, k2) -> k2));
+            for (String name : stackServiceNameOrderByDependence) {
+                sortedServiceInfos.add(map.get(name));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return sortedServiceInfos;
     }
 
     /**
@@ -685,7 +727,7 @@ public class ClusterServiceController {
         List<ServiceInstanceConfigEntity> serviceInstanceConfigEntities = new ArrayList<>();
         List<ServiceCustomConf> customConfList = serviceConfUpgradeRequest.getCustomConfList();
         List<ServicePresetConf> presetConfList = serviceConfUpgradeRequest.getPresetConfList();
-        fillInstanceConfigEntities(stackId, stackServiceId, serviceInstanceId, serviceInstanceConfigEntities, presetConfList, customConfList,false);
+        fillInstanceConfigEntities(stackId, stackServiceId, serviceInstanceId, serviceInstanceConfigEntities, presetConfList, customConfList, false);
         serviceInstanceConfigRepository.saveAllAndFlush(serviceInstanceConfigEntities);
         return ResultDTO.success(null);
     }
