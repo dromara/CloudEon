@@ -3,10 +3,10 @@
 
 [![GitHub Pull Requests](https://img.shields.io/github/stars/Pandas886/e-mapreduce)](https://github.com/Pandas886/e-mapreduce/stargazers)
 [![HitCount](https://views.whatilearened.today/views/github/Pandas886/e-mapreduce.svg)](https://github.com/Pandas886/e-mapreduce)
-[![GitHub license](https://img.shields.io/github/license/Pandas886/e-mapreduce)](https://github.com/Pandas886/e-mapreduce/LICENSE)
 [![Commits](https://img.shields.io/github/commit-activity/m/Pandas886/e-mapreduce?color=ffff00)](https://github.com/Pandas886/e-mapreduce/commits/main)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 [![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
+[![GitHub license](https://img.shields.io/github/license/Pandas886/e-mapreduce)](https://github.com/Pandas886/e-mapreduce/LICENSE)
 
 <p> 🌉 构建于K8s集群之上的大数据集群管理平台 🌉</p>
 
