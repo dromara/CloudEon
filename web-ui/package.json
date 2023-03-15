@@ -20,7 +20,7 @@
     "lint:style": "stylelint --fix \"src/**/*.less\" --syntax less",
     "openapi": "umi openapi",
     "playwright": "playwright install && playwright test",
-    "prepare": "husky install",
+    "prepare": "cd .. && husky install superjsonweb/.husky",
     "prettier": "prettier -c --write \"src/**/*\"",
     "serve": "umi-serve",
     "start": "cross-env UMI_ENV=dev umi dev",

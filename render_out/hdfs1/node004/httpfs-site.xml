@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <configuration>
 <property>
-    <name>httpfs.hadoop.config.dir</name>
+    <name>httpfs.hadoop.com.data.udh.config.dir</name>
     <value>/etc/HDFS1/conf</value>
 </property>
 <property>
