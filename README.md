@@ -55,7 +55,7 @@
 
 ## 🥰 感谢
 
-感谢如下优秀的项目，没有这些项目，不可能会有go-ldap-admin：
+感谢如下优秀的项目，没有这些项目，不可能会有CloudEon：
 
 - 后端技术栈
   - [Gin-v1.6.3](https://github.com/gin-gonic/gin)
@@ -64,8 +64,8 @@
   - [Go-ldap-v3.4.2](https://github.com/go-ldap/ldap)
   - [Casbin-v2.22.0](https://github.com/casbin/casbin)
 - 前端技术栈
-  - [axios](https://github.com/axios/axios)
-  - [element-ui](https://github.com/ElemeFE/element)
+  - [react](https://github.com/facebook/react)
+  - [ant-design](https://github.com/ant-design/ant-design)
 
 - 另外感谢
   - [go-web-mini](https://github.com/gnimli/go-web-mini)：项目基于该项目重构而成，感谢作者的付出。
@@ -80,9 +80,13 @@
 
 如果你所在公司使用了该项目，烦请在这里留下脚印，感谢支持🥳 [点我](https://github.com/eryajf/go-ldap-admin/issues/18)
 
+
 ## 💎 优秀软件推荐
 
-- [🦄 ConsulManager：高效易用的Consul Web运维平台](https://github.com/starsliao/ConsulManager)
+- [🦄 Kyuubi：高效易用的Consul Web运维平台](https://github.com/starsliao/ConsulManager)
+- [🦄 Doris：高效易用的Consul Web运维平台](https://github.com/starsliao/ConsulManager)
+- [🦄 Dophischeduler：高效易用的Consul Web运维平台](https://github.com/starsliao/ConsulManager)
+
 
 ## 🤝 贡献者
 
