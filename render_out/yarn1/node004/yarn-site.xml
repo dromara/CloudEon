@@ -26,23 +26,23 @@
     <value>yarn</value>
 </property>
 <property>
-    <name>yarn.timeline-service.keytab</name>
+    <name>yarn.timeline-com.data.udh.service.keytab</name>
     <value>YARN.keytab</value>
 </property>
 <property>
-    <name>yarn.timeline-service.principal</name>
+    <name>yarn.timeline-com.data.udh.service.principal</name>
     <value>yarn/_HOST@HADOOP@COM</value>
 </property>
 <property>
-    <name>yarn.timeline-service.http-authentication.type</name>
+    <name>yarn.timeline-com.data.udh.service.http-authentication.type</name>
     <value>kerberos</value>
 </property>
 <property>
-    <name>yarn.timeline-service.http-authentication.kerberos.principal</name>
+    <name>yarn.timeline-com.data.udh.service.http-authentication.kerberos.principal</name>
     <value>HTTP/_HOST@HADOOP@COM</value>
 </property>
 <property>
-    <name>yarn.timeline-service.http-authentication.kerberos.keytab</name>
+    <name>yarn.timeline-com.data.udh.service.http-authentication.kerberos.keytab</name>
     <value>YARN.keytab</value>
 </property>
 
@@ -129,15 +129,15 @@
 </property>
 
 <property>
-    <name>yarn.timeline-service.hostname</name>
+    <name>yarn.timeline-com.data.udh.service.hostname</name>
     <value>node003</value>
 </property>
 <property>
-    <name>yarn.timeline-service.webapp.https.address</name>
+    <name>yarn.timeline-com.data.udh.service.webapp.https.address</name>
     <value>node003:8190</value>
 </property>
 <property>
-    <name>yarn.timeline-service.webapp.address</name>
+    <name>yarn.timeline-com.data.udh.service.webapp.address</name>
     <value>node003:8188</value>
 </property>
 
