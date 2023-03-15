@@ -108,7 +108,7 @@
 
 - [🦄 ConsulManager：高效易用的Consul Web运维平台](https://github.com/starsliao/ConsulManager)
 
-## Contributors ✨
+## 贡献者 ✨
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
 
