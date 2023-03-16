@@ -68,11 +68,11 @@
 感谢如下优秀的项目，没有这些项目，不可能会有CloudEon：
 
 - 后端技术栈
-  - [Gin-v1.6.3](https://github.com/gin-gonic/gin)
-  - [Gorm-v1.24.5](https://github.com/go-gorm/gorm)
-  - [Sqlite-v1.7.0](https://github.com/glebarez/sqlite)
-  - [Go-ldap-v3.4.2](https://github.com/go-ldap/ldap)
-  - [Casbin-v2.22.0](https://github.com/casbin/casbin)
+  - [springboot-v2.7.4](https://github.com/spring-projects/spring-boot)
+  - [lombok-v1.18.12](https://github.com/projectlombok/lombok)
+  - [hutool-v5.8.9](https://github.com/dromara/hutool)
+  - [hibernate-v5.6.11](https://github.com/hibernate/hibernate-orm)
+  - [freemarker-v2.3.31](https://github.com/apache/freemarker)
 - 前端技术栈
   - [react](https://github.com/facebook/react)
   - [ant-design](https://github.com/ant-design/ant-design)
@@ -93,9 +93,9 @@
 
 ## 💎 优秀软件推荐
 
-- [🦄 Kyuubi：高效易用的Consul Web运维平台](https://github.com/starsliao/ConsulManager)
-- [🦄 Doris：高效易用的Consul Web运维平台](https://github.com/starsliao/ConsulManager)
-- [🦄 Dophischeduler：高效易用的Consul Web运维平台](https://github.com/starsliao/ConsulManager)
+- [🦄 Kyuubi：为数据湖查询引擎（例如Spark、Flink或Trino等）提供SQL服务](https://github.com/apache/kyuubi)
+- [🦄 Doris：简单易用、高性能和统一的分析数据库](https://github.com/apache/doris/)
+- [🦄 DolphinScheduler：分布式和可扩展的开源工作流协调平台](https://github.com/apache/dolphinscheduler)
 
 
 ## 🤝 贡献者
