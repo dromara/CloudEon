@@ -37,11 +37,11 @@
 
 **页面功能概览：**
 
-| ![登录页](https://cdn.staticaly.com/gh/eryajf/tu/main/img/image_20220724_165411.png) | ![首页](https://cdn.staticaly.com/gh/eryajf/tu/main/img/image_20220724_165545.png) |
-| :----------------------------------------------------------: | ------------------------------------------------------------ |
-| ![用户管理](https://cdn.staticaly.com/gh/eryajf/tu/main/img/image_20220724_165623.png) | ![分组管理](https://cdn.staticaly.com/gh/eryajf/tu/main/img/image_20220724_165701.png) |
-| ![字段关系管理](https://cdn.staticaly.com/gh/eryajf/tu/main/img/image_20220724_165853.png) | ![菜单管理](https://cdn.staticaly.com/gh/eryajf/tu/main/img/image_20220724_165954.png) |
-| ![接口管理](https://cdn.staticaly.com/gh/eryajf/tu/main/img/image_20220724_170015.png) | ![操作日志](https://cdn.staticaly.com/gh/eryajf/tu/main/img/image_20220724_170035.png) |
+| ![服务详情](http://image-picgo.test.upcdn.net/img/20230316100228.png) | ![服务角色](http://image-picgo.test.upcdn.net/img/20230316100441.png)   |
+|:-----------------------------------------------------------------:|---------------------------------------------------------------------|
+| ![服务配置](http://image-picgo.test.upcdn.net/img/20230316100517.png) | ![指令执行详情](http://image-picgo.test.upcdn.net/img/20230316100553.png) |
+| ![指令日志](http://image-picgo.test.upcdn.net/img/20230316100634.png) | ![新增服务](http://image-picgo.test.upcdn.net/img/20230316100720.png)   |
+| ![分配角色](http://image-picgo.test.upcdn.net/img/20230316100747.png) | ![自定义配置](http://image-picgo.test.upcdn.net/img/20230316100833.png)  |
 
 
 ## 👨‍💻 项目地址
