@@ -19,6 +19,9 @@
         <akka.version>2.6.12</akka.version>
         <fastjson.version>1.2.83</fastjson.version>
         <lombok.version>1.18.12</lombok.version>
+        <commons.lang.version>3.12.0</commons.lang.version>
+        <guava.version>31.1-jre</guava.version>
+        <commons.io.version>2.7</commons.io.version>
 
     </properties>
 
@@ -59,6 +62,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-freemarker</artifactId>
             <version>${springboot.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>snakeyaml</artifactId>
+                    <groupId>org.yaml</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- SpringBoot -->
         <dependency>
@@ -106,6 +115,46 @@
             <version>2.9.2</version>
         </dependency>
         <!-- 自定义依赖 -->
+        <dependency>
+            <groupId>io.fabric8</groupId>
+            <artifactId>kubernetes-client</artifactId>
+            <version>6.5.0</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>snakeyaml</artifactId>
+                    <groupId>org.yaml</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons.lang.version}</version>
+        </dependency>
+        <!-- guava -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+        </dependency>
+        <!-- commons-io -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons.io.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <artifactId>snakeyaml</artifactId>
+            <groupId>org.yaml</groupId>
+            <version>1.33</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

@@ -3,10 +3,10 @@ package com.data.udh.controller;
 import com.data.udh.controller.request.ModifyClusterInfoRequest;
 import com.data.udh.dao.ClusterInfoRepository;
 import com.data.udh.dao.StackInfoRepository;
+import com.data.udh.dto.ResultDTO;
 import com.data.udh.entity.ClusterInfoEntity;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
-import tech.powerjob.common.response.ResultDTO;
 
 import javax.annotation.Resource;
 import java.util.Date;
