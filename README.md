@@ -19,6 +19,7 @@
 **目录**
 
 - [ℹ️ 项目简介](#-%E9%A1%B9%E7%9B%AE%E7%AE%80%E4%BB%8B)
+- [👨‍💻 项目地址](#-%E9%A1%B9%E7%9B%AE%E5%9C%B0%E5%9D%80)
 - [🔗 文档快链](#-%E6%96%87%E6%A1%A3%E5%BF%AB%E9%93%BE)
 - [🥰 感谢](##-%E6%84%9F%E8%B0%A2)
 - [🤗 另外](#-%E5%8F%A6%E5%A4%96)
@@ -41,6 +42,14 @@
 | ![用户管理](https://cdn.staticaly.com/gh/eryajf/tu/main/img/image_20220724_165623.png) | ![分组管理](https://cdn.staticaly.com/gh/eryajf/tu/main/img/image_20220724_165701.png) |
 | ![字段关系管理](https://cdn.staticaly.com/gh/eryajf/tu/main/img/image_20220724_165853.png) | ![菜单管理](https://cdn.staticaly.com/gh/eryajf/tu/main/img/image_20220724_165954.png) |
 | ![接口管理](https://cdn.staticaly.com/gh/eryajf/tu/main/img/image_20220724_170015.png) | ![操作日志](https://cdn.staticaly.com/gh/eryajf/tu/main/img/image_20220724_170035.png) |
+
+
+## 👨‍💻 项目地址
+
+| 分类 |                        GitHub                        |                        Gitee                        |
+| :--: | :--------------------------------------------------: | :-------------------------------------------------: |
+| 后端 |  https://github.com/Pandas886/CloudEon   | https://github.com/Pandas886/CloudEon   |
+| 前端 | https://github.com/Pandas886/CloudEon/tree/master/web-ui | https://gitee.com/eryajf-world/go-ldap-admin-ui.git |
 
 
 ## 🔗 文档快链
