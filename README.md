@@ -56,12 +56,12 @@
 
 项目相关介绍，使用，最佳实践等相关内容，都会在官方文档呈现，如有疑问，请先阅读官方文档，以下列举以下常用快链。
 
-- [官网地址](http://ldapdoc.eryajf.net)
-- [项目背景](http://ldapdoc.eryajf.net/pages/101948/)
-- [快速开始](http://ldapdoc.eryajf.net/pages/706e78/)
-- [功能概览](http://ldapdoc.eryajf.net/pages/7a40de/)
-- [本地开发](http://ldapdoc.eryajf.net/pages/cb7497/)
-- [生产部署](http://ldapdoc.eryajf.net/pages/5769c4/)
+- [官网地址](https://github.com/Pandas886/CloudEon)
+- [项目背景](https://github.com/Pandas886/CloudEon)
+- [快速开始](https://github.com/Pandas886/CloudEon)
+- [功能概览](https://github.com/Pandas886/CloudEon)
+- [本地开发](https://github.com/Pandas886/CloudEon)
+- [生产部署](https://github.com/Pandas886/CloudEon)
 
 ## 🥰 感谢
 
@@ -89,7 +89,7 @@
 
 ## 📝 使用登记
 
-如果你所在公司使用了该项目，烦请在这里留下脚印，感谢支持🥳 [点我](https://github.com/eryajf/go-ldap-admin/issues/18)
+如果你所在公司使用了该项目，烦请在这里留下脚印，感谢支持🥳 [点我](https://github.com/Pandas886/CloudEon/issues/8)
 
 
 ## 💎 优秀软件推荐
