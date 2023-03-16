@@ -23,12 +23,23 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "huzk8",
+      "name": "huzk",
+      "avatar_url": "https://avatars.githubusercontent.com/u/18548053?v=4",
+      "profile": "https://github.com/huzk8",
+      "contributions": [
+        "infra",
+        "test",
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
   "skipCi": true,
   "repoType": "github",
   "repoHost": "https://github.com",
-  "projectName": "e-mapreduce",
+  "projectName": "CloudEon",
   "projectOwner": "Pandas886"
 }
