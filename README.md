@@ -78,7 +78,8 @@
   - [ant-design](https://github.com/ant-design/ant-design)
 
 - 另外感谢
-  - [go-web-mini](https://github.com/gnimli/go-web-mini)：项目基于该项目重构而成，感谢作者的付出。
+  - [datasophon](https://github.com/datasophon/datasophon)
+  - [Ambari](https://github.com/apache/ambari)
 
 ## 🤗 另外
 
