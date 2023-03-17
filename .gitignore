@@ -42,13 +42,13 @@ build/
 */.phd
 */.txt
 */.trc
-powerjob-data/
 
-### web-ui
-web-ui/node_modules
-web-ui/src/.umi
-web-ui/src/.umi-production
-web-ui/yarn.lock
-web-ui/package-lock.json
-web-ui/pnpm-lock.yaml
-web-ui/dist
+### cloudeon-ui
+cloudeon-ui/node_modules
+cloudeon-ui/src/.umi
+cloudeon-ui/src/.umi-production
+cloudeon-ui/yarn.lock
+cloudeon-ui/package-lock.json
+cloudeon-ui/pnpm-lock.yaml
+cloudeon-ui/dist
+web-ui
