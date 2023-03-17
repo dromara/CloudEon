@@ -24,6 +24,8 @@ import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @RestController
@@ -82,13 +84,27 @@ public class NodeController {
         return checkHostInfo;
     }
 
+    /**
+     *  根据集群id查询绑定的k8s节点信息
+     */
     @GetMapping("/list")
     public ResultDTO<List<NodeInfoVO>> listNode(Integer clusterId) {
         List<NodeInfoVO> result;
+        // 获取k8s集群节点信息
+        NodeList nodeList = kubeClient.nodes().list();
+        List<Node> items = nodeList.getItems();
+        Map<String, Node> nodeMap = items.stream().collect(Collectors.toMap(new Function<Node, String>() {
+            @Override
+            public String apply(Node node) {
+                return node.getStatus().getAddresses().get(0).getAddress();
+            }
+        }, node -> node));
+        // 从数据库查出当前集群绑定的节点
         List<ClusterNodeEntity> nodeEntities = clusterNodeRepository.findByClusterId(clusterId);
         result = nodeEntities.stream().map(n -> {
-            NodeInfoVO nodeInfoVO = new NodeInfoVO();
-            BeanUtil.copyProperties(n, nodeInfoVO);
+            // 从map中获得k8s上最新的节点信息
+            Node node = nodeMap.get(n.getIp());
+            NodeInfoVO nodeInfoVO = getNodeInfoVO(node);
             return nodeInfoVO;
         }).collect(Collectors.toList());
         return ResultDTO.success(result);
@@ -97,6 +113,7 @@ public class NodeController {
 
     /**
      * 查询k8s节点信息详情
+     * todo  过滤出未绑定的节点
      */
     @GetMapping("/listK8sNode")
     public ResultDTO<List<NodeInfoVO>> listK8sNode() {
@@ -104,34 +121,39 @@ public class NodeController {
         NodeList nodeList = kubeClient.nodes().list();
         List<Node> items = nodeList.getItems();
         List<NodeInfoVO> result = items.stream().map(e -> {
-            int cpu = e.getStatus().getCapacity().get("cpu").getNumericalAmount().intValue();
-            long memory = e.getStatus().getCapacity().get("memory").getNumericalAmount().longValue();
-            long storage = e.getStatus().getCapacity().get("ephemeral-storage").getNumericalAmount().longValue();
-            String ip = e.getStatus().getAddresses().get(0).getAddress();
-            String hostname = e.getStatus().getAddresses().get(1).getAddress();
-            String architecture = e.getStatus().getNodeInfo().getArchitecture();
-            String containerRuntimeVersion = e.getStatus().getNodeInfo().getContainerRuntimeVersion();
-            String kubeletVersion = e.getStatus().getNodeInfo().getKubeletVersion();
-            String kernelVersion = e.getStatus().getNodeInfo().getKernelVersion();
-            String osImage = e.getStatus().getNodeInfo().getOsImage();
-
-            NodeInfoVO nodeInfoVO = NodeInfoVO.builder()
-                    .ip(ip)
-                    .hostname(hostname)
-                    .cpuArchitecture(architecture)
-                    .coreNum(cpu)
-                    .totalMem(ByteConverter.convertKBToGB(memory) + "GB")
-                    .totalDisk(ByteConverter.convertKBToGB(storage) + "GB")
-                    .kernelVersion(kernelVersion)
-                    .kubeletVersion(kubeletVersion)
-                    .containerRuntimeVersion(containerRuntimeVersion)
-                    .osImage(osImage)
-                    .build();
+            NodeInfoVO nodeInfoVO = getNodeInfoVO(e);
 
             return nodeInfoVO;
 
         }).collect(Collectors.toList());
 
         return ResultDTO.success(result);
+    }
+
+    private NodeInfoVO getNodeInfoVO(Node e) {
+        int cpu = e.getStatus().getCapacity().get("cpu").getNumericalAmount().intValue();
+        long memory = e.getStatus().getCapacity().get("memory").getNumericalAmount().longValue();
+        long storage = e.getStatus().getCapacity().get("ephemeral-storage").getNumericalAmount().longValue();
+        String ip = e.getStatus().getAddresses().get(0).getAddress();
+        String hostname = e.getStatus().getAddresses().get(1).getAddress();
+        String architecture = e.getStatus().getNodeInfo().getArchitecture();
+        String containerRuntimeVersion = e.getStatus().getNodeInfo().getContainerRuntimeVersion();
+        String kubeletVersion = e.getStatus().getNodeInfo().getKubeletVersion();
+        String kernelVersion = e.getStatus().getNodeInfo().getKernelVersion();
+        String osImage = e.getStatus().getNodeInfo().getOsImage();
+
+        NodeInfoVO nodeInfoVO = NodeInfoVO.builder()
+                .ip(ip)
+                .hostname(hostname)
+                .cpuArchitecture(architecture)
+                .coreNum(cpu)
+                .totalMem(ByteConverter.convertKBToGB(memory) + " GB")
+                .totalDisk(ByteConverter.convertKBToGB(storage) + " GB")
+                .kernelVersion(kernelVersion)
+                .kubeletVersion(kubeletVersion)
+                .containerRuntimeVersion(containerRuntimeVersion)
+                .osImage(osImage)
+                .build();
+        return nodeInfoVO;
     }
 }
