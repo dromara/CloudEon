@@ -682,13 +682,15 @@ public class ClusterServiceController {
                 ClusterNodeEntity nodeEntity = clusterNodeRepository.findById(roleInstanceEntity.getNodeId()).get();
                 // 查找该角色实例绑定的web地址
                 ServiceRoleInstanceWebuisEntity webuisEntity = roleInstanceWebuisRepository.findByServiceRoleInstanceId(roleInstanceEntity.getId());
+                StackServiceRoleEntity stackServiceRoleEntity = stackServiceRoleRepository.findById(roleInstanceEntity.getStackServiceRoleId()).get();
                 ServiceInstanceRoleVO serviceInstanceRoleVO = ServiceInstanceRoleVO.builder()
                         .roleStatus(roleInstanceEntity.getServiceRoleState().name())
                         .id(roleInstanceEntity.getId())
                         .nodeHostIp(nodeEntity.getIp())
                         .nodeHostname(nodeEntity.getHostname())
                         .nodeId(nodeEntity.getId())
-                        .name(roleInstanceEntity.getServiceRoleName())
+                        // 用 stackServiceRoleEntity label更清晰 （如：Doris Be）
+                        .name(stackServiceRoleEntity.getLabel())
                         .build();
                 if (webuisEntity != null) {
                     serviceInstanceRoleVO.setUiUrls(Lists.newArrayList(webuisEntity.getWebHostUrl(), webuisEntity.getWebIpUrl()));
