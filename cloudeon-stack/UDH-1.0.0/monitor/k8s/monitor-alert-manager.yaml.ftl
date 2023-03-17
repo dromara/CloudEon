@@ -41,7 +41,7 @@ spec:
       hostNetwork: true
       containers:
       - args:
-        - "/opt/udh/${service.serviceName}/conf/nodemananger-bootstrap.sh"
+        - "/opt/udh/${service.serviceName}/conf/alertmanager-bootstrap.sh"
         image: "${dockerImage}"
         imagePullPolicy: "Always"
         readinessProbe:
@@ -49,8 +49,8 @@ spec:
             command:
             - "/bin/bash"
             - "-c"
-            - "curl --fail --connect-timeout 15 --max-time 15 \"http://`hostname`:${conf['nodemanager.webapp.port']}/?user.name=yarn\"\
-              \n"
+            - "curl --fail --connect-timeout 15 --max-time 15 \"http://`hostname`:${conf['alertmanager.http.port']}/\"\
+            \n"
           failureThreshold: 3
           initialDelaySeconds: 10
           periodSeconds: 10

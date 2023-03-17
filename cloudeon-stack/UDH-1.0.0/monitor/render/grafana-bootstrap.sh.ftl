@@ -3,7 +3,7 @@
 
 
 export LOG_DIR=/opt/udh/${service.serviceName}/log
-export PID_DIR=/opt/udh/${service.serviceName}/grafana/data
+export PID_DIR=/opt/udh/${service.serviceName}/data/grafana
 
 export HOSTNAME=`hostname`
 

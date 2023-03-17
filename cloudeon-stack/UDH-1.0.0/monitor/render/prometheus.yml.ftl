@@ -31,4 +31,4 @@ scrape_configs:
     # scheme defaults to 'http'.
 
     static_configs:
-    - targets: ['${serviceRoles['MONITOR_PROMETHUS'][0].hostname}:${conf['prometheus.http.port']}']
+    - targets: ['${serviceRoles['MONITOR_PROMETHEUS'][0].hostname}:${conf['prometheus.http.port']}']
