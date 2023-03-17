@@ -41,7 +41,7 @@ spec:
       hostNetwork: true
       containers:
       - args:
-        - "/opt/udh/${service.serviceName}/conf/historyserver-bootstrap.sh"
+        - "/opt/udh/${service.serviceName}/conf/grafana-bootstrap.sh"
         image: "${dockerImage}"
         imagePullPolicy: "Always"
         name: "${roleServiceFullName}"
@@ -50,7 +50,7 @@ spec:
             command:
               - "/bin/bash"
               - "-c"
-              - "curl --fail --connect-timeout 15 --max-time 15 \"http://`hostname`:${conf['historyserver.http-port']}/?user.name=yarn\"\
+              - "curl --fail --connect-timeout 15 --max-time 15 \"http://`hostname`:${conf['grafana.http.port']}/\"\
               \n"
           failureThreshold: 3
           initialDelaySeconds: 10

@@ -13,28 +13,26 @@ persistencePaths:
   - /opt/udh/${serviceInstanceId}/conf
   - /opt/udh/${serviceInstanceId}/log
   - /opt/udh/${serviceInstanceId}/data
-  - /opt/udh/${serviceInstanceId}/grafana/data
-  - /opt/udh/${serviceInstanceId}/prometheus/data
-  - /opt/udh/${serviceInstanceId}/alertmanager/data
-  - /opt/udh/${serviceInstanceId}/nodeexporter/data
+  - /opt/udh/${serviceInstanceId}/data/grafana
+  - /opt/udh/${serviceInstanceId}/data/prometheus
+  - /opt/udh/${serviceInstanceId}/data/alertmanager
+  - /opt/udh/${serviceInstanceId}/data/nodeexporter
 
 
 roles:
-  - name: MONITOR_PROMETHUS
-    label: prometheus
+  - name: MONITOR_PROMETHEUS
+    label: Prometheus
     roleFullName: monitor-prometheus
-    linkExpression: "http://${localhostname}:${conf['nodemanager.webapp.port']}/node/allApplications/?user.name=yarn"
+    linkExpression: "http://${localhostname}:${conf['prometheus.http.port']}"
     sortNum: 1
     type: MASTER
     jmxPort: 9232
     fixedNum: 1
 
-
-
   - name: MONITOR_ALERTMANAGER
     label: "Alert Manager"
     roleFullName: monitor-alert-manager
-    linkExpression: "http://${localhostname}:${conf['historyserver.http-port']}"
+    linkExpression: "http://${localhostname}:${conf['alertmanager.http.port']}"
     sortNum: 2
     type: MASTER
     jmxPort: 9232
@@ -43,7 +41,7 @@ roles:
   - name: MONITOR_NODEEXPORTER
     label: "Node Exporter"
     roleFullName: monitor-node-exporter
-    linkExpression: "http://${localhostname}:${conf['historyserver.http-port']}"
+    linkExpression: "http://${localhostname}:${conf['nodeexporter.http.port']}"
     sortNum: 3
     type: SLAVE
     jmxPort: 9232
@@ -52,7 +50,7 @@ roles:
   - name: MONITOR_GRAFANA
     label: Grafana
     roleFullName: monitor-grafana
-    linkExpression: "http://${localhostname}:${conf['resourcemanager.webapp.port']}/?user.name=yarn"
+    linkExpression: "http://${localhostname}:${conf['grafana.http.port']}"
     sortNum: 4
     type: MASTER
     jmxPort: 9232
@@ -72,7 +70,7 @@ configurations:
     valueType: InputNumber
     configurableInWizard: true
   - name: nodeexporter.http.port
-    recommendExpression: 9100
+    recommendExpression: 9101
     valueType: InputNumber
     configurableInWizard: true
   - name: alertmanager.http.port

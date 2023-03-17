@@ -97,7 +97,6 @@ public class ClusterServiceController {
     @Resource
     private ServiceInstanceSeqRepository serviceInstanceSeqRepository;
 
-    //    @Transactional(value = "udhTransactionManager", rollbackFor = Exception.class)
     @PostMapping("/initService")
     public ResultDTO<Void> initService(@RequestBody InitServiceRequest req) {
         Integer clusterId = req.getClusterId();
@@ -703,7 +702,7 @@ public class ClusterServiceController {
      * 删除服务实例
      */
     @GetMapping("/deleteServiceInstance")
-    @Transactional(value = "udhTransactionManager", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public ResultDTO<Void> deleteServiceInstance(Integer serviceInstanceId) {
 
         // 删除服务实例表

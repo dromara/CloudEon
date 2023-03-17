@@ -41,22 +41,22 @@ spec:
       hostNetwork: true
       containers:
       - args:
-        - "/opt/udh/${service.serviceName}/conf/resourcemanager-bootstrap.sh"
+        - "/opt/udh/${service.serviceName}/conf/prometheus-bootstrap.sh"
         image: "${dockerImage}"
         imagePullPolicy: "Always"
+        name: "${roleServiceFullName}"
         readinessProbe:
           exec:
             command:
-            - "/bin/bash"
-            - "-c"
-            - "curl --fail --connect-timeout 15 --max-time 15 \"http://`hostname`:${conf['resourcemanager.webapp.port']}/?user.name=yarn\"\
-            \n"
+              - "/bin/bash"
+              - "-c"
+              - "curl --fail --connect-timeout 15 --max-time 15 \"http://`hostname`:${conf['prometheus.http.port']}/\"\
+              \n"
           failureThreshold: 3
           initialDelaySeconds: 10
           periodSeconds: 10
           successThreshold: 1
           timeoutSeconds: 1
-        name: "${roleServiceFullName}"
         resources:
           requests: {}
           limits: {}
