@@ -1,4 +1,4 @@
-import { outLogin } from '@/services/ant-design-pro/api';
+// import { outLogin } from '@/services/ant-design-pro/api';
 import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Menu, Spin } from 'antd';
 import type { ItemType } from 'antd/lib/menu/hooks/useItems';
@@ -9,6 +9,7 @@ import { history, useModel } from 'umi';
 import HeaderDropdown from '../HeaderDropdown';
 import styles from './index.less';
 import userImg from '../../assets/images/user.png'
+import { logoutAPI } from '@/services/ant-design-pro/colonyLogin';
 
 export type GlobalHeaderRightProps = {
   menu?: boolean;
@@ -18,7 +19,7 @@ export type GlobalHeaderRightProps = {
  * 退出登录，并且将当前的 url 保存
  */
 const loginOut = async () => {
-  await outLogin();
+  await logoutAPI();
   const { query = {}, search, pathname } = history.location;
   const { redirect } = query;
   // Note: There may be security issues, please note
@@ -65,6 +66,7 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) => {
   }
 
   const { currentUser } = initialState;
+  
 
   if (!currentUser || !currentUser.name) {
     return loading;
