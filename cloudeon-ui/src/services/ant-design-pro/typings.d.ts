@@ -231,6 +231,12 @@ declare namespace API {
     data?: any[];
   }
 
+  type stringResult = {
+    success?: boolean;
+    message?: string;
+    data?: string;
+  }
+
   type commandResult = {
     success?: boolean;
     message?: string;

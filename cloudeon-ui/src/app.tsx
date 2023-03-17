@@ -69,7 +69,20 @@ export const request: RequestConfig = {
   //     };
   //   },
   middlewares: [],
-  requestInterceptors: [],
+  requestInterceptors: [
+    (url,options) => {
+        let headers = { satoken:'' }
+        //判断本地session是否有数据，如果有就得到token，并付给请求头
+        if(sessionStorage.getItem('token') != null){
+          let c_token = sessionStorage.getItem('token');
+          headers.satoken = c_token || ''
+        }
+        return {
+          url,
+          options:{...options,headers}
+        }
+    }
+  ],
   responseInterceptors: [
     (response, options) => {
       const codeMaps = {
@@ -99,23 +112,23 @@ export async function getInitialState(): Promise<{
   fetchUserInfo?: () => Promise<API.CurrentUser | undefined>;
 }> {
   const fetchUserInfo = async () => {
-    try {
-      const msg = await queryCurrentUser();
-      return msg.data;
-    } catch (error) {
-      history.push(loginPath);
-    }
+    // try {
+    //   const msg = await queryCurrentUser();
+    //   return msg.data;
+    // } catch (error) {
+    //   history.push(loginPath);
+    // }
     return undefined;
   };
   // 如果不是登录页面，执行
-  if (history.location.pathname !== loginPath) {
-    const currentUser = await fetchUserInfo();
-    return {
-      fetchUserInfo,
-      currentUser,
-      settings: defaultSettings,
-    };
-  }
+  // if (history.location.pathname !== loginPath) {
+  //   const currentUser = await fetchUserInfo();
+  //   return {
+  //     fetchUserInfo,
+  //     currentUser,
+  //     settings: defaultSettings,
+  //   };
+  // }
   return {
     fetchUserInfo,
     settings: defaultSettings,

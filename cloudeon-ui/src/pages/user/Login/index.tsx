@@ -18,6 +18,7 @@ import {
 import { Alert, message, Button, Image, Form, Input } from 'antd';
 import React, { useState } from 'react';
 import { FormattedMessage, history, SelectLang, useIntl, useModel } from 'umi';
+import { loginAPI } from '@/services/ant-design-pro/colonyLogin'
 import styles from './index.less';
 import loginImg from '../../../assets/images/login-img.png'
 
@@ -35,51 +36,87 @@ const LoginMessage: React.FC<{
 );
 
 const Login: React.FC = () => {
-  const [userLoginState, setUserLoginState] = useState<API.LoginResult>({});
+  // const [userLoginState, setUserLoginState] = useState<API.stringResult>({});
   const [type, setType] = useState<string>('account');
   const { initialState, setInitialState } = useModel('@@initialState');
 
   const intl = useIntl();
 
-  const fetchUserInfo = async () => {
-    const userInfo = await initialState?.fetchUserInfo?.();
-    if (userInfo) {
+  const fetchUserInfo = async (values: any) => {
+    // const userInfo = await initialState?.fetchUserInfo?.();
+    // if (userInfo) {
+    //   await setInitialState((s) => ({
+    //     ...s,
+    //     currentUser: userInfo,
+    //   }));
+    // }
+    if (values) {
       await setInitialState((s) => ({
         ...s,
-        currentUser: userInfo,
+        currentUser: values,
       }));
     }
   };
 
+  const setToken = (value:string) =>{
+    sessionStorage.setItem('token',value)
+  }
+
   const handleSubmit = async (values: API.LoginParams) => {
-    try {
-      // 登录
-      const msg = await login({ ...values, type });
-      if (msg.status === 'ok') {
-        const defaultLoginSuccessMessage = intl.formatMessage({
-          id: 'pages.login.success',
-          defaultMessage: '登录成功！',
-        });
-        message.success(defaultLoginSuccessMessage);
-        await fetchUserInfo();
-        /** 此方法会跳转到 redirect 参数所在的位置 */
-        if (!history) return;
-        const { query } = history.location;
-        const { redirect } = query as { redirect: string };
-        history.push(redirect || '/');
-        return;
-      }
-      console.log(msg);
-      // 如果失败去设置用户错误信息
-      setUserLoginState(msg);
-    } catch (error) {
-      const defaultLoginFailureMessage = intl.formatMessage({
-        id: 'pages.login.failure',
-        defaultMessage: '登录失败，请重试！',
-      });
-      message.error(defaultLoginFailureMessage);
+    const params = {
+      name: values.username,
+      pwd: values.password
     }
-  };
+    const result = await loginAPI(params)
+    if(result && result.success){
+      const defaultLoginSuccessMessage = intl.formatMessage({
+        id: 'pages.login.success',
+        defaultMessage: '登录成功！',
+      });
+      message.success(defaultLoginSuccessMessage);
+      setToken(result.data||'')
+      await fetchUserInfo(params);
+      /** 此方法会跳转到 redirect 参数所在的位置 */
+      if (!history) return;
+      const { query } = history.location;
+      const { redirect } = query as { redirect: string };
+      history.push(redirect || '/');
+      return;
+    }
+    // 如果失败显示错误信息
+    message.error(result.message);
+    // setUserLoginState(false);
+  }
+
+  // const handleSubmit1 = async (values: API.LoginParams) => {
+  //   try {
+  //     // 登录
+  //     const msg = await login({ ...values, type });
+  //     if (msg.status === 'ok') {
+  //       const defaultLoginSuccessMessage = intl.formatMessage({
+  //         id: 'pages.login.success',
+  //         defaultMessage: '登录成功！',
+  //       });
+  //       message.success(defaultLoginSuccessMessage);
+  //       await fetchUserInfo();
+  //       /** 此方法会跳转到 redirect 参数所在的位置 */
+  //       if (!history) return;
+  //       const { query } = history.location;
+  //       const { redirect } = query as { redirect: string };
+  //       history.push(redirect || '/');
+  //       return;
+  //     }
+  //     console.log(msg);
+  //     // 如果失败去设置用户错误信息
+  //     setUserLoginState(msg);
+  //   } catch (error) {
+  //     const defaultLoginFailureMessage = intl.formatMessage({
+  //       id: 'pages.login.failure',
+  //       defaultMessage: '登录失败，请重试！',
+  //     });
+  //     message.error(defaultLoginFailureMessage);
+  //   }
+  // };
   // const { status, type: loginType } = userLoginState;
   const onFinishFailed = (errorInfo: any) => {
     console.log('Failed:', errorInfo);
