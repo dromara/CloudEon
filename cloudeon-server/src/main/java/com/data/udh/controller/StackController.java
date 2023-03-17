@@ -11,10 +11,10 @@ import com.data.udh.controller.response.ServiceConfVO;
 import com.data.udh.controller.response.StackServiceConfVO;
 import com.data.udh.controller.response.StackServiceVO;
 import com.data.udh.dao.*;
+import com.data.udh.dto.ResultDTO;
 import com.data.udh.entity.*;
 import org.springframework.data.domain.Example;
 import org.springframework.web.bind.annotation.*;
-import tech.powerjob.common.response.ResultDTO;
 
 import javax.annotation.Resource;
 import java.util.*;

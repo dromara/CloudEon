@@ -2,11 +2,11 @@ package com.data.udh.controller;
 
 import cn.hutool.core.io.FileUtil;
 import com.data.udh.dao.CommandTaskRepository;
+import com.data.udh.dto.ResultDTO;
 import com.data.udh.entity.CommandTaskEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import tech.powerjob.common.response.ResultDTO;
 
 import javax.annotation.Resource;
 import java.io.File;
