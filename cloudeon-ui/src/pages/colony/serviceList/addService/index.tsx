@@ -67,11 +67,11 @@ const serviceAdd: React.FC = () => {
     return selectList
   }
 
-  const changeStatus = (id:number) => {
+  const changeStatus = (ids:number[]) => {
     const statusData = serviceListData && serviceListData.map(item=>{
       return {
         ...item,
-        selected: item.id==id ? !item.selected : item.selected 
+        selected: ids.includes(item.id) ? !item.selected : item.selected 
       }
     })
     setServiceListData(statusData)
@@ -93,7 +93,7 @@ const serviceAdd: React.FC = () => {
         presetConfList:[],
         customConfList:[]
       }
-      const pIndex = params?.serviceInfos?.findIndex(pItem=>{ return pItem.stackServiceId == id })
+      const pIndex = params?.serviceInfos?.findIndex(pItem=>{ return pItem.stackServiceId && ids.includes(pItem.stackServiceId) })
       if(pIndex && pIndex == -1){
         params?.serviceInfos?.push(sData)
       }
