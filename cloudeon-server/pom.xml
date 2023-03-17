@@ -155,6 +155,12 @@
             <groupId>org.yaml</groupId>
             <version>1.33</version>
         </dependency>
+        <!-- Sa-Token 权限认证，在线文档：https://sa-token.cc -->
+        <dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-spring-boot-starter</artifactId>
+            <version>1.34.0</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
