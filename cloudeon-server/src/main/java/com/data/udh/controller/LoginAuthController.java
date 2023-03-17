@@ -3,6 +3,7 @@ package com.data.udh.controller;
 import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.dev33.satoken.stp.StpUtil;
 import com.data.udh.dto.ResultDTO;
+import com.data.udh.entity.UserEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,7 +28,9 @@ public class LoginAuthController {
 			StpUtil.login(10001);
 
 			// 第三步：填充账户属性
-			StpUtil.getSession().set("username", "admin");
+			UserEntity userEntity = new UserEntity();
+			userEntity.setUsername("admin");
+			StpUtil.getSession().set("user", userEntity);
 
 			SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
 			return ResultDTO.success(tokenInfo.tokenValue);
@@ -51,7 +54,8 @@ public class LoginAuthController {
 		StpUtil.checkLogin();
 
 		// 抛出异常后，代码将走入全局异常处理（GlobalException.java），如果没有抛出异常，则代表通过了登录校验，返回下面信息 
-		return ResultDTO.success("校验登录成功，这行字符串是只有登录后才会返回的信息");
+		UserEntity user = (UserEntity) StpUtil.getSession().get("user");
+		return ResultDTO.success(user.getUsername() +"校验登录成功");
 	}
 
 	// 获取当前登录的账号是谁  ---- http://localhost:8081/acc/getLoginId
