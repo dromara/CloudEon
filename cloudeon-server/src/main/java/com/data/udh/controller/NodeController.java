@@ -7,6 +7,7 @@ import com.data.udh.controller.request.SaveNodeRequest;
 import com.data.udh.controller.response.NodeInfoVO;
 import com.data.udh.dao.ClusterNodeRepository;
 import com.data.udh.dto.CheckHostInfo;
+import com.data.udh.dto.ResultDTO;
 import com.data.udh.entity.ClusterNodeEntity;
 import com.data.udh.utils.SshUtils;
 import org.apache.sshd.client.session.ClientSession;
@@ -14,7 +15,6 @@ import org.apache.sshd.sftp.client.SftpClientFactory;
 import org.apache.sshd.sftp.client.fs.SftpFileSystem;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
-import tech.powerjob.common.response.ResultDTO;
 
 import javax.annotation.Resource;
 import java.io.IOException;

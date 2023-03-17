@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.data.udh.controller.response.CommandDetailVO;
 import com.data.udh.dao.CommandRepository;
 import com.data.udh.dao.CommandTaskRepository;
+import com.data.udh.dto.ResultDTO;
 import com.data.udh.dto.ServiceProgress;
 import com.data.udh.entity.CommandEntity;
 import com.data.udh.entity.CommandTaskEntity;
@@ -11,7 +12,6 @@ import com.data.udh.utils.CommandState;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import tech.powerjob.common.response.ResultDTO;
 
 import javax.annotation.Resource;
 import java.util.Comparator;
