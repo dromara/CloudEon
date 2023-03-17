@@ -8,7 +8,7 @@
 [![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
 [![GitHub license](https://img.shields.io/github/license/Pandas886/e-mapreduce)](https://github.com/Pandas886/e-mapreduce/LICENSE)
 
-<p> 🌉 构建于K8s集群之上的大数据集群管理平台 🌉</p>
+<p> 🌉 构建于kubernetes集群之上的大数据集群管理平台 🌉</p>
 
 <img src="https://camo.githubusercontent.com/82291b0fe831bfc6781e07fc5090cbd0a8b912bb8b8d4fec0696c881834f81ac/68747470733a2f2f70726f626f742e6d656469612f394575424971676170492e676966" width="800"  height="3">
 </div><br>
@@ -36,8 +36,8 @@
 
 ## 🔍 功能特点
 
-- 🚀 快速搭建大数据集群：通过`CloudEon`，用户可以在k8s上快速搭建部署hadoop集群、doris集群等大数据集群，省去了手动安装和配置的繁琐过程。
-- 🐳 容器化运行所有大数据服务：`CloudEon`将所有大数据服务都以容器方式运行，使得这些服务的部署和管理更加灵活和便捷，同时也能更好地利用k8s的资源调度和管理能力。
+- 🚀 快速搭建大数据集群：通过`CloudEon`，用户可以在kubernetes上快速搭建部署hadoop集群、doris集群等大数据集群，省去了手动安装和配置的繁琐过程。
+- 🐳 容器化运行所有大数据服务：`CloudEon`将所有大数据服务都以容器方式运行，使得这些服务的部署和管理更加灵活和便捷，同时也能更好地利用kubernetes的资源调度和管理能力。
 - 📈 支持监控告警等功能：`CloudEon`提供了监控告警等功能，帮助用户实时监控集群运行状态，及时发现和解决问题。
 - 🔧 支持配置修改等功能：`CloudEon`还提供了配置修改等功能，使得用户能够更加灵活地管理和配置自己的大数据集群。
 - 🤖自动化运维：`CloudEon`通过自动化运维，能够降低集群管理的难度和人力成本，同时也能提高集群的可用性和稳定性。
