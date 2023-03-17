@@ -11,10 +11,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.data.udh.actor.CommandExecuteActor;
 import com.data.udh.controller.request.InitServiceRequest;
 import com.data.udh.controller.request.ServiceConfUpgradeRequest;
-import com.data.udh.controller.response.ServiceInstanceConfVO;
-import com.data.udh.controller.response.ServiceInstanceDetailVO;
-import com.data.udh.controller.response.ServiceInstanceRoleVO;
-import com.data.udh.controller.response.ServiceInstanceVO;
+import com.data.udh.controller.response.*;
 import com.data.udh.dao.*;
 import com.data.udh.dto.*;
 import com.data.udh.entity.*;
@@ -132,7 +129,7 @@ public class ClusterServiceController {
             if (serviceInstanceSeqEntity == null) {
                 maxInstanceSeq = 1;
                 serviceInstanceSeqEntity = ServiceInstanceSeqEntity.builder().maxSeq(maxInstanceSeq).stackServiceId(stackServiceId).build();
-            }else {
+            } else {
                 maxInstanceSeq = serviceInstanceSeqEntity.getMaxSeq() + 1;
                 serviceInstanceSeqEntity.setMaxSeq(maxInstanceSeq);
             }
@@ -167,7 +164,7 @@ public class ClusterServiceController {
             List<ServicePresetConf> presetConfList = serviceInfo.getPresetConfList();
             // 用户自定义配置
             List<ServiceCustomConf> customConfList = serviceInfo.getCustomConfList();
-            fillInstanceConfigEntities(stackId, stackServiceId, serviceInstanceEntityId, serviceInstanceConfigEntities, presetConfList, customConfList,true);
+            fillInstanceConfigEntities(stackId, stackServiceId, serviceInstanceEntityId, serviceInstanceConfigEntities, presetConfList, customConfList, true);
             serviceInstanceConfigRepository.saveAllAndFlush(serviceInstanceConfigEntities);
 
             // 获取需要安装的service 所有角色
@@ -274,7 +271,7 @@ public class ClusterServiceController {
         stackServiceEntities.forEach(stackServiceEntity -> {
             String stackServiceEntityName = stackServiceEntity.getName();
             dag.addNode(stackServiceEntityName, null);
-            log.info("Dag添加node：{}",stackServiceEntityName);
+            log.info("Dag添加node：{}", stackServiceEntityName);
         });
         // 构建边
         stackServiceEntities.forEach(stackServiceEntity -> {
@@ -283,7 +280,7 @@ public class ClusterServiceController {
             if (StrUtil.isNotBlank(dependencies)) {
                 for (String depServiceName : dependencies.split(",")) {
                     dag.addEdge(depServiceName, stackServiceEntityName);
-                    log.info("Dag添加边：{} -> {}",depServiceName,stackServiceEntityName);
+                    log.info("Dag添加边：{} -> {}", depServiceName, stackServiceEntityName);
                 }
             }
         });
@@ -737,6 +734,32 @@ public class ClusterServiceController {
         fillInstanceConfigEntities(stackId, stackServiceId, serviceInstanceId, serviceInstanceConfigEntities, presetConfList, customConfList, false);
         serviceInstanceConfigRepository.saveAllAndFlush(serviceInstanceConfigEntities);
         return ResultDTO.success(null);
+    }
+
+    /**
+     * 服务实例角色列表
+     */
+    @GetMapping("/listWebURLs")
+    public ResultDTO<List<ServiceInstanceWebUrlVO>> listWebURLs(Integer serviceInstanceId) {
+        List<ServiceInstanceWebUrlVO> result = roleInstanceRepository.findByServiceInstanceId(serviceInstanceId).stream().map(new Function<ServiceRoleInstanceEntity, ServiceInstanceWebUrlVO>() {
+            @Override
+            public ServiceInstanceWebUrlVO apply(ServiceRoleInstanceEntity roleInstanceEntity) {
+                ClusterNodeEntity nodeEntity = clusterNodeRepository.findById(roleInstanceEntity.getNodeId()).get();
+                // 查找该角色实例绑定的web地址
+                ServiceRoleInstanceWebuisEntity webuisEntity = roleInstanceWebuisRepository.findByServiceRoleInstanceId(roleInstanceEntity.getId());
+                if (webuisEntity != null) {
+                    StackServiceRoleEntity stackServiceRoleEntity = stackServiceRoleRepository.findById(roleInstanceEntity.getStackServiceRoleId()).get();
+                    return ServiceInstanceWebUrlVO.builder()
+                            .name(stackServiceRoleEntity.getLabel() + " Web UI (" + nodeEntity.getHostname() + ")")
+                            .ipUrl(webuisEntity.getWebIpUrl())
+                            .hostnameUrl(webuisEntity.getWebHostUrl())
+                            .build();
+                }
+                return null;
+            }
+        }).collect(Collectors.toList());
+
+        return ResultDTO.success(result);
     }
 
 }
