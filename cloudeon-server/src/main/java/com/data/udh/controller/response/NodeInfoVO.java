@@ -1,10 +1,16 @@
 package com.data.udh.controller.response;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
 @Data
+@AllArgsConstructor
+@Builder
+@NoArgsConstructor
 public class NodeInfoVO {
     private Integer id;
     /**
@@ -30,11 +36,15 @@ public class NodeInfoVO {
     /**
      * 总内存
      */
-    private Integer totalMem;
+    private String  totalMem;
     /**
      * 总磁盘
      */
-    private Integer totalDisk;
+    private String totalDisk;
+    private String containerRuntimeVersion;
+    private String kubeletVersion;
+    private String kernelVersion;
+    private String osImage;
 
     private String sshUser;
     private Integer sshPort;

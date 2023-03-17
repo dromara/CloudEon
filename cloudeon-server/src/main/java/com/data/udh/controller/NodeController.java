@@ -9,7 +9,11 @@ import com.data.udh.dao.ClusterNodeRepository;
 import com.data.udh.dto.CheckHostInfo;
 import com.data.udh.dto.ResultDTO;
 import com.data.udh.entity.ClusterNodeEntity;
+import com.data.udh.utils.ByteConverter;
 import com.data.udh.utils.SshUtils;
+import io.fabric8.kubernetes.api.model.Node;
+import io.fabric8.kubernetes.api.model.NodeList;
+import io.fabric8.kubernetes.client.KubernetesClient;
 import org.apache.sshd.client.session.ClientSession;
 import org.apache.sshd.sftp.client.SftpClientFactory;
 import org.apache.sshd.sftp.client.fs.SftpFileSystem;
@@ -31,6 +35,9 @@ public class NodeController {
 
     @Resource
     private ClusterNodeRepository clusterNodeRepository;
+
+    @Resource
+    private KubernetesClient kubeClient;
 
     @PostMapping("/add")
     public ResultDTO<Void> addNode(@RequestBody SaveNodeRequest req) throws IOException {
@@ -84,6 +91,47 @@ public class NodeController {
             BeanUtil.copyProperties(n, nodeInfoVO);
             return nodeInfoVO;
         }).collect(Collectors.toList());
+        return ResultDTO.success(result);
+    }
+
+
+    /**
+     * 查询k8s节点信息详情
+     */
+    @GetMapping("/listK8sNode")
+    public ResultDTO<List<NodeInfoVO>> listK8sNode() {
+
+        NodeList nodeList = kubeClient.nodes().list();
+        List<Node> items = nodeList.getItems();
+        List<NodeInfoVO> result = items.stream().map(e -> {
+            int cpu = e.getStatus().getCapacity().get("cpu").getNumericalAmount().intValue();
+            long memory = e.getStatus().getCapacity().get("memory").getNumericalAmount().longValue();
+            long storage = e.getStatus().getCapacity().get("ephemeral-storage").getNumericalAmount().longValue();
+            String ip = e.getStatus().getAddresses().get(0).getAddress();
+            String hostname = e.getStatus().getAddresses().get(1).getAddress();
+            String architecture = e.getStatus().getNodeInfo().getArchitecture();
+            String containerRuntimeVersion = e.getStatus().getNodeInfo().getContainerRuntimeVersion();
+            String kubeletVersion = e.getStatus().getNodeInfo().getKubeletVersion();
+            String kernelVersion = e.getStatus().getNodeInfo().getKernelVersion();
+            String osImage = e.getStatus().getNodeInfo().getOsImage();
+
+            NodeInfoVO nodeInfoVO = NodeInfoVO.builder()
+                    .ip(ip)
+                    .hostname(hostname)
+                    .cpuArchitecture(architecture)
+                    .coreNum(cpu)
+                    .totalMem(ByteConverter.convertKBToGB(memory) + "GB")
+                    .totalDisk(ByteConverter.convertKBToGB(storage) + "GB")
+                    .kernelVersion(kernelVersion)
+                    .kubeletVersion(kubeletVersion)
+                    .containerRuntimeVersion(containerRuntimeVersion)
+                    .osImage(osImage)
+                    .build();
+
+            return nodeInfoVO;
+
+        }).collect(Collectors.toList());
+
         return ResultDTO.success(result);
     }
 }
