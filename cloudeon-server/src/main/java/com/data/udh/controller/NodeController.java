@@ -101,10 +101,13 @@ public class NodeController {
         }, node -> node));
         // 从数据库查出当前集群绑定的节点
         List<ClusterNodeEntity> nodeEntities = clusterNodeRepository.findByClusterId(clusterId);
-        result = nodeEntities.stream().map(n -> {
+        result = nodeEntities.stream().map(nodeEntity -> {
             // 从map中获得k8s上最新的节点信息
-            Node node = nodeMap.get(n.getIp());
+            Node node = nodeMap.get(nodeEntity.getIp());
             NodeInfoVO nodeInfoVO = getNodeInfoVO(node);
+            nodeInfoVO.setId(nodeEntity.getId());
+            nodeInfoVO.setClusterId(nodeEntity.getClusterId());
+            nodeInfoVO.setCreateTime(nodeEntity.getCreateTime());
             return nodeInfoVO;
         }).collect(Collectors.toList());
         return ResultDTO.success(result);

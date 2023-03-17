@@ -10,11 +10,16 @@ alerting:
   - static_configs:
     - targets:
       # - alertmanager:9093
+      <#if serviceRoles['MONITOR_ALERTMANAGER']?size gt 1>
+        - ${serviceRoles['MONITOR_ALERTMANAGER'][0].hostname}:${conf['alertmanager.http.port']}
+      </#if>
+
 
 # Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
 rule_files:
   # - "first_rules.yml"
   # - "second_rules.yml"
+  - "rules*.yml"
 
 # A scrape configuration containing exactly one endpoint to scrape:
 # Here it's Prometheus itself.
@@ -26,4 +31,4 @@ scrape_configs:
     # scheme defaults to 'http'.
 
     static_configs:
-    - targets: ['localhost:9090']
+    - targets: ['${serviceRoles['MONITOR_PROMETHUS'][0].hostname}:${conf['prometheus.http.port']}']
