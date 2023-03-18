@@ -11,6 +11,7 @@ supportKerberos: false
 
 persistencePaths:
   - /opt/udh/${serviceInstanceId}/conf
+  - /opt/udh/${serviceInstanceId}/conf/rule
   - /opt/udh/${serviceInstanceId}/log
   - /opt/udh/${serviceInstanceId}/data
   - /opt/udh/${serviceInstanceId}/data/grafana

@@ -12,7 +12,7 @@ pid=$PID_DIR/grafana.pid
 
 echo "========================start grafana========================"
 
-exec_command="grafana-server --config=/opt/udh/${service.serviceName}/conf/defaults.ini --homepath=/opt/grafana-latest/"
+exec_command="grafana-server --config=/opt/udh/${service.serviceName}/conf/grafana.ini --homepath=/opt/grafana-latest/"
 echo "nohup $exec_command > $log 2>&1 &"
 nohup $exec_command > $log 2>&1 &
 echo $! > $pid

@@ -10,7 +10,7 @@ alerting:
   - static_configs:
     - targets:
       # - alertmanager:9093
-      <#if serviceRoles['MONITOR_ALERTMANAGER']?size gt 1>
+      <#if serviceRoles['MONITOR_ALERTMANAGER']?size gt 0>
         - ${serviceRoles['MONITOR_ALERTMANAGER'][0].hostname}:${conf['alertmanager.http.port']}
       </#if>
 
@@ -19,16 +19,32 @@ alerting:
 rule_files:
   # - "first_rules.yml"
   # - "second_rules.yml"
-  - "rules*.yml"
-
+  - "/opt/udh/${service.serviceName}/conf/rule/rules*.yml"
+<#assign node_exporters=[]>
+<#list serviceRoles['MONITOR_NODEEXPORTER'] as role>
+  <#assign node_exporters += ["'"+role.hostname + ":" + conf["nodeexporter.http.port"]+"'"]>
+</#list>
 # A scrape configuration containing exactly one endpoint to scrape:
 # Here it's Prometheus itself.
 scrape_configs:
-  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+
   - job_name: 'prometheus'
-
-    # metrics_path defaults to '/metrics'
-    # scheme defaults to 'http'.
-
     static_configs:
     - targets: ['${serviceRoles['MONITOR_PROMETHEUS'][0].hostname}:${conf['prometheus.http.port']}']
+  - job_name: 'grafana'
+    static_configs:
+    - targets: ['${serviceRoles['MONITOR_GRAFANA'][0].hostname}:${conf['grafana.http.port']}']
+  - job_name: 'alertmanager'
+    static_configs:
+    - targets: ['${serviceRoles['MONITOR_ALERTMANAGER'][0].hostname}:${conf['alertmanager.http.port']}']
+#  - job_name: 'pushgateway'
+#    static_configs:
+#    - targets: ['localhost:9091']
+  - job_name: node_exporter
+    honor_timestamps: true
+    scrape_interval: 5s
+    scrape_timeout: 5s
+    metrics_path: /metrics
+    scheme: http
+    static_configs:
+      - targets: [${node_exporters?join(",")}]
