@@ -17,8 +17,10 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.sshd.client.session.ClientSession;
+import org.springframework.core.env.Environment;
 
 import java.io.*;
+import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -43,6 +45,7 @@ public class ConfigTask extends BaseUdhTask {
         ServiceInstanceConfigRepository configRepository = SpringUtil.getBean(ServiceInstanceConfigRepository.class);
 
         UdhConfigProp udhConfigProp = SpringUtil.getBean(UdhConfigProp.class);
+        Environment environment = SpringUtil.getBean(Environment.class);
 
         TaskParam taskParam = getTaskParam();
         Integer serviceInstanceId = taskParam.getServiceInstanceId();
@@ -93,6 +96,7 @@ public class ConfigTask extends BaseUdhTask {
             dataModel.put("serviceRoles", serviceRoles);
             dataModel.put("localhostname", taskExecuteHostName);
             dataModel.put("localhostip", taskParam.getIp());
+            dataModel.put("cloudeonURL", "http://"+ InetAddress.getLocalHost()+":"+environment.getProperty("server.port"));
 
             // 获取该服务支持的自定义配置文件名
             String customConfigFiles = stackServiceEntity.getCustomConfigFiles();

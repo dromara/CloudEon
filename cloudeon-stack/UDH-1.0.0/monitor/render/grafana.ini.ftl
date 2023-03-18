@@ -15,7 +15,7 @@ force_migration = false
 #################################### Paths ###############################
 [paths]
 # Path to where grafana can store temp files, sessions, and the sqlite3 db (if that is used)
-data = data
+data = /opt/udh/${service.serviceName}/data/grafana
 
 # Temporary files in `data` directory older than given duration will be removed
 temp_data_lifetime = 24h

@@ -12,7 +12,7 @@ pid=$PID_DIR/nodeexporter.pid
 
 echo "========================start nodeexporter========================"
 
-exec_command="node_exporter  --web.listen-address=:${conf['nodeexporter.http.port']} --path.procfs /host/proc  --path.sysfs /host/sys --path.rootfs /host/root"
+exec_command="node_exporter  --web.listen-address=0.0.0.0:${conf['nodeexporter.http.port']} --path.procfs /host/proc  --path.sysfs /host/sys --path.rootfs /host/root"
 echo "nohup $exec_command > $log 2>&1 &"
 nohup $exec_command > $log 2>&1 &
 echo $! > $pid

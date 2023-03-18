@@ -45,6 +45,11 @@ spec:
         image: "${dockerImage}"
         imagePullPolicy: "Always"
         name: "${roleServiceFullName}"
+        env:
+          - name: GF_SECURITY_ADMIN_PASSWORD
+            value: "password"
+          - name: GF_USERS_ALLOW_SIGN_UP
+            value: "false"
         readinessProbe:
           exec:
             command:
