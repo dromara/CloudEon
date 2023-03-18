@@ -17,6 +17,8 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.sshd.client.session.ClientSession;
+import org.apache.sshd.sftp.client.SftpClientFactory;
+import org.apache.sshd.sftp.client.fs.SftpFileSystem;
 import org.springframework.core.env.Environment;
 
 import java.io.*;
@@ -115,24 +117,7 @@ public class ConfigTask extends BaseUdhTask {
             dataModel.put("confFiles", confFiles);
 
             // 执行渲染
-            for (String templateName : renderDirFile.list()) {
-                if (templateName.endsWith(".ftl")) {
-                    Template template = config.getTemplate(templateName);
-                    String outPutFile = outputConfPath + File.separator + StringUtils.substringBeforeLast(templateName, ".ftl");
-                    FileWriter out = new FileWriter(outPutFile);
-                    template.process(dataModel, out);
-                    log.info("完成配置文件生成：" + outPutFile);
-                    out.close();
-                } else {
-                    InputStream fileReader = new FileInputStream(renderDir + File.separator + templateName);
-                    String outPutFile = outputConfPath + File.separator + templateName;
-                    FileOutputStream out = new FileOutputStream(outPutFile);
-                    IOUtils.copy(fileReader, out);
-                    log.info("完成配置文件生成：" + outPutFile);
-                    IOUtils.close(fileReader);
-                    IOUtils.close(out);
-                }
-            }
+            scanTemplateToRender(renderDirFile, renderDir,config,dataModel,outputConfPath);
 
         } catch (IOException | TemplateException e) {
             e.printStackTrace();
@@ -142,9 +127,16 @@ public class ConfigTask extends BaseUdhTask {
         // ssh上传所有配置文件到指定目录
         ClusterNodeEntity nodeEntity = clusterNodeRepository.findByHostname(taskParam.getHostName());
         ClientSession clientSession = SshUtils.openConnectionByPassword(nodeEntity.getIp(), nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getSshPassword());
+        SftpFileSystem sftp;
+        try {
+            sftp = SftpClientFactory.instance().createSftpFileSystem(clientSession);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("打开sftp失败："+e);
+        }
         String remoteConfDirPath = "/opt/udh/" + serviceInstanceEntity.getServiceName() + File.separator + "conf";
         log.info("拷贝本地配置目录：" + outputConfPath + " 到节点" + taskParam.getHostName() + "的：" + remoteConfDirPath);
-        SshUtils.uploadLocalDirToRemote(clientSession, remoteConfDirPath, outputConfPath);
+        SshUtils.uploadLocalDirToRemote(clientSession, remoteConfDirPath, outputConfPath,sftp);
         log.info("成功拷贝本地配置目录：" + outputConfPath + " 到节点" + taskParam.getHostName() + "的：" + remoteConfDirPath);
 
         try {
@@ -172,6 +164,43 @@ public class ConfigTask extends BaseUdhTask {
         }
 
         SshUtils.closeConnection(clientSession);
+    }
+
+    private void scanTemplateToRender(File renderDirFile, String renderDir, Configuration config,
+                                      Map<String, Object> dataModel, String outputConfPath) throws IOException, TemplateException {
+        if (renderDirFile.isDirectory()) {
+            log.info("Scanning directory: " + renderDirFile.getAbsolutePath());
+            File[] files = renderDirFile.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    scanTemplateToRender(file,renderDir, config, dataModel, outputConfPath);
+                }
+            }
+        } else {
+            // 相对于render目录的路径：dashboards/grafana/alertmanager.json
+            String fileSubPath = FileUtil.subPath(renderDir, renderDirFile);
+            log.info("File found: " + fileSubPath);
+            if (fileSubPath.endsWith(".ftl")) {
+                Template template = config.getTemplate(fileSubPath);
+                String outPutFile = outputConfPath + File.separator + StringUtils.substringBeforeLast(fileSubPath, ".ftl");
+                // 输出文件前先建好其父级目录
+                FileUtil.mkParentDirs(outPutFile);
+                FileWriter out = new FileWriter(outPutFile);
+                template.process(dataModel, out);
+                log.info("完成配置文件生成：" + outPutFile);
+                out.close();
+            } else {
+                InputStream fileReader = new FileInputStream(renderDir + File.separator + fileSubPath);
+                String outPutFile = outputConfPath + File.separator + fileSubPath;
+                // 输出文件前先建好其父级目录
+                FileUtil.mkParentDirs(outPutFile);
+                FileOutputStream out = new FileOutputStream(outPutFile);
+                IOUtils.copy(fileReader, out);
+                log.info("完成配置文件生成：" + outPutFile);
+                IOUtils.close(fileReader);
+                IOUtils.close(out);
+            }
+        }
     }
 
     /**

@@ -4,11 +4,13 @@ import org.apache.sshd.client.SshClient;
 import org.apache.sshd.client.channel.ChannelExec;
 import org.apache.sshd.client.channel.ClientChannelEvent;
 import org.apache.sshd.client.session.ClientSession;
+import org.apache.sshd.common.util.io.input.NoCloseInputStream;
 import org.apache.sshd.sftp.client.SftpClientFactory;
 import org.apache.sshd.sftp.client.fs.SftpFileSystem;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.KeyPair;
@@ -53,9 +55,9 @@ public class SshUtils {
         sshClient.start();
         ClientSession session = null;
         try {
-            session = sshClient.connect(sshUser, sshHost, sshPort).verify().getClientSession();
+            session = sshClient.connect(sshUser, sshHost, sshPort).verify(10L,TimeUnit.SECONDS).getClientSession();
             session.addPasswordIdentity(password);
-            if (session.auth().verify().isFailure()) {
+            if (session.auth().verify(10L,TimeUnit.SECONDS).isFailure()) {
                 LOG.info("验证失败");
                 return null;
             }
@@ -108,23 +110,23 @@ public class SshUtils {
         session.resetAuthTimeout();
         LOG.info("exe cmd: {}", command);
         // 命令返回的结果
-        ChannelExec ce = null;
+        ChannelExec channelExec = null;
         // 返回结果流
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         // 错误信息
         ByteArrayOutputStream err = new ByteArrayOutputStream();
-        ce = session.createExecChannel(command);
-        ce.setOut(out);
-        ce.setErr(err);
+        channelExec = session.createExecChannel(command);
+        channelExec.setOut(out);
+        channelExec.setErr(err);
         // 执行并等待
-        ce.open();
+        channelExec.open().verify(10L,TimeUnit.SECONDS);
         Set<ClientChannelEvent> events =
-                ce.waitFor(EnumSet.of(ClientChannelEvent.CLOSED), TimeUnit.SECONDS.toMillis(100000));
+                channelExec.waitFor(EnumSet.of(ClientChannelEvent.CLOSED), TimeUnit.SECONDS.toMillis(100000));
         //  检查请求是否超时
         if (events.contains(ClientChannelEvent.TIMEOUT)) {
             throw new RuntimeException("ssh 连接超时");
         }
-        int exitStatus = ce.getExitStatus();
+        Integer exitStatus = channelExec.getExitStatus();
         LOG.info("mina result {}", exitStatus);
         if (exitStatus != 0) {
             throw new RuntimeException("ssh 执行命令失败：" + err.toString());
@@ -169,15 +171,10 @@ public class SshUtils {
      * @param remoteDirPath
      * @param localDir
      */
-    public static void uploadLocalDirToRemote(ClientSession session, String remoteDirPath, String localDir) {
-        try {
-            SftpFileSystem sftp = SftpClientFactory.instance().createSftpFileSystem(session);
-            for (String file : new File(localDir).list()) {
-                String localFilePath = localDir + File.separator + file;
-                uploadFile(session, remoteDirPath, localFilePath,sftp);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+    public static void uploadLocalDirToRemote(ClientSession session, String remoteDirPath, String localDir,SftpFileSystem sftp) {
+        for (String file : new File(localDir).list()) {
+            String localFilePath = localDir + File.separator + file;
+            uploadFile(session, remoteDirPath, localFilePath,sftp);
         }
 
     }
@@ -188,10 +185,8 @@ public class SshUtils {
      * @param path
      * @return
      */
-    public static boolean createDir(ClientSession session, String path) {
-        SftpFileSystem sftp = null;
+    public static boolean createDir(ClientSession session, String path,SftpFileSystem sftp) {
         try {
-            sftp = SftpClientFactory.instance().createSftpFileSystem(session);
             Path remoteRoot = sftp.getDefaultDir().resolve(path);
             if (!Files.exists(remoteRoot)) {
                 Files.createDirectories(remoteRoot);

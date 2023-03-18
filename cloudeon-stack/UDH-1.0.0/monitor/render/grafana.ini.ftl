@@ -27,7 +27,7 @@ logs = /opt/udh/${service.serviceName}/log
 plugins = data/plugins
 
 # folder that contains provisioning config files that grafana will apply on startup and while running.
-provisioning = conf/provisioning
+provisioning = /opt/udh/${service.serviceName}/conf/provisioning
 
 #################################### Server ##############################
 [server]
@@ -446,7 +446,7 @@ azure_auth_enabled = false
 #################################### Anonymous Auth ######################
 [auth.anonymous]
 # enable anonymous access
-enabled = false
+enabled = true
 
 # specify organization name that should be used for unauthenticated users
 org_name = Main Org.
