@@ -51,18 +51,10 @@ public class NodeController {
         if (clusterNodeRepository.countByIp(ip) > 0) {
            return ResultDTO.failed("已添加ip为：" + ip + " 的节点(服务器)");
         }
-        // 检查ssh通讯是否ok
-        CheckHostInfo checkHostInfo = checkHostInfo(ip, sshPort, sshUser, sshPassword);
 
         // 保存到数据库
         ClusterNodeEntity newClusterNodeEntity = new ClusterNodeEntity();
         BeanUtil.copyProperties(req, newClusterNodeEntity);
-        newClusterNodeEntity.setHostname(checkHostInfo.getHostname());
-        newClusterNodeEntity.setCoreNum(checkHostInfo.getCoreNum());
-        newClusterNodeEntity.setCpuArchitecture("");
-        newClusterNodeEntity.setTotalDisk(checkHostInfo.getTotalDisk());
-        newClusterNodeEntity.setTotalMem(checkHostInfo.getTotalMem());
-        newClusterNodeEntity.setCpuArchitecture(checkHostInfo.getArch());
         newClusterNodeEntity.setCreateTime(new Date());
         clusterNodeRepository.save(newClusterNodeEntity);
 
@@ -70,19 +62,7 @@ public class NodeController {
         return ResultDTO.success(null);
     }
 
-    /**
-     * 查询服务器基础信息
-     */
-    public CheckHostInfo checkHostInfo(String sshHost, Integer sshPort, String sshUser, String password) throws IOException {
 
-        ClientSession session = SshUtils.openConnectionByPassword(sshHost, sshPort, sshUser, password);
-        SftpFileSystem sftp = SftpClientFactory.instance().createSftpFileSystem(session);
-        SshUtils.uploadFile(session, "/tmp/", remoteScriptPath + FileUtil.FILE_SEPARATOR + "host-info-collect.sh",sftp);
-        String result = SshUtils.execCmdWithResult(session, "sh /tmp/host-info-collect.sh");
-        CheckHostInfo checkHostInfo = JSONObject.parseObject(result, CheckHostInfo.class);
-        session.close();
-        return checkHostInfo;
-    }
 
     /**
      *  根据集群id查询绑定的k8s节点信息
