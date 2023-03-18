@@ -136,7 +136,12 @@ public class ConfigTask extends BaseUdhTask {
         }
         String remoteConfDirPath = "/opt/udh/" + serviceInstanceEntity.getServiceName() + File.separator + "conf";
         log.info("拷贝本地配置目录：" + outputConfPath + " 到节点" + taskParam.getHostName() + "的：" + remoteConfDirPath);
-        SshUtils.uploadLocalDirToRemote(clientSession, remoteConfDirPath, outputConfPath,sftp);
+        try {
+            SshUtils.uploadLocalDirToRemote(remoteConfDirPath, outputConfPath,sftp);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("拷贝文件上远程服务器失败："+e);
+        }
         log.info("成功拷贝本地配置目录：" + outputConfPath + " 到节点" + taskParam.getHostName() + "的：" + remoteConfDirPath);
 
         try {
@@ -166,6 +171,9 @@ public class ConfigTask extends BaseUdhTask {
         SshUtils.closeConnection(clientSession);
     }
 
+    /**
+     * 递归扫描目录里的模板和文件进行渲染
+     */
     private void scanTemplateToRender(File renderDirFile, String renderDir, Configuration config,
                                       Map<String, Object> dataModel, String outputConfPath) throws IOException, TemplateException {
         if (renderDirFile.isDirectory()) {

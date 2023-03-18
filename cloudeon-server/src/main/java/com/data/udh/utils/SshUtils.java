@@ -1,18 +1,17 @@
 package com.data.udh.utils;
 
+import cn.hutool.core.io.FileUtil;
 import org.apache.sshd.client.SshClient;
 import org.apache.sshd.client.channel.ChannelExec;
 import org.apache.sshd.client.channel.ClientChannelEvent;
 import org.apache.sshd.client.session.ClientSession;
-import org.apache.sshd.common.util.io.input.NoCloseInputStream;
-import org.apache.sshd.sftp.client.SftpClientFactory;
 import org.apache.sshd.sftp.client.fs.SftpFileSystem;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -138,27 +137,25 @@ public class SshUtils {
     /**
      * 上传单个文件到指定目录,相同路径ui覆盖
      *
-     * @param session       连接
      * @param remoteDirPath 远程目录地址
      * @param inputFile     文件 File
      */
-    public static boolean uploadFile(ClientSession session, String remoteDirPath, String inputFile,SftpFileSystem sftp) {
+    public static boolean uploadFile(String remoteDirPath, String inputFile, SftpFileSystem sftp) {
         File uploadFile = new File(inputFile);
-        InputStream input = null;
+        InputStream localInputStream = null;
         try {
-            Path path = sftp.getDefaultDir().resolve(remoteDirPath);
-            if (!Files.exists(path)) {
-                LOG.info("create pathHome {} ", path);
-                Files.createDirectories(path);
+            Path sftpPath = sftp.getDefaultDir().resolve(remoteDirPath);
+            if (!Files.exists(sftpPath)) {
+                LOG.info("create pathHome {} ", sftpPath);
+                Files.createDirectories(sftpPath);
             }
-            input = Files.newInputStream(uploadFile.toPath());
-            Path file = path.resolve(uploadFile.getName());
-            if (Files.exists(file)) {
-                LOG.info("delete remote file  {}", file);
-                Files.deleteIfExists(file);
+            localInputStream = Files.newInputStream(uploadFile.toPath());
+            if (Files.exists(sftpPath)) {
+                LOG.info("delete remote file  {}", sftpPath);
+                Files.deleteIfExists(sftpPath);
             }
-            Files.copy(input, file);
-            LOG.info("local file {} copy to remote success " ,uploadFile.toPath());
+            Files.copy(localInputStream, sftpPath);
+            LOG.info("local file {} copy to remote {} success " ,uploadFile.toPath(),sftpPath);
             return true;
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -167,15 +164,21 @@ public class SshUtils {
 
     /**
      * 将本地目录里所有文件拷贝到远程目录中
-     * @param session
      * @param remoteDirPath
      * @param localDir
      */
-    public static void uploadLocalDirToRemote(ClientSession session, String remoteDirPath, String localDir,SftpFileSystem sftp) {
-        for (String file : new File(localDir).list()) {
-            String localFilePath = localDir + File.separator + file;
-            uploadFile(session, remoteDirPath, localFilePath,sftp);
-        }
+    public static void uploadLocalDirToRemote(String remoteDirPath, String localDir, SftpFileSystem sftp) throws IOException {
+
+        Path localDirPath = Paths.get(localDir);
+        Files.walk(localDirPath).forEach(file -> {
+            if (!Files.isDirectory(file)) {
+                File localFile = file.toFile();
+                String localFileAbsolutePath = localFile.getAbsolutePath();
+                String remoteFilePath = remoteDirPath + "/" + FileUtil.subPath(localDir, localFile);
+                LOG.info("即将上传文件:{} 到远程目录:{}",localFileAbsolutePath,remoteFilePath);
+                uploadFile(remoteFilePath, localFileAbsolutePath,sftp);
+            }
+        });
 
     }
 
