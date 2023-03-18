@@ -20,7 +20,7 @@ public class SshTest {
                 "Ltcyhlwylym@admin2021zi!");
 
 //        SshUtils.uploadFile(session,"/opt/udh/ZOOKEEPER1/conf", "/Users/huzekang/Downloads/apache-zookeeper-3.6.3-bin.tar.gz");
-        SshUtils.uploadLocalDirToRemote(session,"/opt/udh/ZOOKEEPER1/conf","/Volumes/Samsung_T5/opensource/e-mapreduce/work/ZOOKEEPER1/fl001/conf");
+//        SshUtils.uploadLocalDirToRemote(session,"/opt/udh/ZOOKEEPER1/conf","/Volumes/Samsung_T5/opensource/e-mapreduce/work/ZOOKEEPER1/fl001/conf");
     }
 
 

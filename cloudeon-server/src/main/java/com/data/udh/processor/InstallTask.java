@@ -8,6 +8,8 @@ import com.data.udh.entity.ServiceInstanceEntity;
 import com.data.udh.utils.SshUtils;
 import lombok.NoArgsConstructor;
 import org.apache.sshd.client.session.ClientSession;
+import org.apache.sshd.sftp.client.SftpClientFactory;
+import org.apache.sshd.sftp.client.fs.SftpFileSystem;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -28,16 +30,23 @@ public class InstallTask extends BaseUdhTask {
 
         ClusterNodeEntity nodeEntity = clusterNodeRepository.findByHostname(taskParam.getHostName());
         ClientSession clientSession = SshUtils.openConnectionByPassword(nodeEntity.getIp(), nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getSshPassword());
+        SftpFileSystem sftp;
+        try {
+            sftp = SftpClientFactory.instance().createSftpFileSystem(clientSession);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("打开sftp失败："+e);
+        }
         // 查询节点
         Arrays.stream(paths).forEach(new Consumer<String>() {
             @Override
             public void accept(String path) {
                 log.info("节点：" + taskParam.getHostName() + " 上创建目录：" + path);
                 // ssh执行创建目录
-                SshUtils.createDir(clientSession, path);
+                SshUtils.createDir(clientSession, path, sftp);
                 try {
                     String command = "chmod 777 -R " + path;
-                    log.info("执行远程命令："+command);
+                    log.info("执行远程命令：" + command);
                     SshUtils.execCmdWithResult(clientSession, command);
                 } catch (IOException e) {
                     e.printStackTrace();
