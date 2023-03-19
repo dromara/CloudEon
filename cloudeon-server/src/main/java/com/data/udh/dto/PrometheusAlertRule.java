@@ -5,7 +5,7 @@ import lombok.Data;
 import java.io.Serializable;
 
 @Data
-public class AlertItem implements Serializable {
+public class PrometheusAlertRule implements Serializable {
     private String alertName;
 
     private Integer clusterId;

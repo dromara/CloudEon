@@ -2,7 +2,7 @@ package com.data.udh;
  
 import com.data.udh.dao.AlertQuotaRepository;
 import com.data.udh.dao.ClusterInfoRepository;
-import com.data.udh.dto.AlertItem;
+import com.data.udh.dto.PrometheusAlertRule;
 import com.data.udh.entity.ClusterAlertQuotaEntity;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -40,18 +40,18 @@ public class ClusterRepositoryTest {
     @Test
     public void alert() throws IOException, TemplateException {
         List<ClusterAlertQuotaEntity> alerts = alertQuotaRepository.findAll();
-        List<AlertItem> alertItems = alerts.stream().map(new Function<ClusterAlertQuotaEntity, AlertItem>() {
+        List<PrometheusAlertRule> prometheusAlertRules = alerts.stream().map(new Function<ClusterAlertQuotaEntity, PrometheusAlertRule>() {
             @Override
-            public AlertItem apply(ClusterAlertQuotaEntity clusterAlertQuota) {
-                AlertItem alertItem = new AlertItem();
-                alertItem.setAlertName(clusterAlertQuota.getAlertQuotaName());
-                alertItem.setAlertExpr(clusterAlertQuota.getAlertExpr() + " " + clusterAlertQuota.getCompareMethod() + " " + clusterAlertQuota.getAlertThreshold());
-                alertItem.setClusterId(1);
-                alertItem.setServiceRoleName(clusterAlertQuota.getServiceRoleName());
-                alertItem.setAlertLevel(clusterAlertQuota.getAlertLevel().getDesc());
-                alertItem.setAlertAdvice(clusterAlertQuota.getAlertAdvice());
-                alertItem.setTriggerDuration(clusterAlertQuota.getTriggerDuration());
-                return alertItem;
+            public PrometheusAlertRule apply(ClusterAlertQuotaEntity clusterAlertQuota) {
+                PrometheusAlertRule prometheusAlertRule = new PrometheusAlertRule();
+                prometheusAlertRule.setAlertName(clusterAlertQuota.getAlertQuotaName());
+                prometheusAlertRule.setAlertExpr(clusterAlertQuota.getAlertExpr() + " " + clusterAlertQuota.getCompareMethod() + " " + clusterAlertQuota.getAlertThreshold());
+                prometheusAlertRule.setClusterId(1);
+                prometheusAlertRule.setServiceRoleName(clusterAlertQuota.getServiceRoleName());
+                prometheusAlertRule.setAlertLevel(clusterAlertQuota.getAlertLevel().getDesc());
+                prometheusAlertRule.setAlertAdvice(clusterAlertQuota.getAlertAdvice());
+                prometheusAlertRule.setTriggerDuration(clusterAlertQuota.getTriggerDuration());
+                return prometheusAlertRule;
             }
         }).collect(Collectors.toList());
 
@@ -63,7 +63,7 @@ public class ClusterRepositoryTest {
 
         // 数据对象
         Map<String, Object> data = new HashMap<>();
-        data.put("itemList", alertItems);
+        data.put("itemList", prometheusAlertRules);
         data.put("serviceName", "internal-service");
 
         // 得到模板对象
