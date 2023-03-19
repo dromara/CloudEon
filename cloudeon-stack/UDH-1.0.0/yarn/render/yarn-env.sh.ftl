@@ -95,6 +95,10 @@ export YARN_HISTORYSERVER_HEAPSIZE=${historyserverMemory?floor?c}m
 </#if>
 export YARN_TIMELINESERVER_HEAPSIZE=${timelineserverMemory?floor?c}m
 
+# 添加jmx监控开放
+export YARN_NODEMANAGER_OPTS="$YARN_NODEMANAGER_OPTS -Dcom.sun.management.jmxremote.port=9917 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=5547:/opt/udh/${service.serviceName}/conf/jmx_prometheus.yaml"
+export YARN_RESOURCEMANAGER_OPTS="$YARN_RESOURCEMANAGER_OPTS -Dcom.sun.management.jmxremote.port=9918 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=5548:/opt/udh/${service.serviceName}/conf/jmx_prometheus.yaml"
+
 # check envvars which might override default args
 if [ "$YARN_HEAPSIZE" != "" ]; then
   #echo "run with heapsize $YARN_HEAPSIZE"
