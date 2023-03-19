@@ -19,5 +19,4 @@ export SERVER_JVMFLAGS="-Dzookeeper.log.dir=/opt/udh/${service.serviceName}/log 
 
 export SERVER_JVMFLAGS="-Dznode.container.checkIntervalMs=${conf['znode.container.checkIntervalMs']} $SERVER_JVMFLAGS"
 
-
-export JAVAAGENT_OPTS=" -javaagent:/usr/lib/jmx_exporter/jmx_prometheus_javaagent-0.7.jar=5556:/usr/lib/jmx_exporter/agentconfig.yml "
+export SERVER_JVMFLAGS=" -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=5541:/opt/udh/${service.serviceName}/conf/jmx_zookeeper.yaml $SERVER_JVMFLAGS"

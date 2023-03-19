@@ -27,7 +27,9 @@ rule_files:
 # A scrape configuration containing exactly one endpoint to scrape:
 # Here it's Prometheus itself.
 scrape_configs:
-
+#  - job_name: 'pushgateway'
+#    static_configs:
+#    - targets: ['localhost:9091']
   - job_name: 'prometheus'
     static_configs:
     - targets: ['${serviceRoles['MONITOR_PROMETHEUS'][0].hostname}:${conf['prometheus.http.port']}']
@@ -37,9 +39,6 @@ scrape_configs:
   - job_name: 'alertmanager'
     static_configs:
     - targets: ['${serviceRoles['MONITOR_ALERTMANAGER'][0].hostname}:${conf['alertmanager.http.port']}']
-#  - job_name: 'pushgateway'
-#    static_configs:
-#    - targets: ['localhost:9091']
   - job_name: node_exporter
     honor_timestamps: true
     scrape_interval: 5s
@@ -47,4 +46,4 @@ scrape_configs:
     metrics_path: /metrics
     scheme: http
     static_configs:
-      - targets: [${node_exporters?join(",")}]
+    - targets: [${node_exporters?join(",")}]
