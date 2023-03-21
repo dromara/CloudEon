@@ -234,7 +234,7 @@ declare namespace API {
   type stringResult = {
     success?: boolean;
     message?: string;
-    data?: string;
+    data?: string | number;
   }
 
   type commandResult = {
@@ -347,6 +347,17 @@ declare namespace API {
     success?: boolean;
     message?: string;
     data?: {[key:string]: rolesValid[]};
+  }
+
+  type nodeIpItem = {
+    hostname?: string,
+    ip?: string
+  }
+
+  type nodeIpListResult = {
+    success?: boolean;
+    message?: string;
+    data?: nodeIpItem[];
   }
 
 }

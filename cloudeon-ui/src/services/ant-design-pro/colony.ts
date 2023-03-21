@@ -64,6 +64,17 @@ export async function createClusterAPI(options?: { [key: string]: any }) {
   });
 }
 
+
+/** 获取k8s节点列表 */
+export async function getListK8sNodeAPI(options?: { [key: string]: any }) {
+  return request<API.nodeIpListResult>('/node/listK8sNode', {
+    method: 'GET',
+    params: {
+      ...options,
+    },
+  });
+}
+
 //新增节点
 export async function createNodeAPI(options?: { [key: string]: any }) {  
   return request<API.normalResult>('/node/add', {
@@ -239,6 +250,16 @@ export async function saveServiceConfAPI(options?: { [key: string]: any }) {
   return request<API.normalResult>('/service/serviceInstanceSaveConf', {
     method: 'POST',
     data: options,
+  });
+}
+
+/** 查询正在运行的指令书 */
+export async function getCountActiveAPI(options?: { [key: string]: any }) {
+  return request<API.stringResult>('/command/countActive', {
+    method: 'GET',
+    params: {
+      ...options,
+    },
   });
 }
 

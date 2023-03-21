@@ -1,10 +1,10 @@
 // 集群管理页面
 import { PageContainer, ProCard } from '@ant-design/pro-components';
-import { Space, Card, Table, Button, Modal, Form, Input, message, Spin } from 'antd';
+import { Space, Select, Table, Button, Modal, Form, Input, message, Spin } from 'antd';
 import React, { useState, useEffect, useRef } from 'react';
 import type { FormInstance } from 'antd/es/form';
 import { FormattedMessage, useIntl, history } from 'umi';
-import { getNodeListAPI, createNodeAPI } from '@/services/ant-design-pro/colony';
+import { getNodeListAPI, createNodeAPI, getListK8sNodeAPI } from '@/services/ant-design-pro/colony';
 
 const nodeList: React.FC = () => {
   const intl = useIntl();
@@ -12,6 +12,9 @@ const nodeList: React.FC = () => {
   const [nodeListData, setNodeListData] = useState<any[]>();
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
+  const [ipList, setIpList] = useState<any[]>()
+
+  const getData = JSON.parse(sessionStorage.getItem('colonyData') || '{}')
   // formRef = React.createRef<FormInstance>();
   // const form = useRef();
 
@@ -22,7 +25,22 @@ const nodeList: React.FC = () => {
     setNodeListData(result?.data)
   };
 
-  const getData = JSON.parse(sessionStorage.getItem('colonyData') || '{}')
+  const getk8sNodeList = async (params: any) => {
+    setLoading(true)
+    const result:API.nodeIpListResult = await getListK8sNodeAPI(params)
+    setLoading(false)
+    if(result?.data){
+      const list = result.data.map(item=>{
+        return {
+          value: item.ip,
+          label: `${item.hostname}(${item.ip})`,
+        }
+      })
+      setIpList(list)
+    }
+    
+  }
+
 
   // const onFinish = async (values: any) => {
   //   const result: API.normalResult = await createNodeAPI({...values, clusterId: getData.clusterId})
@@ -57,52 +75,69 @@ const nodeList: React.FC = () => {
   };
 
   useEffect(() => {
-    getNodeData({ clusterId: getData.clusterId });
+    const params = { clusterId: getData.clusterId }
+    getk8sNodeList(params);
+    getNodeData(params);
   }, []);
 
   const columns = [
     {
-      title: '节点',
+      title: '主机名',
       dataIndex: 'hostname',
       key: 'hostname',
-    },{
+    },
+    {
       title: 'IP地址',
       dataIndex: 'ip',
       key: 'ip',
     },
     {
-      title: '核数',
+      title: '总cpu',
       dataIndex: 'coreNum',
       key: 'coreNum',
     },
-    // {
-    //   title: '机柜',
-    //   dataIndex: 'jigui',
-    //   key: 'jigui',
-    // },{
-    //   title: '仓库',
-    //   dataIndex: 'canku',
-    //   key: 'canku',
-    // },
-    // {
-    //   title: '角色',
-    //   dataIndex: 'serviceRoleNum',
-    //   key: 'serviceRoleNum',
-    // },
     {
-      title: '处理器',
-      dataIndex: 'cpuArchitecture',
-      key: 'cpuArchitecture',
-    },{
-      title: '内存',
+      title: '总内存',
       dataIndex: 'totalMem',
       key: 'totalMem',
-    },{
-      title: '磁盘',
+    },
+    {
+      title: '总硬盘',
       dataIndex: 'totalDisk',
       key: 'totalDisk',
+    },
+    {
+      title: '容器版本',
+      dataIndex: 'containerRuntimeVersion',
+      key: 'containerRuntimeVersion',
+    },
+    {
+      title: 'k8s版本',
+      dataIndex: 'kubeletVersion',
+      key: 'kubeletVersion',
+    },
+    {
+      title: '系统内核',
+      dataIndex: 'kernelVersion',
+      key: 'kernelVersion',
+    },
+    {
+      title: '操作系统',
+      dataIndex: 'osImage',
+      key: 'osImage',
+    },
+    {
+      title: 'cpu架构',
+      dataIndex: 'cpuArchitecture',
+      key: 'cpuArchitecture',
     }
   ]
+
+
+  const handleChange = (value: any)=>{
+    console.log('value: ',value);
+    
+  }
   
 
   return (
@@ -144,33 +179,37 @@ const nodeList: React.FC = () => {
             autoComplete="off"
           >
             <Form.Item
-              label="ip"
+              label="选择k8s节点"
               name="ip"
-              rules={[{ required: true, message: '请输入ip!' }]}
+              rules={[{ required: true, message: '请选择k8s节点!' }]}
             >
-              <Input />
+               <Select
+                  defaultValue=""
+                  onChange={handleChange}
+                  options={ipList}
+                />
             </Form.Item>
 
             <Form.Item
-              label="sshUser"
+              label="ssh账号"
               name="sshUser"
-              rules={[{ required: true, message: '请输入sshUser!' }]}
+              rules={[{ required: true, message: '请输入ssh账号!' }]}
             >
               <Input />
             </Form.Item>
 
             <Form.Item
-              label="sshPassword"
+              label="ssh密码"
               name="sshPassword"
-              rules={[{ required: true, message: '请输入sshPassword!' }]}
+              rules={[{ required: true, message: '请输入ssh密码!' }]}
             >
               <Input />
             </Form.Item>
 
             <Form.Item
-              label="sshPort"
+              label="ssh端口"
               name="sshPort"
-              rules={[{ required: true, message: 'sshPort!' }]}
+              rules={[{ required: true, message: 'ssh端口!' }]}
             >
               <Input />
             </Form.Item>

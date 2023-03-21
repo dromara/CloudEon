@@ -1,4 +1,4 @@
-import { BorderOuterOutlined } from '@ant-design/icons';
+import { CheckCircleFilled, ClockCircleFilled } from '@ant-design/icons';
 import { Image,Checkbox } from 'antd'
 import styles from './index.less'
 
@@ -16,7 +16,7 @@ const ChooseService: React.FC<{
       <Checkbox.Group style={{ width: '100%' }} onChange={onChange}>
         {serviceList.map((sitem: any) => {
           return (<div className={styles.checkItem} >
-          <Checkbox value={sitem.id} key={sitem.id} disabled={sitem.installedInCluster}>
+          <Checkbox style={{ width: '100%' }} value={sitem.id} key={sitem.id} disabled={sitem.installedInCluster}>
             <ServiceItem key={sitem.id} item={sitem} type={1} changeStatus={changeStatus} />
           </Checkbox>
           </div>);
@@ -35,34 +35,25 @@ const ChooseService: React.FC<{
   }> = ({ item, type, changeStatus }) => {
     return (
       <div key={item.id} className={styles.serviceItem}>
-        <div className={styles.serviceItemLeft}>
-        <div style={{display:'flex',flexDirection: 'row'}}>
-          <div style={{display:'flex',flexDirection: 'column', alignItems: 'flex-start'}}>
-                <div style={{display:'flex',flexDirection: 'row', alignItems: 'center',flexWrap:'wrap'}}>
-                    {/* <BorderOuterOutlined /> */}
+                {/* <div style={{display:'flex',flexDirection: 'row', alignItems: 'center',flexWrap:'wrap', width:'100%'}}> */}
                     <Image src={'data:image/jpeg;base64,'+item.iconApp} className={styles.serviceItemIcon} alt="" preview={false} />
-                  <div style={{display:'flex',flexDirection: 'column', alignItems: 'flex-start',width:'500px', marginRight:'20px'}}>
-                    <div className={item.installedInCluster?styles.disabledText:styles.serviceItemTitle}>{item.label}<span style={{fontSize:'12px'}}>{item.installedInCluster?'（已安装）':''}</span></div> 
+                  <div style={{display:'flex',flexDirection: 'column', flex: 1, alignItems: 'flex-start',width:'500px', marginRight:'20px'}}>
+                    <div className={item.installedInCluster?styles.disabledText:styles.serviceItemTitle}>{item.label}</div> 
                     <div className={item.installedInCluster?styles.disabledText:styles.serviceItemDesc}>{item.description}</div>
                   </div>
-                  <div className={`serviceItemDesc ${item.installedInCluster?styles.disabledText:''}`}>
+                  {/* ${item.installedInCluster?styles.disabledText:''} */}
+                  <div className={`${styles.serviceImgWrap} ${styles.serviceItemDesc} `}>
                     <div>镜像：{item.dockerImage}</div>
                     <div>版本：{item.version}</div>
                   </div>
-                </div>
-                {/* <div className={item.installedInCluster?styles.disabledText:styles.serviceItemDesc}>
-                  <div>镜像：{item.dockerImage}</div>
-                  <div>版本：{item.version}</div>
-                </div> */}
-                
-  
-          </div>
-                {/* <div className={styles.serviceItemCenter}>
-                  <div className={styles.serviceItemDesc}>镜像：{item.dockerImage}</div>
-                  <div className={styles.serviceItemDesc}>版本：{item.version}</div>
-                </div> */}
-        </div>
-       </div>
+                  <div className={`serviceStatusWrap`}>
+                       {
+                        item.installedInCluster?(<><CheckCircleFilled style={{marginRight:'5px'}} />已安装</>)
+                        :
+                        (<><ClockCircleFilled style={{marginRight:'5px',color: '#1890ff'}} />未安装</>)
+                       } 
+                  </div>
+                {/* </div> */}
        </div>
     );
   } 

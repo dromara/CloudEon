@@ -5,7 +5,7 @@ import type { Settings as LayoutSettings } from '@ant-design/pro-components';
 import { PageLoading, SettingDrawer } from '@ant-design/pro-components';
 import type { RunTimeLayoutConfig } from 'umi';
 import { history, RequestConfig } from 'umi';
-import { message, Image } from 'antd';
+import { message, Image, Badge } from 'antd';
 import defaultSettings from '../config/defaultSettings';
 import { currentUser as queryCurrentUser } from './services/ant-design-pro/api';
 import logoImg from '../src/assets/images/ic_launcher.png';
@@ -15,6 +15,8 @@ import * as Icon from '@ant-design/icons';
 import {
   RobotOutlined,
 } from '@ant-design/icons';
+import { getCountActiveAPI } from './services/ant-design-pro/colony'; 
+import styles from './app.less'
 
 
 const isDev = process.env.NODE_ENV === 'development';
@@ -135,8 +137,19 @@ export async function getInitialState(): Promise<{
   };
 }
 
+let timer:any = null
+let count:number | string = 0
+
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
 export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) => {
+  const getData = JSON.parse(sessionStorage.getItem('colonyData') || '{}')
+  
+  if(getData && getData.clusterId && !timer){
+    timer = setInterval(async ()=>{
+      const result = await getCountActiveAPI({clusterId:getData.clusterId})
+      count = result?.data || 0
+    },5000)
+  }
   return {
     rightContentRender: () => <RightContent />,
     disableContentMargin: false,
@@ -148,7 +161,9 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     onPageChange: () => {
       const { location } = history;
       // 如果没有登录，重定向到 login
-      if (!initialState?.currentUser && location.pathname !== loginPath) {
+      let c_token = sessionStorage.getItem('token');
+
+      if (!c_token && location.pathname !== loginPath) {
         history.push(loginPath);
       }
     },
@@ -203,8 +218,12 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
         onClick={() => {
           history.push(itemProps.path);
         }}>
-            <div style={{display:'inline-flex',lineHeight:'30px', fontSize: '24px'}}>
+            <div style={{display:'inline-flex',lineHeight:'30px', fontSize: '24px',position:'relative'}}>
               {/* {itemProps.icon} */}
+              
+              {itemProps.name == '指令' && count ? (<>
+              <div className={styles.countBox}>{count}</div>
+              </>):''}
               {createIcon(itemProps.name)}
             </div>
             <div style={{lineHeight:'20px',fontSize:'12px'}}>{itemProps.name}</div>
