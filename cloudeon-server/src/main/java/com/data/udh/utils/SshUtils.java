@@ -1,16 +1,17 @@
 package com.data.udh.utils;
 
+import cn.hutool.core.io.FileUtil;
 import org.apache.sshd.client.SshClient;
 import org.apache.sshd.client.channel.ChannelExec;
 import org.apache.sshd.client.channel.ClientChannelEvent;
 import org.apache.sshd.client.session.ClientSession;
-import org.apache.sshd.sftp.client.SftpClientFactory;
 import org.apache.sshd.sftp.client.fs.SftpFileSystem;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -53,9 +54,9 @@ public class SshUtils {
         sshClient.start();
         ClientSession session = null;
         try {
-            session = sshClient.connect(sshUser, sshHost, sshPort).verify().getClientSession();
+            session = sshClient.connect(sshUser, sshHost, sshPort).verify(10L,TimeUnit.SECONDS).getClientSession();
             session.addPasswordIdentity(password);
-            if (session.auth().verify().isFailure()) {
+            if (session.auth().verify(10L,TimeUnit.SECONDS).isFailure()) {
                 LOG.info("验证失败");
                 return null;
             }
@@ -108,23 +109,23 @@ public class SshUtils {
         session.resetAuthTimeout();
         LOG.info("exe cmd: {}", command);
         // 命令返回的结果
-        ChannelExec ce = null;
+        ChannelExec channelExec = null;
         // 返回结果流
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         // 错误信息
         ByteArrayOutputStream err = new ByteArrayOutputStream();
-        ce = session.createExecChannel(command);
-        ce.setOut(out);
-        ce.setErr(err);
+        channelExec = session.createExecChannel(command);
+        channelExec.setOut(out);
+        channelExec.setErr(err);
         // 执行并等待
-        ce.open();
+        channelExec.open().verify(10L,TimeUnit.SECONDS);
         Set<ClientChannelEvent> events =
-                ce.waitFor(EnumSet.of(ClientChannelEvent.CLOSED), TimeUnit.SECONDS.toMillis(100000));
+                channelExec.waitFor(EnumSet.of(ClientChannelEvent.CLOSED), TimeUnit.SECONDS.toMillis(100000));
         //  检查请求是否超时
         if (events.contains(ClientChannelEvent.TIMEOUT)) {
             throw new RuntimeException("ssh 连接超时");
         }
-        int exitStatus = ce.getExitStatus();
+        Integer exitStatus = channelExec.getExitStatus();
         LOG.info("mina result {}", exitStatus);
         if (exitStatus != 0) {
             throw new RuntimeException("ssh 执行命令失败：" + err.toString());
@@ -136,27 +137,25 @@ public class SshUtils {
     /**
      * 上传单个文件到指定目录,相同路径ui覆盖
      *
-     * @param session       连接
      * @param remoteDirPath 远程目录地址
      * @param inputFile     文件 File
      */
-    public static boolean uploadFile(ClientSession session, String remoteDirPath, String inputFile,SftpFileSystem sftp) {
+    public static boolean uploadFile(String remoteDirPath, String inputFile, SftpFileSystem sftp) {
         File uploadFile = new File(inputFile);
-        InputStream input = null;
+        InputStream localInputStream = null;
         try {
-            Path path = sftp.getDefaultDir().resolve(remoteDirPath);
-            if (!Files.exists(path)) {
-                LOG.info("create pathHome {} ", path);
-                Files.createDirectories(path);
+            Path sftpPath = sftp.getDefaultDir().resolve(remoteDirPath);
+            if (!Files.exists(sftpPath)) {
+                LOG.info("create pathHome {} ", sftpPath);
+                Files.createDirectories(sftpPath);
             }
-            input = Files.newInputStream(uploadFile.toPath());
-            Path file = path.resolve(uploadFile.getName());
-            if (Files.exists(file)) {
-                LOG.info("delete remote file  {}", file);
-                Files.deleteIfExists(file);
+            localInputStream = Files.newInputStream(uploadFile.toPath());
+            if (Files.exists(sftpPath)) {
+                LOG.info("delete remote file  {}", sftpPath);
+                Files.deleteIfExists(sftpPath);
             }
-            Files.copy(input, file);
-            LOG.info("local file {} copy to remote success " ,uploadFile.toPath());
+            Files.copy(localInputStream, sftpPath);
+            LOG.info("local file {} copy to remote {} success " ,uploadFile.toPath(),sftpPath);
             return true;
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -165,20 +164,21 @@ public class SshUtils {
 
     /**
      * 将本地目录里所有文件拷贝到远程目录中
-     * @param session
      * @param remoteDirPath
      * @param localDir
      */
-    public static void uploadLocalDirToRemote(ClientSession session, String remoteDirPath, String localDir) {
-        try {
-            SftpFileSystem sftp = SftpClientFactory.instance().createSftpFileSystem(session);
-            for (String file : new File(localDir).list()) {
-                String localFilePath = localDir + File.separator + file;
-                uploadFile(session, remoteDirPath, localFilePath,sftp);
+    public static void uploadLocalDirToRemote(String remoteDirPath, String localDir, SftpFileSystem sftp) throws IOException {
+
+        Path localDirPath = Paths.get(localDir);
+        Files.walk(localDirPath).forEach(file -> {
+            if (!Files.isDirectory(file)) {
+                File localFile = file.toFile();
+                String localFileAbsolutePath = localFile.getAbsolutePath();
+                String remoteFilePath = remoteDirPath + "/" + FileUtil.subPath(localDir, localFile);
+                LOG.info("即将上传文件:{} 到远程目录:{}",localFileAbsolutePath,remoteFilePath);
+                uploadFile(remoteFilePath, localFileAbsolutePath,sftp);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        });
 
     }
 
@@ -188,10 +188,8 @@ public class SshUtils {
      * @param path
      * @return
      */
-    public static boolean createDir(ClientSession session, String path) {
-        SftpFileSystem sftp = null;
+    public static boolean createDir(ClientSession session, String path,SftpFileSystem sftp) {
         try {
-            sftp = SftpClientFactory.instance().createSftpFileSystem(session);
             Path remoteRoot = sftp.getDefaultDir().resolve(path);
             if (!Files.exists(remoteRoot)) {
                 Files.createDirectories(remoteRoot);

@@ -2,17 +2,17 @@
 
 
 
-export LOG_DIR=$SH_DIR/logs
-export PID_DIR=$SH_DIR/pid
+export LOG_DIR=/opt/udh/${service.serviceName}/log
+export PID_DIR=/opt/udh/${service.serviceName}/data/prometheus
 
 export HOSTNAME=`hostname`
 
-log=$LOG_DIR/$command-$HOSTNAME.out
-pid=$PID_DIR/$command.pid
+log=$LOG_DIR/prometheus-$HOSTNAME.out
+pid=$PID_DIR/prometheus.pid
 
 echo "========================start prometheus========================"
 
-exec_command="prometheus --config.file=/opt/udh/${service.serviceName}/conf/prometheus.yml --web.listen-address=:9090 --web.enable-lifecycle"
+exec_command="prometheus --config.file=/opt/udh/${service.serviceName}/conf/prometheus.yml --storage.tsdb.path="/opt/udh/${service.serviceName}/data/prometheus"  --web.listen-address=0.0.0.0:${conf['prometheus.http.port']} --web.enable-lifecycle"
 echo "nohup $exec_command > $log 2>&1 &"
 nohup $exec_command > $log 2>&1 &
 echo $! > $pid
