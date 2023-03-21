@@ -32,7 +32,7 @@ const nodeList: React.FC = () => {
     if(result?.data){
       const list = result.data.map(item=>{
         return {
-          value: item.ip,
+          value: `${item.hostname}(${item.ip})`,//item.ip,
           label: `${item.hostname}(${item.ip})`,
         }
       })
@@ -56,7 +56,17 @@ const nodeList: React.FC = () => {
     form
       .validateFields()
       .then(async (values) => {
-        const result: API.normalResult = await createNodeAPI({...values, clusterId: getData.clusterId})
+        console.log('values: ', values);
+        const arr = values?.ip?.replace('(',' ').replace(')','').split(' ')        
+        
+        const params = {
+          ip :  arr && arr[1],
+          hostname: arr && arr[0],
+          sshPassword: values.sshPassword,
+          sshPort: values.sshPort,
+          sshUser: values.sshUser,
+        }
+        const result: API.normalResult = await createNodeAPI({...params, clusterId: getData.clusterId})
         if(result && result.success){
           message.success('新增成功');
           getNodeData({ clusterId: getData.clusterId });
@@ -163,6 +173,7 @@ const nodeList: React.FC = () => {
         destroyOnClose={true}
         open={isModalOpen}
         onOk={handleOk}
+        confirmLoading={loading}
         onCancel={handleCancel}
         // footer={null}
       >
@@ -209,6 +220,7 @@ const nodeList: React.FC = () => {
             <Form.Item
               label="ssh端口"
               name="sshPort"
+              initialValue={22}
               rules={[{ required: true, message: 'ssh端口!' }]}
             >
               <Input />

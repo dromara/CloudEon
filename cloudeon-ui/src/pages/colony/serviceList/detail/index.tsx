@@ -106,6 +106,11 @@ const serviceListDetail: React.FC = () => {
       label: `配置`,
       children: <ConfigTab serviceId={serviceId}/>,
     },
+    {
+      key: 'WebUITab',
+      label: `webUI`,
+      children: <ConfigTab serviceId={serviceId}/>,
+    },
   ];
 
   useEffect(()=>{

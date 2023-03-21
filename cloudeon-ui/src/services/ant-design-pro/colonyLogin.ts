@@ -1,6 +1,6 @@
 import { request } from 'umi';
 export async function loginAPI(options?: { [key: string]: any }) {
-    return request<API.stringResult>('/acc/doLogin', {
+    return request<API.stringResult>('/colony/acc/doLogin', {
         method: 'GET',
         params: {
             ...options,
@@ -12,7 +12,7 @@ export async function loginAPI(options?: { [key: string]: any }) {
 }
 
 export async function logoutAPI(options?: { [key: string]: any }) {
-    return request<API.stringResult>('/acc/logout', {
+    return request<API.stringResult>('/colony/acc/logout', {
         method: 'GET',
         params: {
             ...options,
