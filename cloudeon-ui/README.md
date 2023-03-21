@@ -18,7 +18,16 @@ npm install yarn tyarn -g
 ```bash
 tyarn
 ```
-5. 启动项目
+5. 本地环境启动修改接口地址
+   在config/proxy.ts文件修改：
+   ```bash
+    '/colony/': {
+      target: 'http://192.168.31.30:7700', // 要代理的地址改成后端接口实际的地址
+      changeOrigin: true,
+      pathRewrite: { '^/colony' : '' },
+    }
+   ```
+6. 启动项目
 ```bash
 npm start
 ```

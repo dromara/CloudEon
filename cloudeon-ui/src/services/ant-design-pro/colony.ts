@@ -6,7 +6,7 @@ export async function getClusterListAPI(params: {
   /** 集群id */
   clusterId?: number;
 }) {
-  return request<API.ServiceList>('/cluster/list', {
+  return request<API.ServiceList>('/colony/cluster/list', {
     method: 'GET',
     params: {
       ...params,
@@ -20,7 +20,7 @@ export async function getNodeListAPI(params: {
   /** 集群id */
   clusterId?: number;
 }) {
-  return request<API.ServiceList>('/node/list', {
+  return request<API.ServiceList>('/colony/node/list', {
     method: 'GET',
     params: {
       ...params,
@@ -34,7 +34,7 @@ export async function getServiceListAPI(params: {
   /** 集群id */
   clusterId?: number;
 }) {
-  return request<API.ServiceList>('/stack/listService', {
+  return request<API.ServiceList>('/colony/stack/listService', {
     method: 'GET',
     params: {
       ...params,
@@ -48,7 +48,7 @@ export async function getStackListAPI(params: {
   /** 集群id */
   clusterId?: number;
 }) {
-  return request<API.StackList>('/stack/list', {
+  return request<API.StackList>('/colony/stack/list', {
     method: 'GET',
     params: {
       ...params,
@@ -58,7 +58,7 @@ export async function getStackListAPI(params: {
 
 //新增集群
 export async function createClusterAPI(options?: { [key: string]: any }) {
-  return request<API.normalResult>('/cluster/save', {
+  return request<API.normalResult>('/colony/cluster/save', {
     method: 'POST',
     data: {...(options || {})},
   });
@@ -67,7 +67,7 @@ export async function createClusterAPI(options?: { [key: string]: any }) {
 
 /** 获取k8s节点列表 */
 export async function getListK8sNodeAPI(options?: { [key: string]: any }) {
-  return request<API.nodeIpListResult>('/node/listK8sNode', {
+  return request<API.nodeIpListResult>('/colony/node/listK8sNode', {
     method: 'GET',
     params: {
       ...options,
@@ -77,7 +77,7 @@ export async function getListK8sNodeAPI(options?: { [key: string]: any }) {
 
 //新增节点
 export async function createNodeAPI(options?: { [key: string]: any }) {  
-  return request<API.normalResult>('/node/add', {
+  return request<API.normalResult>('/colony/node/add', {
     method: 'POST',
     data: {...(options || {})},
   });
@@ -85,7 +85,7 @@ export async function createNodeAPI(options?: { [key: string]: any }) {
 
 // 安装服务校验
 export async function checkServiceAPI(options?: { [key: string]: any }) {
-  return request<API.StackList>('/stack/validInstallServicesDeps', {
+  return request<API.StackList>('/colony/stack/validInstallServicesDeps', {
     method: 'POST',
     data: {...(options || {})},
   });
@@ -96,7 +96,7 @@ export async function getServiceConfAPI(params: {
   serviceId?: number;
   inWizard?: boolean;
 }) {
-  return request<API.ConfList>('/stack/listServiceConf', {
+  return request<API.ConfList>('/colony/stack/listServiceConf', {
     method: 'GET',
     params: {
       ...params,
@@ -106,7 +106,7 @@ export async function getServiceConfAPI(params: {
 
 // 安装服务校验
 export async function checkKerberosAPI(options?: number[]) {
-  return request<API.normalResult>('/service/validInstallServiceHasKerberos', {
+  return request<API.normalResult>('/colony/service/validInstallServiceHasKerberos', {
     method: 'POST',
     data: options,
   });
@@ -114,7 +114,7 @@ export async function checkKerberosAPI(options?: number[]) {
 
 // 添加服务校验
 export async function initServiceAPI(options?: API.SubmitServicesParams) {
-  return request<API.normalResult>('/service/initService', {
+  return request<API.normalResult>('/colony/service/initService', {
     method: 'POST',
     data: options,
   });
@@ -124,7 +124,7 @@ export async function initServiceAPI(options?: API.SubmitServicesParams) {
 export async function serviceListAPI(params: {
   clusterId?: number;
 }) {
-  return request<API.normalResult>('/service/listServiceInstance', {
+  return request<API.normalResult>('/colony/service/listServiceInstance', {
     method: 'GET',
     params: {
       ...params,
@@ -135,7 +135,7 @@ export async function serviceListAPI(params: {
 // /command/list?clusterId=1
 /** 指令 */
 export async function getCommandListAPI(options?: { [key: string]: any }) {
-  return request<API.normalResult>('/command/list', {
+  return request<API.normalResult>('/colony/command/list', {
     method: 'GET',
     params: {
       ...options,
@@ -145,7 +145,7 @@ export async function getCommandListAPI(options?: { [key: string]: any }) {
 
 /** 指令明细 */
 export async function getCommandDetailAPI(options?: { [key: string]: any }) {
-  return request<API.commandResult>('/command/detail', {
+  return request<API.commandResult>('/colony/command/detail', {
     method: 'GET',
     params: {
       ...options,
@@ -155,7 +155,7 @@ export async function getCommandDetailAPI(options?: { [key: string]: any }) {
 
 /** 删除服务 */
 export async function deleteServiceAPI(options?: { [key: string]: any }) {
-  return request<API.normalResult>('/service/deleteServiceInstance', {
+  return request<API.normalResult>('/colony/service/deleteServiceInstance', {
     method: 'GET',
     params: {
       ...options,
@@ -165,7 +165,7 @@ export async function deleteServiceAPI(options?: { [key: string]: any }) {
 
 /** 日志详情 */
 export async function getTaskLogAPI(options?: { [key: string]: any }) {
-  return request<API.logResult>('/log/task', {
+  return request<API.logResult>('/colony/log/task', {
     method: 'GET',
     params: {
       ...options,
@@ -175,7 +175,7 @@ export async function getTaskLogAPI(options?: { [key: string]: any }) {
 
 // 启动服务
 export async function startServiceAPI(options?: { [key: string]: any}) {
-  return request<API.normalResult>('/service/startService', {
+  return request<API.normalResult>('/colony/service/startService', {
     method: 'POST',
     params: options,
   });
@@ -183,7 +183,7 @@ export async function startServiceAPI(options?: { [key: string]: any}) {
 
 // 停止服务
 export async function stopServiceAPI(options?: { [key: string]: any}) {
-  return request<API.normalResult>('/service/stopService', {
+  return request<API.normalResult>('/colony/service/stopService', {
     method: 'POST',
     params: options,
   });
@@ -191,7 +191,7 @@ export async function stopServiceAPI(options?: { [key: string]: any}) {
 
 // 重启服务
 export async function restartServiceAPI(options?: { [key: string]: any}) {
-  return request<API.normalResult>('/service/restartService', {
+  return request<API.normalResult>('/colony/service/restartService', {
     method: 'POST',
     params: options,
   });
@@ -199,7 +199,7 @@ export async function restartServiceAPI(options?: { [key: string]: any}) {
 
 // 更新配置
 export async function upgradeServiceAPI(options?: { [key: string]: any}) {
-  return request<API.normalResult>('/service/upgradeServiceConfig', {
+  return request<API.normalResult>('/colony/service/upgradeServiceConfig', {
     method: 'POST',
     params: options,
   });
@@ -207,7 +207,7 @@ export async function upgradeServiceAPI(options?: { [key: string]: any}) {
 
 /** 服务实例详情 */
 export async function getServiceInfoAPI(options?: { [key: string]: any }) {
-  return request<API.serviceInfosResult>('/service/serviceInstanceInfo', {
+  return request<API.serviceInfosResult>('/colony/service/serviceInstanceInfo', {
     method: 'GET',
     params: {
       ...options,
@@ -217,7 +217,7 @@ export async function getServiceInfoAPI(options?: { [key: string]: any }) {
 
 /** 服务实例角色列表 */
 export async function getServiceRolesAPI(options?: { [key: string]: any }) {
-  return request<API.serviceRolesResult>('/service/serviceInstanceRoles', {
+  return request<API.serviceRolesResult>('/colony/service/serviceInstanceRoles', {
     method: 'GET',
     params: {
       ...options,
@@ -227,7 +227,7 @@ export async function getServiceRolesAPI(options?: { [key: string]: any }) {
 
 /** 自动分配角色绑定节点 */
 export async function getRolesAllocationAPI(options?: { [key: string]: any }) {
-  return request<API.rolesValidResult>('/stack/getRolesAllocation', {
+  return request<API.rolesValidResult>('/colony/stack/getRolesAllocation', {
     method: 'POST',
     data: options,
   });
@@ -235,7 +235,7 @@ export async function getRolesAllocationAPI(options?: { [key: string]: any }) {
 
 /** 查询服务实例配置 */
 export async function getListConfsAPI(options?: { [key: string]: any }) {
-  return request<API.ConfList>('/service/listConfs', {
+  return request<API.ConfList>('/colony/service/listConfs', {
     method: 'GET',
     params: {
       ...options,
@@ -247,7 +247,7 @@ export async function getListConfsAPI(options?: { [key: string]: any }) {
 
 /** 保存服务实例配置 */
 export async function saveServiceConfAPI(options?: { [key: string]: any }) {
-  return request<API.normalResult>('/service/serviceInstanceSaveConf', {
+  return request<API.normalResult>('/colony/service/serviceInstanceSaveConf', {
     method: 'POST',
     data: options,
   });
@@ -255,7 +255,7 @@ export async function saveServiceConfAPI(options?: { [key: string]: any }) {
 
 /** 查询正在运行的指令书 */
 export async function getCountActiveAPI(options?: { [key: string]: any }) {
-  return request<API.stringResult>('/command/countActive', {
+  return request<API.stringResult>('/colony/command/countActive', {
     method: 'GET',
     params: {
       ...options,
