@@ -62,6 +62,10 @@ const Login: React.FC = () => {
     sessionStorage.setItem('token',value)
   }
 
+  const setCurrentUser = (value:any) =>{
+    sessionStorage.setItem('currentUser',value)
+  }
+
   const handleSubmit = async (values: API.LoginParams) => {
     const params = {
       name: values.username,
@@ -74,7 +78,8 @@ const Login: React.FC = () => {
         defaultMessage: '登录成功！',
       });
       message.success(defaultLoginSuccessMessage);
-      setToken(result.data||'')
+      setToken(String(result?.data)||'')
+      setCurrentUser(JSON.stringify(params))
       await fetchUserInfo(params);
       /** 此方法会跳转到 redirect 参数所在的位置 */
       if (!history) return;
@@ -84,7 +89,7 @@ const Login: React.FC = () => {
       return;
     }
     // 如果失败显示错误信息
-    message.error(result.message);
+    result && message.error(result.message);
     // setUserLoginState(false);
   }
 

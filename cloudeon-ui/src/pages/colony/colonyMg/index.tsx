@@ -124,7 +124,7 @@ const Colony: React.FC = () => {
               <ProCard
                 hoverable
                 key={cItem.id}
-                style={{ width: 150, height: 150, padding: 0, overflow: 'hidden' }}
+                style={{ width: 250, height: 150, padding: 0, overflow: 'hidden' }}
                 bodyStyle={{ padding: 0 }}
                 actions={[
                   <Popconfirm
