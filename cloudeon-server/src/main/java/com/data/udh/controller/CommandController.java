@@ -38,6 +38,12 @@ public class CommandController {
         return ResultDTO.success(result);
     }
 
+    @GetMapping("/countActive")
+    public ResultDTO<Long> countActive(Integer clusterId) {
+        long result = commandRepository.countByCommandStateAndClusterId(CommandState.RUNNING,clusterId);
+        return ResultDTO.success(result);
+    }
+
     @GetMapping("/detail")
     public ResultDTO<CommandDetailVO> commandDetail(Integer commandId) {
         CommandDetailVO result = new CommandDetailVO();
