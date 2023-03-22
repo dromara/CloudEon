@@ -12,6 +12,9 @@ public interface ServiceInstanceRepository extends JpaRepository<ServiceInstance
     @Query(value = "select a.id  from ServiceInstanceEntity a join StackServiceEntity b on a.stackServiceId = b.id where a.clusterId =:clusterId and  b.name = :stackServiceName")
     Integer findByClusterIdAndStackServiceName(@Param("clusterId") Integer clusterId, @Param("stackServiceName") String stackServiceName);
 
+    @Query(value = "select a  from ServiceInstanceEntity a join StackServiceEntity b on a.stackServiceId = b.id where a.clusterId =:clusterId and  b.name = :stackServiceName")
+    ServiceInstanceEntity findEntityByClusterIdAndStackServiceName(@Param("clusterId") Integer clusterId, @Param("stackServiceName") String stackServiceName);
+
     ServiceInstanceEntity findByClusterIdAndStackServiceId(Integer clusterId, Integer stackServiceId);
 
     List<ServiceInstanceEntity> findByClusterId(Integer clusterId);

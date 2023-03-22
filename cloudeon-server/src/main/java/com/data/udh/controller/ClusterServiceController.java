@@ -38,6 +38,7 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.data.udh.utils.Constant.AdminUserId;
@@ -755,6 +756,11 @@ public class ClusterServiceController {
                             .build();
                 }
                 return null;
+            }
+        }).filter(new Predicate<ServiceInstanceWebUrlVO>() {
+            @Override
+            public boolean test(ServiceInstanceWebUrlVO serviceInstanceWebUrlVO) {
+                return serviceInstanceWebUrlVO !=null;
             }
         }).collect(Collectors.toList());
 

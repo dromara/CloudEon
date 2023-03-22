@@ -51,6 +51,7 @@ public class CommandHandler {
                 if (stackServiceName.equals("DORIS")) {
                     taskGroupTypes.add(TaskGroupType.INIT_DORIS);
                 }
+                taskGroupTypes.add(TaskGroupType.REGISTER_MONITOR);
                 return taskGroupTypes;
             case START_SERVICE:
                 return Lists.newArrayList(TaskGroupType.TAG_AND_START_K8S_SERVICE);

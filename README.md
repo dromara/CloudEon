@@ -47,11 +47,12 @@
 
 **页面功能概览：**
 
-| ![服务详情](http://image-picgo.test.upcdn.net/img/20230316100228.png) | ![服务角色](http://image-picgo.test.upcdn.net/img/20230316100441.png)   |
-|:-----------------------------------------------------------------:|---------------------------------------------------------------------|
-| ![服务配置](http://image-picgo.test.upcdn.net/img/20230316100517.png) | ![指令执行详情](http://image-picgo.test.upcdn.net/img/20230316100553.png) |
-| ![指令日志](http://image-picgo.test.upcdn.net/img/20230316100634.png) | ![新增服务](http://image-picgo.test.upcdn.net/img/20230316100720.png)   |
-| ![分配角色](http://image-picgo.test.upcdn.net/img/20230316100747.png) | ![自定义配置](http://image-picgo.test.upcdn.net/img/20230316100833.png)  |
+| ![登录页面](http://image-picgo.test.upcdn.net/img/20230322182700.png) | ![节点列表](http://image-picgo.test.upcdn.net/img/20230322182617.png)  |
+|:---------------------------------------------------------------------:|---------------------------------------------------------------------|
+|  ![服务详情](http://image-picgo.test.upcdn.net/img/20230322181657.png) |  ![服务角色](http://image-picgo.test.upcdn.net/img/20230322181531.png)  |
+|   ![服务配置](http://image-picgo.test.upcdn.net/img/20230316100517.png)   | ![指令执行详情](http://image-picgo.test.upcdn.net/img/20230316100553.png) |
+|   ![指令日志](http://image-picgo.test.upcdn.net/img/20230316100634.png)   | ![新增服务](http://image-picgo.test.upcdn.net/img/20230322181806.png)   |
+|   ![分配角色](http://image-picgo.test.upcdn.net/img/20230316100747.png)   | ![自定义配置](http://image-picgo.test.upcdn.net/img/20230316100833.png)  |
 
 
 ## 👨‍💻 项目地址
