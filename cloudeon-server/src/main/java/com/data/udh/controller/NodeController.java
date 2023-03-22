@@ -26,7 +26,9 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @RestController
@@ -111,14 +113,26 @@ public class NodeController {
 
     /**
      * 查询k8s节点信息详情
-     * todo  过滤出未绑定的节点
      */
     @GetMapping("/listK8sNode")
     public ResultDTO<List<NodeInfoVO>> listK8sNode() {
-
+        // 从数据库查出已经和集群绑定的k8s节点
+        Set<String> clusterIpSets = clusterNodeRepository.findAll().stream().map(new Function<ClusterNodeEntity, String>() {
+            @Override
+            public String apply(ClusterNodeEntity clusterNodeEntity) {
+                return clusterNodeEntity.getIp();
+            }
+        }).collect(Collectors.toSet());
         NodeList nodeList = kubeClient.nodes().list();
         List<Node> items = nodeList.getItems();
-        List<NodeInfoVO> result = items.stream().map(e -> {
+        List<NodeInfoVO> result = items.stream().filter(new Predicate<Node>() {
+            @Override
+            public boolean test(Node node) {
+                String ip = node.getStatus().getAddresses().get(0).getAddress();
+                //  过滤出未绑定的节点
+                return !clusterIpSets.contains(ip);
+            }
+        }).map(e -> {
             NodeInfoVO nodeInfoVO = getNodeInfoVO(e);
 
             return nodeInfoVO;
