@@ -1,10 +1,13 @@
 package com.data.udh.utils;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.StrUtil;
 import org.apache.sshd.client.SshClient;
 import org.apache.sshd.client.channel.ChannelExec;
 import org.apache.sshd.client.channel.ClientChannelEvent;
 import org.apache.sshd.client.session.ClientSession;
+import org.apache.sshd.sftp.client.SftpClient;
 import org.apache.sshd.sftp.client.fs.SftpFileSystem;
 import org.slf4j.LoggerFactory;
 
@@ -54,9 +57,9 @@ public class SshUtils {
         sshClient.start();
         ClientSession session = null;
         try {
-            session = sshClient.connect(sshUser, sshHost, sshPort).verify(10L,TimeUnit.SECONDS).getClientSession();
+            session = sshClient.connect(sshUser, sshHost, sshPort).verify(10L, TimeUnit.SECONDS).getClientSession();
             session.addPasswordIdentity(password);
-            if (session.auth().verify(10L,TimeUnit.SECONDS).isFailure()) {
+            if (session.auth().verify(10L, TimeUnit.SECONDS).isFailure()) {
                 LOG.info("验证失败");
                 return null;
             }
@@ -118,7 +121,7 @@ public class SshUtils {
         channelExec.setOut(out);
         channelExec.setErr(err);
         // 执行并等待
-        channelExec.open().verify(10L,TimeUnit.SECONDS);
+        channelExec.open().verify(10L, TimeUnit.SECONDS);
         Set<ClientChannelEvent> events =
                 channelExec.waitFor(EnumSet.of(ClientChannelEvent.CLOSED), TimeUnit.SECONDS.toMillis(100000));
         //  检查请求是否超时
@@ -143,27 +146,21 @@ public class SshUtils {
     public static boolean uploadFile(String remoteDirPath, String inputFile, SftpFileSystem sftp) {
         File uploadFile = new File(inputFile);
         InputStream localInputStream = null;
+        String remotePath = remoteDirPath + "/" + new File(inputFile).getName();
         try {
-            Path sftpPath = sftp.getDefaultDir().resolve(remoteDirPath);
-            if (!Files.exists(sftpPath)) {
-                LOG.info("create pathHome {} ", sftpPath);
-                Files.createDirectories(sftpPath);
-            }
+            OutputStream outputStream = sftp.getClient().write(remotePath);
             localInputStream = Files.newInputStream(uploadFile.toPath());
-            if (Files.exists(sftpPath)) {
-                LOG.info("delete remote file  {}", sftpPath);
-                Files.deleteIfExists(sftpPath);
-            }
-            Files.copy(localInputStream, sftpPath);
-            LOG.info("local file {} copy to remote {} success " ,uploadFile.toPath(),sftpPath);
+            IoUtil.copy(localInputStream, outputStream);
             return true;
         } catch (IOException e) {
+            LOG.error("上传找到文件到远程服务上 {} 失败", remotePath);
             throw new RuntimeException(e);
         }
     }
 
     /**
      * 将本地目录里所有文件拷贝到远程目录中
+     *
      * @param remoteDirPath
      * @param localDir
      */
@@ -171,12 +168,20 @@ public class SshUtils {
 
         Path localDirPath = Paths.get(localDir);
         Files.walk(localDirPath).forEach(file -> {
+
+            File localFile = file.toFile();
+            String localFileAbsolutePath = localFile.getAbsolutePath();
+            String removeSuffix = StrUtil.removeSuffix(FileUtil.subPath(localDir, localFile), localFile.getName());
             if (!Files.isDirectory(file)) {
-                File localFile = file.toFile();
-                String localFileAbsolutePath = localFile.getAbsolutePath();
-                String remoteFilePath = remoteDirPath + "/" + FileUtil.subPath(localDir, localFile);
-                LOG.info("即将上传文件:{} 到远程目录:{}",localFileAbsolutePath,remoteFilePath);
-                uploadFile(remoteFilePath, localFileAbsolutePath,sftp);
+                String finalRemoteDir = remoteDirPath + removeSuffix;
+                LOG.info("即将上传文件:{} 到远程目录:{}", localFileAbsolutePath, finalRemoteDir);
+                uploadFile(finalRemoteDir, localFileAbsolutePath, sftp);
+            } else {
+                String finalRemoteDir = remoteDirPath + FileUtil.subPath(localDir, localFile);
+                if (!finalRemoteDir.equals(remoteDirPath)){
+                    createDir(null, finalRemoteDir, sftp);
+                }
+
             }
         });
 
@@ -188,14 +193,17 @@ public class SshUtils {
      * @param path
      * @return
      */
-    public static boolean createDir(ClientSession session, String path,SftpFileSystem sftp) {
+    public static boolean createDir(ClientSession session, String path, SftpFileSystem sftp) {
         try {
             Path remoteRoot = sftp.getDefaultDir().resolve(path);
             if (!Files.exists(remoteRoot)) {
                 Files.createDirectories(remoteRoot);
+                LOG.info("远程服务器上创建目录 {} 成功",remoteRoot);
                 return true;
             }
         } catch (IOException e) {
+            LOG.error("远程服务上创建目录 {} 失败", path);
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
         return false;
