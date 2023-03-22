@@ -47,3 +47,28 @@ scrape_configs:
     scheme: http
     static_configs:
     - targets: [${node_exporters?join(",")}]
+  - job_name: 'namenode'
+    file_sd_configs:
+    - files: ['discovery_configs/namenode.json']
+  - job_name: 'datanode'
+    file_sd_configs:
+    - files: ['discovery_configs/datanode.json']
+  - job_name: 'zkfc'
+    file_sd_configs:
+    - files: ['discovery_configs/zkfc.json']
+  - job_name: 'journalnode'
+    file_sd_configs:
+    - files: ['discovery_configs/journalnode.json']
+  - job_name: 'resourcemanager'
+    file_sd_configs:
+    - files: ['discovery_configs/resourcemanager.json']
+  - job_name: 'nodemanager'
+    file_sd_configs:
+    - files: ['discovery_configs/nodemanager.json']
+  - job_name: 'zkserver'
+    file_sd_configs:
+    - files: ['discovery_configs/zkserver.json']
+  - job_name: 'doris'
+    metrics_path: '/metrics'
+    file_sd_configs:
+    - files: ['discovery_configs/doris.json']

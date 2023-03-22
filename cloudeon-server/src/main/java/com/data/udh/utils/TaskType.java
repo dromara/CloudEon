@@ -17,6 +17,7 @@ public enum TaskType {
     CANCEL_TAG_HOST(8, "移除节点上的标签", "com.data.udh.processor.CancelHostTagTask", true),
     STOP_K8S_SERVICE(9, "停止K8s服务", "com.data.udh.processor.StopK8sServiceTask", false),
     REGISTER_BE(10, "注册be节点", "com.data.udh.processor.RegisterBeTask", false),
+    REGISTER_PROMETHEUS(11, "注册prometheus采集配置", "com.data.udh.processor.RegisterPrometheusScrapyTask", false),
 
 
     ;

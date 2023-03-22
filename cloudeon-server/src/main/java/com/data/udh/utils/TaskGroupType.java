@@ -18,6 +18,7 @@ public enum TaskGroupType {
     INIT_YARN(6, "初始化YARN", Lists.newArrayList(TaskType.HDFS_MKDIR), false),
     CANCEL_TAG_AND_STOP_K8S_SERVICE(7, "移除标签并停止k8s服务", Lists.newArrayList(TaskType.CANCEL_TAG_HOST, TaskType.STOP_K8S_SERVICE), true),
     INIT_DORIS(8, "初始化DORIS", Lists.newArrayList(TaskType.REGISTER_BE), false),
+    REGISTER_MONITOR(9, "注册监控到Monitor服务", Lists.newArrayList(TaskType.REGISTER_PROMETHEUS), false),
 
 
     ;
