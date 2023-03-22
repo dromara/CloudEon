@@ -360,4 +360,16 @@ declare namespace API {
     data?: nodeIpItem[];
   }
 
+  type webUrlsItem = {
+    hostnameUrl?: string,
+    ipUrl?: string,
+    name?: string
+  }
+
+  type webUrlsListResult = {
+    success?: boolean;
+    message?: string;
+    data?: webUrlsItem[];
+  }
+
 }
