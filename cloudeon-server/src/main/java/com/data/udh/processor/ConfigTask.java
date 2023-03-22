@@ -134,7 +134,7 @@ public class ConfigTask extends BaseUdhTask {
             e.printStackTrace();
             throw new RuntimeException("打开sftp失败："+e);
         }
-        String remoteConfDirPath = "/opt/udh/" + serviceInstanceEntity.getServiceName() + File.separator + "conf";
+        String remoteConfDirPath = "/opt/udh/" + serviceInstanceEntity.getServiceName() + File.separator + "conf/";
         log.info("拷贝本地配置目录：" + outputConfPath + " 到节点" + taskParam.getHostName() + "的：" + remoteConfDirPath);
         try {
             SshUtils.uploadLocalDirToRemote(remoteConfDirPath, outputConfPath,sftp);

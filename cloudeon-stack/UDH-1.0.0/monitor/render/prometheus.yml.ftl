@@ -68,7 +68,7 @@ scrape_configs:
   - job_name: 'zkserver'
     file_sd_configs:
     - files: ['discovery_configs/zkserver.json']
-  - job_name: 'doris'
+  - job_name: 'PALO_CLUSTER'
     metrics_path: '/metrics'
     file_sd_configs:
     - files: ['discovery_configs/doris.json']

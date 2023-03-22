@@ -117,7 +117,7 @@ public class RegisterPrometheusScrapyTask extends BaseUdhTask {
             e.printStackTrace();
             throw new RuntimeException("打开sftp失败：" + e);
         }
-        String remoteConfDirPath = "/opt/udh/" + monitorServiceInstance.getServiceName() + File.separator + "conf" + File.separator + "discovery_configs";
+        String remoteConfDirPath = "/opt/udh/" + monitorServiceInstance.getServiceName() + File.separator + "conf" + File.separator + "discovery_configs/";
         log.info("拷贝本地配置目录：" + outputConfPath + " 到节点" + prometheusNodeEntity.getHostname() + "的：" + remoteConfDirPath);
         try {
             SshUtils.uploadLocalDirToRemote(remoteConfDirPath, outputConfPath, sftp);
