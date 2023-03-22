@@ -9,4 +9,5 @@ public class SaveNodeRequest {
     private Integer sshPort;
     private Integer clusterId;
     private String ip;
+    private String hostname;
 }

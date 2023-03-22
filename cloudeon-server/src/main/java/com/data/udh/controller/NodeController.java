@@ -2,6 +2,7 @@ package com.data.udh.controller;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.lang.Assert;
 import com.alibaba.fastjson.JSONObject;
 import com.data.udh.controller.request.SaveNodeRequest;
 import com.data.udh.controller.response.NodeInfoVO;
@@ -25,7 +26,9 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @RestController
@@ -51,6 +54,8 @@ public class NodeController {
         if (clusterNodeRepository.countByIp(ip) > 0) {
            return ResultDTO.failed("已添加ip为：" + ip + " 的节点(服务器)");
         }
+        // 校验ssh服务
+        checkSSH(ip, sshPort, sshUser, sshPassword);
 
         // 保存到数据库
         ClusterNodeEntity newClusterNodeEntity = new ClusterNodeEntity();
@@ -62,6 +67,18 @@ public class NodeController {
         return ResultDTO.success(null);
     }
 
+    /**
+     * 查询服务器基础信息
+     */
+    public void checkSSH(String sshHost, Integer sshPort, String sshUser, String password) throws IOException {
+
+        ClientSession session = SshUtils.openConnectionByPassword(sshHost, sshPort, sshUser, password);
+        SftpFileSystem sftp = SftpClientFactory.instance().createSftpFileSystem(session);
+        SshUtils.uploadFile("/tmp/", remoteScriptPath + FileUtil.FILE_SEPARATOR + "check.sh",sftp);
+        String result = SshUtils.execCmdWithResult(session, "sh /tmp/check.sh");
+        Assert.equals(result,"ok!!!");
+        session.close();
+    }
 
 
     /**
@@ -96,14 +113,26 @@ public class NodeController {
 
     /**
      * 查询k8s节点信息详情
-     * todo  过滤出未绑定的节点
      */
     @GetMapping("/listK8sNode")
     public ResultDTO<List<NodeInfoVO>> listK8sNode() {
-
+        // 从数据库查出已经和集群绑定的k8s节点
+        Set<String> clusterIpSets = clusterNodeRepository.findAll().stream().map(new Function<ClusterNodeEntity, String>() {
+            @Override
+            public String apply(ClusterNodeEntity clusterNodeEntity) {
+                return clusterNodeEntity.getIp();
+            }
+        }).collect(Collectors.toSet());
         NodeList nodeList = kubeClient.nodes().list();
         List<Node> items = nodeList.getItems();
-        List<NodeInfoVO> result = items.stream().map(e -> {
+        List<NodeInfoVO> result = items.stream().filter(new Predicate<Node>() {
+            @Override
+            public boolean test(Node node) {
+                String ip = node.getStatus().getAddresses().get(0).getAddress();
+                //  过滤出未绑定的节点
+                return !clusterIpSets.contains(ip);
+            }
+        }).map(e -> {
             NodeInfoVO nodeInfoVO = getNodeInfoVO(e);
 
             return nodeInfoVO;
