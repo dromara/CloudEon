@@ -1,14 +1,24 @@
 import { PageContainer, ProCard } from '@ant-design/pro-components';
-import { Button, Radio, Typography, Tabs, message, Spin } from 'antd';
+import { Button, Popover, Radio, Typography, Tabs, message, Spin } from 'antd';
 import type { TabsProps } from 'antd';
-import { PoweroffOutlined, PlayCircleOutlined, ReloadOutlined, ExceptionOutlined, DeleteOutlined  } from '@ant-design/icons';
+import { PoweroffOutlined, PlayCircleOutlined, ReloadOutlined, ExceptionOutlined, DeleteOutlined, LinkOutlined  } from '@ant-design/icons';
 import { FormattedMessage, useIntl, history } from 'umi';
 import styles from './index.less'
 import { useState, useEffect } from 'react';
-import { restartServiceAPI, stopServiceAPI, startServiceAPI, deleteServiceAPI, getServiceInfoAPI, getServiceRolesAPI, upgradeServiceAPI } from '@/services/ant-design-pro/colony';
+import { 
+  restartServiceAPI, 
+  stopServiceAPI, 
+  startServiceAPI, 
+  deleteServiceAPI, 
+  getServiceInfoAPI, 
+  getServiceRolesAPI, 
+  upgradeServiceAPI, 
+  getListWebURLsAPI
+} from '@/services/ant-design-pro/colony';
 import StatusTab from './components/StatusTab/index';
 import RoleTab from './components/RoleTab/index'
 import ConfigTab from './components/ConfigTab/index'
+import webUITab from './components/webUITab/index'
 import { dealResult } from '../../../../utils/resultUtil'
 
 const serviceListDetail: React.FC = () => {
@@ -19,6 +29,7 @@ const serviceListDetail: React.FC = () => {
   const [btnLoading, setBtnLoading] = useState(false);
   const [statusInfo, setStatusInfo] = useState<API.serviceInfos>();
   const [rolesInfo, setRolesInfo] = useState<API.rolesInfos[]>();
+  const [webUrls, setWebUrls] = useState<API.webUrlsItem[]>();
   const [apiLoading, setApiLoading] = useState(false);
   const [currentTab, setCurrentTab] = useState('StatusTab');
 
@@ -29,8 +40,16 @@ const serviceListDetail: React.FC = () => {
     switch(key){
       case 'StatusTab': getInfos(params);break;
       case 'RoleTab': getRoles(params) ;break;
+      // case '': getListWebURLs();break;
     }
   };
+
+  const getListWebURLs = async (params:any) => {
+    const result = await getListWebURLsAPI(params)
+    if(result?.success){
+      setWebUrls(result?.data)
+    }
+  }
 
   const getInfos = async (params:any) =>{
     setApiLoading(true)
@@ -109,7 +128,7 @@ const serviceListDetail: React.FC = () => {
     {
       key: 'WebUITab',
       label: `webUI`,
-      children: <ConfigTab serviceId={serviceId}/>,
+      // children: <webUITab serviceId={serviceId}/>,
     },
   ];
 
@@ -117,7 +136,9 @@ const serviceListDetail: React.FC = () => {
     const { query } = history.location;
     setServiceId(query?.id || 0)
     setServiceName(query?.serviceName || '')
-    getInfos({serviceInstanceId: query?.id || 0})
+    const params = {serviceInstanceId: query?.id || 0}
+    getInfos(params)
+    getListWebURLs(params)
   }, [])
 
 
@@ -194,11 +215,40 @@ const serviceListDetail: React.FC = () => {
           ]
       }}
       >
-        <Tabs
+        {/* <Tabs
           onChange={onChange}
           type="card"
           items={items}
-        />
+        /> */}
+        <div className={styles.tabsBar}>
+          {
+            items.map(item=>{
+              return (
+                item.key!= 'WebUITab'?
+                <div className={`${currentTab == item.key? styles.actived : ''}`} key={item.key} onClick={(e)=>onChange(item.key)}>
+                  {item.label}
+                </div>
+                :
+                <div key={item.key}>
+                  <Popover content={
+                    webUrls?.map(urlItem=>{
+                      return <div key={urlItem.ipUrl}>
+                        <div><a href={urlItem.hostnameUrl} target="_blank">{urlItem.name} <LinkOutlined /></a></div>
+                        <div><a href={urlItem.ipUrl} target="_blank">{urlItem.name} <LinkOutlined /></a></div>
+                      </div>
+                    })
+                  } title="" placement="bottom">
+                    <Button type="text">{item.label}</Button>
+                  </Popover>
+                  
+                </div>
+              )
+            })
+          }
+        </div>
+        <div className={styles.tabContent}>
+          { currentTab != 'WebUITab' && items.filter(item=>{return item.key == currentTab})[0].children}
+        </div>
       </PageContainer>
     </div>
   );

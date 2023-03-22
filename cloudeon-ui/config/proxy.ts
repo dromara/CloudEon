@@ -16,11 +16,11 @@ export default {
       // 依赖 origin 的功能可能需要这个，比如 cookie
       changeOrigin: true,
     },
-    '/colony/': {
+    '/apiPre/': {
       // 要代理的地址
-      target: 'http://192.168.31.30:7700',
+      target: 'http://6e183884.r9.cpolar.top',
       changeOrigin: true,
-      pathRewrite: { '^/colony' : '' },
+      pathRewrite: { '^/apiPre' : '' },
     }
   },
   test: {

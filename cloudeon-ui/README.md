@@ -21,10 +21,10 @@ tyarn
 5. 本地环境启动修改接口地址
    在config/proxy.ts文件修改：
    ```bash
-    '/colony/': {
+    '/apiPre/': {
       target: 'http://192.168.31.30:7700', // 要代理的地址改成后端接口实际的地址
       changeOrigin: true,
-      pathRewrite: { '^/colony' : '' },
+      pathRewrite: { '^/apiPre' : '' },
     }
    ```
 6. 启动项目

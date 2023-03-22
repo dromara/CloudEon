@@ -38,65 +38,45 @@ const roleTab:React.FC<{rolesInfo: API.rolesInfos[], loading: Boolean}> = ({role
             dataIndex: 'nodeHostIp',
             align: 'left'
         },
-        {
-            title: 'ui地址',
-            key:'uiUrls',
-            dataIndex: 'uiUrls',
-            align: 'left',
-            render: (_, record) => {
-                return (
-                    <>
-                    {record.uiUrls && 
-                    <Tooltip 
-                    overlayStyle={{maxWidth:'1000px'}} overlayInnerStyle={{width:'auto'}}  color="#fff"
-                    title={()=>{
-                       return  record?.uiUrls?.map((urlItem,index)=>{
-                            return (
-                                <div 
-                                    key={index.toString()} 
-                                    style={{width:'auto'}} 
-                                    // className={styles.urlLinkWrap} 
-                                    >
-                                        <a 
-                                            key={'url'+index.toString()} 
-                                            // className={styles.urlLinkWrap}  
-                                            target="_blank" 
-                                            href={urlItem}
-                                            >
-                                                {urlItem}
-                                        </a>
-                                </div>
-                            )
-                        })
-                    }}
-                            placement="top">                                                
-                        <a>查看</a>
-                    </Tooltip>
-            }
-                        {/* {
-                            record?.uiUrls?.map((urlItem,index)=>{
-                                return (
-                                    <div 
-                                        key={index.toString()} 
-                                        style={{width:'200px', whiteSpace:'break-spaces'}} 
-                                        // className={styles.urlLinkWrap} 
-                                        >
-                                            <a 
-                                                key={'url'+index.toString()} 
-                                                // className={styles.urlLinkWrap}  
-                                                target="_blank" 
-                                                href={urlItem}
-                                                >
-                                                    {urlItem}
-                                            </a>
-                                    </div>
-                                )
-                            })
-                        } */}
-                    </>
-                )
-            }
-        },
+        // {
+        //     title: 'ui地址',
+        //     key:'uiUrls',
+        //     dataIndex: 'uiUrls',
+        //     align: 'left',
+        //     render: (_, record) => {
+        //         return (
+        //             <>
+        //             {record.uiUrls && 
+        //                     <Tooltip 
+        //                     overlayStyle={{maxWidth:'1000px'}} overlayInnerStyle={{width:'auto'}}  color="#fff"
+        //                     title={()=>{
+        //                     return  record?.uiUrls?.map((urlItem,index)=>{
+        //                             return (
+        //                                 <div 
+        //                                     key={index.toString()} 
+        //                                     style={{width:'auto'}} 
+        //                                     // className={styles.urlLinkWrap} 
+        //                                     >
+        //                                         <a 
+        //                                             key={'url'+index.toString()} 
+        //                                             // className={styles.urlLinkWrap}  
+        //                                             target="_blank" 
+        //                                             href={urlItem}
+        //                                             >
+        //                                                 {urlItem}
+        //                                         </a>
+        //                                 </div>
+        //                             )
+        //                         })
+        //                     }}
+        //                             placement="top">                                                
+        //                         <a>查看</a>
+        //                     </Tooltip>
+        //             }
+        //             </>
+        //         )
+        //     }
+        // },
         {
             title: '操作',
             key: 'actionBtns',
