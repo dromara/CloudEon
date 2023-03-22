@@ -161,7 +161,7 @@ public class SshUtils {
     /**
      * 将本地目录里所有文件拷贝到远程目录中
      *
-     * @param remoteDirPath
+     * @param remoteDirPath 需要以"/"结尾
      * @param localDir
      */
     public static void uploadLocalDirToRemote(String remoteDirPath, String localDir, SftpFileSystem sftp) throws IOException {
