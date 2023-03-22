@@ -68,10 +68,12 @@ const serviceAdd: React.FC = () => {
   }
 
   const changeStatus = (ids:number[]) => {
+    console.log('ids: ', ids);
+    
     const statusData = serviceListData && serviceListData.map(item=>{
       return {
         ...item,
-        selected: ids.includes(item.id) ? !item.selected : item.selected 
+        selected: ids.includes(item.id) ? true : false 
       }
     })
     setServiceListData(statusData)

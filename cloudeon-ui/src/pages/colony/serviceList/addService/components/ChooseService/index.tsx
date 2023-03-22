@@ -38,8 +38,8 @@ const ChooseService: React.FC<{
                 {/* <div style={{display:'flex',flexDirection: 'row', alignItems: 'center',flexWrap:'wrap', width:'100%'}}> */}
                     <Image src={'data:image/jpeg;base64,'+item.iconApp} className={styles.serviceItemIcon} alt="" preview={false} />
                   <div style={{display:'flex',flexDirection: 'column', flex: 1, alignItems: 'flex-start',width:'500px', marginRight:'20px'}}>
-                    <div className={item.installedInCluster?styles.disabledText:styles.serviceItemTitle}>{item.label}</div> 
-                    <div className={item.installedInCluster?styles.disabledText:styles.serviceItemDesc}>{item.description}</div>
+                    <div className={styles.serviceItemTitle}>{item.label}</div> 
+                    <div className={styles.serviceItemDesc}>{item.description}</div>
                   </div>
                   {/* ${item.installedInCluster?styles.disabledText:''} */}
                   <div className={`${styles.serviceImgWrap} ${styles.serviceItemDesc} `}>
@@ -48,7 +48,7 @@ const ChooseService: React.FC<{
                   </div>
                   <div className={`serviceStatusWrap`}>
                        {
-                        item.installedInCluster?(<><CheckCircleFilled style={{marginRight:'5px'}} />已安装</>)
+                        item.installedInCluster?(<><CheckCircleFilled style={{marginRight:'5px', color:'#52c41a'}} />已安装</>)
                         :
                         (<><ClockCircleFilled style={{marginRight:'5px',color: '#1890ff'}} />未安装</>)
                        } 
