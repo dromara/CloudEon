@@ -10,12 +10,27 @@ const statusTab:React.FC<{statusInfo: API.serviceInfos, loading: boolean}> = ({s
             <Spin tip="Loading" size="small" spinning={!!loading}>
             <div className={styles.statusBar}>
                 <div className={styles.leftBox}>
-                    {/* <div>版本：19.6.0ffgfhcvbfghjfghjgh</div>
-                    <div>监控状态：开启</div>
-                    <div>服务配置：正常</div>
-                    <div>产品：Basic</div>
-                    <div>Kerberos：关闭</div> */}
-                    <ProDescriptions
+                    <div>
+                        <div>版本：</div>
+                        <div>{statusInfo.version}</div>
+                    </div>
+                    <div>
+                        <div>dockerImage：</div>
+                        <div>{statusInfo.dockerImage}</div>
+                    </div>
+                    <div>
+                        <div>服务实例名：</div>
+                        <div>{statusInfo.name}</div>
+                    </div>
+                    <div>
+                        <div>框架服务名：</div>
+                        <div>{statusInfo.stackServiceName}</div>
+                    </div>
+                    <div>
+                        <div>服务描述：</div>
+                        <div>{statusInfo.stackServiceDesc}</div>
+                    </div>
+                    {/* <ProDescriptions
                         title=""
                         dataSource={statusInfo}
                         columns={[
@@ -24,25 +39,7 @@ const statusTab:React.FC<{statusInfo: API.serviceInfos, loading: boolean}> = ({s
                                 key: 'version',
                                 dataIndex: 'version',
                                 ellipsis: true,
-                                // copyable: true,
                             },
-                            // {
-                            //     title: '服务状态',
-                            //     key: 'serviceStatus',
-                            //     dataIndex: 'serviceStatus',
-                            //     valueType: 'select',
-                            //     valueEnum: {
-                            //         all: { text: '全部', status: 'Default' },
-                            //         open: {
-                            //             text: '出错',
-                            //             status: 'Error',
-                            //         },
-                            //         closed: {
-                            //             text: '运行中',
-                            //             status: 'OPERATING',
-                            //         },
-                            //     },
-                            // },
                             {
                                 title: '服务实例名',
                                 key: 'name',
@@ -53,37 +50,22 @@ const statusTab:React.FC<{statusInfo: API.serviceInfos, loading: boolean}> = ({s
                                 key: 'stackServiceName',
                                 dataIndex: 'stackServiceName',
                                 ellipsis: true,
-                                // copyable: true,
                             },
                             {
                                 title: '服务描述',
                                 key: 'stackServiceDesc',
                                 dataIndex: 'stackServiceDesc',
                                 ellipsis: true,
-                                // copyable: true,
                             },
                             {
                                 title: '镜像',
                                 key: 'dockerImage',
                                 dataIndex: 'dockerImage',
                                 ellipsis: true,
-                                // copyable: true,
                             }
-                            // {
-                            //     title: '时间',
-                            //     key: 'date',
-                            //     dataIndex: 'date',
-                            //     valueType: 'date',
-                            // },
-                            // {
-                            //     title: 'money',
-                            //     key: 'money',
-                            //     dataIndex: 'money',
-                            //     valueType: 'money',
-                            // },
                         ]}
                         >
-                        </ProDescriptions>
+                        </ProDescriptions> */}
                 </div>
                 <div className={styles.rightBox}>
                     <div style={{whiteSpace: 'nowrap'}}> 
@@ -95,31 +77,6 @@ const statusTab:React.FC<{statusInfo: API.serviceInfos, loading: boolean}> = ({s
                             健康
                         </div>
                     </div>
-                {/* <ProDescriptions
-                    title=""
-                    dataSource={{
-                        state: 'Success',
-                    }}
-                    columns={[
-                        {
-                            title: '监控状态',
-                            key: 'state',
-                            dataIndex: 'state',
-                            valueType: 'select',
-                            valueEnum: {
-                                all: { text: '全部', status: 'Default' },
-                                Error: {
-                                    text: '出错',
-                                    status: 'Error',
-                                },
-                                Success: {
-                                    text: '健康',
-                                    status: 'Success',
-                                },
-                            },
-                        },
-                    ]}
-                ></ProDescriptions> */}
                 </div>
             </div>
             <div>
