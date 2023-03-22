@@ -40,7 +40,8 @@ public class SshTest {
             e.printStackTrace();
             throw new RuntimeException("打开sftp失败："+e);
         }
-        SshUtils.uploadLocalDirToRemote("/tmp/test", "/Volumes/Samsung_T5/opensource/e-mapreduce/work/monitor29/fl001/conf", fileSystem);
+        SshUtils.uploadLocalDirToRemote("/tmp/test/", "/Volumes/Samsung_T5/opensource/e-mapreduce/cloudeon-stack/UDH-1.0.0", fileSystem);
+        SshUtils.uploadFile("/tmp/test/", "/Volumes/Samsung_T5/opensource/e-mapreduce/remote-script/check.sh", fileSystem);
 
 
     }
