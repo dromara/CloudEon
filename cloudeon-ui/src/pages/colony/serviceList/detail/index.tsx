@@ -232,10 +232,15 @@ const serviceListDetail: React.FC = () => {
                 <div key={item.key}>
                   <Popover content={
                     webUrls?.map(urlItem=>{
-                      return <div key={urlItem.ipUrl}>
-                        <div><a href={urlItem.hostnameUrl} target="_blank">{urlItem.name} <LinkOutlined /></a></div>
-                        <div><a href={urlItem.ipUrl} target="_blank">{urlItem.name} <LinkOutlined /></a></div>
-                      </div>
+                      if(urlItem && (urlItem.ipUrl || urlItem.hostnameUrl)){
+                        return <div key={urlItem.ipUrl || urlItem.hostnameUrl}>
+                          <div>{urlItem.name}
+                            <a href={urlItem.hostnameUrl} target="_blank">&nbsp;&nbsp;地址1 </a>
+                            <a href={urlItem.ipUrl} target="_blank">&nbsp;地址2 &nbsp;</a>
+                          </div>
+                          {/* <div><a href={urlItem.ipUrl} target="_blank">{urlItem.name} <LinkOutlined /></a></div> */}
+                        </div>
+                      }
                     })
                   } title="" placement="bottom">
                     <Button type="text">{item.label}</Button>

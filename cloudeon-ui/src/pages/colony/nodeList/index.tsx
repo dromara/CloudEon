@@ -11,6 +11,7 @@ const nodeList: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [nodeListData, setNodeListData] = useState<any[]>();
   const [loading, setLoading] = useState(false);
+  const [k8sLiatloading, setK8sListLoading] = useState(false);
   const [form] = Form.useForm();
   const [ipList, setIpList] = useState<any[]>()
 
@@ -25,10 +26,12 @@ const nodeList: React.FC = () => {
     setNodeListData(result?.data)
   };
 
-  const getk8sNodeList = async (params: any) => {
-    setLoading(true)
+  // 获取k8s节点
+  const getk8sNodeList = async () => {
+    const params = { clusterId: getData.clusterId }
+    setK8sListLoading(true)
     const result:API.nodeIpListResult = await getListK8sNodeAPI(params)
-    setLoading(false)
+    setK8sListLoading(false)
     if(result?.data){
       const list = result.data.map(item=>{
         return {
@@ -72,6 +75,8 @@ const nodeList: React.FC = () => {
           getNodeData({ clusterId: getData.clusterId });
           setIsModalOpen(false);
           form.resetFields()
+        }else{
+          message.error(result.message);
         }
       })
       .catch((err) => {
@@ -86,7 +91,7 @@ const nodeList: React.FC = () => {
 
   useEffect(() => {
     const params = { clusterId: getData.clusterId }
-    getk8sNodeList(params);
+    getk8sNodeList();
     getNodeData(params);
   }, []);
 
@@ -158,6 +163,7 @@ const nodeList: React.FC = () => {
           key="addnode"
           type="primary"
           onClick={() => {
+            getk8sNodeList();
             setIsModalOpen(true)
           }}
         >
@@ -173,11 +179,11 @@ const nodeList: React.FC = () => {
         destroyOnClose={true}
         open={isModalOpen}
         onOk={handleOk}
-        confirmLoading={loading}
+        confirmLoading={loading || k8sLiatloading}
         onCancel={handleCancel}
         // footer={null}
       >
-        <div>
+        <Spin spinning={k8sLiatloading}>
           <Form
             form={form}
             key="addnodeform"
@@ -232,7 +238,7 @@ const nodeList: React.FC = () => {
               </Button>
             </Form.Item> */}
           </Form>
-        </div>
+        </Spin>
       </Modal>
     </PageContainer>
   );
