@@ -2,6 +2,7 @@ package com.data.udh.controller;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.lang.Assert;
 import com.alibaba.fastjson.JSONObject;
 import com.data.udh.controller.request.SaveNodeRequest;
 import com.data.udh.controller.response.NodeInfoVO;
@@ -51,6 +52,8 @@ public class NodeController {
         if (clusterNodeRepository.countByIp(ip) > 0) {
            return ResultDTO.failed("已添加ip为：" + ip + " 的节点(服务器)");
         }
+        // 校验ssh服务
+        checkSSH(ip, sshPort, sshUser, sshPassword);
 
         // 保存到数据库
         ClusterNodeEntity newClusterNodeEntity = new ClusterNodeEntity();
@@ -62,6 +65,18 @@ public class NodeController {
         return ResultDTO.success(null);
     }
 
+    /**
+     * 查询服务器基础信息
+     */
+    public void checkSSH(String sshHost, Integer sshPort, String sshUser, String password) throws IOException {
+
+        ClientSession session = SshUtils.openConnectionByPassword(sshHost, sshPort, sshUser, password);
+        SftpFileSystem sftp = SftpClientFactory.instance().createSftpFileSystem(session);
+        SshUtils.uploadFile("/tmp/", remoteScriptPath + FileUtil.FILE_SEPARATOR + "check.sh",sftp);
+        String result = SshUtils.execCmdWithResult(session, "sh /tmp/check.sh");
+        Assert.equals(result,"ok!!!");
+        session.close();
+    }
 
 
     /**
