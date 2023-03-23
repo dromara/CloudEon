@@ -107,7 +107,7 @@
 
 - [🦊 Kyuubi：为数据湖查询引擎（例如Spark、Flink或Trino等）提供SQL服务](https://github.com/apache/kyuubi)
 - [🦄 Doris：简单易用、高性能和统一的分析数据库](https://github.com/apache/doris/)
-- [🐬 DolphinScheduler：分布式和可扩展的开源工作流协调平台](https://github.com/apache/dolphinscheduler)
+- [🐬 DolphinScheduler：分布式和可扩展的开源工作流调度平台](https://github.com/apache/dolphinscheduler)
 
 
 ## 🤝 贡献者
