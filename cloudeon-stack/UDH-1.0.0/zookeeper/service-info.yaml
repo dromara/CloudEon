@@ -132,7 +132,7 @@ configurations:
 
 
   - name: 4lw.commands.whitelist
-    recommendExpression: mntr
+    recommendExpression: "*"
     valueType: InputString
     confFile: "zoo.cfg"
     label: "指令白名单"
