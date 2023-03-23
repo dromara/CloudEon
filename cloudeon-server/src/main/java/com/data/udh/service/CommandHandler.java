@@ -60,6 +60,8 @@ public class CommandHandler {
 
             case STOP_SERVICE:
                 return Lists.newArrayList(TaskGroupType.CANCEL_TAG_AND_STOP_K8S_SERVICE);
+            case DELETE_SERVICE:
+                return Lists.newArrayList(TaskGroupType.CANCEL_TAG_AND_STOP_K8S_SERVICE, TaskGroupType.DELETE_SERVICE,TaskGroupType.DELETE_DB_DATA);
             case UPGRADE_SERVICE_CONFIG:
                 return Lists.newArrayList(TaskGroupType.CONFIG_SERVICE);
             default:

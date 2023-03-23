@@ -560,6 +560,7 @@ public class ClusterServiceController {
         taskParam.setCommandTaskId(commandTaskEntity.getId());
         taskParam.setCommandId(commandEntity.getId());
         taskParam.setServiceInstanceId(serviceInstanceEntity.getId());
+        taskParam.setServiceInstanceName(serviceInstanceEntity.getServiceName());
         taskParam.setStackServiceId(serviceInstanceEntity.getStackServiceId());
         return taskParam;
     }
@@ -706,14 +707,12 @@ public class ClusterServiceController {
     @Transactional(rollbackFor = Exception.class)
     public ResultDTO<Void> deleteServiceInstance(Integer serviceInstanceId) {
 
-        // 删除服务实例表
-        serviceInstanceRepository.deleteById(serviceInstanceId);
-        // 删除服务角色实例表
-        roleInstanceRepository.deleteByServiceInstanceId(serviceInstanceId);
-        // 删除服务角色配置表
-        serviceInstanceConfigRepository.deleteByServiceInstanceId(serviceInstanceId);
-        // 删除服务ui表
-        roleInstanceWebuisRepository.deleteByServiceInstanceId(serviceInstanceId);
+        ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(serviceInstanceId).get();
+        //  生成删除服务command
+        List<ServiceInstanceEntity> serviceInstanceEntities = Lists.newArrayList(serviceInstanceEntity);
+        Integer commandId = buildServiceCommand(serviceInstanceEntities, serviceInstanceEntity.getClusterId(), CommandType.DELETE_SERVICE);
+        //  调用workflow
+        udhActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
 
 
         return ResultDTO.success(null);

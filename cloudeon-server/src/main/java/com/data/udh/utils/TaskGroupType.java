@@ -19,6 +19,8 @@ public enum TaskGroupType {
     CANCEL_TAG_AND_STOP_K8S_SERVICE(7, "移除标签并停止k8s服务", Lists.newArrayList(TaskType.CANCEL_TAG_HOST, TaskType.STOP_K8S_SERVICE), true),
     INIT_DORIS(8, "初始化DORIS", Lists.newArrayList(TaskType.REGISTER_BE), false),
     REGISTER_MONITOR(9, "注册监控到Monitor服务", Lists.newArrayList(TaskType.REGISTER_PROMETHEUS), false),
+    DELETE_SERVICE(10, "删除服务", Lists.newArrayList(TaskType.DELETE_DATA_DIR), true),
+    DELETE_DB_DATA(11, "删除db中服务相关数据", Lists.newArrayList(TaskType.DELETE_SERVICE_DB_DATA), false),
 
 
     ;
