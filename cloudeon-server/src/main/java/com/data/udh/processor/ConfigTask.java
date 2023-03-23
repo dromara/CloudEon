@@ -160,7 +160,7 @@ public class ConfigTask extends BaseUdhTask {
         // 特殊处理
         if (stackServiceEntity.getName().equals(Constant.ZOOKEEPER_SERVICE_NAME)) {
             try {
-                String remoteDataDirPath = "/opt/udh/" + serviceInstanceEntity.getServiceName() + File.separator + "data";
+                String remoteDataDirPath = "/opt/udh/" + serviceInstanceEntity.getServiceName()  +"/data";
                 String command = "mv " + remoteConfDirPath + File.separator + "myid " + remoteDataDirPath;
                 log.info("移动myid文件到data目录 {}", remoteDataDirPath);
                 log.info("ssh执行命令： {}", command);
