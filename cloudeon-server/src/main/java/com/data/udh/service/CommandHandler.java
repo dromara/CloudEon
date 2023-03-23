@@ -62,7 +62,7 @@ public class CommandHandler {
             case STOP_SERVICE:
                 return Lists.newArrayList(TaskGroupType.CANCEL_TAG_AND_STOP_K8S_SERVICE);
             case DELETE_SERVICE:
-                return Lists.newArrayList(TaskGroupType.CANCEL_TAG_AND_STOP_K8S_SERVICE, TaskGroupType.DELETE_SERVICE,TaskGroupType.DELETE_DB_DATA);
+                return Lists.newArrayList(TaskGroupType.CANCEL_TAG_AND_STOP_K8S_SERVICE, TaskGroupType.DELETE_SERVICE, TaskGroupType.DELETE_DB_DATA);
             case UPGRADE_SERVICE_CONFIG:
                 return Lists.newArrayList(TaskGroupType.CONFIG_SERVICE);
             case STOP_ROLE:
@@ -90,7 +90,7 @@ public class CommandHandler {
                 Stream<TaskModel> taskModelStream;
                 if (taskGroupType.isRoleLoop()) {
                     taskModelStream = serviceTaskGroupType.getRoleHostMaps().keySet().stream().filter(e -> {
-                        if (specRoleHosts.isEmpty()) {
+                        if (specRoleHosts == null || specRoleHosts.isEmpty()) {
                             return true;
                         } else {
                             return specRoleHosts.stream().map(SpecRoleHost::getRoleName).collect(Collectors.toList()).contains(e);
@@ -102,7 +102,7 @@ public class CommandHandler {
                             public Stream<TaskModel> apply(TaskType taskType) {
                                 if (taskType.isHostLoop()) {
                                     Stream<TaskModel> taskModelStream = serviceTaskGroupType.getRoleHostMaps().get(roleName).stream().filter(nodeInfo -> {
-                                        if (specRoleHosts.isEmpty()) {
+                                        if (specRoleHosts == null || specRoleHosts.isEmpty()) {
                                             return true;
                                         } else {
                                             return specRoleHosts.stream().map(SpecRoleHost::getHostName).collect(Collectors.toList()).contains(nodeInfo.getHostName());

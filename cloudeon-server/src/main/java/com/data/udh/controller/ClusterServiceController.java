@@ -481,7 +481,7 @@ public class ClusterServiceController {
 
     private Integer buildServiceCommand(List<ServiceInstanceEntity> serviceInstanceEntities,
                                         Integer ClusterId, CommandType commandType) {
-        return buildInternalCommand(serviceInstanceEntities, null, ClusterId, commandType);
+        return buildInternalCommand(serviceInstanceEntities, Lists.newArrayList(), ClusterId, commandType);
     }
 
     private Integer buildRoleCommand(List<ServiceInstanceEntity> serviceInstanceEntities, List<ServiceRoleInstanceEntity> spceRoleInstanceEntities,
