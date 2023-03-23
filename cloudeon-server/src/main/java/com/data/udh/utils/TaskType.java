@@ -20,6 +20,8 @@ public enum TaskType {
     REGISTER_PROMETHEUS(11, "注册prometheus采集配置", "com.data.udh.processor.RegisterPrometheusScrapyTask", false),
     DELETE_DATA_DIR(12, "删除服务数据目录", "com.data.udh.processor.DeleteServiceDataDir", true),
     DELETE_SERVICE_DB_DATA(13, "删除服务相关db数据库", "com.data.udh.processor.DeleteServiceDBData", false),
+    STOP_ROLE_POD(14, "停止角色Pod", "com.data.udh.processor.StopRolePodTask", true),
+    SCALE_DOWN_K8S_SERVICE(15, "按规模减少k8s服务", "com.data.udh.processor.ScaleDownK8sServiceTask", false),
 
 
     ;

@@ -10,6 +10,7 @@ import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.data.udh.actor.CommandExecuteActor;
 import com.data.udh.controller.request.InitServiceRequest;
+import com.data.udh.controller.request.OpsServiceRoleRequest;
 import com.data.udh.controller.request.ServiceConfUpgradeRequest;
 import com.data.udh.controller.response.*;
 import com.data.udh.dao.*;
@@ -17,6 +18,7 @@ import com.data.udh.dto.*;
 import com.data.udh.entity.*;
 import com.data.udh.processor.TaskParam;
 import com.data.udh.service.CommandHandler;
+import com.data.udh.service.SpecRoleHost;
 import com.data.udh.utils.*;
 import com.google.common.collect.Lists;
 import freemarker.cache.StringTemplateLoader;
@@ -477,8 +479,18 @@ public class ClusterServiceController {
         return result;
     }
 
+    private Integer buildServiceCommand(List<ServiceInstanceEntity> serviceInstanceEntities,
+                                        Integer ClusterId, CommandType commandType) {
+        return buildInternalCommand(serviceInstanceEntities, null, ClusterId, commandType);
+    }
 
-    private Integer buildServiceCommand(List<ServiceInstanceEntity> serviceInstanceEntities, Integer ClusterId, CommandType commandType) {
+    private Integer buildRoleCommand(List<ServiceInstanceEntity> serviceInstanceEntities, List<ServiceRoleInstanceEntity> spceRoleInstanceEntities,
+                                     Integer ClusterId, CommandType commandType) {
+        return buildInternalCommand(serviceInstanceEntities, spceRoleInstanceEntities, ClusterId, commandType);
+    }
+
+    private Integer buildInternalCommand(List<ServiceInstanceEntity> serviceInstanceEntities, List<ServiceRoleInstanceEntity> spceRoleInstanceEntities,
+                                         Integer ClusterId, CommandType commandType) {
 
         // 创建 command
         CommandEntity commandEntity = new CommandEntity();
@@ -524,33 +536,55 @@ public class ClusterServiceController {
                     .taskGroupTypes(taskGroupTypes)
                     .roleHostMaps(roleHostMaps).build();
 
-            List<TaskModel> models = commandHandler.buildTaskModels(serviceTaskGroupType).stream().map(e -> {
+            List<TaskModel> taskModels;
+            // 确定是角色相关指令还是服务指令
+            if (!spceRoleInstanceEntities.isEmpty()) {
+                List<SpecRoleHost> specRoleHosts = spceRoleInstanceEntities.stream().map(new Function<ServiceRoleInstanceEntity, SpecRoleHost>() {
+                    @Override
+                    public SpecRoleHost apply(ServiceRoleInstanceEntity serviceRoleInstanceEntity) {
+                        ClusterNodeEntity clusterNodeEntity = clusterNodeRepository.findById(serviceRoleInstanceEntity.getNodeId()).get();
+                        SpecRoleHost specRoleHost = SpecRoleHost.builder()
+                                .roleName(serviceRoleInstanceEntity.getServiceRoleName())
+                                .hostName(clusterNodeEntity.getHostname())
+                                .build();
+                        return specRoleHost;
+                    }
+                }).collect(Collectors.toList());
+                taskModels = commandHandler.buildTaskModels(serviceTaskGroupType, specRoleHosts);
+            } else {
+                taskModels = commandHandler.buildTaskModels(serviceTaskGroupType);
+            }
+            List<TaskModel> models = taskModels.stream().map(e -> {
                 e.setTaskSortNum(taskModelId.getAndIncrement());
                 return e;
             }).collect(Collectors.toList());
 
             // 根据taskModels生成command task，并持久化数据库
-            for (TaskModel taskModel : models) {
-                CommandTaskEntity commandTaskEntity = new CommandTaskEntity();
-                commandTaskEntity.setCommandId(commandEntity.getId());
-                commandTaskEntity.setProgress(0);
-                commandTaskEntity.setProcessorClassName(taskModel.getProcessorClassName());
-                commandTaskEntity.setTaskName(taskModel.getTaskName());
-                commandTaskEntity.setTaskShowSortNum(taskModel.getTaskSortNum());
-                commandTaskEntity.setCommandState(CommandState.WAITING);
-                commandTaskEntity.setServiceInstanceId(serviceInstanceEntity.getId());
-                commandTaskEntity.setServiceInstanceName(serviceInstanceEntity.getServiceName());
-                commandTaskRepository.saveAndFlush(commandTaskEntity);
-                // 更新日志路径
-                commandTaskEntity.setTaskLogPath(taskLogPath + File.separator + commandEntity.getId() + "-" + commandTaskEntity.getId() + ".log");
-                // 更新任务参数
-                TaskParam taskParam = buildTaskParam(taskModel, commandEntity, serviceInstanceEntity, commandTaskEntity);
-                commandTaskEntity.setTaskParam(JSONObject.toJSONString(taskParam));
-                commandTaskRepository.saveAndFlush(commandTaskEntity);
-            }
+            saveCommandTask2DB(commandEntity, serviceInstanceEntity, models);
         }
 
         return commandEntity.getId();
+    }
+
+    private void saveCommandTask2DB(CommandEntity commandEntity, ServiceInstanceEntity serviceInstanceEntity, List<TaskModel> models) {
+        for (TaskModel taskModel : models) {
+            CommandTaskEntity commandTaskEntity = new CommandTaskEntity();
+            commandTaskEntity.setCommandId(commandEntity.getId());
+            commandTaskEntity.setProgress(0);
+            commandTaskEntity.setProcessorClassName(taskModel.getProcessorClassName());
+            commandTaskEntity.setTaskName(taskModel.getTaskName());
+            commandTaskEntity.setTaskShowSortNum(taskModel.getTaskSortNum());
+            commandTaskEntity.setCommandState(CommandState.WAITING);
+            commandTaskEntity.setServiceInstanceId(serviceInstanceEntity.getId());
+            commandTaskEntity.setServiceInstanceName(serviceInstanceEntity.getServiceName());
+            commandTaskRepository.saveAndFlush(commandTaskEntity);
+            // 更新日志路径
+            commandTaskEntity.setTaskLogPath(taskLogPath + File.separator + commandEntity.getId() + "-" + commandTaskEntity.getId() + ".log");
+            // 更新任务参数
+            TaskParam taskParam = buildTaskParam(taskModel, commandEntity, serviceInstanceEntity, commandTaskEntity);
+            commandTaskEntity.setTaskParam(JSONObject.toJSONString(taskParam));
+            commandTaskRepository.saveAndFlush(commandTaskEntity);
+        }
     }
 
     private TaskParam buildTaskParam(TaskModel taskModel, CommandEntity commandEntity,
@@ -565,6 +599,21 @@ public class ClusterServiceController {
         return taskParam;
     }
 
+
+    @PostMapping("/stopRoles")
+    public ResultDTO<Void> stopRoles(@RequestBody OpsServiceRoleRequest opsServiceRoleRequest) {
+
+        Integer serviceInstanceId = opsServiceRoleRequest.getServiceInstanceId();
+        ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(serviceInstanceId).get();
+        List<ServiceRoleInstanceEntity> specRoleInstances = roleInstanceRepository.findAllById(opsServiceRoleRequest.getRoleInstanceIds());
+        //  生成停止角色command
+        List<ServiceInstanceEntity> serviceInstanceEntities = Lists.newArrayList(serviceInstanceEntity);
+        Integer commandId = buildRoleCommand(serviceInstanceEntities, specRoleInstances, serviceInstanceEntity.getClusterId(), CommandType.STOP_ROLE);
+        //  调用workflow
+        udhActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
+
+        return ResultDTO.success(null);
+    }
 
     /**
      * 校验要安装的服务是否需要Kerberos配置

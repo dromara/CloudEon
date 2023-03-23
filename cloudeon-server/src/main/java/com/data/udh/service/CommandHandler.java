@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -64,6 +65,8 @@ public class CommandHandler {
                 return Lists.newArrayList(TaskGroupType.CANCEL_TAG_AND_STOP_K8S_SERVICE, TaskGroupType.DELETE_SERVICE,TaskGroupType.DELETE_DB_DATA);
             case UPGRADE_SERVICE_CONFIG:
                 return Lists.newArrayList(TaskGroupType.CONFIG_SERVICE);
+            case STOP_ROLE:
+                return Lists.newArrayList(TaskGroupType.STOP_ROLE);
             default:
                 return null;
 
@@ -71,10 +74,14 @@ public class CommandHandler {
 
     }
 
+    public List<TaskModel> buildTaskModels(ServiceTaskGroupType serviceTaskGroupType) {
+        return buildTaskModels(serviceTaskGroupType, null);
+    }
+
     /**
      * 生成单个服务的所有TaskModel
      */
-    public List<TaskModel> buildTaskModels(ServiceTaskGroupType serviceTaskGroupType) {
+    public List<TaskModel> buildTaskModels(ServiceTaskGroupType serviceTaskGroupType, List<SpecRoleHost> specRoleHosts) {
 
         List<TaskModel> taskModelList = serviceTaskGroupType.getTaskGroupTypes().stream().flatMap(new Function<TaskGroupType, Stream<TaskModel>>() {
             @Override
@@ -82,12 +89,25 @@ public class CommandHandler {
                 // 判断taskGroup是否需要按角色迭代：如JN、NN
                 Stream<TaskModel> taskModelStream;
                 if (taskGroupType.isRoleLoop()) {
-                    taskModelStream = serviceTaskGroupType.getRoleHostMaps().keySet().stream().flatMap(roleName -> {
+                    taskModelStream = serviceTaskGroupType.getRoleHostMaps().keySet().stream().filter(e -> {
+                        if (specRoleHosts.isEmpty()) {
+                            return true;
+                        } else {
+                            return specRoleHosts.stream().map(SpecRoleHost::getRoleName).collect(Collectors.toList()).contains(e);
+                        }
+
+                    }).flatMap(roleName -> {
                         return taskGroupType.getTaskTypes().stream().flatMap(new Function<TaskType, Stream<TaskModel>>() {
                             @Override
                             public Stream<TaskModel> apply(TaskType taskType) {
                                 if (taskType.isHostLoop()) {
-                                    Stream<TaskModel> taskModelStream = serviceTaskGroupType.getRoleHostMaps().get(roleName).stream().map(new Function<NodeInfo, TaskModel>() {
+                                    Stream<TaskModel> taskModelStream = serviceTaskGroupType.getRoleHostMaps().get(roleName).stream().filter(nodeInfo -> {
+                                        if (specRoleHosts.isEmpty()) {
+                                            return true;
+                                        } else {
+                                            return specRoleHosts.stream().map(SpecRoleHost::getHostName).collect(Collectors.toList()).contains(nodeInfo.getHostName());
+                                        }
+                                    }).map(new Function<NodeInfo, TaskModel>() {
                                         @Override
                                         public TaskModel apply(NodeInfo nodeInfo) {
                                             return TaskModel.builder()
