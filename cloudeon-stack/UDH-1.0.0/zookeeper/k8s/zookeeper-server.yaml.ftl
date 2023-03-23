@@ -45,6 +45,17 @@ spec:
           value: "/opt/udh/${service.serviceName}/conf"
         image: "${dockerImage}"
         imagePullPolicy: "Always"
+        readinessProbe:
+          exec:
+            command:
+            - "/bin/bash"
+            - "-c"
+            - "echo stat | nc localhost 2181 > /tmp/stat_zk; cat /tmp/stat_zk; grep -qE 'Mode: (follower|leader|standalone)' /tmp/stat_zk "
+        failureThreshold: 3
+        initialDelaySeconds: 3
+        periodSeconds: 30
+        successThreshold: 1
+        timeoutSeconds: 15
         name: "${roleServiceFullName}"
         resources:
           requests: {}
