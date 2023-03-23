@@ -2,7 +2,7 @@ name: HDFS
 label: "HDFS"
 description: "分布式大数据存储"
 version: 3.3.4
-dockerImage: "registry.mufankong.top/udh/hadoop:3.3.4"
+dockerImage: "registry.cn-hangzhou.aliyuncs.com/udh/hadoop:3.3.4"
 dependencies:
   - "ZOOKEEPER"
 
@@ -92,7 +92,7 @@ configurations:
 
 
   - name: datanode.port
-    recommendExpression: 50010
+    recommendExpression: 50011
     valueType: InputNumber
     configurableInWizard: true
 

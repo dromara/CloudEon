@@ -2,7 +2,7 @@ name: MONITOR
 label: "Monitor"
 description: "集齐Promethus、Alermanager、Node Exporter和Grafana一体的监控告警服务"
 version: 1.0.0
-dockerImage: "registry.mufankong.top/udh/monitor:1.0.0"
+dockerImage: "registry.cn-hangzhou.aliyuncs.com/udh/monitor:1.0.0"
 dependencies:
 
 runAs: root

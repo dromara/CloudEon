@@ -2,7 +2,7 @@ name: ZOOKEEPER
 label: "ZooKeeper"
 description: "分布式协调系统"
 version: 3.5.10
-dockerImage: "registry.mufankong.top/udh/zookeeper:3.5.9"
+dockerImage: "registry.cn-hangzhou.aliyuncs.com/udh/zookeeper:3.5.9"
 dependencies: []
 
 runAs: zookeeper
