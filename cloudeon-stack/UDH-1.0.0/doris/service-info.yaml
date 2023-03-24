@@ -9,6 +9,9 @@ runAs: doris
 
 supportKerberos: false
 
+dashboard:
+  uid: 1fFiWJ4mz
+
 roles:
   - name: DORIS_FE
     label: "Doris Fe"

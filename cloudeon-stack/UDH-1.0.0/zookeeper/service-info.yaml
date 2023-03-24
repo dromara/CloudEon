@@ -9,6 +9,9 @@ runAs: zookeeper
 
 supportKerberos: true
 
+dashboard:
+  uid: 000000261
+
 roles:
   - name: ZOOKEEPER_SERVER
     label: "Zookeeper Server"

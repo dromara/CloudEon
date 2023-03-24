@@ -785,6 +785,32 @@ public class ClusterServiceController {
     }
 
     /**
+     * 获取服务实例监控看板地址
+     */
+    @GetMapping("/getDashboardUrl")
+    public ResultDTO<String> getDashboardUrl(Integer serviceInstanceId) {
+        ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(serviceInstanceId).get();
+        StackServiceEntity stackServiceEntity = stackServiceRepository.findById(serviceInstanceEntity.getStackServiceId()).get();
+
+        // 如果没安装monitor服务，则提示请先安装
+        ServiceInstanceEntity monitorServiceInstance = serviceInstanceRepository.findEntityByClusterIdAndStackServiceName(serviceInstanceEntity.getClusterId(), "MONITOR");
+        if (monitorServiceInstance == null) {
+            ResultDTO.success("请先安装Monitor服务");
+        }
+
+        // 通过服务框架的dashboard和Grafana地址拼接完整url
+        String grafanaHttpPort = serviceInstanceConfigRepository.findByServiceInstanceIdAndName(serviceInstanceId, "grafana.http.port").getValue();
+        ServiceRoleInstanceEntity grafana = roleInstanceRepository.findByServiceInstanceIdAndServiceRoleName(monitorServiceInstance.getId(), "MONITOR_GRAFANA").get(0);
+        Integer grafanaNodeId = grafana.getNodeId();
+        ClusterNodeEntity grafanaNodeEntity = clusterNodeRepository.findById(grafanaNodeId).get();
+        String dashboardUid = stackServiceEntity.getDashboardUid();
+//        http://fl001:3000/d/eea-9_siks/?theme=light&orgId=1&kiosk
+        String url = String.format("http://%s:%s/d/%s/?theme=light&orgId=1&kiosk", grafanaNodeEntity.getIp(), grafanaHttpPort, dashboardUid);
+
+        return ResultDTO.success(url);
+    }
+
+    /**
      * 保存实例配置
      */
     @PostMapping("/serviceInstanceSaveConf")

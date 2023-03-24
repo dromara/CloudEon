@@ -11,6 +11,9 @@ runAs: yarn
 
 supportKerberos: true
 
+dashboard:
+  uid: -ZErfqOWz
+
 persistencePaths:
   - /opt/udh/${serviceInstanceId}/conf
   - /opt/udh/${serviceInstanceId}/log

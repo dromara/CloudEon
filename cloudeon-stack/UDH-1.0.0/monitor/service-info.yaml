@@ -9,6 +9,9 @@ runAs: root
 
 supportKerberos: false
 
+dashboard:
+  uid: dd4t3A6nz
+
 persistencePaths:
   - /opt/udh/${serviceInstanceId}/conf
   - /opt/udh/${serviceInstanceId}/conf/discovery_configs

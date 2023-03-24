@@ -17,6 +17,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -153,5 +155,10 @@ public class K8sTest {
         System.out.println("当前deployment可用Replicas: " + readyReplicas);
         System.out.println(resource.scale(readyReplicas - 1));
 
+    }
+
+    @Test
+    public void ip() throws UnknownHostException {
+        System.out.println(InetAddress.getLocalHost().getHostAddress());
     }
 }

@@ -99,7 +99,7 @@ public class ConfigTask extends BaseUdhTask {
             dataModel.put("serviceRoles", serviceRoles);
             dataModel.put("localhostname", taskExecuteHostName);
             dataModel.put("localhostip", taskParam.getIp());
-            dataModel.put("cloudeonURL", "http://"+ InetAddress.getLocalHost()+":"+environment.getProperty("server.port"));
+            dataModel.put("cloudeonURL", "http://"+ InetAddress.getLocalHost().getHostAddress()+":"+environment.getProperty("server.port"));
 
             // 获取该服务支持的自定义配置文件名
             String customConfigFiles = stackServiceEntity.getCustomConfigFiles();

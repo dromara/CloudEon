@@ -14,6 +14,7 @@ public class StackServiceInfo {
     private String version;
     private String dockerImage;
     private String runAs;
+    private Dashboard dashboard;
     private List<String> dependencies;
     private List<String> customConfigFiles;
     private List<StackServiceRole> roles;
