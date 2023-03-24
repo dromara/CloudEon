@@ -255,7 +255,7 @@ export async function saveServiceConfAPI(options?: { [key: string]: any }) {
 
 /** 查询正在运行的指令书 */
 export async function getCountActiveAPI(options?: { [key: string]: any }) {
-  return request<API.stringResult>('/apiPre/command/countActive', {
+  return request<API.numberResult>('/apiPre/command/countActive', {
     method: 'GET',
     params: {
       ...options,

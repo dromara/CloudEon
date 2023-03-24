@@ -4,7 +4,7 @@ import { BookOutlined, LinkOutlined } from '@ant-design/icons';
 import type { Settings as LayoutSettings } from '@ant-design/pro-components';
 import { PageLoading, SettingDrawer } from '@ant-design/pro-components';
 import type { RunTimeLayoutConfig } from 'umi';
-import { history, RequestConfig } from 'umi';
+import { history, RequestConfig, useModel } from 'umi';
 import { message, Image, Badge } from 'antd';
 import defaultSettings from '../config/defaultSettings';
 import { currentUser as queryCurrentUser } from './services/ant-design-pro/api';
@@ -138,18 +138,11 @@ export async function getInitialState(): Promise<{
 }
 
 let timer:any = null
-let count:number | string = 0
+
 
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
 export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) => {
-  const getData = JSON.parse(sessionStorage.getItem('colonyData') || '{}')
   
-  if(getData && getData.clusterId && !timer){
-    timer = setInterval(async ()=>{
-      const result = await getCountActiveAPI({clusterId:getData.clusterId})
-      count = result?.data || 0
-    },5000)
-  }
   return {
     rightContentRender: () => <RightContent />,
     disableContentMargin: false,
@@ -212,22 +205,36 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     collapsed:false,
     collapsedButtonRender: false,
     menuFooterRender:()=><></>,
-    menuItemRender: (itemProps: any, defaultDom: any, props: any) => (
+    menuItemRender: (itemProps: any, defaultDom: any, props: any) => {
+      const getData = JSON.parse(sessionStorage.getItem('colonyData') || '{}')
+      const { actionCount, setActionCount } = useModel('colonyModel', model => ({ actionCount: model.actionCount, setActionCount: model.setActionCountModel }));
+      const getCount = async()=>{
+        const result = await getCountActiveAPI({clusterId:getData.clusterId})
+          setActionCount(result?.data || 0)
+      }
+      if(getData && getData.clusterId && !timer){
+        getCount()
+        timer = setInterval(getCount,3000)
+      }
 
-      <div style={{height:'100%',display:'flex',justifyContent: 'center',flexDirection:'column', alignItems:'center',width:'100%'}} 
+     return <div style={{height:'100%',display:'flex',justifyContent: 'center',flexDirection:'column', alignItems:'center',width:'100%'}} 
         onClick={() => {
           history.push(itemProps.path);
         }}>
             <div style={{display:'inline-flex',lineHeight:'30px', fontSize: '24px',position:'relative'}}>
               {/* {itemProps.icon} */}
               
-              {itemProps.name == '指令' && count ? (<>
-              <div className={styles.countBox}>{count}</div>
+              {itemProps.name == '指令' ? (<>
+              <div className={`${styles.countWrap} ${actionCount ? styles.countBoxshow:''}`}>
+                <div className={styles.countBox}>
+                  {actionCount}
+                </div>
+              </div>
               </>):''}
               {createIcon(itemProps.name)}
             </div>
             <div style={{lineHeight:'20px',fontSize:'12px'}}>{itemProps.name}</div>
       </div>
-    )
+  }
   };
 };

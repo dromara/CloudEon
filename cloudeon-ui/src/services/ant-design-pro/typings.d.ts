@@ -234,7 +234,13 @@ declare namespace API {
   type stringResult = {
     success?: boolean;
     message?: string;
-    data?: string | number;
+    data?: string;
+  }
+
+  type numberResult = {
+    success?: boolean;
+    message?: string;
+    data?: number;
   }
 
   type commandResult = {
