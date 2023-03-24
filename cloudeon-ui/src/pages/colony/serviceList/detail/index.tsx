@@ -13,7 +13,8 @@ import {
   getServiceInfoAPI, 
   getServiceRolesAPI, 
   upgradeServiceAPI, 
-  getListWebURLsAPI
+  getListWebURLsAPI,
+  getDashboardUrlAPI
 } from '@/services/ant-design-pro/colony';
 import StatusTab from './components/StatusTab/index';
 import RoleTab from './components/RoleTab/index'
@@ -32,6 +33,7 @@ const serviceListDetail: React.FC = () => {
   const [webUrls, setWebUrls] = useState<API.webUrlsItem[]>();
   const [apiLoading, setApiLoading] = useState(false);
   const [currentTab, setCurrentTab] = useState('StatusTab');
+  const [dashboardUrl, setDashboardUrl] = useState<any>('');
 
   const onChange = (key: string) => {
     console.log(key);
@@ -44,6 +46,7 @@ const serviceListDetail: React.FC = () => {
     }
   };
 
+ // 获取webUI地址
   const getListWebURLs = async (params:any) => {
     const result = await getListWebURLsAPI(params)
     if(result?.success){
@@ -51,6 +54,7 @@ const serviceListDetail: React.FC = () => {
     }
   }
 
+  // 获取服务详情
   const getInfos = async (params:any) =>{
     setApiLoading(true)
     const result = await getServiceInfoAPI(params)
@@ -60,12 +64,23 @@ const serviceListDetail: React.FC = () => {
     }
   }
 
+  // 获取角色数据
   const getRoles = async (params:any) =>{
     setApiLoading(true)
     const result = await getServiceRolesAPI(params)
     setApiLoading(false)
     if(result?.success){
       setRolesInfo(result?.data)
+    }
+  }
+
+  // 获取实力监控地址
+  const getDashboard = async (params:any) =>{
+    setApiLoading(true)
+    const result = await getDashboardUrlAPI(params)
+    setApiLoading(false)
+    if(result?.success){
+      setDashboardUrl(result?.data)
     }
   }
 
@@ -113,7 +128,7 @@ const serviceListDetail: React.FC = () => {
     {
       key: 'StatusTab',
       label: `状态`,
-      children: <StatusTab statusInfo={statusInfo || {}} loading={currentTab == 'StatusTab' && apiLoading}/>,
+      children: <StatusTab statusInfo={statusInfo || {}} dashboardUrl={dashboardUrl} loading={currentTab == 'StatusTab' && apiLoading}/>,
     },
     {
       key: 'RoleTab',
@@ -138,6 +153,7 @@ const serviceListDetail: React.FC = () => {
     setServiceName(query?.serviceName || '')
     const params = {serviceInstanceId: query?.id || 0}
     getInfos(params)
+    getDashboard(params)
     getListWebURLs(params)
   }, [])
 

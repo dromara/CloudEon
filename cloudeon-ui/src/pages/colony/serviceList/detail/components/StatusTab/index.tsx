@@ -4,7 +4,8 @@ import styles from './index.less'
 import example from '../../../../../../assets/images/1.png';
 import { statusColor } from '../../../../../../utils/colonyColor'
 
-const statusTab:React.FC<{statusInfo: API.serviceInfos, loading: boolean}> = ({statusInfo, loading}) => {
+const statusTab:React.FC<{statusInfo: API.serviceInfos, dashboardUrl:string, loading: boolean}> = ({statusInfo,dashboardUrl, loading}) => {
+    
     return (
         <div className={styles.statusTabLayout}>
             <Spin tip="Loading" size="small" spinning={!!loading}>
@@ -30,42 +31,6 @@ const statusTab:React.FC<{statusInfo: API.serviceInfos, loading: boolean}> = ({s
                         <div>服务描述：</div>
                         <div>{statusInfo.stackServiceDesc}</div>
                     </div>
-                    {/* <ProDescriptions
-                        title=""
-                        dataSource={statusInfo}
-                        columns={[
-                            {
-                                title: '版本',
-                                key: 'version',
-                                dataIndex: 'version',
-                                ellipsis: true,
-                            },
-                            {
-                                title: '服务实例名',
-                                key: 'name',
-                                dataIndex: 'name',
-                            },
-                            {
-                                title: '框架服务名',
-                                key: 'stackServiceName',
-                                dataIndex: 'stackServiceName',
-                                ellipsis: true,
-                            },
-                            {
-                                title: '服务描述',
-                                key: 'stackServiceDesc',
-                                dataIndex: 'stackServiceDesc',
-                                ellipsis: true,
-                            },
-                            {
-                                title: '镜像',
-                                key: 'dockerImage',
-                                dataIndex: 'dockerImage',
-                                ellipsis: true,
-                            }
-                        ]}
-                        >
-                        </ProDescriptions> */}
                 </div>
                 <div className={styles.rightBox}>
                     <div style={{whiteSpace: 'nowrap'}}> 
@@ -79,8 +44,8 @@ const statusTab:React.FC<{statusInfo: API.serviceInfos, loading: boolean}> = ({s
                     </div>
                 </div>
             </div>
-            <div>
-                <Image width={'100%'} src={example} alt="chucui" />
+            <div className={styles.dashboardWrap}>
+                <iframe src="https://4x.ant.design/components/progress-cn/" style={{border:0, width:'100%',height:'100%'}}></iframe>
             </div>
             </Spin>
         </div>

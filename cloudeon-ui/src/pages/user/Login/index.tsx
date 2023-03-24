@@ -149,10 +149,10 @@ const Login: React.FC = () => {
               CloudEon
             </div>
             <div className={styles.subTitle}>
-              基于k8s安装和运维大数据集群
+              基于kubernetes安装和运维大数据集群
             </div>
           </div>
-          <div className={styles.loginContent}>
+          <div className={styles.loginForm}>
               <Form
                 name="basic"
                 labelCol={{ span: 8 }}

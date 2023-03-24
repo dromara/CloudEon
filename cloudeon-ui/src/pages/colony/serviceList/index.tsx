@@ -17,13 +17,13 @@ const serviceList: React.FC = () => {
   const [btnLoading, setBtnLoading] = useState(false);
   const colonyData = JSON.parse(sessionStorage.getItem('colonyData') || '{}')
 
-  const getServiceListData = async () => {
+  const getServiceListData = async (showLoading:boolean) => {
     const params = {
       clusterId: colonyData.clusterId
     }
-    setLoading(true)
+    showLoading && setLoading(true)
     const result = await serviceListAPI(params)
-    setLoading(false)
+    showLoading && setLoading(false)
     if(result?.success){
       setServiceList(result?.data)
     }
@@ -33,7 +33,7 @@ const serviceList: React.FC = () => {
     const result = await deleteServiceAPI(params)
     setLoading(false)
     if(result?.success){
-      getServiceListData()
+      getServiceListData(true)
       message.success('删除成功！', 3)
     }
   }
@@ -72,7 +72,11 @@ const serviceList: React.FC = () => {
   }
 
   useEffect(()=>{
-    getServiceListData()
+    getServiceListData(true)
+    const intervalId = setInterval(()=>{
+      getServiceListData(false)
+    },2000)
+    return () => clearInterval(intervalId);
   },[])
 
 

@@ -274,4 +274,29 @@ export async function getListWebURLsAPI(options?: { [key: string]: any }) {
   });
 }
 
+/** 获取服务实例监控dashboard地址 */
+export async function getDashboardUrlAPI(options?: { [key: string]: any }) {
+  return request<API.stringResult>('/apiPre/service/getDashboardUrl', {
+    method: 'GET',
+    params: {
+      ...options,
+    },
+  });
+}
+
+/** 停止角色 */
+export async function stopRoleAPI(options?: { [key: string]: any }) {
+  return request<API.normalResult>('/apiPre/service/stopRole', {
+    method: 'POST',
+    data: options,
+  });
+}
+
+/** 启动角色 */
+export async function startRoleAPI(options?: { [key: string]: any }) {
+  return request<API.normalResult>('/apiPre/service/startRole', {
+    method: 'POST',
+    data: options,
+  });
+}
 
