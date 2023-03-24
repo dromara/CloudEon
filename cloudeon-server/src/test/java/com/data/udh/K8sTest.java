@@ -1,17 +1,28 @@
 package com.data.udh;
 
 import com.data.udh.utils.ByteConverter;
+import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.Node;
+import io.fabric8.kubernetes.api.model.NodeBuilder;
 import io.fabric8.kubernetes.api.model.NodeList;
+import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
+import io.fabric8.kubernetes.client.Watcher;
+import io.fabric8.kubernetes.client.WatcherException;
+import io.fabric8.kubernetes.client.dsl.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class K8sTest {
@@ -47,5 +58,77 @@ public class K8sTest {
             System.out.println("===============");
 
         });
+    }
+
+    @Test
+    public void deployDetele() throws FileNotFoundException {
+        try(    KubernetesClient client = new KubernetesClientBuilder().build();) {
+            client.load(new FileInputStream("/Volumes/Samsung_T5/opensource/e-mapreduce/work/k8s-resource/zookeeper13/zookeeper-server.yaml"))
+                    .inNamespace("default")
+                    .delete();
+        }
+
+
+    }
+
+    @Test
+    public void startDeploy() throws FileNotFoundException {
+        KubernetesClient client = new KubernetesClientBuilder().build();
+        List<HasMetadata> metadata = client.load(new FileInputStream("/Volumes/Samsung_T5/opensource/e-mapreduce/work/k8s-resource/zookeeper13/zookeeper-server.yaml"))
+                .inNamespace("default")
+                .create();
+        String deploymentName = ((Deployment) metadata.get(0)).getMetadata().getName();
+        final Deployment deployment = client.apps().deployments().inNamespace("default").withName(deploymentName).get();
+        Resource<Deployment> resource = client.resource(deployment).inNamespace("default");
+        resource.watch(new Watcher<Deployment>() {
+            @Override
+            public void eventReceived(Action action, Deployment resource) {
+                log.info("{} {}", action.name(), resource.getMetadata().getName());
+                switch (action) {
+                    case ADDED:
+                        log.info("{} got added", resource.getMetadata().getName());
+                        break;
+                    case DELETED:
+                        log.info("{} got deleted", resource.getMetadata().getName());
+                        break;
+                    case MODIFIED:
+                        log.info("{} got modified", resource.getMetadata().getName());
+                        break;
+                    default:
+                        log.error("Unrecognized event: {}", action.name());
+                }
+            }
+
+            @Override
+            public void onClose(WatcherException cause) {
+                System.out.println(cause.getMessage());
+            }
+        });
+        resource.waitUntilReady(1200, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void addNodeLabel() {
+        KubernetesClient client = new KubernetesClientBuilder().build();
+
+        // 添加label
+        client.nodes().withName("fl001")
+                .edit(r -> new NodeBuilder(r)
+                        .editMetadata()
+                        .addToLabels("my-hdfs-dn", "true")
+                        .endMetadata()
+                        .build());
+
+        // 检查label
+        System.out.println(client.nodes().withName("fl001").get().getMetadata().getLabels().get("my-hdfs-dn").equals("true"));
+        // 移除lable
+        client.nodes().withName("fl001")
+                .edit(r -> new NodeBuilder(r)
+                        .editMetadata()
+                        .removeFromLabels("my-hdfs-dn")
+                        .endMetadata()
+                        .build());
+
+
     }
 }

@@ -8,9 +8,13 @@ import com.data.udh.entity.ServiceInstanceEntity;
 import com.data.udh.entity.StackServiceRoleEntity;
 import com.data.udh.utils.Constant;
 import com.data.udh.utils.ShellCommandExecUtil;
+import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import lombok.NoArgsConstructor;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -39,12 +43,11 @@ public class StopK8sServiceTask extends BaseUdhTask {
         String k8sResourceDirPath = workHome + File.separator + Constant.K8S_RESOURCE_DIR+File.separator+serviceInstanceEntity.getServiceName() ;
         String k8sServiceResourceFilePath = k8sResourceDirPath + File.separator + roleFullName + ".yaml";
 
-        ShellCommandExecUtil commandExecUtil = ShellCommandExecUtil.builder().log(log).build();
-        String[] command = new String[]{"kubectl", "delete","-f",k8sServiceResourceFilePath,"--ignore-not-found"};
-        log.info("本地执行命令："+ Arrays.stream(command).collect(Collectors.joining(" ")));
-        try {
-            commandExecUtil.runShellCommandSync(k8sResourceDirPath, command, StandardCharsets.UTF_8);
-        } catch (IOException e) {
+        try(KubernetesClient client = new KubernetesClientBuilder().build();) {
+            client.load(new FileInputStream(k8sServiceResourceFilePath))
+                    .inNamespace("default")
+                    .delete();
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }

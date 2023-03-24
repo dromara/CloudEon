@@ -7,6 +7,9 @@ import com.data.udh.dao.StackServiceRoleRepository;
 import com.data.udh.entity.ServiceInstanceEntity;
 import com.data.udh.entity.StackServiceRoleEntity;
 import com.data.udh.utils.ShellCommandExecUtil;
+import io.fabric8.kubernetes.api.model.NodeBuilder;
+import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import lombok.NoArgsConstructor;
 
 import java.io.IOException;
@@ -31,19 +34,21 @@ public class TagHostLabelTask extends BaseUdhTask {
         // 获取服务实例名
         String serviceName = serviceInstanceEntity.getServiceName();
         // 拼接成标签
-        String tag = roleFullName + "-" + serviceName.toLowerCase() + "=true";
+        String tag = roleFullName + "-" + serviceName.toLowerCase();
         String hostName = taskParam.getHostName();
 
         // 调用k8s命令启动资源
-        ShellCommandExecUtil commandExecUtil = ShellCommandExecUtil.builder().log(log).build();
-        // kubectl label --overwrite node nod001 status=unhealth
-        String[] command = new String[]{"kubectl", "label", "--overwrite", "node", hostName, tag};
-        log.info("本地执行命令：" + Arrays.stream(command).collect(Collectors.joining(" ")));
-        try {
-            commandExecUtil.runShellCommandSync(workHome, command, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
+        log.info("给k8s节点 {} 打上label :{}",hostName,tag);
+       try(KubernetesClient client = new KubernetesClientBuilder().build();){
+           // 添加label
+           client.nodes().withName(hostName)
+                   .edit(r -> new NodeBuilder(r)
+                           .editMetadata()
+                           .addToLabels(tag, "true")
+                           .endMetadata()
+                           .build());
+       }
+
+
     }
 }

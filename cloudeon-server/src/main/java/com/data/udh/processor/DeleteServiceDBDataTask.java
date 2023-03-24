@@ -1,12 +1,11 @@
 package com.data.udh.processor;
 
 import cn.hutool.extra.spring.SpringUtil;
-import com.data.udh.dao.*;
 import com.data.udh.service.DeleteClusterService;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-public class DeleteServiceDBData extends BaseUdhTask {
+public class DeleteServiceDBDataTask extends BaseUdhTask {
 
     @Override
     public void internalExecute() {
