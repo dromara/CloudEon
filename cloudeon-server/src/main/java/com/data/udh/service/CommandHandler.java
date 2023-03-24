@@ -53,14 +53,15 @@ public class CommandHandler {
                     taskGroupTypes.add(TaskGroupType.INIT_DORIS);
                 }
                 taskGroupTypes.add(TaskGroupType.REGISTER_MONITOR);
+                taskGroupTypes.add(TaskGroupType.UPDATE_SERVICE_STATE);
                 return taskGroupTypes;
             case START_SERVICE:
-                return Lists.newArrayList(TaskGroupType.TAG_AND_START_K8S_SERVICE);
+                return Lists.newArrayList(TaskGroupType.TAG_AND_START_K8S_SERVICE, TaskGroupType.UPDATE_SERVICE_STATE);
             case RESTART_SERVICE:
-                return Lists.newArrayList(TaskGroupType.CANCEL_TAG_AND_STOP_K8S_SERVICE, TaskGroupType.TAG_AND_START_K8S_SERVICE);
+                return Lists.newArrayList(TaskGroupType.CANCEL_TAG_AND_STOP_K8S_SERVICE, TaskGroupType.TAG_AND_START_K8S_SERVICE, TaskGroupType.UPDATE_SERVICE_STATE);
 
             case STOP_SERVICE:
-                return Lists.newArrayList(TaskGroupType.CANCEL_TAG_AND_STOP_K8S_SERVICE);
+                return Lists.newArrayList(TaskGroupType.CANCEL_TAG_AND_STOP_K8S_SERVICE,TaskGroupType.UPDATE_SERVICE_STATE);
             case DELETE_SERVICE:
                 return Lists.newArrayList(TaskGroupType.CANCEL_TAG_AND_STOP_K8S_SERVICE, TaskGroupType.DELETE_SERVICE, TaskGroupType.DELETE_DB_DATA);
             case UPGRADE_SERVICE_CONFIG:

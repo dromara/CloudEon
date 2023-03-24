@@ -16,8 +16,6 @@ import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
-import io.fabric8.kubernetes.client.Watcher;
-import io.fabric8.kubernetes.client.WatcherException;
 import io.fabric8.kubernetes.client.dsl.Resource;
 import io.fabric8.kubernetes.client.dsl.RollableScalableResource;
 import lombok.NoArgsConstructor;
@@ -30,8 +28,11 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+/**
+ * 为角色实例创建k8s deployment
+ */
 @NoArgsConstructor
-public class StartK8sServiceTask extends BaseUdhTask{
+public class StartRoleK8sDeploymentTask extends BaseUdhTask{
     @Override
     public void internalExecute() {
         StackServiceRepository stackServiceRepository = SpringUtil.getBean(StackServiceRepository.class);

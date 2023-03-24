@@ -10,7 +10,6 @@ import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.data.udh.actor.CommandExecuteActor;
 import com.data.udh.controller.request.InitServiceRequest;
-import com.data.udh.controller.request.OpsServiceRoleRequest;
 import com.data.udh.controller.request.ServiceConfUpgradeRequest;
 import com.data.udh.controller.response.*;
 import com.data.udh.dao.*;
@@ -147,7 +146,7 @@ public class ClusterServiceController {
             serviceInstanceEntity.setUpdateTime(new Date());
             serviceInstanceEntity.setEnableKerberos(req.getEnableKerberos());
             serviceInstanceEntity.setStackServiceId(stackServiceId);
-            serviceInstanceEntity.setServiceState(ServiceState.OPERATING);
+            serviceInstanceEntity.setServiceState(ServiceState.INIT_SERVICE);
             // 生成持久化宿主机路径
             String persistencePaths = stackServiceRepository.findById(stackServiceId).get().getPersistencePaths();
             serviceInstanceEntity.setPersistencePaths(genPersistencePaths(persistencePaths, serviceName));
@@ -406,6 +405,9 @@ public class ClusterServiceController {
 
         //  调用workflow
         udhActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
+        // 更新服务实例状态
+        serviceInstanceEntity.setServiceState(ServiceState.STOPPING_SERVICE);
+        serviceInstanceRepository.save(serviceInstanceEntity);
 
 
         return ResultDTO.success(null);
@@ -434,6 +436,9 @@ public class ClusterServiceController {
 
         //  调用workflow
         udhActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
+        // 更新服务实例状态
+        serviceInstanceEntity.setServiceState(ServiceState.RESTARTING_SERVICE);
+        serviceInstanceRepository.save(serviceInstanceEntity);
 
         return ResultDTO.success(null);
     }
@@ -448,6 +453,9 @@ public class ClusterServiceController {
         //  调用workflow
         udhActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
 
+        // 更新服务实例状态
+        serviceInstanceEntity.setServiceState(ServiceState.STARTING_SERVICE);
+        serviceInstanceRepository.save(serviceInstanceEntity);
 
         return ResultDTO.success(null);
     }
@@ -497,9 +505,10 @@ public class ClusterServiceController {
         commandEntity.setCommandState(CommandState.RUNNING);
         commandEntity.setCurrentProgress(0);
         commandEntity.setClusterId(ClusterId);
-        commandEntity.setName(commandType.getName());
+        commandEntity.setName(commandType.getDesc());
         commandEntity.setSubmitTime(new Date());
         commandEntity.setOperateUserId(AdminUserId);
+        commandEntity.setType(commandType);
         // 持久化 command
         commandRepository.saveAndFlush(commandEntity);
 
@@ -655,17 +664,12 @@ public class ClusterServiceController {
             ServiceInstanceVO serviceInstanceVO = new ServiceInstanceVO();
             BeanUtil.copyProperties(instanceEntity, serviceInstanceVO);
             ServiceState serviceState = instanceEntity.getServiceState();
-            serviceInstanceVO.setServiceStateValue(serviceState.name());
+            serviceInstanceVO.setServiceStateValue(serviceState.getDesc());
 
-            // 根据状态查询icon
+            // 查询icon
             StackServiceEntity stackServiceEntity = stackServiceRepository.findById(instanceEntity.getStackServiceId()).get();
-            if (serviceState == ServiceState.OPERATING) {
-                serviceInstanceVO.setIcon(stackServiceEntity.getIconApp());
-            } else if (serviceState == ServiceState.WARN || serviceState == ServiceState.DANGER) {
-                serviceInstanceVO.setIcon(stackServiceEntity.getIconDanger());
-            } else {
-                serviceInstanceVO.setIcon(stackServiceEntity.getIconDefault());
-            }
+            serviceInstanceVO.setIcon(stackServiceEntity.getIconApp());
+
 
             return serviceInstanceVO;
         }).collect(Collectors.toList());
@@ -729,7 +733,7 @@ public class ClusterServiceController {
                 .stackServiceId(stackServiceId)
                 .stackServiceName(stackServiceEntity.getName())
                 .version(stackServiceEntity.getVersion())
-                .serviceStatus(serviceInstanceEntity.getServiceState().name())
+                .serviceStatus(serviceInstanceEntity.getServiceState().getDesc())
                 .build();
         return ResultDTO.success(instanceDetailVO);
     }
@@ -779,6 +783,10 @@ public class ClusterServiceController {
         Integer commandId = buildServiceCommand(serviceInstanceEntities, serviceInstanceEntity.getClusterId(), CommandType.DELETE_SERVICE);
         //  调用workflow
         udhActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
+
+        // 更新服务实例状态
+        serviceInstanceEntity.setServiceState(ServiceState.DELETING_SERVICE);
+        serviceInstanceRepository.save(serviceInstanceEntity);
 
 
         return ResultDTO.success(null);

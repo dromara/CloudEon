@@ -7,7 +7,6 @@ import com.data.udh.dao.StackServiceRoleRepository;
 import com.data.udh.entity.ServiceInstanceEntity;
 import com.data.udh.entity.StackServiceRoleEntity;
 import com.data.udh.utils.Constant;
-import com.data.udh.utils.ShellCommandExecUtil;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import lombok.NoArgsConstructor;
@@ -15,13 +14,11 @@ import lombok.NoArgsConstructor;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
+/**
+ * 为角色实例删除k8s deployment
+ */
 @NoArgsConstructor
-public class StopK8sServiceTask extends BaseUdhTask {
+public class StopRoleK8sDeploymentTask extends BaseUdhTask {
     @Override
     public void internalExecute() {
         ServiceInstanceRepository serviceInstanceRepository = SpringUtil.getBean(ServiceInstanceRepository.class);
