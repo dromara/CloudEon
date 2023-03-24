@@ -600,15 +600,16 @@ public class ClusterServiceController {
     }
 
 
-    @PostMapping("/stopRoles")
-    public ResultDTO<Void> stopRoles(@RequestBody OpsServiceRoleRequest opsServiceRoleRequest) {
+    @PostMapping("/stopRole")
+    public ResultDTO<Void> stopRoles(Integer roleInstanceId) {
 
-        Integer serviceInstanceId = opsServiceRoleRequest.getServiceInstanceId();
-        ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(serviceInstanceId).get();
-        List<ServiceRoleInstanceEntity> specRoleInstances = roleInstanceRepository.findAllById(opsServiceRoleRequest.getRoleInstanceIds());
+        ServiceRoleInstanceEntity roleInstanceEntity = roleInstanceRepository.findById(roleInstanceId).get();
+        ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(roleInstanceEntity.getServiceInstanceId()).get();
+
         //  生成停止角色command
         List<ServiceInstanceEntity> serviceInstanceEntities = Lists.newArrayList(serviceInstanceEntity);
-        Integer commandId = buildRoleCommand(serviceInstanceEntities, specRoleInstances, serviceInstanceEntity.getClusterId(), CommandType.STOP_ROLE);
+        Integer commandId = buildRoleCommand(serviceInstanceEntities, Lists.newArrayList(roleInstanceEntity),
+                serviceInstanceEntity.getClusterId(), CommandType.STOP_ROLE);
         //  调用workflow
         udhActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
 
@@ -808,7 +809,7 @@ public class ClusterServiceController {
         }).filter(new Predicate<ServiceInstanceWebUrlVO>() {
             @Override
             public boolean test(ServiceInstanceWebUrlVO serviceInstanceWebUrlVO) {
-                return serviceInstanceWebUrlVO !=null;
+                return serviceInstanceWebUrlVO != null;
             }
         }).collect(Collectors.toList());
 

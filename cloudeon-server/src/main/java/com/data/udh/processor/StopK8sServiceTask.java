@@ -40,10 +40,11 @@ public class StopK8sServiceTask extends BaseUdhTask {
         String roleFullName = stackServiceRoleEntity.getRoleFullName();
 
         // 读取本地k8s资源工作目录  ${workHome}/k8s-resource/ZOOKEEPER1/
-        String k8sResourceDirPath = workHome + File.separator + Constant.K8S_RESOURCE_DIR+File.separator+serviceInstanceEntity.getServiceName() ;
+        String k8sResourceDirPath = workHome + File.separator + Constant.K8S_RESOURCE_DIR + File.separator + serviceInstanceEntity.getServiceName();
         String k8sServiceResourceFilePath = k8sResourceDirPath + File.separator + roleFullName + ".yaml";
 
-        try(KubernetesClient client = new KubernetesClientBuilder().build();) {
+        log.info("在k8s上停止deployment ,使用本地资源文件: {}", k8sServiceResourceFilePath);
+        try (KubernetesClient client = new KubernetesClientBuilder().build();) {
             client.load(new FileInputStream(k8sServiceResourceFilePath))
                     .inNamespace("default")
                     .delete();

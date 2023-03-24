@@ -1,16 +1,14 @@
 package com.data.udh;
 
 import com.data.udh.utils.ByteConverter;
-import io.fabric8.kubernetes.api.model.HasMetadata;
-import io.fabric8.kubernetes.api.model.Node;
-import io.fabric8.kubernetes.api.model.NodeBuilder;
-import io.fabric8.kubernetes.api.model.NodeList;
+import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import io.fabric8.kubernetes.client.Watcher;
 import io.fabric8.kubernetes.client.WatcherException;
 import io.fabric8.kubernetes.client.dsl.Resource;
+import io.fabric8.kubernetes.client.dsl.RollableScalableResource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,7 +30,7 @@ public class K8sTest {
         KubernetesClient client = new KubernetesClientBuilder().build();
         NodeList nodeList = client.nodes().list();
         List<Node> items = nodeList.getItems();
-        items.forEach(e-> {
+        items.forEach(e -> {
             String cpu = e.getStatus().getCapacity().get("cpu").getAmount();
             long memory = e.getStatus().getCapacity().get("memory").getNumericalAmount().longValue();
             long storage = e.getStatus().getCapacity().get("ephemeral-storage").getNumericalAmount().longValue();
@@ -44,16 +42,16 @@ public class K8sTest {
             String kernelVersion = e.getStatus().getNodeInfo().getKernelVersion();
             String osImage = e.getStatus().getNodeInfo().getOsImage();
 
-            System.out.println("cpu: "+cpu);
-            System.out.println("memory: "+ ByteConverter.convertKBToGB(memory)+"GB");
-            System.out.println("storage: "+ ByteConverter.convertKBToGB(storage)+"GB");
-            System.out.println("ip: "+ip);
-            System.out.println("hostname: "+hostname);
-            System.out.println("architecture: "+architecture);
-            System.out.println("containerRuntimeVersion: "+containerRuntimeVersion);
-            System.out.println("kubeletVersion: "+kubeletVersion);
-            System.out.println("kernelVersion: "+kernelVersion);
-            System.out.println("osImage: "+osImage);
+            System.out.println("cpu: " + cpu);
+            System.out.println("memory: " + ByteConverter.convertKBToGB(memory) + "GB");
+            System.out.println("storage: " + ByteConverter.convertKBToGB(storage) + "GB");
+            System.out.println("ip: " + ip);
+            System.out.println("hostname: " + hostname);
+            System.out.println("architecture: " + architecture);
+            System.out.println("containerRuntimeVersion: " + containerRuntimeVersion);
+            System.out.println("kubeletVersion: " + kubeletVersion);
+            System.out.println("kernelVersion: " + kernelVersion);
+            System.out.println("osImage: " + osImage);
 
             System.out.println("===============");
 
@@ -62,7 +60,7 @@ public class K8sTest {
 
     @Test
     public void deployDetele() throws FileNotFoundException {
-        try(    KubernetesClient client = new KubernetesClientBuilder().build();) {
+        try (KubernetesClient client = new KubernetesClientBuilder().build();) {
             client.load(new FileInputStream("/Volumes/Samsung_T5/opensource/e-mapreduce/work/k8s-resource/zookeeper13/zookeeper-server.yaml"))
                     .inNamespace("default")
                     .delete();
@@ -129,6 +127,31 @@ public class K8sTest {
                         .endMetadata()
                         .build());
 
+
+    }
+
+    @Test
+    public void findPod() {
+        KubernetesClient client = new KubernetesClientBuilder().build();
+        List<Pod> pods = client.pods().inNamespace("default").withLabel("app=zookeeper-server-zookeeper13").list().getItems();
+        for (Pod pod : pods) {
+            String nodeName = pod.getSpec().getNodeName();
+            if (nodeName!=null &&nodeName.equals("fl001")) {
+                // do something with the pod
+                String podName = pod.getMetadata().getName();
+                System.out.println(podName);
+//                client.pods().withName(podName).delete();
+            }
+        }
+    }
+
+    @Test
+    public void scale() {
+        KubernetesClient client = new KubernetesClientBuilder().build();
+        RollableScalableResource<Deployment> resource = client.apps().deployments().inNamespace("default").withName("zookeeper-server-zookeeper13");
+        Integer readyReplicas = resource.get().getStatus().getReadyReplicas();
+        System.out.println("当前deployment可用Replicas: " + readyReplicas);
+        System.out.println(resource.scale(readyReplicas - 1));
 
     }
 }

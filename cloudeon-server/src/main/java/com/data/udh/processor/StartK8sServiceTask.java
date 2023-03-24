@@ -19,6 +19,7 @@ import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import io.fabric8.kubernetes.client.Watcher;
 import io.fabric8.kubernetes.client.WatcherException;
 import io.fabric8.kubernetes.client.dsl.Resource;
+import io.fabric8.kubernetes.client.dsl.RollableScalableResource;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
@@ -108,31 +109,13 @@ public class StartK8sServiceTask extends BaseUdhTask{
             String deploymentName = ((Deployment) metadata.get(0)).getMetadata().getName();
             final Deployment deployment = client.apps().deployments().inNamespace("default").withName(deploymentName).get();
             Resource<Deployment> resource = client.resource(deployment).inNamespace("default");
-            resource.watch(new Watcher<Deployment>() {
-                @Override
-                public void eventReceived(Action action, Deployment resource) {
-                    log.info("{} {}", action.name(), resource.getMetadata().getName());
-                    switch (action) {
-                        case ADDED:
-                            log.info("{} got added", resource.getMetadata().getName());
-                            break;
-                        case DELETED:
-                            log.info("{} got deleted", resource.getMetadata().getName());
-                            break;
-                        case MODIFIED:
-                            log.info("{} got modified", resource.getMetadata().getName());
-                            break;
-                        default:
-                            log.error("Unrecognized event: {}", action.name());
-                    }
-                }
+            int amount = 10;
+            log.info("在k8s上启动deployment: {} ,使用本地资源文件: {} ,持续等待 {} 分钟",deploymentName,outPutFile,amount);
+            resource.waitUntilReady(amount, TimeUnit.MINUTES);
 
-                @Override
-                public void onClose(WatcherException cause) {
-                    System.out.println(cause.getMessage());
-                }
-            });
-            resource.waitUntilReady(10, TimeUnit.MINUTES);
+            // 打印deployment的输出日志
+            RollableScalableResource<Deployment> scalableResource = client.apps().deployments().inNamespace("default").withName(deploymentName);
+            log.info(scalableResource.getLog());
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
