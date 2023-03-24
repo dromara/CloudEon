@@ -22,6 +22,8 @@ public enum TaskType {
     DELETE_SERVICE_DB_DATA(13, "删除服务相关db数据库", "com.data.udh.processor.DeleteServiceDBDataTask", false),
     STOP_ROLE_POD(14, "停止角色Pod", "com.data.udh.processor.StopRolePodTask", true),
     SCALE_DOWN_K8S_SERVICE(15, "按规模减少k8s服务", "com.data.udh.processor.ScaleDownK8sServiceTask", false),
+    SCALE_UP_K8S_SERVICE(16, "按规模增加k8s服务", "com.data.udh.processor.ScaleUpK8sServiceTask", false),
+
 
 
     ;

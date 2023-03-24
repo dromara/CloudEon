@@ -22,6 +22,7 @@ public enum TaskGroupType {
     DELETE_SERVICE(10, "删除服务", Lists.newArrayList(TaskType.DELETE_DATA_DIR), true),
     DELETE_DB_DATA(11, "删除db中服务相关数据", Lists.newArrayList(TaskType.DELETE_SERVICE_DB_DATA), false),
     STOP_ROLE(12, "停止服务的角色实例", Lists.newArrayList(TaskType.CANCEL_TAG_HOST,TaskType.STOP_ROLE_POD,TaskType.SCALE_DOWN_K8S_SERVICE), true),
+    START_ROLE(13, "启动服务的角色实例", Lists.newArrayList(TaskType.TAG_HOST,TaskType.SCALE_UP_K8S_SERVICE), true),
 
 
     ;

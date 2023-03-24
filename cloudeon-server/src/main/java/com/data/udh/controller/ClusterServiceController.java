@@ -616,6 +616,22 @@ public class ClusterServiceController {
         return ResultDTO.success(null);
     }
 
+    @PostMapping("/startRole")
+    public ResultDTO<Void> startRole(Integer roleInstanceId) {
+
+        ServiceRoleInstanceEntity roleInstanceEntity = roleInstanceRepository.findById(roleInstanceId).get();
+        ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(roleInstanceEntity.getServiceInstanceId()).get();
+
+        //  生成启动角色command
+        List<ServiceInstanceEntity> serviceInstanceEntities = Lists.newArrayList(serviceInstanceEntity);
+        Integer commandId = buildRoleCommand(serviceInstanceEntities, Lists.newArrayList(roleInstanceEntity),
+                serviceInstanceEntity.getClusterId(), CommandType.START_ROLE);
+        //  调用workflow
+        udhActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
+
+        return ResultDTO.success(null);
+    }
+
     /**
      * 校验要安装的服务是否需要Kerberos配置
      */

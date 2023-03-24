@@ -67,6 +67,8 @@ public class CommandHandler {
                 return Lists.newArrayList(TaskGroupType.CONFIG_SERVICE);
             case STOP_ROLE:
                 return Lists.newArrayList(TaskGroupType.STOP_ROLE);
+            case START_ROLE:
+                return Lists.newArrayList(TaskGroupType.START_ROLE);
             default:
                 return null;
 
