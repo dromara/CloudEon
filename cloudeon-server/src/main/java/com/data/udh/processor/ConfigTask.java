@@ -9,6 +9,7 @@ import com.data.udh.dto.RoleNodeInfo;
 import com.data.udh.entity.*;
 import com.data.udh.utils.Constant;
 import com.data.udh.utils.SshUtils;
+import com.data.udh.utils.UnixConverUtil;
 import com.google.common.collect.ImmutableMap;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -98,7 +99,7 @@ public class ConfigTask extends BaseUdhTask {
             dataModel.put("serviceRoles", serviceRoles);
             dataModel.put("localhostname", taskExecuteHostName);
             dataModel.put("localhostip", taskParam.getIp());
-            dataModel.put("cloudeonURL", "http://"+ InetAddress.getLocalHost()+":"+environment.getProperty("server.port"));
+            dataModel.put("cloudeonURL", "http://"+ InetAddress.getLocalHost().getHostAddress()+":"+environment.getProperty("server.port"));
 
             // 获取该服务支持的自定义配置文件名
             String customConfigFiles = stackServiceEntity.getCustomConfigFiles();
@@ -118,6 +119,8 @@ public class ConfigTask extends BaseUdhTask {
 
             // 执行渲染
             scanTemplateToRender(renderDirFile, renderDir,config,dataModel,outputConfPath);
+            File dir = new File(outputConfPath);
+            UnixConverUtil.convertToUnix(dir);
 
         } catch (IOException | TemplateException e) {
             e.printStackTrace();
@@ -134,10 +137,10 @@ public class ConfigTask extends BaseUdhTask {
             e.printStackTrace();
             throw new RuntimeException("打开sftp失败："+e);
         }
-        String remoteConfDirPath = "/opt/udh/" + serviceInstanceEntity.getServiceName() + File.separator + "conf/";
+        String remoteConfDirPath = "/opt/udh/" + serviceInstanceEntity.getServiceName() +"/conf/";
         log.info("拷贝本地配置目录：" + outputConfPath + " 到节点" + taskParam.getHostName() + "的：" + remoteConfDirPath);
         try {
-            SshUtils.uploadLocalDirToRemote(remoteConfDirPath, outputConfPath,sftp);
+            SshUtils.uploadDirectory(sftp,new File(outputConfPath),remoteConfDirPath);
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException("拷贝文件上远程服务器失败："+e);
@@ -157,7 +160,7 @@ public class ConfigTask extends BaseUdhTask {
         // 特殊处理
         if (stackServiceEntity.getName().equals(Constant.ZOOKEEPER_SERVICE_NAME)) {
             try {
-                String remoteDataDirPath = "/opt/udh/" + serviceInstanceEntity.getServiceName() + File.separator + "data";
+                String remoteDataDirPath = "/opt/udh/" + serviceInstanceEntity.getServiceName()  +"/data";
                 String command = "mv " + remoteConfDirPath + File.separator + "myid " + remoteDataDirPath;
                 log.info("移动myid文件到data目录 {}", remoteDataDirPath);
                 log.info("ssh执行命令： {}", command);

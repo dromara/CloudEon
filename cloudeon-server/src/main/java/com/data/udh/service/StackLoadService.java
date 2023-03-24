@@ -102,6 +102,9 @@ public class StackLoadService implements ApplicationRunner {
                     // 持久化service
                     BeanUtil.copyProperties(serviceInfo, stackServiceEntity);
                     stackServiceEntity.setStackId(stackInfoEntityId);
+                    if (serviceInfo.getDashboard() != null && StrUtil.isNotBlank(serviceInfo.getDashboard().getUid())) {
+                        stackServiceEntity.setDashboardUid(serviceInfo.getDashboard().getUid());
+                    }
                     stackServiceEntity.setStackCode(stackInfoEntity.getStackCode());
                     stackServiceEntity.setDependencies(StrUtil.join(",", serviceInfo.getDependencies()));
                     stackServiceEntity.setCustomConfigFiles(StrUtil.join(",", serviceInfo.getCustomConfigFiles()));

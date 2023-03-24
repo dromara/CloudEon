@@ -30,7 +30,7 @@ public enum CommandType {
 
     private final int code;
 
-    private final String name;
+    private final String desc;
 
     public static CommandType of(int code) {
         for (CommandType nodeType : values()) {

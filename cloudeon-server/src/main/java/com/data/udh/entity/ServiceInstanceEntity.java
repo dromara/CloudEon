@@ -48,7 +48,7 @@ public class ServiceInstanceEntity implements Serializable {
     /**
      * 服务状态
      */
-    @Enumerated(EnumType.ORDINAL)
+    @Convert(converter = ServiceStateConverter.class)
     private ServiceState serviceState;
 
     /**

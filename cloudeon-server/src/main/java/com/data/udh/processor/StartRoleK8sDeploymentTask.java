@@ -9,25 +9,30 @@ import com.data.udh.entity.ServiceInstanceEntity;
 import com.data.udh.entity.StackServiceEntity;
 import com.data.udh.entity.StackServiceRoleEntity;
 import com.data.udh.utils.Constant;
-import com.data.udh.utils.ShellCommandExecUtil;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import io.fabric8.kubernetes.api.model.HasMetadata;
+import io.fabric8.kubernetes.api.model.apps.Deployment;
+import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClientBuilder;
+import io.fabric8.kubernetes.client.dsl.Resource;
+import io.fabric8.kubernetes.client.dsl.RollableScalableResource;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
+import java.io.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+/**
+ * 为角色实例创建k8s deployment
+ */
 @NoArgsConstructor
-public class StartRoleK8sServiceTask extends BaseUdhTask{
+public class StartRoleK8sDeploymentTask extends BaseUdhTask{
     @Override
     public void internalExecute() {
         StackServiceRepository stackServiceRepository = SpringUtil.getBean(StackServiceRepository.class);
@@ -83,11 +88,11 @@ public class StartRoleK8sServiceTask extends BaseUdhTask{
         dataModel.put("conf", allConfigEntityList.stream().collect(Collectors.toMap(ServiceInstanceConfigEntity::getName, ServiceInstanceConfigEntity::getValue)));
 
         String outputFileName = null;
+        outputFileName=StringUtils.substringBeforeLast(k8sTemplateFileName, ".ftl");
+        String outPutFile = k8sResourceOutputPath + File.separator + outputFileName;
         try {
             config.setDirectoryForTemplateLoading(new File(k8sTemplateDir));
             template = config.getTemplate(k8sTemplateFileName);
-            outputFileName=StringUtils.substringBeforeLast(k8sTemplateFileName, ".ftl");
-            String outPutFile = k8sResourceOutputPath + File.separator + outputFileName;
             FileWriter out = new FileWriter(outPutFile);
             template.process(dataModel, out);
             log.info("完成角色k8s资源文件生成："+outPutFile);
@@ -98,26 +103,25 @@ public class StartRoleK8sServiceTask extends BaseUdhTask{
         }
 
         // 调用k8s命令启动资源
-        ShellCommandExecUtil commandExecUtil = ShellCommandExecUtil.builder().log(log).build();
-        String[] command = new String[]{"kubectl", "apply","-f",outputFileName};
-        log.info("本地执行命令："+ Arrays.stream(command).collect(Collectors.joining(" ")));
-        try {
-            commandExecUtil.runShellCommandSync(k8sResourceOutputPath, command, StandardCharsets.UTF_8);
-        } catch (IOException e) {
+        try (  KubernetesClient client = new KubernetesClientBuilder().build();){
+            List<HasMetadata> metadata = client.load(new FileInputStream(outPutFile))
+                    .inNamespace("default")
+                    .create();
+            String deploymentName = ((Deployment) metadata.get(0)).getMetadata().getName();
+            final Deployment deployment = client.apps().deployments().inNamespace("default").withName(deploymentName).get();
+            Resource<Deployment> resource = client.resource(deployment).inNamespace("default");
+            int amount = 10;
+            log.info("在k8s上启动deployment: {} ,使用本地资源文件: {} ,持续等待 {} 分钟",deploymentName,outPutFile,amount);
+            resource.waitUntilReady(amount, TimeUnit.MINUTES);
+
+            // 打印deployment的输出日志
+            RollableScalableResource<Deployment> scalableResource = client.apps().deployments().inNamespace("default").withName(deploymentName);
+            log.info(scalableResource.getLog());
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
-        // 等待资源启动成功
-        // kubectl rollout status deploy/my-deployment
-        try {
-            String[] statusCommand = new String[]{"kubectl", "rollout", "status", "deploy/" + roleServiceFullName};
-            log.info("本地执行命令：" + Arrays.stream(statusCommand).collect(Collectors.joining(" ")));
-            // todo 设置超时时间中断，抛出异常
-            commandExecUtil.runShellCommandSync(k8sResourceOutputPath, statusCommand, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
+
 
     }
 }

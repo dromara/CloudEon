@@ -1,6 +1,7 @@
 package com.data.udh.entity;
 
 import com.data.udh.utils.CommandState;
+import com.data.udh.utils.CommandType;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -32,7 +33,8 @@ public class CommandEntity {
     /**
      * 指令类型
      */
-    private String type;
+    @Convert(converter = CommandTypeConverter.class)
+    private CommandType type;
 
     /**
      * 指令运行状态

@@ -2,7 +2,7 @@ name: YARN
 label: "YARN"
 description: "分布式计算资源调度"
 version: 3.3.4
-dockerImage: "registry.mufankong.top/udh/hadoop:3.3.4"
+dockerImage: "registry.cn-hangzhou.aliyuncs.com/udh/hadoop:3.3.4"
 dependencies:
   - "ZOOKEEPER"
   - "HDFS"
@@ -10,6 +10,9 @@ dependencies:
 runAs: yarn
 
 supportKerberos: true
+
+dashboard:
+  uid: -ZErfqOWz
 
 persistencePaths:
   - /opt/udh/${serviceInstanceId}/conf

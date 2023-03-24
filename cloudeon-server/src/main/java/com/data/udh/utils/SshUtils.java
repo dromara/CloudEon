@@ -157,7 +157,28 @@ public class SshUtils {
             throw new RuntimeException(e);
         }
     }
+    /**
+     * 递归上传本地目录内所有子文件夹和子文件到远程文件夹中
+     */
+    public static void uploadDirectory(SftpFileSystem fs, File localDir, String remoteDir) throws IOException {
+        // 创建远程目录
+        SftpClient sftpClient = fs.getClient();
+        createDir(null, remoteDir, fs);
 
+        // 递归上传每个子文件和子目录
+        for (File file : localDir.listFiles()) {
+            String remoteFilePath = remoteDir + "/" + file.getName();
+            if (file.isFile()) {
+                // 上传文件
+                try (FileInputStream in = new FileInputStream(file); OutputStream outputStream = sftpClient.write(remoteFilePath);) {
+                    IoUtil.copy(in, outputStream);
+                }
+            } else {
+                // 递归上传子目录
+                uploadDirectory(fs, file, remoteFilePath);
+            }
+        }
+    }
     /**
      * 将本地目录里所有文件拷贝到远程目录中
      *

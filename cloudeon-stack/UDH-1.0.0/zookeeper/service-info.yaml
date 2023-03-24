@@ -2,12 +2,15 @@ name: ZOOKEEPER
 label: "ZooKeeper"
 description: "分布式协调系统"
 version: 3.5.10
-dockerImage: "registry.mufankong.top/udh/zookeeper:3.5.9"
+dockerImage: "registry.cn-hangzhou.aliyuncs.com/udh/zookeeper:3.5.9"
 dependencies: []
 
 runAs: zookeeper
 
 supportKerberos: true
+
+dashboard:
+  uid: 000000261
 
 roles:
   - name: ZOOKEEPER_SERVER
@@ -132,7 +135,7 @@ configurations:
 
 
   - name: 4lw.commands.whitelist
-    recommendExpression: mntr
+    recommendExpression: "*"
     valueType: InputString
     confFile: "zoo.cfg"
     label: "指令白名单"

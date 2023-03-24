@@ -17,6 +17,7 @@ public class TaskParam {
      * 任务关联的服务实例id
      */
     private Integer serviceInstanceId;
+    private String serviceInstanceName;
     private Integer stackServiceId;
     private String taskName;
     /**

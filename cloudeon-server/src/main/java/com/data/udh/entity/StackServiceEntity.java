@@ -40,6 +40,7 @@ public class StackServiceEntity implements Serializable {
      * 服务版本
      */
     private String version;
+    private String dashboardUid;
     /**
      * 服务描述
      */

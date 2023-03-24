@@ -7,17 +7,18 @@ import com.data.udh.dao.StackServiceRoleRepository;
 import com.data.udh.entity.ServiceInstanceEntity;
 import com.data.udh.entity.StackServiceRoleEntity;
 import com.data.udh.utils.Constant;
-import com.data.udh.utils.ShellCommandExecUtil;
+import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import lombok.NoArgsConstructor;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+/**
+ * 为角色实例删除k8s deployment
+ */
 @NoArgsConstructor
-public class StopK8sServiceTask extends BaseUdhTask {
+public class StopRoleK8sDeploymentTask extends BaseUdhTask {
     @Override
     public void internalExecute() {
         ServiceInstanceRepository serviceInstanceRepository = SpringUtil.getBean(ServiceInstanceRepository.class);
@@ -36,15 +37,15 @@ public class StopK8sServiceTask extends BaseUdhTask {
         String roleFullName = stackServiceRoleEntity.getRoleFullName();
 
         // 读取本地k8s资源工作目录  ${workHome}/k8s-resource/ZOOKEEPER1/
-        String k8sResourceDirPath = workHome + File.separator + Constant.K8S_RESOURCE_DIR+File.separator+serviceInstanceEntity.getServiceName() ;
+        String k8sResourceDirPath = workHome + File.separator + Constant.K8S_RESOURCE_DIR + File.separator + serviceInstanceEntity.getServiceName();
         String k8sServiceResourceFilePath = k8sResourceDirPath + File.separator + roleFullName + ".yaml";
 
-        ShellCommandExecUtil commandExecUtil = ShellCommandExecUtil.builder().log(log).build();
-        String[] command = new String[]{"kubectl", "delete","-f",k8sServiceResourceFilePath,"--ignore-not-found"};
-        log.info("本地执行命令："+ Arrays.stream(command).collect(Collectors.joining(" ")));
-        try {
-            commandExecUtil.runShellCommandSync(k8sResourceDirPath, command, StandardCharsets.UTF_8);
-        } catch (IOException e) {
+        log.info("在k8s上停止deployment ,使用本地资源文件: {}", k8sServiceResourceFilePath);
+        try (KubernetesClient client = new KubernetesClientBuilder().build();) {
+            client.load(new FileInputStream(k8sServiceResourceFilePath))
+                    .inNamespace("default")
+                    .delete();
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }

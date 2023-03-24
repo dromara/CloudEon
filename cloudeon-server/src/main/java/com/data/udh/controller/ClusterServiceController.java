@@ -17,6 +17,7 @@ import com.data.udh.dto.*;
 import com.data.udh.entity.*;
 import com.data.udh.processor.TaskParam;
 import com.data.udh.service.CommandHandler;
+import com.data.udh.service.SpecRoleHost;
 import com.data.udh.utils.*;
 import com.google.common.collect.Lists;
 import freemarker.cache.StringTemplateLoader;
@@ -145,7 +146,7 @@ public class ClusterServiceController {
             serviceInstanceEntity.setUpdateTime(new Date());
             serviceInstanceEntity.setEnableKerberos(req.getEnableKerberos());
             serviceInstanceEntity.setStackServiceId(stackServiceId);
-            serviceInstanceEntity.setServiceState(ServiceState.OPERATING);
+            serviceInstanceEntity.setServiceState(ServiceState.INIT_SERVICE);
             // 生成持久化宿主机路径
             String persistencePaths = stackServiceRepository.findById(stackServiceId).get().getPersistencePaths();
             serviceInstanceEntity.setPersistencePaths(genPersistencePaths(persistencePaths, serviceName));
@@ -404,6 +405,9 @@ public class ClusterServiceController {
 
         //  调用workflow
         udhActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
+        // 更新服务实例状态
+        serviceInstanceEntity.setServiceState(ServiceState.STOPPING_SERVICE);
+        serviceInstanceRepository.save(serviceInstanceEntity);
 
 
         return ResultDTO.success(null);
@@ -432,6 +436,9 @@ public class ClusterServiceController {
 
         //  调用workflow
         udhActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
+        // 更新服务实例状态
+        serviceInstanceEntity.setServiceState(ServiceState.RESTARTING_SERVICE);
+        serviceInstanceRepository.save(serviceInstanceEntity);
 
         return ResultDTO.success(null);
     }
@@ -446,6 +453,9 @@ public class ClusterServiceController {
         //  调用workflow
         udhActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
 
+        // 更新服务实例状态
+        serviceInstanceEntity.setServiceState(ServiceState.STARTING_SERVICE);
+        serviceInstanceRepository.save(serviceInstanceEntity);
 
         return ResultDTO.success(null);
     }
@@ -477,17 +487,28 @@ public class ClusterServiceController {
         return result;
     }
 
+    private Integer buildServiceCommand(List<ServiceInstanceEntity> serviceInstanceEntities,
+                                        Integer ClusterId, CommandType commandType) {
+        return buildInternalCommand(serviceInstanceEntities, Lists.newArrayList(), ClusterId, commandType);
+    }
 
-    private Integer buildServiceCommand(List<ServiceInstanceEntity> serviceInstanceEntities, Integer ClusterId, CommandType commandType) {
+    private Integer buildRoleCommand(List<ServiceInstanceEntity> serviceInstanceEntities, List<ServiceRoleInstanceEntity> spceRoleInstanceEntities,
+                                     Integer ClusterId, CommandType commandType) {
+        return buildInternalCommand(serviceInstanceEntities, spceRoleInstanceEntities, ClusterId, commandType);
+    }
+
+    private Integer buildInternalCommand(List<ServiceInstanceEntity> serviceInstanceEntities, List<ServiceRoleInstanceEntity> spceRoleInstanceEntities,
+                                         Integer ClusterId, CommandType commandType) {
 
         // 创建 command
         CommandEntity commandEntity = new CommandEntity();
         commandEntity.setCommandState(CommandState.RUNNING);
         commandEntity.setCurrentProgress(0);
         commandEntity.setClusterId(ClusterId);
-        commandEntity.setName(commandType.getName());
+        commandEntity.setName(commandType.getDesc());
         commandEntity.setSubmitTime(new Date());
         commandEntity.setOperateUserId(AdminUserId);
+        commandEntity.setType(commandType);
         // 持久化 command
         commandRepository.saveAndFlush(commandEntity);
 
@@ -524,33 +545,55 @@ public class ClusterServiceController {
                     .taskGroupTypes(taskGroupTypes)
                     .roleHostMaps(roleHostMaps).build();
 
-            List<TaskModel> models = commandHandler.buildTaskModels(serviceTaskGroupType).stream().map(e -> {
+            List<TaskModel> taskModels;
+            // 确定是角色相关指令还是服务指令
+            if (!spceRoleInstanceEntities.isEmpty()) {
+                List<SpecRoleHost> specRoleHosts = spceRoleInstanceEntities.stream().map(new Function<ServiceRoleInstanceEntity, SpecRoleHost>() {
+                    @Override
+                    public SpecRoleHost apply(ServiceRoleInstanceEntity serviceRoleInstanceEntity) {
+                        ClusterNodeEntity clusterNodeEntity = clusterNodeRepository.findById(serviceRoleInstanceEntity.getNodeId()).get();
+                        SpecRoleHost specRoleHost = SpecRoleHost.builder()
+                                .roleName(serviceRoleInstanceEntity.getServiceRoleName())
+                                .hostName(clusterNodeEntity.getHostname())
+                                .build();
+                        return specRoleHost;
+                    }
+                }).collect(Collectors.toList());
+                taskModels = commandHandler.buildTaskModels(serviceTaskGroupType, specRoleHosts);
+            } else {
+                taskModels = commandHandler.buildTaskModels(serviceTaskGroupType);
+            }
+            List<TaskModel> models = taskModels.stream().map(e -> {
                 e.setTaskSortNum(taskModelId.getAndIncrement());
                 return e;
             }).collect(Collectors.toList());
 
             // 根据taskModels生成command task，并持久化数据库
-            for (TaskModel taskModel : models) {
-                CommandTaskEntity commandTaskEntity = new CommandTaskEntity();
-                commandTaskEntity.setCommandId(commandEntity.getId());
-                commandTaskEntity.setProgress(0);
-                commandTaskEntity.setProcessorClassName(taskModel.getProcessorClassName());
-                commandTaskEntity.setTaskName(taskModel.getTaskName());
-                commandTaskEntity.setTaskShowSortNum(taskModel.getTaskSortNum());
-                commandTaskEntity.setCommandState(CommandState.WAITING);
-                commandTaskEntity.setServiceInstanceId(serviceInstanceEntity.getId());
-                commandTaskEntity.setServiceInstanceName(serviceInstanceEntity.getServiceName());
-                commandTaskRepository.saveAndFlush(commandTaskEntity);
-                // 更新日志路径
-                commandTaskEntity.setTaskLogPath(taskLogPath + File.separator + commandEntity.getId() + "-" + commandTaskEntity.getId() + ".log");
-                // 更新任务参数
-                TaskParam taskParam = buildTaskParam(taskModel, commandEntity, serviceInstanceEntity, commandTaskEntity);
-                commandTaskEntity.setTaskParam(JSONObject.toJSONString(taskParam));
-                commandTaskRepository.saveAndFlush(commandTaskEntity);
-            }
+            saveCommandTask2DB(commandEntity, serviceInstanceEntity, models);
         }
 
         return commandEntity.getId();
+    }
+
+    private void saveCommandTask2DB(CommandEntity commandEntity, ServiceInstanceEntity serviceInstanceEntity, List<TaskModel> models) {
+        for (TaskModel taskModel : models) {
+            CommandTaskEntity commandTaskEntity = new CommandTaskEntity();
+            commandTaskEntity.setCommandId(commandEntity.getId());
+            commandTaskEntity.setProgress(0);
+            commandTaskEntity.setProcessorClassName(taskModel.getProcessorClassName());
+            commandTaskEntity.setTaskName(taskModel.getTaskName());
+            commandTaskEntity.setTaskShowSortNum(taskModel.getTaskSortNum());
+            commandTaskEntity.setCommandState(CommandState.WAITING);
+            commandTaskEntity.setServiceInstanceId(serviceInstanceEntity.getId());
+            commandTaskEntity.setServiceInstanceName(serviceInstanceEntity.getServiceName());
+            commandTaskRepository.saveAndFlush(commandTaskEntity);
+            // 更新日志路径
+            commandTaskEntity.setTaskLogPath(taskLogPath + File.separator + commandEntity.getId() + "-" + commandTaskEntity.getId() + ".log");
+            // 更新任务参数
+            TaskParam taskParam = buildTaskParam(taskModel, commandEntity, serviceInstanceEntity, commandTaskEntity);
+            commandTaskEntity.setTaskParam(JSONObject.toJSONString(taskParam));
+            commandTaskRepository.saveAndFlush(commandTaskEntity);
+        }
     }
 
     private TaskParam buildTaskParam(TaskModel taskModel, CommandEntity commandEntity,
@@ -560,10 +603,43 @@ public class ClusterServiceController {
         taskParam.setCommandTaskId(commandTaskEntity.getId());
         taskParam.setCommandId(commandEntity.getId());
         taskParam.setServiceInstanceId(serviceInstanceEntity.getId());
+        taskParam.setServiceInstanceName(serviceInstanceEntity.getServiceName());
         taskParam.setStackServiceId(serviceInstanceEntity.getStackServiceId());
         return taskParam;
     }
 
+
+    @PostMapping("/stopRole")
+    public ResultDTO<Void> stopRoles(Integer roleInstanceId) {
+
+        ServiceRoleInstanceEntity roleInstanceEntity = roleInstanceRepository.findById(roleInstanceId).get();
+        ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(roleInstanceEntity.getServiceInstanceId()).get();
+
+        //  生成停止角色command
+        List<ServiceInstanceEntity> serviceInstanceEntities = Lists.newArrayList(serviceInstanceEntity);
+        Integer commandId = buildRoleCommand(serviceInstanceEntities, Lists.newArrayList(roleInstanceEntity),
+                serviceInstanceEntity.getClusterId(), CommandType.STOP_ROLE);
+        //  调用workflow
+        udhActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
+
+        return ResultDTO.success(null);
+    }
+
+    @PostMapping("/startRole")
+    public ResultDTO<Void> startRole(Integer roleInstanceId) {
+
+        ServiceRoleInstanceEntity roleInstanceEntity = roleInstanceRepository.findById(roleInstanceId).get();
+        ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(roleInstanceEntity.getServiceInstanceId()).get();
+
+        //  生成启动角色command
+        List<ServiceInstanceEntity> serviceInstanceEntities = Lists.newArrayList(serviceInstanceEntity);
+        Integer commandId = buildRoleCommand(serviceInstanceEntities, Lists.newArrayList(roleInstanceEntity),
+                serviceInstanceEntity.getClusterId(), CommandType.START_ROLE);
+        //  调用workflow
+        udhActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
+
+        return ResultDTO.success(null);
+    }
 
     /**
      * 校验要安装的服务是否需要Kerberos配置
@@ -588,17 +664,12 @@ public class ClusterServiceController {
             ServiceInstanceVO serviceInstanceVO = new ServiceInstanceVO();
             BeanUtil.copyProperties(instanceEntity, serviceInstanceVO);
             ServiceState serviceState = instanceEntity.getServiceState();
-            serviceInstanceVO.setServiceStateValue(serviceState.name());
+            serviceInstanceVO.setServiceStateValue(serviceState.getDesc());
 
-            // 根据状态查询icon
+            // 查询icon
             StackServiceEntity stackServiceEntity = stackServiceRepository.findById(instanceEntity.getStackServiceId()).get();
-            if (serviceState == ServiceState.OPERATING) {
-                serviceInstanceVO.setIcon(stackServiceEntity.getIconApp());
-            } else if (serviceState == ServiceState.WARN || serviceState == ServiceState.DANGER) {
-                serviceInstanceVO.setIcon(stackServiceEntity.getIconDanger());
-            } else {
-                serviceInstanceVO.setIcon(stackServiceEntity.getIconDefault());
-            }
+            serviceInstanceVO.setIcon(stackServiceEntity.getIconApp());
+
 
             return serviceInstanceVO;
         }).collect(Collectors.toList());
@@ -662,7 +733,7 @@ public class ClusterServiceController {
                 .stackServiceId(stackServiceId)
                 .stackServiceName(stackServiceEntity.getName())
                 .version(stackServiceEntity.getVersion())
-                .serviceStatus(serviceInstanceEntity.getServiceState().name())
+                .serviceStatus(serviceInstanceEntity.getServiceState().getDesc())
                 .build();
         return ResultDTO.success(instanceDetailVO);
     }
@@ -706,17 +777,45 @@ public class ClusterServiceController {
     @Transactional(rollbackFor = Exception.class)
     public ResultDTO<Void> deleteServiceInstance(Integer serviceInstanceId) {
 
-        // 删除服务实例表
-        serviceInstanceRepository.deleteById(serviceInstanceId);
-        // 删除服务角色实例表
-        roleInstanceRepository.deleteByServiceInstanceId(serviceInstanceId);
-        // 删除服务角色配置表
-        serviceInstanceConfigRepository.deleteByServiceInstanceId(serviceInstanceId);
-        // 删除服务ui表
-        roleInstanceWebuisRepository.deleteByServiceInstanceId(serviceInstanceId);
+        ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(serviceInstanceId).get();
+        //  生成删除服务command
+        List<ServiceInstanceEntity> serviceInstanceEntities = Lists.newArrayList(serviceInstanceEntity);
+        Integer commandId = buildServiceCommand(serviceInstanceEntities, serviceInstanceEntity.getClusterId(), CommandType.DELETE_SERVICE);
+        //  调用workflow
+        udhActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
+
+        // 更新服务实例状态
+        serviceInstanceEntity.setServiceState(ServiceState.DELETING_SERVICE);
+        serviceInstanceRepository.save(serviceInstanceEntity);
 
 
         return ResultDTO.success(null);
+    }
+
+    /**
+     * 获取服务实例监控看板地址
+     */
+    @GetMapping("/getDashboardUrl")
+    public ResultDTO<String> getDashboardUrl(Integer serviceInstanceId) {
+        ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(serviceInstanceId).get();
+        StackServiceEntity stackServiceEntity = stackServiceRepository.findById(serviceInstanceEntity.getStackServiceId()).get();
+
+        // 如果没安装monitor服务，则提示请先安装
+        ServiceInstanceEntity monitorServiceInstance = serviceInstanceRepository.findEntityByClusterIdAndStackServiceName(serviceInstanceEntity.getClusterId(), "MONITOR");
+        if (monitorServiceInstance == null) {
+            ResultDTO.success("请先安装Monitor服务");
+        }
+
+        // 通过服务框架的dashboard和Grafana地址拼接完整url
+        String grafanaHttpPort = serviceInstanceConfigRepository.findByServiceInstanceIdAndName(serviceInstanceId, "grafana.http.port").getValue();
+        ServiceRoleInstanceEntity grafana = roleInstanceRepository.findByServiceInstanceIdAndServiceRoleName(monitorServiceInstance.getId(), "MONITOR_GRAFANA").get(0);
+        Integer grafanaNodeId = grafana.getNodeId();
+        ClusterNodeEntity grafanaNodeEntity = clusterNodeRepository.findById(grafanaNodeId).get();
+        String dashboardUid = stackServiceEntity.getDashboardUid();
+//        http://fl001:3000/d/eea-9_siks/?theme=light&orgId=1&kiosk
+        String url = String.format("http://%s:%s/d/%s/?theme=light&orgId=1&kiosk", grafanaNodeEntity.getIp(), grafanaHttpPort, dashboardUid);
+
+        return ResultDTO.success(url);
     }
 
     /**
@@ -760,7 +859,7 @@ public class ClusterServiceController {
         }).filter(new Predicate<ServiceInstanceWebUrlVO>() {
             @Override
             public boolean test(ServiceInstanceWebUrlVO serviceInstanceWebUrlVO) {
-                return serviceInstanceWebUrlVO !=null;
+                return serviceInstanceWebUrlVO != null;
             }
         }).collect(Collectors.toList());
 

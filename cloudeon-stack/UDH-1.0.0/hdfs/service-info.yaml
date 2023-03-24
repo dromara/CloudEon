@@ -2,7 +2,7 @@ name: HDFS
 label: "HDFS"
 description: "分布式大数据存储"
 version: 3.3.4
-dockerImage: "registry.mufankong.top/udh/hadoop:3.3.4"
+dockerImage: "registry.cn-hangzhou.aliyuncs.com/udh/hadoop:3.3.4"
 dependencies:
   - "ZOOKEEPER"
 
@@ -15,6 +15,8 @@ persistencePaths:
   - /opt/udh/${serviceInstanceId}/log
   - /opt/udh/${serviceInstanceId}/data
 
+dashboard:
+  uid: huM_B3dZz
 
 roles:
   - name: HDFS_JOURNALNODE
@@ -92,7 +94,7 @@ configurations:
 
 
   - name: datanode.port
-    recommendExpression: 50010
+    recommendExpression: 50011
     valueType: InputNumber
     configurableInWizard: true
 
