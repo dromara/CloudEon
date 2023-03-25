@@ -3,7 +3,7 @@ package com.data.udh.utils;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum AlertLevel {
-    WARN(1,"warning"),
+    WARNING(1,"warning"),
     EXCEPTION(2,"exception");
 
     private int value;

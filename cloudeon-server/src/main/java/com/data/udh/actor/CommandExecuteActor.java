@@ -50,6 +50,7 @@ public class CommandExecuteActor extends AbstractActor {
 
 
         List<CommandTaskEntity> taskEntityList = commandTaskRepository.findByCommandId(commandId);
+        log.info("根据commandId {} 找出task数量：{}",commandId,taskEntityList.size());
         // 根据任务列表生成runnable
         List<Runnable> runnableList = taskEntityList.stream().map(new Function<CommandTaskEntity, Runnable>() {
             @Override

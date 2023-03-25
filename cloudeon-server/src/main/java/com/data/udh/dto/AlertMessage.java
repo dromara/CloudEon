@@ -7,8 +7,9 @@ import java.util.List;
 public class AlertMessage {
 
     private String receiver;
+    // resolved or firing
     private String status;
-    private List<Alerts> alerts;
+    private List<Alert> alerts;
     private String externalURL;
     private String version;
     private String groupKey;
