@@ -45,7 +45,7 @@ const statusTab:React.FC<{statusInfo: API.serviceInfos, dashboardUrl:string, loa
                 </div>
             </div>
             <div className={styles.dashboardWrap}>
-                <iframe src="https://4x.ant.design/components/progress-cn/" style={{border:0, width:'100%',height:'100%'}}></iframe>
+                <iframe style={{border:0, width:'100%',height:'100%'}} src={dashboardUrl} ></iframe>
             </div>
             </Spin>
         </div>

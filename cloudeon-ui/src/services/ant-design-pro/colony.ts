@@ -288,7 +288,7 @@ export async function getDashboardUrlAPI(options?: { [key: string]: any }) {
 export async function stopRoleAPI(options?: { [key: string]: any }) {
   return request<API.normalResult>('/apiPre/service/stopRole', {
     method: 'POST',
-    data: options,
+    params: options,
   });
 }
 
@@ -296,7 +296,7 @@ export async function stopRoleAPI(options?: { [key: string]: any }) {
 export async function startRoleAPI(options?: { [key: string]: any }) {
   return request<API.normalResult>('/apiPre/service/startRole', {
     method: 'POST',
-    data: options,
+    params: options,
   });
 }
 

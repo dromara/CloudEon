@@ -11,7 +11,6 @@ import {
   startServiceAPI, 
   deleteServiceAPI, 
   getServiceInfoAPI, 
-  getServiceRolesAPI, 
   upgradeServiceAPI, 
   getListWebURLsAPI,
   getDashboardUrlAPI
@@ -19,7 +18,6 @@ import {
 import StatusTab from './components/StatusTab/index';
 import RoleTab from './components/RoleTab/index'
 import ConfigTab from './components/ConfigTab/index'
-import webUITab from './components/webUITab/index'
 import { dealResult } from '../../../../utils/resultUtil'
 
 const serviceListDetail: React.FC = () => {
@@ -29,7 +27,6 @@ const serviceListDetail: React.FC = () => {
   const [selectACT, setSelectACT] = useState<any>('');
   const [btnLoading, setBtnLoading] = useState(false);
   const [statusInfo, setStatusInfo] = useState<API.serviceInfos>();
-  const [rolesInfo, setRolesInfo] = useState<API.rolesInfos[]>();
   const [webUrls, setWebUrls] = useState<API.webUrlsItem[]>();
   const [apiLoading, setApiLoading] = useState(false);
   const [currentTab, setCurrentTab] = useState('StatusTab');
@@ -41,8 +38,7 @@ const serviceListDetail: React.FC = () => {
     const params = {serviceInstanceId: serviceId}
     switch(key){
       case 'StatusTab': getInfos(params);break;
-      case 'RoleTab': getRoles(params) ;break;
-      // case '': getListWebURLs();break;
+      default:break;
     }
   };
 
@@ -61,16 +57,6 @@ const serviceListDetail: React.FC = () => {
     setApiLoading(false)
     if(result?.success){
       setStatusInfo(result?.data)
-    }
-  }
-
-  // 获取角色数据
-  const getRoles = async (params:any) =>{
-    setApiLoading(true)
-    const result = await getServiceRolesAPI(params)
-    setApiLoading(false)
-    if(result?.success){
-      setRolesInfo(result?.data)
     }
   }
 
@@ -133,7 +119,7 @@ const serviceListDetail: React.FC = () => {
     {
       key: 'RoleTab',
       label: `角色`,
-      children: <RoleTab rolesInfo={rolesInfo || []} loading={currentTab == 'RoleTab' && apiLoading}/>,
+      children: <RoleTab serviceId={serviceId}/>,
     },
     {
       key: 'ConfigTab',
@@ -151,7 +137,7 @@ const serviceListDetail: React.FC = () => {
     const { query } = history.location;
     setServiceId(query?.id || 0)
     setServiceName(query?.serviceName || '')
-    const params = {serviceInstanceId: query?.id || 0}
+    const params = {serviceInstanceId: query?.id || null}
     getInfos(params)
     getDashboard(params)
     getListWebURLs(params)

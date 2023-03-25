@@ -1,10 +1,71 @@
 import type { ProColumns } from '@ant-design/pro-components';
 import { ProTable, TableDropdown } from '@ant-design/pro-components';
-import { Spin, Tooltip } from 'antd';
+import { Spin, Button, Popconfirm, message } from 'antd';
 import { useState, useEffect } from 'react';
 import styles from './index.less'
+import { startRoleAPI, stopRoleAPI, getServiceRolesAPI } from '@/services/ant-design-pro/colony';
 
-const roleTab:React.FC<{rolesInfo: API.rolesInfos[], loading: Boolean}> = ({rolesInfo, loading}) => {
+
+const roleTab:React.FC<{ serviceId: any}> = ({serviceId}) => {
+    const [confirmLoading, setConfirmLoading] = useState(false);
+    const [currentId, setCurrentId] = useState(0);
+    const [currentType, setCurrentType] = useState('');
+    const [apiLoading, setApiLoading] = useState(false);
+    const [rolesInfo, setRolesInfo] = useState<API.rolesInfos[]>();
+
+
+    // 获取角色数据
+  const getRoles = async () =>{
+    const params = {serviceInstanceId: serviceId}
+    setApiLoading(true)
+    const result = await getServiceRolesAPI(params)
+    setApiLoading(false)
+    if(result?.success){
+      setRolesInfo(result?.data)
+    }
+  }
+
+  useEffect(()=>{
+    getRoles()
+  },[])
+
+
+    const confirm = async(type:string, id:number)=>{
+        const params = { roleInstanceId: id}
+        setCurrentId(id)
+        setCurrentType(type)
+        switch(type){
+            case 'start': await startRole(params);break;
+            case 'stop': await stopRole(params);break;
+            default: break;
+        }
+        setCurrentId(0)
+        setCurrentType('')
+    }
+
+    const startRole = async(params:any)=>{
+        setConfirmLoading(true)
+        const result = await startRoleAPI(params)
+        setConfirmLoading(false)
+        if(result?.success){
+            message.success('启动成功！', 3)
+            getRoles()
+        }else{
+            message.error('启动失败：'+result?.message, 3)
+        } 
+    }
+
+    const stopRole = async(params:any)=>{
+        setConfirmLoading(true)
+        const result = await stopRoleAPI(params)
+        setConfirmLoading(false)
+        if(result?.success){
+            message.success('停止成功！', 3)
+            getRoles()
+        }else{
+            message.error('停止失败：'+result?.message, 3)
+        }
+    }
 
     const columns: ProColumns<API.rolesInfos>[] = [
         {
@@ -82,10 +143,26 @@ const roleTab:React.FC<{rolesInfo: API.rolesInfos[], loading: Boolean}> = ({role
             key: 'actionBtns',
             dataIndex: 'actionBtns',
             valueType: 'option',
-            render: () => [
-                <a key="link">启动</a>,
-                <a key="link2">停止</a>,
-                <a key="link5">删除</a>,
+            render: (_, record) => [
+                <Popconfirm
+                    title="确定要启动吗?"
+                    onConfirm={()=>confirm('start',record?.id || 0)}
+                    okText="确定"
+                    cancelText="取消"
+                >
+                    <Button className={styles.roleBtn} type="link" loading={currentType=='start' && currentId == record.id} disabled={confirmLoading}>启动</Button>
+              </Popconfirm>,
+              <Popconfirm
+                    title="确定要停止吗?"
+                    onConfirm={()=>confirm('stop',record?.id || 0)}
+                    okText="确定"
+                    cancelText="取消"
+                >
+                    <Button className={styles.roleBtn} type="link" loading={currentType=='stop' && currentId == record.id} disabled={confirmLoading}>停止</Button>
+                </Popconfirm>,
+                // <a key="link">启动</a>,
+                // <a key="link2">停止</a>,
+                // <a key="link5">删除</a>,
                 // <TableDropdown
                 //     key="actionGroup"
                 //     menus={[
@@ -103,7 +180,7 @@ const roleTab:React.FC<{rolesInfo: API.rolesInfos[], loading: Boolean}> = ({role
             title={<a>Tooltip will show on mouse enter.</a>}>
                 <a>Tooltip will show on mouse enter.</a>
             </Tooltip> */}
-            <Spin tip="Loading" size="small" spinning={!!loading}>
+            <Spin tip="Loading" size="small" spinning={!!apiLoading}>
                 <ProTable
                     dataSource={rolesInfo}
                     rowKey="id"
