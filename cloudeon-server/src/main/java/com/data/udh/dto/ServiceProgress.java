@@ -12,4 +12,6 @@ public class ServiceProgress {
     private String currentState;
     private String serviceInstanceName;
     private List<CommandTaskEntity> taskDetails;
+    private Long totalCnt;
+    private Long successCnt;
 }
