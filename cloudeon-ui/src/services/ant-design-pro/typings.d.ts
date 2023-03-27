@@ -285,7 +285,9 @@ declare namespace API {
   type progressItem = {
     currentState?: string,
     serviceInstanceName?: string,
-    taskDetails?: taskDetailType[]
+    taskDetails?: taskDetailType[],
+    successCnt: number,
+    totalCnt: number
   }
 
   type commandType = {
@@ -316,7 +318,8 @@ declare namespace API {
     stackServiceId?: number,
     version?: string,
     stackServiceDesc?: string,
-    serviceStatus?: string
+    serviceState?: string,
+    serviceStateValue?: number,
   }
 
   type serviceInfosResult = {

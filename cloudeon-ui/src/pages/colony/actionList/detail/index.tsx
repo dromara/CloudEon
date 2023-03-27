@@ -129,7 +129,20 @@ const actionDetail: React.FC = () => {
                                             onClick={()=>{
                                                 handleTask(taskItem.serviceInstanceName,  _index)
                                             }}
-                                        >{taskItem.serviceInstanceName}</div>
+                                        >
+                                            {taskItem.serviceInstanceName}
+                                            <Progress 
+                                                percent={taskItem.successCnt/taskItem.totalCnt * 100} 
+                                                steps={5}
+                                                // strokeWidth={10} 
+                                                // width={40}
+                                                // type="circle"
+                                                strokeColor={statusColor[taskItem.currentState ||'DEFAULT']} 
+                                                size="small" 
+                                                // status={taskItem.currentState=='RUNNING'?"active":'normal'} 
+                                                style={{minWidth:'60px', marginLeft:'10px', fontSize:'12px'}}
+                                            />
+                                        </div>
                                     )
                                 })
                                 }
