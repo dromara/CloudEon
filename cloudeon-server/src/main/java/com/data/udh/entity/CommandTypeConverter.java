@@ -11,8 +11,8 @@ public class CommandTypeConverter implements AttributeConverter<CommandType, Str
 
 
     @Override
-    public String convertToDatabaseColumn(CommandType serviceState) {
-        return serviceState.name();
+    public String convertToDatabaseColumn(CommandType commandType) {
+        return commandType.name();
     }
 
     @Override

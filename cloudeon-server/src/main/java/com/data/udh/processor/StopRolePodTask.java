@@ -1,8 +1,12 @@
 package com.data.udh.processor;
 
 import cn.hutool.extra.spring.SpringUtil;
+import com.data.udh.dao.ClusterNodeRepository;
+import com.data.udh.dao.ServiceRoleInstanceRepository;
 import com.data.udh.dao.StackServiceRoleRepository;
+import com.data.udh.entity.ServiceRoleInstanceEntity;
 import com.data.udh.entity.StackServiceRoleEntity;
+import com.data.udh.utils.ServiceRoleState;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
@@ -15,8 +19,11 @@ public class StopRolePodTask extends BaseUdhTask {
     @Override
     public void internalExecute() {
         StackServiceRoleRepository stackServiceRoleRepository = SpringUtil.getBean(StackServiceRoleRepository.class);
+        ClusterNodeRepository clusterNodeRepository = SpringUtil.getBean(ClusterNodeRepository.class);
+        ServiceRoleInstanceRepository serviceRoleInstanceRepository = SpringUtil.getBean(ServiceRoleInstanceRepository.class);
 
         String serviceInstanceName = taskParam.getServiceInstanceName();
+        Integer serviceInstanceId = taskParam.getServiceInstanceId();
         String hostName = taskParam.getHostName();
 
         // 查询框架服务角色名获取模板名
@@ -37,5 +44,12 @@ public class StopRolePodTask extends BaseUdhTask {
                 }
             }
         }
+        // 根据hostname查询节点
+        Integer nodeId = clusterNodeRepository.findByHostname(hostName).getId();
+
+        // 根据节点id更新角色状态
+        ServiceRoleInstanceEntity roleInstanceEntity = serviceRoleInstanceRepository.findByServiceInstanceIdAndNodeId(serviceInstanceId, nodeId);
+        roleInstanceEntity.setServiceRoleState(ServiceRoleState.ROLE_STOPPED);
+        serviceRoleInstanceRepository.save(roleInstanceEntity);
     }
 }

@@ -36,7 +36,7 @@ public class ServiceRoleInstanceEntity implements Serializable {
     /**
      * 服务角色状态
      */
-    @Enumerated(EnumType.ORDINAL)
+    @Convert(converter = RoleStateConverter.class)
     private ServiceRoleState serviceRoleState;
 
 

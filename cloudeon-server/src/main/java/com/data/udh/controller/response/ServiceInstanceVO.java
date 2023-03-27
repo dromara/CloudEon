@@ -6,6 +6,7 @@ import lombok.Data;
 public class ServiceInstanceVO {
     private String serviceName;
     private Integer id;
-    private String serviceStateValue;
+    private String serviceState;
+    private Integer serviceStateValue;
     private String icon;
 }

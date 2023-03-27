@@ -3,10 +3,13 @@ package com.data.udh.processor;
 import cn.hutool.extra.spring.SpringUtil;
 import com.data.udh.config.UdhConfigProp;
 import com.data.udh.dao.ServiceInstanceRepository;
+import com.data.udh.dao.ServiceRoleInstanceRepository;
 import com.data.udh.dao.StackServiceRoleRepository;
 import com.data.udh.entity.ServiceInstanceEntity;
+import com.data.udh.entity.ServiceRoleInstanceEntity;
 import com.data.udh.entity.StackServiceRoleEntity;
 import com.data.udh.utils.Constant;
+import com.data.udh.utils.ServiceRoleState;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import lombok.NoArgsConstructor;
@@ -14,6 +17,8 @@ import lombok.NoArgsConstructor;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.List;
+
 /**
  * 为角色实例删除k8s deployment
  */
@@ -23,6 +28,7 @@ public class StopRoleK8sDeploymentTask extends BaseUdhTask {
     public void internalExecute() {
         ServiceInstanceRepository serviceInstanceRepository = SpringUtil.getBean(ServiceInstanceRepository.class);
         StackServiceRoleRepository stackServiceRoleRepository = SpringUtil.getBean(StackServiceRoleRepository.class);
+        ServiceRoleInstanceRepository serviceRoleInstanceRepository = SpringUtil.getBean(ServiceRoleInstanceRepository.class);
 
         UdhConfigProp udhConfigProp = SpringUtil.getBean(UdhConfigProp.class);
         String workHome = udhConfigProp.getWorkHome();
@@ -49,5 +55,13 @@ public class StopRoleK8sDeploymentTask extends BaseUdhTask {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+
+        // 更新角色实例状态为已停止
+        List<ServiceRoleInstanceEntity> roleInstanceEntities = serviceRoleInstanceRepository.findByServiceInstanceIdAndServiceRoleName(serviceInstanceId, stackServiceRoleEntity.getName());
+        roleInstanceEntities.forEach(r->{
+            r.setServiceRoleState(ServiceRoleState.ROLE_STOPPED);
+            serviceRoleInstanceRepository.save(r);
+        });
+
     }
 }

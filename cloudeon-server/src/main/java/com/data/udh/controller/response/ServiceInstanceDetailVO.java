@@ -23,5 +23,6 @@ public class ServiceInstanceDetailVO {
     private Integer stackServiceId;
     private String version;
     private String stackServiceDesc;
-    private String serviceStatus;
+    private String serviceState;
+    private Integer serviceStateValue;
 }

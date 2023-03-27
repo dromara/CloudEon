@@ -188,7 +188,7 @@ public class ClusterServiceController {
                         roleInstanceEntity.setServiceInstanceId(serviceInstanceEntityId);
                         roleInstanceEntity.setStackServiceRoleId(stackServiceRoleEntity.getId());
                         roleInstanceEntity.setServiceRoleName(stackRoleName);
-                        roleInstanceEntity.setServiceRoleState(ServiceRoleState.OPERATING);
+                        roleInstanceEntity.setServiceRoleState(ServiceRoleState.INIT_ROLE);
                         roleInstanceEntity.setNodeId(nodeId);
                         return roleInstanceEntity;
                     }
@@ -664,7 +664,8 @@ public class ClusterServiceController {
             ServiceInstanceVO serviceInstanceVO = new ServiceInstanceVO();
             BeanUtil.copyProperties(instanceEntity, serviceInstanceVO);
             ServiceState serviceState = instanceEntity.getServiceState();
-            serviceInstanceVO.setServiceStateValue(serviceState.getDesc());
+            serviceInstanceVO.setServiceStateValue(serviceState.getValue());
+            serviceInstanceVO.setServiceState(serviceState.getDesc());
 
             // 查询icon
             StackServiceEntity stackServiceEntity = stackServiceRepository.findById(instanceEntity.getStackServiceId()).get();
@@ -725,6 +726,7 @@ public class ClusterServiceController {
         Integer stackServiceId = serviceInstanceEntity.getStackServiceId();
         StackServiceEntity stackServiceEntity = stackServiceRepository.findById(stackServiceId).get();
 
+        ServiceState serviceState = serviceInstanceEntity.getServiceState();
         ServiceInstanceDetailVO instanceDetailVO = ServiceInstanceDetailVO.builder()
                 .id(serviceInstanceEntity.getId())
                 .name(serviceInstanceEntity.getServiceName())
@@ -733,7 +735,8 @@ public class ClusterServiceController {
                 .stackServiceId(stackServiceId)
                 .stackServiceName(stackServiceEntity.getName())
                 .version(stackServiceEntity.getVersion())
-                .serviceStatus(serviceInstanceEntity.getServiceState().getDesc())
+                .serviceState(serviceState.getDesc())
+                .serviceStateValue(serviceState.getValue())
                 .build();
         return ResultDTO.success(instanceDetailVO);
     }
@@ -751,8 +754,10 @@ public class ClusterServiceController {
                 // 查找该角色实例绑定的web地址
                 ServiceRoleInstanceWebuisEntity webuisEntity = roleInstanceWebuisRepository.findByServiceRoleInstanceId(roleInstanceEntity.getId());
                 StackServiceRoleEntity stackServiceRoleEntity = stackServiceRoleRepository.findById(roleInstanceEntity.getStackServiceRoleId()).get();
+                ServiceRoleState serviceRoleState = roleInstanceEntity.getServiceRoleState();
                 ServiceInstanceRoleVO serviceInstanceRoleVO = ServiceInstanceRoleVO.builder()
-                        .roleStatus(roleInstanceEntity.getServiceRoleState().name())
+                        .roleStatus(serviceRoleState.getDesc())
+                        .roleStatusValue(serviceRoleState.getValue())
                         .id(roleInstanceEntity.getId())
                         .nodeHostIp(nodeEntity.getIp())
                         .nodeHostname(nodeEntity.getHostname())

@@ -4,11 +4,9 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import com.data.udh.config.UdhConfigProp;
 import com.data.udh.dao.*;
-import com.data.udh.entity.ServiceInstanceConfigEntity;
-import com.data.udh.entity.ServiceInstanceEntity;
-import com.data.udh.entity.StackServiceEntity;
-import com.data.udh.entity.StackServiceRoleEntity;
+import com.data.udh.entity.*;
 import com.data.udh.utils.Constant;
+import com.data.udh.utils.ServiceRoleState;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -129,6 +127,12 @@ public class StartRoleK8sDeploymentTask extends BaseUdhTask{
         }finally {
             client.close();
         }
+        // 更新角色实例状态为已启动
+        List<ServiceRoleInstanceEntity> roleInstanceEntities = serviceRoleInstanceRepository.findByServiceInstanceIdAndServiceRoleName(serviceInstanceId, stackServiceRoleEntity.getName());
+        roleInstanceEntities.forEach(r->{
+            r.setServiceRoleState(ServiceRoleState.ROLE_STARTED);
+            serviceRoleInstanceRepository.save(r);
+        });
 
 
     }
