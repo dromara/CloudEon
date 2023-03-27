@@ -18,6 +18,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @RestController
@@ -64,6 +65,13 @@ public class CommandController {
             @Override
             public ServiceProgress apply(Map.Entry<String, List<CommandTaskEntity>> serviceTaskMap) {
                 List<CommandTaskEntity> commandTaskEntities = serviceTaskMap.getValue();
+                long successCnt = commandTaskEntities.stream().filter(new Predicate<CommandTaskEntity>() {
+                    @Override
+                    public boolean test(CommandTaskEntity commandTaskEntity) {
+                        return commandTaskEntity.getCommandState() == CommandState.SUCCESS;
+                    }
+                }).count();
+                long totalCnt = commandTaskEntities.stream().count();
                 String currentState = "";
                 Map<CommandState, List<CommandTaskEntity>> commandStateListMap = commandTaskEntities.stream().collect(Collectors.groupingBy(CommandTaskEntity::getCommandState));
                 if (commandStateListMap.get(CommandState.ERROR)!=null && commandStateListMap.get(CommandState.ERROR).size() > 0) {
@@ -78,7 +86,7 @@ public class CommandController {
                 if (commandStateListMap.get(CommandState.SUCCESS)!=null && commandStateListMap.get(CommandState.SUCCESS).size() == commandTaskEntities.size()) {
                     currentState = CommandState.SUCCESS.name();
                 }
-                return new ServiceProgress(currentState, serviceTaskMap.getKey(),serviceTaskMap.getValue());
+                return new ServiceProgress(currentState, serviceTaskMap.getKey(),serviceTaskMap.getValue(),totalCnt,successCnt);
             }
         }).collect(Collectors.toList());
 

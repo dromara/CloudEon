@@ -45,6 +45,15 @@ spec:
         image: "${dockerImage}"
         imagePullPolicy: "Always"
         name: "${roleServiceFullName}"
+        readinessProbe:
+          httpGet:
+            path: /api/bootstrap
+            port: ${conf['webserver_port']}
+          failureThreshold: 3
+          initialDelaySeconds: 3
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 15
         resources:
           requests: {}
           limits: {}

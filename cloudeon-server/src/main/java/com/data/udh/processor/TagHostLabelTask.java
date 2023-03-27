@@ -44,6 +44,7 @@ public class TagHostLabelTask extends BaseUdhTask {
            client.nodes().withName(hostName)
                    .edit(r -> new NodeBuilder(r)
                            .editMetadata()
+                           .removeFromLabels(tag)
                            .addToLabels(tag, "true")
                            .endMetadata()
                            .build());

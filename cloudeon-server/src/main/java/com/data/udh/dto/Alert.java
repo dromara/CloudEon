@@ -1,7 +1,7 @@
 package com.data.udh.dto;
 import lombok.Data;
 @Data
-public class Alerts {
+public class Alert {
 
     private String status;
     private AlertLabels labels;

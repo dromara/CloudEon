@@ -45,7 +45,9 @@ public class RegisterBeTask extends BaseUdhTask {
         int beHeartBeatPort = Integer.parseInt(configRepository.findByServiceInstanceIdAndName(serviceInstanceId, "heartbeat_service_port").getValue());
 
         // 建立mysql连接
-        DataSource ds = new SimpleDataSource("jdbc:mysql://" + masterFeIp + ":" + masterFeMysqlPort, "root", null);
+        String url = "jdbc:mysql://" + masterFeIp + ":" + masterFeMysqlPort;
+        log.info("jdbc连接为：{}",url);
+        DataSource ds = new SimpleDataSource(url, "root", null);
         try (Connection conn = ds.getConnection();) {
 
             for (ServiceRoleInstanceEntity beRoleEntity : beInstanceList) {

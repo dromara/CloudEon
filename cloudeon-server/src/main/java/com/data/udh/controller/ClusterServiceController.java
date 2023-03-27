@@ -803,7 +803,7 @@ public class ClusterServiceController {
         // 如果没安装monitor服务，则提示请先安装
         ServiceInstanceEntity monitorServiceInstance = serviceInstanceRepository.findEntityByClusterIdAndStackServiceName(serviceInstanceEntity.getClusterId(), "MONITOR");
         if (monitorServiceInstance == null) {
-            ResultDTO.success("请先安装Monitor服务");
+         return    ResultDTO.success("请先安装Monitor服务");
         }
 
         // 通过服务框架的dashboard和Grafana地址拼接完整url

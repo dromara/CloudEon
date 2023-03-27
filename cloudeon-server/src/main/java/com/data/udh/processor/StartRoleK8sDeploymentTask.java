@@ -16,6 +16,7 @@ import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
+import io.fabric8.kubernetes.client.KubernetesClientTimeoutException;
 import io.fabric8.kubernetes.client.dsl.Resource;
 import io.fabric8.kubernetes.client.dsl.RollableScalableResource;
 import lombok.NoArgsConstructor;
@@ -69,7 +70,7 @@ public class StartRoleK8sDeploymentTask extends BaseUdhTask{
 
         // 渲染生成k8s资源
         String k8sTemplateFileName = roleFullName + ".yaml.ftl";
-        String k8sTemplateDir = udhConfigProp.getStackLoadPath() + File.separator + stackCode + File.separator + stackServiceName + File.separator + Constant.K8S_DIR;;
+        String k8sTemplateDir = udhConfigProp.getStackLoadPath() + File.separator + stackCode + File.separator + stackServiceName + File.separator + Constant.K8S_DIR;
         log.info("加载服务实例角色k8s资源模板目录："+k8sTemplateDir);
 
         // 查询本服务实例拥有的指定角色节点数
@@ -103,23 +104,30 @@ public class StartRoleK8sDeploymentTask extends BaseUdhTask{
         }
 
         // 调用k8s命令启动资源
-        try (  KubernetesClient client = new KubernetesClientBuilder().build();){
+        KubernetesClient client = new KubernetesClientBuilder().build();
+        String deploymentName ="";
+        try {
             List<HasMetadata> metadata = client.load(new FileInputStream(outPutFile))
                     .inNamespace("default")
                     .create();
-            String deploymentName = ((Deployment) metadata.get(0)).getMetadata().getName();
+            deploymentName = metadata.get(0).getMetadata().getName();
             final Deployment deployment = client.apps().deployments().inNamespace("default").withName(deploymentName).get();
             Resource<Deployment> resource = client.resource(deployment).inNamespace("default");
             int amount = 10;
-            log.info("在k8s上启动deployment: {} ,使用本地资源文件: {} ,持续等待 {} 分钟",deploymentName,outPutFile,amount);
+            log.info("在k8s上启动deployment: {} ,使用本地资源文件: {} ,持续等待 {} 分钟", deploymentName, outPutFile, amount);
             resource.waitUntilReady(amount, TimeUnit.MINUTES);
 
             // 打印deployment的输出日志
             RollableScalableResource<Deployment> scalableResource = client.apps().deployments().inNamespace("default").withName(deploymentName);
             log.info(scalableResource.getLog());
-        } catch (FileNotFoundException e) {
+        } catch (Exception e) {
+            // 打印deployment的输出日志
+            RollableScalableResource<Deployment> scalableResource = client.apps().deployments().inNamespace("default").withName(deploymentName);
+            log.error(scalableResource.getLog());
             e.printStackTrace();
             throw new RuntimeException(e);
+        }finally {
+            client.close();
         }
 
 

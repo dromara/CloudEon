@@ -272,7 +272,7 @@ cookie_secure = false
 cookie_samesite = lax
 
 # set to true if you want to allow browsers to render Grafana in a <frame>, <iframe>, <embed> or <object>. default is false.
-allow_embedding = false
+allow_embedding = true
 
 # Set to true if you want to enable http strict transport security (HSTS) response header.
 # HSTS tells browsers that the site should only be accessed using HTTPS.
