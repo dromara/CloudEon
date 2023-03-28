@@ -132,7 +132,7 @@ const actionDetail: React.FC = () => {
                                         >
                                             {taskItem.serviceInstanceName}
                                             <Progress 
-                                                percent={taskItem.successCnt/taskItem.totalCnt * 100} 
+                                                percent={Math.floor(taskItem.successCnt/taskItem.totalCnt * 100)} 
                                                 steps={5}
                                                 // strokeWidth={10} 
                                                 // width={40}
