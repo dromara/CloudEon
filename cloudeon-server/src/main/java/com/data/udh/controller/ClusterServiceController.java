@@ -488,12 +488,13 @@ public class ClusterServiceController {
         return result;
     }
 
-    private Integer buildServiceCommand(List<ServiceInstanceEntity> serviceInstanceEntities,
+    @Transactional(rollbackFor = Exception.class)
+    public Integer buildServiceCommand(List<ServiceInstanceEntity> serviceInstanceEntities,
                                         Integer ClusterId, CommandType commandType) {
         return buildInternalCommand(serviceInstanceEntities, Lists.newArrayList(), ClusterId, commandType);
     }
-
-    private Integer buildRoleCommand(List<ServiceInstanceEntity> serviceInstanceEntities, List<ServiceRoleInstanceEntity> spceRoleInstanceEntities,
+    @Transactional(rollbackFor = Exception.class)
+    public Integer buildRoleCommand(List<ServiceInstanceEntity> serviceInstanceEntities, List<ServiceRoleInstanceEntity> spceRoleInstanceEntities,
                                      Integer ClusterId, CommandType commandType) {
         return buildInternalCommand(serviceInstanceEntities, spceRoleInstanceEntities, ClusterId, commandType);
     }

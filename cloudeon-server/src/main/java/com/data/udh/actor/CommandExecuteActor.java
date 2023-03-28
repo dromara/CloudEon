@@ -2,6 +2,7 @@ package com.data.udh.actor;
 
 import akka.actor.AbstractActor;
 import akka.actor.Props;
+import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import com.alibaba.fastjson.JSONObject;
@@ -44,13 +45,21 @@ public class CommandExecuteActor extends AbstractActor {
      * 处理请求
      */
     private void onReceiveCommandId(Integer commandId) {
-        log.info("CommandExecuteActor 接收到指令id为"+commandId+"...........");
+        log.info("CommandExecuteActor 接收到指令id为" + commandId + "...........");
         CommandTaskRepository commandTaskRepository = SpringUtil.getBean(CommandTaskRepository.class);
         CommandRepository commandRepository = SpringUtil.getBean(CommandRepository.class);
 
+        List<CommandTaskEntity> taskEntityList = null;
+        // 解决扫描不到任务直接结束command的问题
+        while (true) {
+            taskEntityList = commandTaskRepository.findByCommandId(commandId);
+            int size = taskEntityList.size();
+            log.info("根据commandId {} 找出task数量：{}", commandId, size);
+            if (size > 0) break;
+            ThreadUtil.sleep(2_000);
+        }
 
-        List<CommandTaskEntity> taskEntityList = commandTaskRepository.findByCommandId(commandId);
-        log.info("根据commandId {} 找出task数量：{}",commandId,taskEntityList.size());
+
         // 根据任务列表生成runnable
         List<Runnable> runnableList = taskEntityList.stream().map(new Function<CommandTaskEntity, Runnable>() {
             @Override
@@ -77,9 +86,8 @@ public class CommandExecuteActor extends AbstractActor {
         });
 
         for (Runnable runnable : runnableList) {
-            completableFuture =completableFuture.thenRunAsync(runnable);
+            completableFuture = completableFuture.thenRunAsync(runnable);
         }
-
 
 
         completableFuture.whenComplete(new BiConsumer<Void, Throwable>() {
