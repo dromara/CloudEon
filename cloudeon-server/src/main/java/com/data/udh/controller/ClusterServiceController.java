@@ -42,6 +42,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.data.udh.utils.Constant.AdminUserId;
 
@@ -490,12 +491,13 @@ public class ClusterServiceController {
 
     @Transactional(rollbackFor = Exception.class)
     public Integer buildServiceCommand(List<ServiceInstanceEntity> serviceInstanceEntities,
-                                        Integer ClusterId, CommandType commandType) {
+                                       Integer ClusterId, CommandType commandType) {
         return buildInternalCommand(serviceInstanceEntities, Lists.newArrayList(), ClusterId, commandType);
     }
+
     @Transactional(rollbackFor = Exception.class)
     public Integer buildRoleCommand(List<ServiceInstanceEntity> serviceInstanceEntities, List<ServiceRoleInstanceEntity> spceRoleInstanceEntities,
-                                     Integer ClusterId, CommandType commandType) {
+                                    Integer ClusterId, CommandType commandType) {
         return buildInternalCommand(serviceInstanceEntities, spceRoleInstanceEntities, ClusterId, commandType);
     }
 
@@ -791,6 +793,20 @@ public class ClusterServiceController {
     public ResultDTO<Void> deleteServiceInstance(Integer serviceInstanceId) {
 
         ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(serviceInstanceId).get();
+        // 查出有依赖此服务的服务实例
+        List<ServiceInstanceEntity> dep = serviceInstanceRepository.findByClusterIdAndDependenceServiceInstanceIdsNotNull(serviceInstanceEntity.getClusterId());
+        List<ServiceInstanceEntity> depServiceInstanceList = dep.stream().filter(new Predicate<ServiceInstanceEntity>() {
+            @Override
+            public boolean test(ServiceInstanceEntity serviceInstanceEntity) {
+                List<String> ids = Arrays.stream(serviceInstanceEntity.getDependenceServiceInstanceIds().split(",")).collect(Collectors.toList());
+                return ids.contains(serviceInstanceId.toString());
+            }
+        }).collect(Collectors.toList());
+        if (depServiceInstanceList.size() > 0) {
+            String depServiceNames = depServiceInstanceList.stream().map(ServiceInstanceEntity::getServiceName).collect(Collectors.joining(","));
+            return ResultDTO.failed("请先删除依赖此服务的服务实例：" + depServiceNames);
+        }
+
         //  生成删除服务command
         List<ServiceInstanceEntity> serviceInstanceEntities = Lists.newArrayList(serviceInstanceEntity);
         Integer commandId = buildServiceCommand(serviceInstanceEntities, serviceInstanceEntity.getClusterId(), CommandType.DELETE_SERVICE);
@@ -816,7 +832,7 @@ public class ClusterServiceController {
         // 如果没安装monitor服务，则提示请先安装
         ServiceInstanceEntity monitorServiceInstance = serviceInstanceRepository.findEntityByClusterIdAndStackServiceName(serviceInstanceEntity.getClusterId(), "MONITOR");
         if (monitorServiceInstance == null) {
-         return    ResultDTO.success("请先安装Monitor服务");
+            return ResultDTO.success("请先安装Monitor服务");
         }
 
         // 通过服务框架的dashboard和Grafana地址拼接完整url
