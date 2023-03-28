@@ -162,6 +162,7 @@ public class AlertController {
                         .alertLevelMsg(alertMessageEntity.getAlertLevel().getDesc())
                         .alertName(alertMessageEntity.getAlertName())
                         .createTime(alertMessageEntity.getCreateTime())
+                        .updateTime(alertMessageEntity.getUpdateTime())
                         .serviceInstanceName(serviceLabel)
                         .serviceRoleLabel(roleInstanceLabel)
                         .serviceInstanceId(serviceInstanceId)
