@@ -47,7 +47,7 @@ spec:
         name: "${roleServiceFullName}"
         readinessProbe:
           httpGet:
-            path: /api/bootstrap
+            path: /metrics
             port: ${conf['webserver_port']}
           failureThreshold: 3
           initialDelaySeconds: 3

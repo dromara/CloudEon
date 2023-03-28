@@ -46,24 +46,27 @@ public class RegisterBeTask extends BaseUdhTask {
 
         // 建立mysql连接
         String url = "jdbc:mysql://" + masterFeIp + ":" + masterFeMysqlPort;
-        log.info("jdbc连接为：{}",url);
+        log.info("jdbc连接为：{}", url);
         DataSource ds = new SimpleDataSource(url, "root", null);
-        try (Connection conn = ds.getConnection();) {
-
-            for (ServiceRoleInstanceEntity beRoleEntity : beInstanceList) {
+        for (ServiceRoleInstanceEntity beRoleEntity : beInstanceList) {
+            try (Connection conn = ds.getConnection();) {
                 // 执行非查询语句，返回影响的行数
                 String beIp = clusterNodeRepository.findById(beRoleEntity.getNodeId()).get().getIp();
                 String sql = String.format("ALTER SYSTEM ADD BACKEND \"%s:%s\" ", beIp, beHeartBeatPort);
                 log.info("执行sql：{}", sql);
                 SqlExecutor.execute(conn, sql);
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+                String message = e.getMessage();
+                if (!message.contains("Same backend already exists")) {
+                    throw new RuntimeException(e);
+                }else {
+                    log.error(message);
+                }
+
             }
-
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
         }
-
 
     }
 }
