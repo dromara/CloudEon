@@ -58,7 +58,7 @@ public class ScaleUpK8sServiceTask extends BaseUdhTask {
                 // 根据hostname查询节点
                 Integer nodeId = clusterNodeRepository.findByHostname(hostname).getId();
                 // 根据节点id更新角色状态
-                ServiceRoleInstanceEntity roleInstanceEntity = serviceRoleInstanceRepository.findByServiceInstanceIdAndNodeId(serviceInstanceId, nodeId);
+                ServiceRoleInstanceEntity roleInstanceEntity = serviceRoleInstanceRepository.findByServiceInstanceIdAndNodeIdAndServiceRoleName(serviceInstanceId, nodeId,roleName);
                 roleInstanceEntity.setServiceRoleState(ServiceRoleState.ROLE_STARTED);
                 serviceRoleInstanceRepository.save(roleInstanceEntity);
             });

@@ -48,7 +48,7 @@ public class StopRolePodTask extends BaseUdhTask {
         Integer nodeId = clusterNodeRepository.findByHostname(hostName).getId();
 
         // 根据节点id更新角色状态
-        ServiceRoleInstanceEntity roleInstanceEntity = serviceRoleInstanceRepository.findByServiceInstanceIdAndNodeId(serviceInstanceId, nodeId);
+        ServiceRoleInstanceEntity roleInstanceEntity = serviceRoleInstanceRepository.findByServiceInstanceIdAndNodeIdAndServiceRoleName(serviceInstanceId, nodeId,roleName);
         roleInstanceEntity.setServiceRoleState(ServiceRoleState.ROLE_STOPPED);
         serviceRoleInstanceRepository.save(roleInstanceEntity);
     }
