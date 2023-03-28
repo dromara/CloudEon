@@ -1,18 +1,16 @@
-package com.data.udh.utils;
+package com.data.udh.enums;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
-public enum ServiceRoleState {
-    INIT_ROLE(0,"新增角色部署中"),
-    STARTING_ROLE(1,"角色启动中"),
-    ROLE_STARTED(2,"角色已启动"),
-    ROLE_STOPPED(3,"角色已停止");
+public enum AlertLevel {
+    WARNING(1,"warning"),
+    EXCEPTION(2,"exception");
 
     private int value;
 
     private String desc;
 
-    ServiceRoleState(int value, String desc) {
+    AlertLevel(int value, String desc) {
         this.value = value;
         this.desc = desc;
     }

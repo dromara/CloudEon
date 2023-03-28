@@ -1,7 +1,6 @@
 package com.data.udh.entity;
 
-import com.data.udh.utils.AlertLevel;
-import com.data.udh.utils.ServiceState;
+import com.data.udh.enums.ServiceState;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;

@@ -1,7 +1,6 @@
 package com.data.udh.entity;
 
-import com.data.udh.utils.CommandType;
-import com.data.udh.utils.ServiceState;
+import com.data.udh.enums.CommandType;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;

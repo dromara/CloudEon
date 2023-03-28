@@ -1,6 +1,6 @@
 package com.data.udh.entity;
 
-import com.data.udh.utils.ServiceState;
+import com.data.udh.enums.ServiceState;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

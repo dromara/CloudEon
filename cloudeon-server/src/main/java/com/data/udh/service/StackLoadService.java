@@ -16,7 +16,7 @@ import com.data.udh.entity.StackInfoEntity;
 import com.data.udh.entity.StackServiceConfEntity;
 import com.data.udh.entity.StackServiceEntity;
 import com.data.udh.entity.StackServiceRoleEntity;
-import com.data.udh.utils.ConfValueType;
+import com.data.udh.enums.ConfValueType;
 import com.data.udh.utils.ImageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

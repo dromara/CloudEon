@@ -1,6 +1,6 @@
 package com.data.udh.entity;
 
-import com.data.udh.utils.ServiceRoleState;
+import com.data.udh.enums.ServiceRoleState;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 

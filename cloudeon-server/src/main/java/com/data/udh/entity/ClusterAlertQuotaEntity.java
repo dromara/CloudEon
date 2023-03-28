@@ -1,7 +1,7 @@
 package com.data.udh.entity;
 
-import com.data.udh.utils.AlertLevel;
-import com.data.udh.utils.QuotaState;
+import com.data.udh.enums.AlertLevel;
+import com.data.udh.enums.QuotaState;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 

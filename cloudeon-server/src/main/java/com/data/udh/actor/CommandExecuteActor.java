@@ -11,7 +11,7 @@ import com.data.udh.entity.CommandEntity;
 import com.data.udh.entity.CommandTaskEntity;
 import com.data.udh.processor.BaseUdhTask;
 import com.data.udh.processor.TaskParam;
-import com.data.udh.utils.CommandState;
+import com.data.udh.enums.CommandState;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

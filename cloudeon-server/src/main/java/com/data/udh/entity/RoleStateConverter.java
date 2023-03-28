@@ -1,7 +1,6 @@
 package com.data.udh.entity;
 
-import com.data.udh.utils.ServiceRoleState;
-import com.data.udh.utils.ServiceState;
+import com.data.udh.enums.ServiceRoleState;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;

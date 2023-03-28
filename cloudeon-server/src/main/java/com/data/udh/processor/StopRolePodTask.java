@@ -6,7 +6,7 @@ import com.data.udh.dao.ServiceRoleInstanceRepository;
 import com.data.udh.dao.StackServiceRoleRepository;
 import com.data.udh.entity.ServiceRoleInstanceEntity;
 import com.data.udh.entity.StackServiceRoleEntity;
-import com.data.udh.utils.ServiceRoleState;
+import com.data.udh.enums.ServiceRoleState;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;

@@ -8,15 +8,12 @@ import com.data.udh.dao.StackServiceRoleRepository;
 import com.data.udh.entity.ServiceInstanceEntity;
 import com.data.udh.entity.ServiceRoleInstanceEntity;
 import com.data.udh.entity.StackServiceRoleEntity;
-import com.data.udh.utils.ServiceRoleState;
-import io.fabric8.kubernetes.api.model.Node;
+import com.data.udh.enums.ServiceRoleState;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import io.fabric8.kubernetes.client.dsl.RollableScalableResource;
 import lombok.NoArgsConstructor;
-
-import java.util.function.Function;
 
 @NoArgsConstructor
 public class ScaleUpK8sServiceTask extends BaseUdhTask {

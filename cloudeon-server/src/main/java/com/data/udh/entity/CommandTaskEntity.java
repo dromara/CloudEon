@@ -1,6 +1,6 @@
 package com.data.udh.entity;
 
-import com.data.udh.utils.CommandState;
+import com.data.udh.enums.CommandState;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 

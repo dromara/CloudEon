@@ -1,6 +1,6 @@
 package com.data.udh.entity;
 
-import com.data.udh.utils.AlertLevel;
+import com.data.udh.enums.AlertLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

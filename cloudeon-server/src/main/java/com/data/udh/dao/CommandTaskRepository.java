@@ -1,7 +1,7 @@
 package com.data.udh.dao;
 
 import com.data.udh.entity.CommandTaskEntity;
-import com.data.udh.utils.CommandState;
+import com.data.udh.enums.CommandState;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

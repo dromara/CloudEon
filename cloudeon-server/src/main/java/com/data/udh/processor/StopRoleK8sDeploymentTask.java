@@ -9,7 +9,7 @@ import com.data.udh.entity.ServiceInstanceEntity;
 import com.data.udh.entity.ServiceRoleInstanceEntity;
 import com.data.udh.entity.StackServiceRoleEntity;
 import com.data.udh.utils.Constant;
-import com.data.udh.utils.ServiceRoleState;
+import com.data.udh.enums.ServiceRoleState;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import lombok.NoArgsConstructor;
