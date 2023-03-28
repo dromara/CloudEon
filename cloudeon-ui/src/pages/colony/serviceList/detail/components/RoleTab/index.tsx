@@ -87,6 +87,7 @@ const roleTab:React.FC<{ serviceId: any}> = ({serviceId}) => {
                 1: { text: '角色启动中', status: 'Processing' },
                 2: { text: '角色已启动', status: 'Success' },
                 3: { text: '角色已停止', status: 'Error' },
+                4: { text: '角色停止中', status: 'Error' },
                 // error: { text: '异常', status: 'Error' },
             },
         },
