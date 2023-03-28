@@ -2,11 +2,15 @@ package com.data.udh.enums;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
+/**
+ * 角色实例状态
+ */
 public enum ServiceRoleState {
     INIT_ROLE(0,"新增角色部署中"),
     STARTING_ROLE(1,"角色启动中"),
     ROLE_STARTED(2,"角色已启动"),
-    ROLE_STOPPED(3,"角色已停止");
+    ROLE_STOPPED(3,"角色已停止"),
+    STOPPING_ROLE(4,"角色停止中");
 
     private int value;
 

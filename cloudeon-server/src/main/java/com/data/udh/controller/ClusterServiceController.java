@@ -617,6 +617,10 @@ public class ClusterServiceController {
         ServiceRoleInstanceEntity roleInstanceEntity = roleInstanceRepository.findById(roleInstanceId).get();
         ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(roleInstanceEntity.getServiceInstanceId()).get();
 
+        // 更新角色实例状态
+        roleInstanceEntity.setServiceRoleState(ServiceRoleState.STOPPING_ROLE);
+        roleInstanceRepository.save(roleInstanceEntity);
+
         //  生成停止角色command
         List<ServiceInstanceEntity> serviceInstanceEntities = Lists.newArrayList(serviceInstanceEntity);
         Integer commandId = buildRoleCommand(serviceInstanceEntities, Lists.newArrayList(roleInstanceEntity),
@@ -632,7 +636,9 @@ public class ClusterServiceController {
 
         ServiceRoleInstanceEntity roleInstanceEntity = roleInstanceRepository.findById(roleInstanceId).get();
         ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(roleInstanceEntity.getServiceInstanceId()).get();
-
+        // 更新角色实例状态
+        roleInstanceEntity.setServiceRoleState(ServiceRoleState.STARTING_ROLE);
+        roleInstanceRepository.save(roleInstanceEntity);
         //  生成启动角色command
         List<ServiceInstanceEntity> serviceInstanceEntities = Lists.newArrayList(serviceInstanceEntity);
         Integer commandId = buildRoleCommand(serviceInstanceEntities, Lists.newArrayList(roleInstanceEntity),
