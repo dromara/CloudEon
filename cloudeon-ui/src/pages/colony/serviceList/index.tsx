@@ -6,6 +6,8 @@ import { PlayCircleOutlined, ReloadOutlined, PoweroffOutlined, DeleteOutlined } 
 import { serviceListAPI, deleteServiceAPI, restartServiceAPI, stopServiceAPI, startServiceAPI } from '@/services/ant-design-pro/colony';
 import { useState, useEffect } from 'react';
 import { dealResult } from '../../../utils/resultUtil'
+import styles from './index.less'
+import { statusColor,serviceStatusColor } from '@/utils/colonyColor'
 
 const { Meta } = Card;
 
@@ -97,7 +99,7 @@ const serviceList: React.FC = () => {
       }}
     >
       <Spin tip="Loading" size="small" spinning={loading}>
-      <Space>
+      <Space className={styles.serviceList}>
         {
           (serviceList && serviceList.length > 0) ? (
             serviceList.map(sItem=>{
@@ -142,8 +144,14 @@ const serviceList: React.FC = () => {
                       }}>
                         <Meta
                           avatar={<Avatar style={{width:'40px', height:'40px'}} src={'data:image/jpeg;base64,'+sItem.icon} />}
-                          title={sItem.serviceName}
-                          description={sItem.serviceStateValue}
+                          title={<div style={{paddingLeft:'2px'}}>{sItem.serviceName}</div>}
+                          description={<div style={{paddingLeft:'2px'}}>
+                          <span style={{backgroundColor: serviceStatusColor[sItem.serviceStateValue || 0]}} 
+                          //  
+                                className={`${styles.statusCircel} ${[1,2,3,4,5,8].includes(sItem.serviceStateValue) && styles.statusProcessing}`}>
+                            </span>
+                          {sItem.serviceState}
+                          </div>}
                         />
                     </div>
                   </Card>
