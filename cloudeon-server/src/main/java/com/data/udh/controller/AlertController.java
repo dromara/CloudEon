@@ -2,6 +2,7 @@ package com.data.udh.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.data.udh.controller.response.ActiveAlertVO;
+import com.data.udh.controller.response.HistoryAlertVO;
 import com.data.udh.dao.AlertMessageRepository;
 import com.data.udh.dao.ClusterNodeRepository;
 import com.data.udh.dao.ServiceInstanceRepository;
@@ -143,6 +144,34 @@ public class AlertController {
         }).collect(Collectors.toList());
 
         return ResultDTO.success(activeAlertVOS) ;
+    }
+
+    @GetMapping("/history")
+    public ResultDTO<List<HistoryAlertVO>> getHistoryMessage() {
+        List<HistoryAlertVO> historyAlertVOS = alertMessageRepository.findByIsResolve(true).stream().map(new Function<AlertMessageEntity, HistoryAlertVO>() {
+            @Override
+            public HistoryAlertVO apply(AlertMessageEntity alertMessageEntity) {
+                Integer serviceInstanceId = alertMessageEntity.getServiceInstanceId();
+                Integer roleInstanceId = alertMessageEntity.getServiceRoleInstanceId();
+
+                String serviceLabel = serviceInstanceRepository.findById(serviceInstanceId).get().getLabel();
+                String roleInstanceLabel = roleInstanceRepository.getRoleInstanceLabel(roleInstanceId);
+
+                return HistoryAlertVO.builder()
+                        .alertId(alertMessageEntity.getId())
+                        .alertLevelMsg(alertMessageEntity.getAlertLevel().getDesc())
+                        .alertName(alertMessageEntity.getAlertName())
+                        .createTime(alertMessageEntity.getCreateTime())
+                        .serviceInstanceName(serviceLabel)
+                        .serviceRoleLabel(roleInstanceLabel)
+                        .serviceInstanceId(serviceInstanceId)
+                        .hostname(alertMessageEntity.getHostname())
+                        .serviceRoleInstanceId(roleInstanceId)
+                        .build();
+            }
+        }).collect(Collectors.toList());
+
+        return ResultDTO.success(historyAlertVOS) ;
     }
 
 }
