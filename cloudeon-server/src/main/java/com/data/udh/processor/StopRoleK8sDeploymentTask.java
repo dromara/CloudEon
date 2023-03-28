@@ -46,22 +46,25 @@ public class StopRoleK8sDeploymentTask extends BaseUdhTask {
         String k8sResourceDirPath = workHome + File.separator + Constant.K8S_RESOURCE_DIR + File.separator + serviceInstanceEntity.getServiceName();
         String k8sServiceResourceFilePath = k8sResourceDirPath + File.separator + roleFullName + ".yaml";
 
-        log.info("在k8s上停止deployment ,使用本地资源文件: {}", k8sServiceResourceFilePath);
-        try (KubernetesClient client = new KubernetesClientBuilder().build();) {
-            client.load(new FileInputStream(k8sServiceResourceFilePath))
-                    .inNamespace("default")
-                    .delete();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
+        // 判断k8s资源文件是否存在
+        if (new File(k8sServiceResourceFilePath).exists()) {
+            log.info("在k8s上停止deployment ,使用本地资源文件: {}", k8sServiceResourceFilePath);
+            try (KubernetesClient client = new KubernetesClientBuilder().build();) {
+                client.load(new FileInputStream(k8sServiceResourceFilePath))
+                        .inNamespace("default")
+                        .delete();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+
+            // 更新角色实例状态为已停止
+            List<ServiceRoleInstanceEntity> roleInstanceEntities = serviceRoleInstanceRepository.findByServiceInstanceIdAndServiceRoleName(serviceInstanceId, stackServiceRoleEntity.getName());
+            roleInstanceEntities.forEach(r->{
+                r.setServiceRoleState(ServiceRoleState.ROLE_STOPPED);
+                serviceRoleInstanceRepository.save(r);
+            });
+
         }
-
-        // 更新角色实例状态为已停止
-        List<ServiceRoleInstanceEntity> roleInstanceEntities = serviceRoleInstanceRepository.findByServiceInstanceIdAndServiceRoleName(serviceInstanceId, stackServiceRoleEntity.getName());
-        roleInstanceEntities.forEach(r->{
-            r.setServiceRoleState(ServiceRoleState.ROLE_STOPPED);
-            serviceRoleInstanceRepository.save(r);
-        });
-
     }
 }
