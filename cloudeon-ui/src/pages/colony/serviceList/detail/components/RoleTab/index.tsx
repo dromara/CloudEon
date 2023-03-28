@@ -1,7 +1,7 @@
 import type { ProColumns } from '@ant-design/pro-components';
-import { ProTable, TableDropdown } from '@ant-design/pro-components';
+import { ProTable, ActionType, TableDropdown } from '@ant-design/pro-components';
 import { Spin, Button, Popconfirm, message } from 'antd';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import styles from './index.less'
 import { startRoleAPI, stopRoleAPI, getServiceRolesAPI } from '@/services/ant-design-pro/colony';
 
@@ -12,6 +12,7 @@ const roleTab:React.FC<{ serviceId: any}> = ({serviceId}) => {
     const [currentType, setCurrentType] = useState('');
     const [apiLoading, setApiLoading] = useState(false);
     const [rolesInfo, setRolesInfo] = useState<API.rolesInfos[]>();
+    // const actionRef = useRef<ActionType>();
 
 
     // 获取角色数据
@@ -30,13 +31,13 @@ const roleTab:React.FC<{ serviceId: any}> = ({serviceId}) => {
   },[])
 
 
-    const confirm = async(type:string, id:number)=>{
+    const handleConfirm = (type:string, id:number)=>{
         const params = { roleInstanceId: id}
         setCurrentId(id)
         setCurrentType(type)
         switch(type){
-            case 'start': await startRole(params);break;
-            case 'stop': await stopRole(params);break;
+            case 'start':  startRole(params);break;
+            case 'stop':  stopRole(params);break;
             default: break;
         }
         setCurrentId(0)
@@ -72,32 +73,35 @@ const roleTab:React.FC<{ serviceId: any}> = ({serviceId}) => {
             title: '名称',
             key:'name',
             dataIndex: 'name',
+            // width: 180,
             // render: (_) => <a>{_}</a>,
         },
         {
             title: '状态',
-            key:'roleStatus',
-            dataIndex: 'roleStatus',
-            initialValue: 'all',
+            key:'roleStatusValue',
+            dataIndex: 'roleStatusValue',
+            initialValue: 0,
+            // width: 200,
             valueEnum: {
-                all: { text: '全部', status: 'Default' },
-                close: { text: '关闭', status: 'Default' },
-                running: { text: '运行中', status: 'OPERATING' },
-                online: { text: '已上线', status: 'Success' },
-                error: { text: '异常', status: 'Error' },
+                0: { text: '新增角色部署中', status: 'Processing' },
+                1: { text: '角色启动中', status: 'Processing' },
+                2: { text: '角色已启动', status: 'Success' },
+                3: { text: '角色已停止', status: 'Error' },
+                // error: { text: '异常', status: 'Error' },
             },
         },
         {
             title: '主机名称',
             key:'nodeHostname',
             dataIndex: 'nodeHostname',
-            align: 'left'
+            // width: 200,
+            // align: 'left'
         },
         {
             title: '主机ip',
             key:'nodeHostIp',
             dataIndex: 'nodeHostIp',
-            align: 'left'
+            // align: 'left'
         },
         // {
         //     title: 'ui地址',
@@ -146,19 +150,19 @@ const roleTab:React.FC<{ serviceId: any}> = ({serviceId}) => {
             render: (_, record) => [
                 <Popconfirm
                     title="确定要启动吗?"
-                    onConfirm={()=>confirm('start',record?.id || 0)}
+                    onConfirm={()=>handleConfirm('start',record?.id || 0)}
                     okText="确定"
                     cancelText="取消"
                 >
-                    <Button className={styles.roleBtn} type="link" loading={currentType=='start' && currentId == record.id} disabled={confirmLoading}>启动</Button>
+                    <Button className={styles.roleBtn} loading={currentType=='start' && currentId == record.id} type="link" >启动</Button>
               </Popconfirm>,
               <Popconfirm
                     title="确定要停止吗?"
-                    onConfirm={()=>confirm('stop',record?.id || 0)}
+                    onConfirm={()=>handleConfirm('stop',record?.id || 0)}
                     okText="确定"
                     cancelText="取消"
                 >
-                    <Button className={styles.roleBtn} type="link" loading={currentType=='stop' && currentId == record.id} disabled={confirmLoading}>停止</Button>
+                    <Button className={styles.roleBtn} loading={currentType=='stop' && currentId == record.id} type="link" >停止</Button>
                 </Popconfirm>,
                 // <a key="link">启动</a>,
                 // <a key="link2">停止</a>,
@@ -180,7 +184,7 @@ const roleTab:React.FC<{ serviceId: any}> = ({serviceId}) => {
             title={<a>Tooltip will show on mouse enter.</a>}>
                 <a>Tooltip will show on mouse enter.</a>
             </Tooltip> */}
-            <Spin tip="Loading" size="small" spinning={!!apiLoading}>
+            <Spin tip="Loading" size="small" spinning={!!apiLoading || !!confirmLoading}>
                 <ProTable
                     dataSource={rolesInfo}
                     rowKey="id"
@@ -189,6 +193,10 @@ const roleTab:React.FC<{ serviceId: any}> = ({serviceId}) => {
                     }}
                     columns={columns}
                     search={false}
+                    request={async (params = {}, sort, filter) => {
+                        // console.log(sort, filter);
+                        return getServiceRolesAPI({serviceInstanceId: serviceId})
+                      }}
                 />
             </Spin>
         </div>

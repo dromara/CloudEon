@@ -11,7 +11,7 @@ const nodeList: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [nodeListData, setNodeListData] = useState<any[]>();
   const [loading, setLoading] = useState(false);
-  const [k8sLiatloading, setK8sListLoading] = useState(false);
+  const [k8sListloading, setK8sListLoading] = useState(false);
   const [form] = Form.useForm();
   const [ipList, setIpList] = useState<any[]>()
 
@@ -179,11 +179,11 @@ const nodeList: React.FC = () => {
         destroyOnClose={true}
         open={isModalOpen}
         onOk={handleOk}
-        confirmLoading={loading || k8sLiatloading}
+        confirmLoading={loading || k8sListloading}
         onCancel={handleCancel}
         // footer={null}
       >
-        <Spin spinning={k8sLiatloading}>
+        <Spin spinning={k8sListloading}>
           <Form
             form={form}
             key="addnodeform"

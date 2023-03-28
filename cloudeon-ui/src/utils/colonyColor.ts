@@ -12,7 +12,19 @@ const trailColor = {
     'DEFAULT': '#f5222d',
 }
 
+const serviceStatusColor = {
+    1: '#1677ff',//蓝色
+    2: '#1677ff',
+    3: '#1677ff',
+    4: '#1677ff',
+    5: '#1677ff',
+    6: '#52c41a',// 绿色
+    7: '#ff4d4f',// 红色
+    8: '#1677ff'
+}
+
 export {
     statusColor,
-    trailColor
+    trailColor,
+    serviceStatusColor
 } 

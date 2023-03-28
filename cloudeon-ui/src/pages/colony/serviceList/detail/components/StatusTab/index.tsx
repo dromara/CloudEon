@@ -1,8 +1,7 @@
 import { ProDescriptions } from '@ant-design/pro-components';
 import { Image, Spin } from 'antd';
 import styles from './index.less'
-import example from '../../../../../../assets/images/1.png';
-import { statusColor } from '../../../../../../utils/colonyColor'
+import { statusColor,serviceStatusColor } from '@/utils/colonyColor'// '../../../../../../utils/colonyColor'
 
 const statusTab:React.FC<{statusInfo: API.serviceInfos, dashboardUrl:string, loading: boolean}> = ({statusInfo,dashboardUrl, loading}) => {
     
@@ -12,20 +11,20 @@ const statusTab:React.FC<{statusInfo: API.serviceInfos, dashboardUrl:string, loa
             <div className={styles.statusBar}>
                 <div className={styles.leftBox}>
                     <div>
-                        <div>版本：</div>
-                        <div>{statusInfo.version}</div>
-                    </div>
-                    <div>
-                        <div>dockerImage：</div>
-                        <div>{statusInfo.dockerImage}</div>
-                    </div>
-                    <div>
                         <div>服务实例名：</div>
                         <div>{statusInfo.name}</div>
                     </div>
                     <div>
                         <div>框架服务名：</div>
                         <div>{statusInfo.stackServiceName}</div>
+                    </div>
+                    <div>
+                        <div>版本：</div>
+                        <div>{statusInfo.version}</div>
+                    </div>
+                    <div>
+                        <div>dockerImage：</div>
+                        <div>{statusInfo.dockerImage}</div>
                     </div>
                     <div>
                         <div>服务描述：</div>
@@ -36,10 +35,10 @@ const statusTab:React.FC<{statusInfo: API.serviceInfos, dashboardUrl:string, loa
                     <div style={{whiteSpace: 'nowrap'}}> 
                         <div>服务状态：</div>
                         <div className={styles.statusTitle}>
-                            <span style={{backgroundColor: statusColor['SUCCESS']}} 
+                            <span style={{backgroundColor: serviceStatusColor[statusInfo.serviceStateValue || 0]}} 
                                 className={styles.statusCircel}>
                             </span>
-                            健康
+                            {statusInfo.serviceState}
                         </div>
                     </div>
                 </div>

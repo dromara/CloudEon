@@ -12,19 +12,24 @@
         display: flex;
         flex-direction: row;
         .leftBox{
+            display: flex;
+            flex-wrap: wrap;
+            flex-direction: row;
+            flex: 1;
             >div{
                 // // margin-right: 20px;
-                // width: 50%;
+                width: 50%;
+                line-height: 25px;
                 // width: 600px;
                 display: flex;
                 flex-direction: row;
                 // align-items: center;
                 div:first-child{ // :first-child
-                    width: 100px;
+                    // width: 100px;
                     display: flex;
                     flex-wrap: wrap;
                     flex-shrink: 0;
-                    justify-content: flex-end;
+                    // justify-content: flex-end;
                     // display: inline-block;
                     // text-align: justify;
                     // text-justify:distribute-all-lines; // 这行必加，兼容ie浏览器
@@ -34,33 +39,40 @@
                     // min-width: 300px;
                     padding: 0 10px 0 0;
                     display: flex;
-                    // flex-wrap: wrap;
+                    flex-wrap: wrap;
+                    white-space: pre-wrap;
                     justify-content: flex-start;
                 }
             }
-            display: flex;
-            flex-wrap: wrap;
-            flex-direction: column;
-            flex: 1;
 
         }
         .rightBox{
-            width: 100px;
+            min-width: 100px;
+            max-width: 300px;
+            display: flex;
+            flex-wrap: wrap;
+            flex-direction: row;
             .statusTitle{
                 font-size: 20px;
                 font-weight: 500;
                 display: flex;
                 justify-content: flex-start;
                 align-items: center;
+                flex-direction: row;
+                // flex-wrap: wrap;
+                word-break: break-all;
+                white-space: pre-wrap;
+
+                .statusCircel{
+                    display: inline-block;
+                    height: 10px;
+                    width: 10px;
+                    border-radius: 10px;
+                    margin-right: 5px;
+                    flex-shrink: 0;
+                }
             }
         }
-    }
-    .statusCircel{
-        display: inline-block;
-        height: 10px;
-        width: 10px;
-        border-radius: 10px;
-        margin-right: 5px;
     }
     .dashboardWrap{
         border-top: 1px solid rgb(233, 233, 233);
