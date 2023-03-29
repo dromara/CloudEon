@@ -679,8 +679,11 @@ public class ClusterServiceController {
             serviceInstanceVO.setServiceStateValue(serviceState.getValue());
             serviceInstanceVO.setServiceState(serviceState.getDesc());
             // 查询相关告警数量
-            int alertMsgCnt = alertMessageRepository.findByServiceInstanceIdAndResolved(instanceEntity.getId(), false).size();
-            serviceInstanceVO.setAlertMsgCnt(alertMsgCnt);
+            List<String> alertNames = alertMessageRepository.findByServiceInstanceIdAndResolved(instanceEntity.getId(), false)
+                    .stream().map(AlertMessageEntity::getAlertName).collect(Collectors.toList());
+
+            serviceInstanceVO.setAlertMsgCnt(alertNames.size());
+            serviceInstanceVO.setAlertMsgName(alertNames);
 
             // 查询icon
             StackServiceEntity stackServiceEntity = stackServiceRepository.findById(instanceEntity.getStackServiceId()).get();
@@ -771,14 +774,16 @@ public class ClusterServiceController {
                 StackServiceRoleEntity stackServiceRoleEntity = stackServiceRoleRepository.findById(roleInstanceEntity.getStackServiceRoleId()).get();
                 ServiceRoleState serviceRoleState = roleInstanceEntity.getServiceRoleState();
                 // 查询角色实例相关告警
-                List<AlertMessageEntity> alertMessageEntities = alertMessageRepository.findByServiceRoleInstanceIdAndResolved(roleInstanceEntity.getId(), false);
+                List<String> alertNames = alertMessageRepository.findByServiceRoleInstanceIdAndResolved(roleInstanceEntity.getId(), false)
+                        .stream().map(AlertMessageEntity::getAlertName).collect(Collectors.toList());
                 ServiceInstanceRoleVO serviceInstanceRoleVO = ServiceInstanceRoleVO.builder()
                         .roleStatus(serviceRoleState.getDesc())
                         .roleStatusValue(serviceRoleState.getValue())
                         .id(roleInstanceEntity.getId())
                         .nodeHostIp(nodeEntity.getIp())
                         .nodeHostname(nodeEntity.getHostname())
-                        .alertMsgCnt(alertMessageEntities.size())
+                        .alertMsgCnt(alertNames.size())
+                        .alertMsgName(alertNames)
                         .nodeId(nodeEntity.getId())
                         // 用 stackServiceRoleEntity label更清晰 （如：Doris Be）
                         .name(stackServiceRoleEntity.getLabel())

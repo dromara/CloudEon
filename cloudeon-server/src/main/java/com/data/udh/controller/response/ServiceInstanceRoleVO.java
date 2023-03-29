@@ -28,4 +28,5 @@ public class ServiceInstanceRoleVO {
     private String nodeHostIp;
     private List<String> uiUrls;
     private Integer alertMsgCnt;
+    private List<String> alertMsgName;
 }

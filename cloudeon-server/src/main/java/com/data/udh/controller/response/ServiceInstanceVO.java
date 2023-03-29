@@ -2,6 +2,8 @@ package com.data.udh.controller.response;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class ServiceInstanceVO {
     private String serviceName;
@@ -10,4 +12,6 @@ public class ServiceInstanceVO {
     private Integer serviceStateValue;
     private String icon;
     private Integer alertMsgCnt;
+    private List<String> alertMsgName;
+
 }
