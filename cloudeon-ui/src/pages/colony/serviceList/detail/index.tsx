@@ -66,7 +66,7 @@ const serviceListDetail: React.FC = () => {
     const result = await getDashboardUrlAPI(params)
     setApiLoading(false)
     if(result?.success){
-      setDashboardUrl(result?.data)
+       result?.data && setDashboardUrl(result.data)
     }
   }
 

@@ -1,8 +1,8 @@
 // 集群管理页面
 import { PageContainer, ProCard } from '@ant-design/pro-components';
-import { Space, Button, Avatar, Card, Spin, Popconfirm, message,Popover } from 'antd';
+import { Space, Button, Avatar, Card, Spin, Popconfirm, message,Popover,Tooltip } from 'antd';
 import { FormattedMessage, useIntl, history } from 'umi';
-import { PlayCircleOutlined, ReloadOutlined, PoweroffOutlined, DeleteOutlined } from '@ant-design/icons';
+import { PlayCircleOutlined, ReloadOutlined, PoweroffOutlined, DeleteOutlined, AlertFilled } from '@ant-design/icons';
 import { serviceListAPI, deleteServiceAPI, restartServiceAPI, stopServiceAPI, startServiceAPI } from '@/services/ant-design-pro/colony';
 import { useState, useEffect } from 'react';
 import { dealResult } from '../../../utils/resultUtil'
@@ -137,6 +137,25 @@ const serviceList: React.FC = () => {
                       // <EllipsisOutlined key="ellipsis" />,
                     ]}
                   >
+                    {
+                      sItem.alertMsgCnt ? 
+                      <div className={styles.alertWrap}>
+                        <Tooltip 
+                          placement="top" 
+                          color="#fff"
+                          title={
+                            <div className={styles.alertText}>
+                              {`该服务当前有${sItem.alertMsgCnt}个告警：`}
+                              {sItem.alertMsgName.map((msg:any,index:any)=>{
+                                return <div key={index}>{`${index+1}. ${msg}`}</div>
+                              })}
+                            </div>
+                          }
+                        >
+                          <AlertFilled style={{fontSize:'18px'}} />
+                        </Tooltip>                      
+                      </div> :''
+                    }
                     <div 
                       style={{cursor:'pointer'}}
                       onClick={() => {
@@ -147,7 +166,6 @@ const serviceList: React.FC = () => {
                           title={<div style={{paddingLeft:'2px'}}>{sItem.serviceName}</div>}
                           description={<div style={{paddingLeft:'2px'}}>
                           <span style={{backgroundColor: serviceStatusColor[sItem.serviceStateValue || 0]}} 
-                          //  
                                 className={`${styles.statusCircel} ${[1,2,3,4,5,8].includes(sItem.serviceStateValue) && styles.statusProcessing}`}>
                             </span>
                           {sItem.serviceState}

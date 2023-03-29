@@ -1,6 +1,7 @@
 import { ProDescriptions } from '@ant-design/pro-components';
 import { Image, Spin } from 'antd';
 import styles from './index.less'
+import emptyImg from '@/assets/images/empty.png'
 import { statusColor,serviceStatusColor } from '@/utils/colonyColor'// '../../../../../../utils/colonyColor'
 
 const statusTab:React.FC<{statusInfo: API.serviceInfos, dashboardUrl:string, loading: boolean}> = ({statusInfo,dashboardUrl, loading}) => {
@@ -23,7 +24,7 @@ const statusTab:React.FC<{statusInfo: API.serviceInfos, dashboardUrl:string, loa
                         <div>{statusInfo.version}</div>
                     </div>
                     <div>
-                        <div>dockerImage：</div>
+                        <div>镜像名：</div>
                         <div>{statusInfo.dockerImage}</div>
                     </div>
                     <div>
@@ -44,7 +45,19 @@ const statusTab:React.FC<{statusInfo: API.serviceInfos, dashboardUrl:string, loa
                 </div>
             </div>
             <div className={styles.dashboardWrap}>
-                <iframe style={{border:0, width:'100%',height:'100%'}} src={dashboardUrl} ></iframe>
+                {dashboardUrl?.includes('http')
+                    ?<iframe style={{border:0, width:'100%',height:'100%'}} src={dashboardUrl} ></iframe>
+                    :
+                    <div className={styles.emptyWrap}>
+                        <Image
+                            width={70}
+                            preview={false}
+                            src={emptyImg}
+                        />
+                        <div style={{width: '100%',marginTop:'20px', display:'flex',justifyContent:'center',alignItems:'center'}}>{dashboardUrl}</div>
+                    </div>
+                }
+                
             </div>
             </Spin>
         </div>

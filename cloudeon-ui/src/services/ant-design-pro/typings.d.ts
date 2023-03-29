@@ -329,6 +329,8 @@ declare namespace API {
   }
 
   type rolesInfos = {
+    alertMsgName?: any;
+    alertMsgCnt?: any;
     name?: string,
     id?: number,
     roleStatus?: string,
@@ -379,6 +381,26 @@ declare namespace API {
     success?: boolean;
     message?: string;
     data?: webUrlsItem[];
+  }
+
+  type alertItem = {
+    alertName?: string,
+    alertId?: number,
+    createTime?: string,
+    alertLevelMsg?: string,
+    serviceInstanceId?: number,
+    serviceRoleInstanceId?: number,
+    serviceInstanceName?: string,
+    serviceRoleLabel?: string,
+    hostname?: string,
+    info?: string,
+    advice?: string
+  }
+
+  type alertListResult = {
+    success?: boolean;
+    message?: string;
+    data?: alertItem[];
   }
 
 }

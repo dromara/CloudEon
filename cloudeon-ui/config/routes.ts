@@ -35,14 +35,14 @@ export default [
   },
   {
     name: 'nodelist',
-    icon: 'DeploymentUnitOutlined',
+    icon: 'RobotOutlined',
     path: '/colony/nodeList',
     component: './colony/nodeList',
     footerRender: false, // 不展示页脚
   },
   {
     name: 'servicelist',
-    icon: 'ControlOutlined',
+    icon: 'CloudServerOutlined',
     path: '/colony/serviceList',
     component: './colony/serviceList',
     footerRender: false, // 不展示页脚
@@ -65,7 +65,7 @@ export default [
   },
   {
     name: 'actionlist',
-    icon: 'CoffeeOutlined',
+    icon: 'AimOutlined',
     path: '/colony/actionList',
     component: './colony/actionList',
   },
@@ -75,6 +75,13 @@ export default [
     hideInMenu: true,
     path: '/colony/actionList/detail',
     component: './colony/actionList/detail',
+  },
+  {
+    name: 'alertlist',
+    icon: 'AlertOutlined',
+    path: '/colony/alertList',
+    component: './colony/alertList',
+    footerRender: false, // 不展示页脚
   },
   {
     path: '/user',
