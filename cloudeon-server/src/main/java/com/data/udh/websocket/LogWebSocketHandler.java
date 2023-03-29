@@ -85,17 +85,19 @@ public class LogWebSocketHandler extends TextWebSocketHandler implements WebSock
         String payload = message.getPayload();
         log.info("WebSocketServer收到客户端" + session.getId() + "的消息：" + payload);
         if (StrUtil.isNotBlank(payload) && payload.startsWith("##roleId:")) {
+            // 提取角色实例id
+            String roleIdStr = payload.split(":")[1];
+            Integer roleId = Integer.valueOf(roleIdStr);
             // 根据角色实例id建立ssh连接
             Session sshSession = null;
             try {
-                sshSession = buildSshSessionByRoleInstanceId(82);
+                sshSession = buildSshSessionByRoleInstanceId(roleId);
                 //缓存当前已经创建的连接
                 WsSessionBean wsSessionBean = new WsSessionBean();
                 wsSessionBean.setWebSocketSession(session);
                 wsSessionBean.setSshSession(sshSession);
                 livingSessionMap.put(session.getId(), wsSessionBean);
-                String roleIdStr = payload.split(":")[1];
-                Integer roleId = Integer.valueOf(roleIdStr);
+
                 //WebSocket的前后端建立连接成功，立即调用日志推动逻辑，将数据推送给客户端
                 logService.sendLog2BrowserClient(wsSessionBean, roleId);
             } catch (Exception e) {

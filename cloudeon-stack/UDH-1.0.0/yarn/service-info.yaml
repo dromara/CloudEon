@@ -29,6 +29,7 @@ roles:
     type: MASTER
     jmxPort: 9232
     minNum: 2
+    logFile: "hadoop-hadoop-resourcemanager-${localhostname}.log"
 
   - name: YARN_NODEMANAGER
     label: "Node Manager"
@@ -38,6 +39,7 @@ roles:
     type: SLAVE
     jmxPort: 9232
     minNum: 1
+    logFile: "hadoop-hadoop-nodemanager-${localhostname}.log"
 
   - name: YARN_HISTORYSERVER
     label: "History Server"
@@ -47,6 +49,7 @@ roles:
     type: MASTER
     jmxPort: 9232
     minNum: 1
+    logFile: "hadoop-yarn-historyserver-${localhostname}.log"
 
   - name: YARN_TIMELINESERVER
     label: "Timeline Server"
@@ -56,7 +59,7 @@ roles:
     type: MASTER
     jmxPort: 9232
     minNum: 1
-
+    logFile: "hadoop-hadoop-timelineserver-${localhostname}.log"
 
 
 
