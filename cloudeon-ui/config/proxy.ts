@@ -18,7 +18,7 @@ export default {
     },
     '/apiPre/': {
       // 要代理的地址
-      target: 'http://335d50d8.r9.cpolar.top', // http://192.168.31.30:7700
+      target: 'http://localhost:7700', // http://192.168.31.30:7700
       changeOrigin: true,
       pathRewrite: { '^/apiPre' : '' },
     }

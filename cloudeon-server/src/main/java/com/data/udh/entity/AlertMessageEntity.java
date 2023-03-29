@@ -45,7 +45,7 @@ public class AlertMessageEntity implements Serializable {
     private Integer nodeId;
     @Convert(converter = AlertLevelConverter.class)
     private AlertLevel alertLevel;
-    private boolean isResolved;
+    private boolean resolved;
     private Integer serviceRoleInstanceId;
     private Integer serviceInstanceId;
     private String fireTime;

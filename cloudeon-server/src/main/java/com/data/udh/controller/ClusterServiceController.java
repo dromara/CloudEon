@@ -59,6 +59,8 @@ public class ClusterServiceController {
     @Value("${udh.task.log}")
     private String taskLogPath;
 
+    @Resource
+    private AlertMessageRepository alertMessageRepository;
 
     @Resource
     private ServiceInstanceRepository serviceInstanceRepository;
@@ -676,6 +678,9 @@ public class ClusterServiceController {
             ServiceState serviceState = instanceEntity.getServiceState();
             serviceInstanceVO.setServiceStateValue(serviceState.getValue());
             serviceInstanceVO.setServiceState(serviceState.getDesc());
+            // 查询相关告警数量
+            int alertMsgCnt = alertMessageRepository.findByServiceInstanceIdAndResolved(instanceEntity.getId(), false).size();
+            serviceInstanceVO.setAlertMsgCnt(alertMsgCnt);
 
             // 查询icon
             StackServiceEntity stackServiceEntity = stackServiceRepository.findById(instanceEntity.getStackServiceId()).get();
@@ -765,12 +770,15 @@ public class ClusterServiceController {
                 ServiceRoleInstanceWebuisEntity webuisEntity = roleInstanceWebuisRepository.findByServiceRoleInstanceId(roleInstanceEntity.getId());
                 StackServiceRoleEntity stackServiceRoleEntity = stackServiceRoleRepository.findById(roleInstanceEntity.getStackServiceRoleId()).get();
                 ServiceRoleState serviceRoleState = roleInstanceEntity.getServiceRoleState();
+                // 查询角色实例相关告警
+                List<AlertMessageEntity> alertMessageEntities = alertMessageRepository.findByServiceRoleInstanceIdAndResolved(roleInstanceEntity.getId(), false);
                 ServiceInstanceRoleVO serviceInstanceRoleVO = ServiceInstanceRoleVO.builder()
                         .roleStatus(serviceRoleState.getDesc())
                         .roleStatusValue(serviceRoleState.getValue())
                         .id(roleInstanceEntity.getId())
                         .nodeHostIp(nodeEntity.getIp())
                         .nodeHostname(nodeEntity.getHostname())
+                        .alertMsgCnt(alertMessageEntities.size())
                         .nodeId(nodeEntity.getId())
                         // 用 stackServiceRoleEntity label更清晰 （如：Doris Be）
                         .name(stackServiceRoleEntity.getLabel())

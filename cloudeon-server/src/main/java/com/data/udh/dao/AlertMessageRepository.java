@@ -11,6 +11,9 @@ import java.util.List;
 public interface AlertMessageRepository extends JpaRepository<AlertMessageEntity, Integer> {
     AlertMessageEntity findByFireTimeAndAlertName(String fireTime, String alertName);
 
-    @Query(value = "select a  from AlertMessageEntity a  where  a.isResolved =:resolved")
+    @Query(value = "select a  from AlertMessageEntity a  where  a.resolved =:resolved")
     List<AlertMessageEntity> findByIsResolve(@Param("resolved")Boolean resolved);
+
+    List<AlertMessageEntity> findByServiceInstanceIdAndResolved(Integer serviceInstanceId, boolean resolved);
+    List<AlertMessageEntity> findByServiceRoleInstanceIdAndResolved(Integer roleInstanceId, boolean resolved);
 }

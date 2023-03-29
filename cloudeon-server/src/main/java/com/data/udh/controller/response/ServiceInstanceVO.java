@@ -9,4 +9,5 @@ public class ServiceInstanceVO {
     private String serviceState;
     private Integer serviceStateValue;
     private String icon;
+    private Integer alertMsgCnt;
 }
