@@ -381,4 +381,24 @@ declare namespace API {
     data?: webUrlsItem[];
   }
 
+  type alertItem = {
+    alertName?: string,
+    alertId?: number,
+    createTime?: string,
+    alertLevelMsg?: string,
+    serviceInstanceId?: number,
+    serviceRoleInstanceId?: number,
+    serviceInstanceName?: string,
+    serviceRoleLabel?: string,
+    hostname?: string,
+    info?: string,
+    advice?: string
+  }
+
+  type alertListResult = {
+    success?: boolean;
+    message?: string;
+    data?: alertItem[];
+  }
+
 }

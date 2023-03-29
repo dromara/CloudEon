@@ -23,23 +23,25 @@ const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
 
 
-const menuIcons = {
-  '节点':'RobotOutlined',
-  '服务':'CloudServerOutlined',
-  '指令':'AimOutlined'
-}
-// antd4中动态创建icon
-const createIcon = (key: string) => {
-  // console.log('--key:', key);
+// const menuIcons = {
+//   '节点':'RobotOutlined',
+//   '服务':'CloudServerOutlined',
+//   '指令':'AimOutlined',
+//   '告警':'AlertOutlined'
+// }
+// // antd4中动态创建icon
+// const createIcon = (key: any) => {
+//   console.log('--key:', key);
   
-  const icon = React.createElement(
-    Icon[menuIcons[key]],
-    {
-      style:{ fontSize: '24px'}
-    }
-  )
-  return icon
-}
+//   const icon = React.createElement(
+//     // Icon[menuIcons[key]||'RobotOutlined'],
+//     key,
+//     {
+//       style:{ fontSize: '24px'}
+//     }
+//   )
+//   return icon
+// }
 
 
 // 接口请求全局配置
@@ -206,6 +208,8 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     collapsedButtonRender: false,
     menuFooterRender:()=><></>,
     menuItemRender: (itemProps: any, defaultDom: any, props: any) => {
+      // console.log('--itemProps: ',itemProps,props);
+      
       const getData = JSON.parse(sessionStorage.getItem('colonyData') || '{}')
       const { actionCount, setActionCount } = useModel('colonyModel', model => ({ actionCount: model.actionCount, setActionCount: model.setActionCountModel }));
       const getCount = async()=>{
@@ -231,7 +235,8 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
                 </div>
               </div>
               </>):''}
-              {createIcon(itemProps.name)}
+              {/* {createIcon(itemProps.icon)} */}
+              <div style={{fontSize: '24px'}}>{itemProps.icon}</div>
             </div>
             <div style={{lineHeight:'20px',fontSize:'12px'}}>{itemProps.name}</div>
       </div>

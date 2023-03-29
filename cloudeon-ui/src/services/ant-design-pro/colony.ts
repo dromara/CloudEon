@@ -300,3 +300,13 @@ export async function startRoleAPI(options?: { [key: string]: any }) {
   });
 }
 
+/** 获取告警列表 */
+export async function getAlertAPI(options?: { [key: string]: any }) {
+  return request<API.alertListResult>('/apiPre/alert/active', {
+    method: 'GET',
+    params: {
+      ...options,
+    },
+  });
+}
+

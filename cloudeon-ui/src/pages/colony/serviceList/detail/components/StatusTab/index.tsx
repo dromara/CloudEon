@@ -44,7 +44,12 @@ const statusTab:React.FC<{statusInfo: API.serviceInfos, dashboardUrl:string, loa
                 </div>
             </div>
             <div className={styles.dashboardWrap}>
-                <iframe style={{border:0, width:'100%',height:'100%'}} src={dashboardUrl} ></iframe>
+                {dashboardUrl.includes('http')
+                    ?<iframe style={{border:0, width:'100%',height:'100%'}} src={dashboardUrl} ></iframe>
+                    :
+                    <div style={{width: '100%',height:'300px',display:'flex',justifyContent:'center',alignItems:'center'}}>{dashboardUrl}</div>
+                }
+                
             </div>
             </Spin>
         </div>

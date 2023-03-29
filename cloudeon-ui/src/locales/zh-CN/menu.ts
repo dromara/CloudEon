@@ -6,6 +6,7 @@ export default {
   'menu.serviceListDetail': '服务详情',
   'menu.actionlist': '指令',
   'menu.actionDetail':'指令详情',
+  'menu.alertlist': '告警',
   'menu.welcome': '欢迎',
   'menu.more-blocks': '更多区块',
   'menu.home': '首页',
