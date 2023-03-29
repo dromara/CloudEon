@@ -1,13 +1,19 @@
 package com.data.udh.test;
 
 import com.data.udh.utils.SshUtils;
+import com.jcraft.jsch.Channel;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.sshd.client.session.ClientSession;
 import org.apache.sshd.sftp.client.SftpClientFactory;
 import org.apache.sshd.sftp.client.fs.SftpFileSystem;
 import org.junit.jupiter.api.Test;
 
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 
 @Slf4j
 public class SshTest {
@@ -44,6 +50,37 @@ public class SshTest {
         SshUtils.uploadFile("/tmp/test/", "/Volumes/Samsung_T5/opensource/e-mapreduce/remote-script/check.sh", fileSystem);
 
 
+    }
+
+
+
+    @Test
+    public void ssh2GetLog2() throws IOException, JSchException {
+
+        JSch jsch = new JSch();
+        Session session = jsch.getSession("root", "10.81.16.19", 22);
+        session.setConfig("StrictHostKeyChecking", "no");
+        session.setPassword("Ltcyhlwylym@admin2021zi!");
+        session.connect();
+
+        Channel channel = session.openChannel("exec");
+        ((com.jcraft.jsch.ChannelExec) channel).setCommand("tail -f /opt/udh/monitor1/log/grafana.log\n");
+
+        InputStream in = channel.getInputStream();
+        channel.connect();
+
+        FileWriter writer = new FileWriter("/Volumes/Samsung_T5/opensource/e-mapreduce/file.txt");
+        byte[] buffer = new byte[1024];
+        while (true) {
+            int n = in.read(buffer);
+            if (n < 0) {
+                break;
+            }
+            writer.write(new String(buffer, 0, n));
+            writer.flush();
+        }
+        channel.disconnect();
+        session.disconnect();
     }
 
 
