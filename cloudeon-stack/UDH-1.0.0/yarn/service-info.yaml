@@ -7,7 +7,7 @@ dependencies:
   - "ZOOKEEPER"
   - "HDFS"
 
-runAs: yarn
+runAs: hadoop
 
 supportKerberos: true
 

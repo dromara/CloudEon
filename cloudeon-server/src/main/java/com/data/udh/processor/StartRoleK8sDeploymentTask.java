@@ -83,6 +83,7 @@ public class StartRoleK8sDeploymentTask extends BaseUdhTask{
         dataModel.put("roleServiceFullName", roleServiceFullName);
         dataModel.put("service", serviceInstanceEntity);
         dataModel.put("roleNodeCnt", roleNodeCnt);
+        dataModel.put("runAs", stackServiceEntity.getRunAs());
         dataModel.put("conf", allConfigEntityList.stream().collect(Collectors.toMap(ServiceInstanceConfigEntity::getName, ServiceInstanceConfigEntity::getValue)));
 
         String outputFileName = null;
