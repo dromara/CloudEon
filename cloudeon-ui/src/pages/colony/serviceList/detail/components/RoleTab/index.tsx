@@ -1,6 +1,7 @@
 import type { ProColumns } from '@ant-design/pro-components';
 import { ProTable, ActionType, TableDropdown } from '@ant-design/pro-components';
-import { Spin, Button, Popconfirm, message } from 'antd';
+import { Spin, Button, Popconfirm, message,Tooltip } from 'antd';
+import { AlertFilled } from '@ant-design/icons';
 import { useState, useEffect, useRef } from 'react';
 import styles from './index.less'
 import { startRoleAPI, stopRoleAPI, getServiceRolesAPI } from '@/services/ant-design-pro/colony';
@@ -74,7 +75,26 @@ const roleTab:React.FC<{ serviceId: any}> = ({serviceId}) => {
             key:'name',
             dataIndex: 'name',
             // width: 180,
-            // render: (_) => <a>{_}</a>,
+            render: (_, record) => <>
+            <span>{record.name}</span>
+            {
+                record.alertMsgCnt ?
+                <Tooltip 
+                    placement="top" 
+                    color="#fff" 
+                    title={
+                    <div className={styles.alertText}>
+                        {`告警：`}
+                        {record.alertMsgName.map((msg:any,index:any)=>{
+                        return <div key={index}>{`${index+1}. ${msg}`}</div>
+                        })}
+                    </div>
+                    }
+                >
+                    <AlertFilled className={styles.alertIcon} />
+                </Tooltip> :''
+            }
+            </>,
         },
         {
             title: '状态',

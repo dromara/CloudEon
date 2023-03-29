@@ -329,6 +329,8 @@ declare namespace API {
   }
 
   type rolesInfos = {
+    alertMsgName?: any;
+    alertMsgCnt?: any;
     name?: string,
     id?: number,
     roleStatus?: string,
