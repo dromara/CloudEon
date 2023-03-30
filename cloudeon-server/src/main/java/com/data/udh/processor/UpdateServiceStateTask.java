@@ -5,8 +5,8 @@ import com.data.udh.dao.CommandRepository;
 import com.data.udh.dao.ServiceInstanceRepository;
 import com.data.udh.entity.CommandEntity;
 import com.data.udh.entity.ServiceInstanceEntity;
-import com.data.udh.utils.CommandType;
-import com.data.udh.utils.ServiceState;
+import com.data.udh.enums.CommandType;
+import com.data.udh.enums.ServiceState;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor

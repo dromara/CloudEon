@@ -1,6 +1,6 @@
 package com.data.udh.entity;
 
-import com.data.udh.utils.ConfValueType;
+import com.data.udh.enums.ConfValueType;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 

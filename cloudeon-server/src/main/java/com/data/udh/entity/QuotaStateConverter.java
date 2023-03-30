@@ -1,7 +1,6 @@
 package com.data.udh.entity;
 
-import com.data.udh.utils.AlertLevel;
-import com.data.udh.utils.QuotaState;
+import com.data.udh.enums.QuotaState;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;

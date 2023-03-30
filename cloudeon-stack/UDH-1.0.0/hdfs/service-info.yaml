@@ -28,6 +28,7 @@ roles:
     jmxPort: 9232
     needOdd: true
     minNum: 3
+    logFile: "hadoop-hadoop-journalnode-${localhostname}.log"
 
   - name: HDFS_NAMENODE
     label: "Name Node"
@@ -37,6 +38,7 @@ roles:
     type: MASTER
     jmxPort: 9232
     fixedNum: 2
+    logFile: "hadoop-hadoop-namenode-${localhostname}.log"
 
   - name: HDFS_DATANODE
     label: "Data Node"
@@ -46,6 +48,7 @@ roles:
     type: SLAVE
     jmxPort: 9232
     minNum: 3
+    logFile: "hadoop-hadoop-datanode-${localhostname}.log"
 
   - name: HDFS_HTTPFS
     label: Httpfs
@@ -55,6 +58,7 @@ roles:
     type: SLAVE
     jmxPort: 9232
     minNum: 1
+    logFile: "httpfs.log"
 
 
 

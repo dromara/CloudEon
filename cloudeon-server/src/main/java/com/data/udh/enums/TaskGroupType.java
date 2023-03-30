@@ -1,4 +1,4 @@
-package com.data.udh.utils;
+package com.data.udh.enums;
 
 import com.google.common.collect.Lists;
 import lombok.AllArgsConstructor;

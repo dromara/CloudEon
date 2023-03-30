@@ -6,7 +6,7 @@ import com.data.udh.dao.CommandRepository;
 import com.data.udh.dao.CommandTaskRepository;
 import com.data.udh.entity.CommandEntity;
 import com.data.udh.entity.CommandTaskEntity;
-import com.data.udh.utils.CommandState;
+import com.data.udh.enums.CommandState;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

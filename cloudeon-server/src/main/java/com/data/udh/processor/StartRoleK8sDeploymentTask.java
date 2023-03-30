@@ -4,11 +4,9 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import com.data.udh.config.UdhConfigProp;
 import com.data.udh.dao.*;
-import com.data.udh.entity.ServiceInstanceConfigEntity;
-import com.data.udh.entity.ServiceInstanceEntity;
-import com.data.udh.entity.StackServiceEntity;
-import com.data.udh.entity.StackServiceRoleEntity;
+import com.data.udh.entity.*;
 import com.data.udh.utils.Constant;
+import com.data.udh.enums.ServiceRoleState;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -16,7 +14,6 @@ import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
-import io.fabric8.kubernetes.client.KubernetesClientTimeoutException;
 import io.fabric8.kubernetes.client.dsl.Resource;
 import io.fabric8.kubernetes.client.dsl.RollableScalableResource;
 import lombok.NoArgsConstructor;
@@ -86,6 +83,7 @@ public class StartRoleK8sDeploymentTask extends BaseUdhTask{
         dataModel.put("roleServiceFullName", roleServiceFullName);
         dataModel.put("service", serviceInstanceEntity);
         dataModel.put("roleNodeCnt", roleNodeCnt);
+        dataModel.put("runAs", stackServiceEntity.getRunAs());
         dataModel.put("conf", allConfigEntityList.stream().collect(Collectors.toMap(ServiceInstanceConfigEntity::getName, ServiceInstanceConfigEntity::getValue)));
 
         String outputFileName = null;
@@ -129,6 +127,12 @@ public class StartRoleK8sDeploymentTask extends BaseUdhTask{
         }finally {
             client.close();
         }
+        // 更新角色实例状态为已启动
+        List<ServiceRoleInstanceEntity> roleInstanceEntities = serviceRoleInstanceRepository.findByServiceInstanceIdAndServiceRoleName(serviceInstanceId, stackServiceRoleEntity.getName());
+        roleInstanceEntities.forEach(r->{
+            r.setServiceRoleState(ServiceRoleState.ROLE_STARTED);
+            serviceRoleInstanceRepository.save(r);
+        });
 
 
     }

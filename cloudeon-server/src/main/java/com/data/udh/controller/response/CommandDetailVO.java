@@ -1,7 +1,7 @@
 package com.data.udh.controller.response;
 
 import com.data.udh.dto.ServiceProgress;
-import com.data.udh.utils.CommandState;
+import com.data.udh.enums.CommandState;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

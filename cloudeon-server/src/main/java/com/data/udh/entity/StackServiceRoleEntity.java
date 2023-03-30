@@ -71,4 +71,6 @@ public class StackServiceRoleEntity implements Serializable {
 	private Integer fixedNum;
 	private boolean needOdd;
 
+	private String logFile;
+
 }

@@ -22,8 +22,11 @@ public class ServiceInstanceRoleVO {
      */
     private Integer id;
     private String roleStatus;
+    private Integer roleStatusValue;
     private Integer nodeId;
     private String nodeHostname;
     private String nodeHostIp;
     private List<String> uiUrls;
+    private Integer alertMsgCnt;
+    private List<String> alertMsgName;
 }

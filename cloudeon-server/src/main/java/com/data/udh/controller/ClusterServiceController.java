@@ -15,6 +15,7 @@ import com.data.udh.controller.response.*;
 import com.data.udh.dao.*;
 import com.data.udh.dto.*;
 import com.data.udh.entity.*;
+import com.data.udh.enums.*;
 import com.data.udh.processor.TaskParam;
 import com.data.udh.service.CommandHandler;
 import com.data.udh.service.SpecRoleHost;
@@ -41,6 +42,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.data.udh.utils.Constant.AdminUserId;
 
@@ -57,6 +59,8 @@ public class ClusterServiceController {
     @Value("${udh.task.log}")
     private String taskLogPath;
 
+    @Resource
+    private AlertMessageRepository alertMessageRepository;
 
     @Resource
     private ServiceInstanceRepository serviceInstanceRepository;
@@ -188,7 +192,7 @@ public class ClusterServiceController {
                         roleInstanceEntity.setServiceInstanceId(serviceInstanceEntityId);
                         roleInstanceEntity.setStackServiceRoleId(stackServiceRoleEntity.getId());
                         roleInstanceEntity.setServiceRoleName(stackRoleName);
-                        roleInstanceEntity.setServiceRoleState(ServiceRoleState.OPERATING);
+                        roleInstanceEntity.setServiceRoleState(ServiceRoleState.INIT_ROLE);
                         roleInstanceEntity.setNodeId(nodeId);
                         return roleInstanceEntity;
                     }
@@ -487,13 +491,15 @@ public class ClusterServiceController {
         return result;
     }
 
-    private Integer buildServiceCommand(List<ServiceInstanceEntity> serviceInstanceEntities,
-                                        Integer ClusterId, CommandType commandType) {
+    @Transactional(rollbackFor = Exception.class)
+    public Integer buildServiceCommand(List<ServiceInstanceEntity> serviceInstanceEntities,
+                                       Integer ClusterId, CommandType commandType) {
         return buildInternalCommand(serviceInstanceEntities, Lists.newArrayList(), ClusterId, commandType);
     }
 
-    private Integer buildRoleCommand(List<ServiceInstanceEntity> serviceInstanceEntities, List<ServiceRoleInstanceEntity> spceRoleInstanceEntities,
-                                     Integer ClusterId, CommandType commandType) {
+    @Transactional(rollbackFor = Exception.class)
+    public Integer buildRoleCommand(List<ServiceInstanceEntity> serviceInstanceEntities, List<ServiceRoleInstanceEntity> spceRoleInstanceEntities,
+                                    Integer ClusterId, CommandType commandType) {
         return buildInternalCommand(serviceInstanceEntities, spceRoleInstanceEntities, ClusterId, commandType);
     }
 
@@ -615,6 +621,10 @@ public class ClusterServiceController {
         ServiceRoleInstanceEntity roleInstanceEntity = roleInstanceRepository.findById(roleInstanceId).get();
         ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(roleInstanceEntity.getServiceInstanceId()).get();
 
+        // 更新角色实例状态
+        roleInstanceEntity.setServiceRoleState(ServiceRoleState.STOPPING_ROLE);
+        roleInstanceRepository.save(roleInstanceEntity);
+
         //  生成停止角色command
         List<ServiceInstanceEntity> serviceInstanceEntities = Lists.newArrayList(serviceInstanceEntity);
         Integer commandId = buildRoleCommand(serviceInstanceEntities, Lists.newArrayList(roleInstanceEntity),
@@ -630,7 +640,9 @@ public class ClusterServiceController {
 
         ServiceRoleInstanceEntity roleInstanceEntity = roleInstanceRepository.findById(roleInstanceId).get();
         ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(roleInstanceEntity.getServiceInstanceId()).get();
-
+        // 更新角色实例状态
+        roleInstanceEntity.setServiceRoleState(ServiceRoleState.STARTING_ROLE);
+        roleInstanceRepository.save(roleInstanceEntity);
         //  生成启动角色command
         List<ServiceInstanceEntity> serviceInstanceEntities = Lists.newArrayList(serviceInstanceEntity);
         Integer commandId = buildRoleCommand(serviceInstanceEntities, Lists.newArrayList(roleInstanceEntity),
@@ -664,7 +676,14 @@ public class ClusterServiceController {
             ServiceInstanceVO serviceInstanceVO = new ServiceInstanceVO();
             BeanUtil.copyProperties(instanceEntity, serviceInstanceVO);
             ServiceState serviceState = instanceEntity.getServiceState();
-            serviceInstanceVO.setServiceStateValue(serviceState.getDesc());
+            serviceInstanceVO.setServiceStateValue(serviceState.getValue());
+            serviceInstanceVO.setServiceState(serviceState.getDesc());
+            // 查询相关告警数量
+            List<String> alertNames = alertMessageRepository.findByServiceInstanceIdAndResolved(instanceEntity.getId(), false)
+                    .stream().map(AlertMessageEntity::getAlertName).collect(Collectors.toList());
+
+            serviceInstanceVO.setAlertMsgCnt(alertNames.size());
+            serviceInstanceVO.setAlertMsgName(alertNames);
 
             // 查询icon
             StackServiceEntity stackServiceEntity = stackServiceRepository.findById(instanceEntity.getStackServiceId()).get();
@@ -725,6 +744,7 @@ public class ClusterServiceController {
         Integer stackServiceId = serviceInstanceEntity.getStackServiceId();
         StackServiceEntity stackServiceEntity = stackServiceRepository.findById(stackServiceId).get();
 
+        ServiceState serviceState = serviceInstanceEntity.getServiceState();
         ServiceInstanceDetailVO instanceDetailVO = ServiceInstanceDetailVO.builder()
                 .id(serviceInstanceEntity.getId())
                 .name(serviceInstanceEntity.getServiceName())
@@ -733,7 +753,8 @@ public class ClusterServiceController {
                 .stackServiceId(stackServiceId)
                 .stackServiceName(stackServiceEntity.getName())
                 .version(stackServiceEntity.getVersion())
-                .serviceStatus(serviceInstanceEntity.getServiceState().getDesc())
+                .serviceState(serviceState.getDesc())
+                .serviceStateValue(serviceState.getValue())
                 .build();
         return ResultDTO.success(instanceDetailVO);
     }
@@ -751,11 +772,18 @@ public class ClusterServiceController {
                 // 查找该角色实例绑定的web地址
                 ServiceRoleInstanceWebuisEntity webuisEntity = roleInstanceWebuisRepository.findByServiceRoleInstanceId(roleInstanceEntity.getId());
                 StackServiceRoleEntity stackServiceRoleEntity = stackServiceRoleRepository.findById(roleInstanceEntity.getStackServiceRoleId()).get();
+                ServiceRoleState serviceRoleState = roleInstanceEntity.getServiceRoleState();
+                // 查询角色实例相关告警
+                List<String> alertNames = alertMessageRepository.findByServiceRoleInstanceIdAndResolved(roleInstanceEntity.getId(), false)
+                        .stream().map(AlertMessageEntity::getAlertName).collect(Collectors.toList());
                 ServiceInstanceRoleVO serviceInstanceRoleVO = ServiceInstanceRoleVO.builder()
-                        .roleStatus(roleInstanceEntity.getServiceRoleState().name())
+                        .roleStatus(serviceRoleState.getDesc())
+                        .roleStatusValue(serviceRoleState.getValue())
                         .id(roleInstanceEntity.getId())
                         .nodeHostIp(nodeEntity.getIp())
                         .nodeHostname(nodeEntity.getHostname())
+                        .alertMsgCnt(alertNames.size())
+                        .alertMsgName(alertNames)
                         .nodeId(nodeEntity.getId())
                         // 用 stackServiceRoleEntity label更清晰 （如：Doris Be）
                         .name(stackServiceRoleEntity.getLabel())
@@ -778,6 +806,20 @@ public class ClusterServiceController {
     public ResultDTO<Void> deleteServiceInstance(Integer serviceInstanceId) {
 
         ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(serviceInstanceId).get();
+        // 查出有依赖此服务的服务实例
+        List<ServiceInstanceEntity> dep = serviceInstanceRepository.findByClusterIdAndDependenceServiceInstanceIdsNotNull(serviceInstanceEntity.getClusterId());
+        List<ServiceInstanceEntity> depServiceInstanceList = dep.stream().filter(new Predicate<ServiceInstanceEntity>() {
+            @Override
+            public boolean test(ServiceInstanceEntity serviceInstanceEntity) {
+                List<String> ids = Arrays.stream(serviceInstanceEntity.getDependenceServiceInstanceIds().split(",")).collect(Collectors.toList());
+                return ids.contains(serviceInstanceId.toString());
+            }
+        }).collect(Collectors.toList());
+        if (depServiceInstanceList.size() > 0) {
+            String depServiceNames = depServiceInstanceList.stream().map(ServiceInstanceEntity::getServiceName).collect(Collectors.joining(","));
+            return ResultDTO.failed("请先删除依赖此服务的服务实例：" + depServiceNames);
+        }
+
         //  生成删除服务command
         List<ServiceInstanceEntity> serviceInstanceEntities = Lists.newArrayList(serviceInstanceEntity);
         Integer commandId = buildServiceCommand(serviceInstanceEntities, serviceInstanceEntity.getClusterId(), CommandType.DELETE_SERVICE);
@@ -803,17 +845,18 @@ public class ClusterServiceController {
         // 如果没安装monitor服务，则提示请先安装
         ServiceInstanceEntity monitorServiceInstance = serviceInstanceRepository.findEntityByClusterIdAndStackServiceName(serviceInstanceEntity.getClusterId(), "MONITOR");
         if (monitorServiceInstance == null) {
-         return    ResultDTO.success("请先安装Monitor服务");
+            return ResultDTO.success("请先安装Monitor服务");
         }
 
         // 通过服务框架的dashboard和Grafana地址拼接完整url
-        String grafanaHttpPort = serviceInstanceConfigRepository.findByServiceInstanceIdAndName(serviceInstanceId, "grafana.http.port").getValue();
-        ServiceRoleInstanceEntity grafana = roleInstanceRepository.findByServiceInstanceIdAndServiceRoleName(monitorServiceInstance.getId(), "MONITOR_GRAFANA").get(0);
+        Integer monitorServiceInstanceId = monitorServiceInstance.getId();
+        String grafanaHttpPort = serviceInstanceConfigRepository.findByServiceInstanceIdAndName(monitorServiceInstanceId, "grafana.http.port").getValue();
+        ServiceRoleInstanceEntity grafana = roleInstanceRepository.findByServiceInstanceIdAndServiceRoleName(monitorServiceInstanceId, "MONITOR_GRAFANA").get(0);
         Integer grafanaNodeId = grafana.getNodeId();
         ClusterNodeEntity grafanaNodeEntity = clusterNodeRepository.findById(grafanaNodeId).get();
         String dashboardUid = stackServiceEntity.getDashboardUid();
 //        http://fl001:3000/d/eea-9_siks/?theme=light&orgId=1&kiosk
-        String url = String.format("http://%s:%s/d/%s/?theme=light&orgId=1&kiosk", grafanaNodeEntity.getIp(), grafanaHttpPort, dashboardUid);
+        String url = String.format("http://%s:%s/d/%s/?theme=light&orgId=1&from=now-5m&to=now&kiosk=tv", grafanaNodeEntity.getIp(), grafanaHttpPort, dashboardUid);
 
         return ResultDTO.success(url);
     }

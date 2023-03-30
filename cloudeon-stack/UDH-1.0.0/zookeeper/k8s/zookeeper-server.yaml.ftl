@@ -43,6 +43,8 @@ spec:
       - env:
         - name: "ZOOCFGDIR"
           value: "/opt/udh/${service.serviceName}/conf"
+        - name: USER
+          value: ${runAs}
         image: "${dockerImage}"
         imagePullPolicy: "Always"
         readinessProbe:

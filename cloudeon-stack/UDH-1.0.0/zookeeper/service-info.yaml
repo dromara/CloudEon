@@ -22,6 +22,7 @@ roles:
     jmxPort: 9232
     needOdd: true
     minNum: 3
+    logFile: "zookeeper-zookeeper-server-${localhostname}.log"
 
 persistencePaths:
   - /opt/udh/${serviceInstanceId}/conf

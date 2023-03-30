@@ -1,7 +1,6 @@
 package com.data.udh.entity;
 
-import com.data.udh.utils.CommandType;
-import com.data.udh.utils.ServiceState;
+import com.data.udh.enums.CommandType;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
@@ -11,8 +10,8 @@ public class CommandTypeConverter implements AttributeConverter<CommandType, Str
 
 
     @Override
-    public String convertToDatabaseColumn(CommandType serviceState) {
-        return serviceState.name();
+    public String convertToDatabaseColumn(CommandType commandType) {
+        return commandType.name();
     }
 
     @Override

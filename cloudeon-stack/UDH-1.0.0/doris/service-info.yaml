@@ -21,6 +21,7 @@ roles:
     type: MASTER
     jmxPort: 9232
     fixedNum : 1
+    logFile: "fe.log"
 
   - name: DORIS_BE
     label: "Doris Be"
@@ -29,6 +30,7 @@ roles:
     sortNum: 2
     type: SLAVE
     minNum: 3
+    logFile: "be.INFO"
 
 persistencePaths:
   - /opt/udh/${serviceInstanceId}/conf

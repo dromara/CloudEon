@@ -1,6 +1,6 @@
 package com.data.udh.dto;
 
-import com.data.udh.utils.TaskGroupType;
+import com.data.udh.enums.TaskGroupType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

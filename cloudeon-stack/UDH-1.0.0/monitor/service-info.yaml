@@ -32,6 +32,7 @@ roles:
     type: MASTER
     jmxPort: 9232
     fixedNum: 1
+    logFile: "prometheus-${localhostname}.out"
 
   - name: MONITOR_ALERTMANAGER
     label: "Alert Manager"
@@ -41,6 +42,7 @@ roles:
     type: MASTER
     jmxPort: 9232
     fixedNum: 1
+    logFile: "alertmanager-${localhostname}.out"
 
   - name: MONITOR_NODEEXPORTER
     label: "Node Exporter"
@@ -50,6 +52,7 @@ roles:
     type: SLAVE
     jmxPort: 9232
     minNum: 1
+    logFile: "nodeexporter-${localhostname}.out"
 
   - name: MONITOR_GRAFANA
     label: Grafana
@@ -59,6 +62,7 @@ roles:
     type: MASTER
     jmxPort: 9232
     fixedNum: 1
+    logFile: "grafana-${localhostname}.out"
 
 
 
