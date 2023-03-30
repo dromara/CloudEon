@@ -139,13 +139,17 @@ public class LogWebSocketHandler extends TextWebSocketHandler implements WebSock
     }
 
     private void closeSshSession(String sessionId) {
-        Session sshSession = livingSessionMap.get(sessionId).getSshSession();
-        if (sshSession != null) {
-            sshSession.disconnect();
-            if (!sshSession.isConnected()) {
-                log.info("SSH已断开连接：" + sshSession.getHost() + ":" + sshSession.getPort() + "  " + sshSession);
+        WsSessionBean wsSessionBean = livingSessionMap.get(sessionId);
+        if (wsSessionBean != null) {
+            Session sshSession = wsSessionBean.getSshSession();
+            if (sshSession != null) {
+                sshSession.disconnect();
+                if (!sshSession.isConnected()) {
+                    log.info("SSH已断开连接：" + sshSession.getHost() + ":" + sshSession.getPort() + "  " + sshSession);
+                }
             }
         }
+
     }
 
 //    public boolean closeWebSocketServer(String sid) {
