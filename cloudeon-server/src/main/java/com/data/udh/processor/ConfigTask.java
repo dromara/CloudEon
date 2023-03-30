@@ -219,7 +219,7 @@ public class ConfigTask extends BaseUdhTask {
      */
     private void copyDependenceServiceConf(String stackServiceName, String[] depServiceInstanceIds, String outputConfPath,
                                            ServiceInstanceRepository serviceInstanceRepository, StackServiceRepository stackServiceRepository, String workHome) {
-        if (stackServiceName.equalsIgnoreCase(Constant.YARN_SERVICE_NAME)) {
+        if (stackServiceName.equalsIgnoreCase(Constant.YARN_SERVICE_NAME)||stackServiceName.equalsIgnoreCase(Constant.HIVE_SERVICE_NAME)) {
             List<Integer> instanceIds = Arrays.stream(depServiceInstanceIds).map(new Function<String, Integer>() {
                 @Override
                 public Integer apply(String s) {

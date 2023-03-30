@@ -21,8 +21,8 @@ packages = org.apache.hadoop.hive.ql.log
 # list of properties
 property.hive.log.level = INFO
 property.hive.root.logger = DRFA
-property.hive.log.dir = ${sys:java.io.tmpdir}/${sys:user.name}
-property.hive.log.file = hive.log
+property.hive.log.dir = /opt/udh/${service.serviceName}/log
+property.hive.log.file = hive-$SERVICE_NAME-$HOSTNAME.log
 property.hive.perflogger.log.level = INFO
 
 # list of all appenders
@@ -33,7 +33,7 @@ appender.console.type = Console
 appender.console.name = console
 appender.console.target = SYSTEM_ERR
 appender.console.layout.type = PatternLayout
-appender.console.layout.pattern = %d{ISO8601} %5p [%t] %c{2}: %m%n
+appender.console.layout.pattern =  %d{yyyy-MM-dd HH:mm:ss} %p %c{2}: %m%n
 
 # daily rolling file appender
 appender.DRFA.type = RollingRandomAccessFile
@@ -42,7 +42,7 @@ appender.DRFA.fileName = ${sys:hive.log.dir}/${sys:hive.log.file}
 # Use %pid in the filePattern to append <process-id>@<host-name> to the filename if you want separate log files for different CLI session
 appender.DRFA.filePattern = ${sys:hive.log.dir}/${sys:hive.log.file}.%d{yyyy-MM-dd}
 appender.DRFA.layout.type = PatternLayout
-appender.DRFA.layout.pattern = %d{ISO8601} %5p [%t] %c{2}: %m%n
+appender.DRFA.layout.pattern = %d{yyyy-MM-dd HH:mm:ss} %p %c{2}: %m%n
 appender.DRFA.policies.type = Policies
 appender.DRFA.policies.time.type = TimeBasedTriggeringPolicy
 appender.DRFA.policies.time.interval = 1

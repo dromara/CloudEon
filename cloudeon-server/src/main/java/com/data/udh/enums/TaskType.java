@@ -24,6 +24,8 @@ public enum TaskType {
     SCALE_DOWN_K8S_SERVICE(15, "按规模减少k8s服务", "com.data.udh.processor.ScaleDownK8sServiceTask", false),
     SCALE_UP_K8S_SERVICE(16, "按规模增加k8s服务", "com.data.udh.processor.ScaleUpK8sServiceTask", false),
     UPDATE_SERVICE_STATE(17, "更新服务实例状态", "com.data.udh.processor.UpdateServiceStateTask", false),
+    INIT_HIVE_WAREHOUSE(17, "初始化hive仓库文件目录", "com.data.udh.processor.InitHiveWarehouseTask", false),
+    INIT_HIVE_METASTORE(18, "初始化hive Metastore", "com.data.udh.processor.InitHiveMetastoreTask", false),
 
 
 

@@ -18,8 +18,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.data.udh.utils.Constant.HDFS_SERVICE_NAME;
-import static com.data.udh.utils.Constant.YARN_SERVICE_NAME;
+import static com.data.udh.utils.Constant.*;
 
 @Service
 public class CommandHandler {
@@ -44,6 +43,9 @@ public class CommandHandler {
                 }
                 if (stackServiceName.equals(YARN_SERVICE_NAME)) {
                     taskGroupTypes.add(TaskGroupType.INIT_YARN);
+                }
+                if (stackServiceName.equals(HIVE_SERVICE_NAME)) {
+                    taskGroupTypes.add(TaskGroupType.INIT_HIVE);
                 }
 
                 taskGroupTypes.add(TaskGroupType.TAG_AND_START_K8S_SERVICE);

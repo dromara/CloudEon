@@ -40,20 +40,25 @@ spec:
       hostPID: false
       hostNetwork: true
       containers:
-      - args:
-        - "/home/doris/doris-fe/conf/fe_bootstrap.sh"
+        args:
+          - "/opt/udh/${service.serviceName}/conf/bootstrap-metastore.sh"
+        env:
+          - name: "SERVICE_NAME"
+            value: "metastore"
         image: "${dockerImage}"
         imagePullPolicy: "Always"
-        name: "${roleServiceFullName}"
         readinessProbe:
-          httpGet:
-            path: /api/health
-            port: ${conf['http_port']}
+          exec:
+            command:
+            - "/bin/bash"
+            - "-c"
+            - " echo 'stat' | nc localhost 2181 > /tmp/stat_zk; cat /tmp/stat_zk; grep -qE 'Mode: (follower|leader|standalone)' /tmp/stat_zk "
           failureThreshold: 3
           initialDelaySeconds: 3
           periodSeconds: 30
           successThreshold: 1
           timeoutSeconds: 15
+        name: "${roleServiceFullName}"
         resources:
           requests: {}
           limits: {}
@@ -66,7 +71,7 @@ spec:
           name: "log"
         - mountPath: "/etc/localtime"
           name: "timezone"
-        - mountPath: "/home/doris/doris-fe/conf"
+        - mountPath: "/opt/udh/${service.serviceName}/conf"
           name: "conf"
 
       nodeSelector:

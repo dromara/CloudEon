@@ -1,36 +1,36 @@
 name: HIVE
 label: "Hive"
-description: "离线数据仓库"
+description: "hadoop离线数据仓库"
 version: 3.1.3
 dockerImage: "registry.mufankong.top/udh/hive:3.1.3"
-dependencies: []
+dependencies:
+    - "HDFS"
+    - "YARN"
 
-runAs: doris
+runAs: hive
 
-supportKerberos: false
+supportKerberos: true
 
 dashboard:
-  uid: 1fFiWJ4mz
+  uid: WYNeBqdZz
 
 roles:
-  - name: DORIS_FE
-    label: "Doris Fe"
-    roleFullName: "doris-fe"
-    linkExpression: "http://${localhostname}:${conf['http_port']}/"
+  - name: HIVE_METASTORE
+    label: "Hive Metastore"
+    roleFullName: "hive-metastore"
     sortNum: 1
     type: MASTER
-    jmxPort: 9232
-    fixedNum : 1
-    logFile: "fe.log"
+    minNum : 1
+    logFile: "hive-metastore-${localhostname}.log"
 
-  - name: DORIS_BE
-    label: "Doris Be"
-    roleFullName: "doris-be"
+  - name: HIVE_SERVEE2
+    label: "Hive Server2"
+    roleFullName: "hive-server2"
     linkExpression: "http://${localhostname}:${conf['webserver_port']}/"
     sortNum: 2
-    type: SLAVE
-    minNum: 3
-    logFile: "be.INFO"
+    type: MASTER
+    minNum: 1
+    logFile: "hive-server2-${localhostname}.log"
 
 persistencePaths:
   - /opt/udh/${serviceInstanceId}/conf
@@ -39,107 +39,144 @@ persistencePaths:
 
 
 customConfigFiles:
-  - fe.conf
-  - be.conf
+  - hive-stie.xml
 
 configurations:
 
-
-
-
-  - name: sys_log_level
-    recommendExpression: INFO
-    valueType: Select
-    options: ["INFO","DEBUG","WARN","ERROR"]
-    confFile: "be.conf"
+  - name: "javax.jdo.option.ConnectionDriverName"
+    recommendExpression: "com.mysql.jdbc.Driver"
+    valueType: InputString
     configurableInWizard: true
-    label: "BE服务日志级别"
+    description: "metastore依赖数据库的jdbc驱动类"
+    confFile:  "hive-site.xml"
 
-  - name: fragment_pool_queue_size
+  - name: "javax.jdo.option.ConnectionUserName"
+    recommendExpression: "hive"
+    valueType: InputString
+    configurableInWizard: true
+    description: "metastore依赖数据库的登录账户"
+    confFile:  "hive-site.xml"
+
+  - name: "javax.jdo.option.ConnectionPassword"
+    recommendExpression: "hive"
+    valueType: InputString
+    configurableInWizard: true
+    description: "metastore依赖数据库的登录密码"
+    confFile:  "hive-site.xml"
+
+  - name: "javax.jdo.option.ConnectionURL"
+    recommendExpression: "jdbc:mysql://xxx:3306/hive?createDatabaseIfNotExist=true&amp;useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"
+    valueType: InputString
+    configurableInWizard: true
+    description: "metastore依赖数据库的jdbc访问地址"
+    confFile:  "hive-site.xml"
+
+  - name: "hive.server2.enable.doAs"
+    recommendExpression: "false"
+    valueType: Switch
+    configurableInWizard: true
+    description: "当这个属性设置为true时，Hive将作为提交查询的用户执行查询。这意味着将使用用户的权限和特权来访问数据和资源。当这个属性设置为false时，Hive将作为启动Hive服务器的用户执行查询，这意味着将不使用用户的权限和特权，而是使用服务器的权限和特权"
+    confFile:  "hive-site.xml"
+
+  - name: "hive.metastore.schema.verification"
+    recommendExpression: "true"
+    valueType: Switch
+    configurableInWizard: true
+    description: "是否验证schema"
+    confFile:  "hive-site.xml"
+
+  - name: "hive.metastore.warehouse.dir"
+    recommendExpression: "/app/hive/warehouse"
+    valueType: InputString
+    configurableInWizard: true
+    description: "hive默认在hdfs上的数据存储目录"
+    confFile:  "hive-site.xml"
+
+  - name: "hive.server2.map.fair.scheduler.queue"
+    recommendExpression: "true"
+    valueType: Switch
+    configurableInWizard: false
+    description: "HiveServer2是否使用公平调度队列"
+    confFile:  "hive-site.xml"
+
+  - name: "hive.server2.memory"
     recommendExpression: 2048
     valueType: InputNumber
-    confFile:  "be.conf"
-    label: "单节点上能够处理的查询请求上限"
+    unit: MB
+    label: "Hive server2最大堆内存,单位MB"
 
-  - name: fragment_pool_thread_num_max
-    recommendExpression: 512
+  - name: "hive.metasotre.memory"
+    recommendExpression: 2048
     valueType: InputNumber
-    confFile:  "be.conf"
-    label: "后续查询请求动态创建线程"
-    description: "后续查询请求动态创建线程，最大创建512个线程。"
+    unit: MB
+    description: "Hive metastore最大堆内存,单位MB"
 
-  - name: be_port
-    recommendExpression: 9060
+  - name: "hive.server2.thrift.port"
+    recommendExpression: 10000
     valueType: InputNumber
-    confFile: "be.conf"
+    description: "hiveserver2 thrift访问端口"
     configurableInWizard: true
-    label: "BE admin端口"
-    description: "BE admin端口"
+    confFile:  "hive-site.xml"
 
-  - name: webserver_port
-    recommendExpression: 18040
-    configurableInWizard: true
+  - name: "hive.metastore.thrift.port"
+    recommendExpression: 9083
     valueType: InputNumber
-    confFile:  "be.conf"
-    label: "Be web页面访问端口"
-
-
-  - name: brpc_port
-    recommendExpression: 8060
-    valueType: InputNumber
-    confFile:  "be.conf"
+    description: "metastore thrift端口"
     configurableInWizard: true
-    label: "BE Rpc端口"
 
-  - name: heartbeat_service_port
-    recommendExpression: 9050
+  - name: "hive.server2.long.polling.timeout"
+    recommendExpression: 10000
     valueType: InputNumber
-    confFile:  "be.conf"
-    configurableInWizard: true
-    label: "BE心跳服务端口"
+    description: "HiveServer2 发送长轮询请求并且在配置指定时间内没有新数据可用，则连接将关闭。"
+    unit: mseconds
+    confFile:  "hive-site.xml"
 
-  - name: rpc_port
-    recommendExpression: 9020
+  - name: "hive.cli.print.header"
+    recommendExpression: "true"
+    valueType: Switch
+    configurableInWizard: false
+    description: "hive cli打印结果是否带header"
+    confFile:  "hive-site.xml"
+
+  - name: "hive.cli.print.current.db"
+    recommendExpression: "true"
+    valueType: Switch
+    configurableInWizard: false
+    description: "hive cli打印结果是否带db名称"
+    confFile:  "hive-site.xml"
+
+  - name: "hive.server2.session.check.interval"
+    recommendExpression: 60000
     valueType: InputNumber
-    confFile:  "fe.conf"
-    configurableInWizard: true
-    label: "FE节点上Thrift服务器的端口"
-    description: "FE 节点上 Thrift 服务器的端口。"
+    unit: mseconds
+    description: "HiveServer2多久检查过期的session会话"
+    confFile:  "hive-site.xml"
 
-
-  - name: query_port
-    recommendExpression: 9030
+  - name: "hive.server2.idle.session.timeout"
+    recommendExpression: 3600000
     valueType: InputNumber
-    confFile:  "fe.conf"
-    configurableInWizard: true
-    label: "FE节点上MySQL服务器的端口"
-    description: "FE 节点上 MySQL 服务器的端口"
+    unit: mseconds
+    confFile:  "hive-site.xml"
 
-  - name: http_port
-    recommendExpression: 18030
-    valueType: InputNumber
-    confFile: "fe.conf"
-    configurableInWizard: true
-    label: "FE节点上web页面的端口"
-    description: "FE节点上web页面的端口"
+  - name: "hive.exec.scratchdir"
+    recommendExpression: /tmp/hive
+    valueType: InputString
+    confFile:  "hive-site.xml"
 
-  - name: edit_log_port
-    recommendExpression: 9010
-    valueType: InputNumber
-    confFile:  "fe.conf"
-    configurableInWizard: true
-    label: "FE节点上bdbje 的通信端口"
-    description: "FE节点上bdbje 的通信端口"
+  - name: "hive.auto.convert.join"
+    recommendExpression: "false"
+    valueType: Switch
+    configurableInWizard: false
+    confFile:  "hive-site.xml"
 
+  - name: "enable.hiveserver2.operation.log"
+    recommendExpression: "true"
+    valueType: Switch
+    configurableInWizard: false
 
-
-
-  - name: cluster_id
-    recommendExpression: 123
-    valueType: InputNumber
-    confFile:  "fe.conf"
-    configurableInWizard: true
-    label: "集群ID"
-    description: "如果节点（FE 或 BE）具有相同的集群 id，则将认为它们属于同一个Doris 集群"
-
-
+  - name: "hive.server2.logging.operation.level"
+    recommendExpression: VERBOSE
+    valueType: Select
+    options: ["NONE","EXECUTION","PERFORMANCE","VERBOSE"]
+    description: "HS2操作日志模式可供客户在会话级别设置"
+    confFile:  "hive-site.xml"
