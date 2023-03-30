@@ -23,10 +23,9 @@ roles:
     minNum : 1
     logFile: "hive-metastore-${localhostname}.log"
 
-  - name: HIVE_SERVEE2
+  - name: HIVE_SERVER2
     label: "Hive Server2"
     roleFullName: "hive-server2"
-    linkExpression: "http://${localhostname}:${conf['webserver_port']}/"
     sortNum: 2
     type: MASTER
     minNum: 1
@@ -39,7 +38,7 @@ persistencePaths:
 
 
 customConfigFiles:
-  - hive-stie.xml
+  - hive-site.xml
 
 configurations:
 
@@ -51,21 +50,21 @@ configurations:
     confFile:  "hive-site.xml"
 
   - name: "javax.jdo.option.ConnectionUserName"
-    recommendExpression: "hive"
+    recommendExpression: "root"
     valueType: InputString
     configurableInWizard: true
     description: "metastore依赖数据库的登录账户"
     confFile:  "hive-site.xml"
 
   - name: "javax.jdo.option.ConnectionPassword"
-    recommendExpression: "hive"
+    recommendExpression: "bigdata"
     valueType: InputString
     configurableInWizard: true
     description: "metastore依赖数据库的登录密码"
     confFile:  "hive-site.xml"
 
   - name: "javax.jdo.option.ConnectionURL"
-    recommendExpression: "jdbc:mysql://xxx:3306/hive?createDatabaseIfNotExist=true&amp;useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"
+    recommendExpression: "jdbc:mysql://10.81.17.8:33066/hive_db_ce?createDatabaseIfNotExist=true&amp;useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"
     valueType: InputString
     configurableInWizard: true
     description: "metastore依赖数据库的jdbc访问地址"

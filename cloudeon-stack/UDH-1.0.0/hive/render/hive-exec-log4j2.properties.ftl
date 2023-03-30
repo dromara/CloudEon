@@ -23,7 +23,7 @@ property.hive.log.level = INFO
 property.hive.root.logger = FA
 property.hive.query.id = hadoop
 property.hive.log.dir = /opt/udh/${service.serviceName}/log
-property.hive.log.file = ${sys:hive.query.id}.log
+property.hive.log.file = ${r"${sys:hive.query.id}"}.log
 
 # list of all appenders
 appenders = console, FA
@@ -38,7 +38,7 @@ appender.console.layout.pattern = %d{yyyy-MM-dd HH:mm:ss} %p %c{2}: %m%n
 # simple file appender
 appender.FA.type = RandomAccessFile
 appender.FA.name = FA
-appender.FA.fileName = ${sys:hive.log.dir}/${sys:hive.log.file}
+appender.FA.fileName = ${r"${sys:hive.log.dir}"}/${r"${sys:hive.log.file}"}
 appender.FA.layout.type = PatternLayout
 appender.FA.layout.pattern =  %d{yyyy-MM-dd HH:mm:ss} %p %c{2}: %m%n
 
@@ -61,6 +61,6 @@ logger.JPOX.name = JPOX
 logger.JPOX.level = ERROR
 
 # root logger
-rootLogger.level = ${sys:hive.log.level}
+rootLogger.level = ${r"${sys:hive.log.level}"}
 rootLogger.appenderRefs = root
-rootLogger.appenderRef.root.ref = ${sys:hive.root.logger}
+rootLogger.appenderRef.root.ref = ${r"${sys:hive.root.logger}"}

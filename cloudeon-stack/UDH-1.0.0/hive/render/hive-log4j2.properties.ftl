@@ -38,9 +38,9 @@ appender.console.layout.pattern =  %d{yyyy-MM-dd HH:mm:ss} %p %c{2}: %m%n
 # daily rolling file appender
 appender.DRFA.type = RollingRandomAccessFile
 appender.DRFA.name = DRFA
-appender.DRFA.fileName = ${sys:hive.log.dir}/${sys:hive.log.file}
+appender.DRFA.fileName = ${r"${sys:hive.log.dir}"}/${r"${sys:hive.log.file}"}
 # Use %pid in the filePattern to append <process-id>@<host-name> to the filename if you want separate log files for different CLI session
-appender.DRFA.filePattern = ${sys:hive.log.dir}/${sys:hive.log.file}.%d{yyyy-MM-dd}
+appender.DRFA.filePattern = ${r"${sys:hive.log.dir}"}/${r"${sys:hive.log.file}"}.%d{yyyy-MM-dd}
 appender.DRFA.layout.type = PatternLayout
 appender.DRFA.layout.pattern = %d{yyyy-MM-dd HH:mm:ss} %p %c{2}: %m%n
 appender.DRFA.policies.type = Policies
@@ -75,9 +75,9 @@ logger.ApacheHttp.name=org.apache.http
 logger.ApacheHttp.level = INFO
 
 logger.PerfLogger.name = org.apache.hadoop.hive.ql.log.PerfLogger
-logger.PerfLogger.level = ${sys:hive.perflogger.log.level}
+logger.PerfLogger.level = ${r"${sys:hive.perflogger.log.level}"}
 
 # root logger
-rootLogger.level = ${sys:hive.log.level}
+rootLogger.level = ${r"${sys:hive.log.level}"}
 rootLogger.appenderRefs = root
-rootLogger.appenderRef.root.ref = ${sys:hive.root.logger}
+rootLogger.appenderRef.root.ref = ${r"${sys:hive.root.logger}"}

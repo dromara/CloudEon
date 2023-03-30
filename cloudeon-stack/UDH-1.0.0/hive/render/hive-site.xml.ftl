@@ -17,13 +17,13 @@
 <#--    hive.metastore.uris-->
     <#assign metastore=serviceRoles['HIVE_METASTORE'] metastore_uri=[]>
     <#list metastore as role>
-        <#assign metastore_uri += "thrift://"+[role.hostname + ":" + conf["hive.metastore.thrift.port"]]>
+        <#assign metastore_uri += ["thrift://"+role.hostname + ":" + conf["hive.metastore.thrift.port"]]>
     </#list>
     <@property "hive.metastore.uris" metastore_uri?join(",")/>
 <#--hiveserver2操作日志-->
     <#assign operationLog=conf['enable.hiveserver2.operation.log']
     >
-    <#if operationLog??>
+    <#if operationLog == "true">
     <@property "hive.server2.logging.operation.enabled" operationLog/>
     <@property "hive.server2.logging.operation.log.location" "/opt/udh/${service.serviceName}/log/operation_logs"/>
     <@property "hive.server2.logging.operation.level" "${conf['hive.server2.logging.operation.level']}"/>

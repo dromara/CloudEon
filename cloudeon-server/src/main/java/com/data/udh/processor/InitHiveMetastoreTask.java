@@ -33,9 +33,9 @@ public class InitHiveMetastoreTask extends BaseUdhTask {
         ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(serviceInstanceId).get();
         StackServiceEntity stackServiceEntity = stackServiceRepository.findById(serviceInstanceEntity.getStackServiceId()).get();
         String serviceName = serviceInstanceEntity.getServiceName();
-        // hdfs 这个zkfc format命令每次执行都会删除然后创建的。todo 能捕获到执行日志吗？
-        String cmd = String.format("sudo docker  run --net=host -v /opt/udh/%s/conf:/opt/udh/%s/conf  %s sh -c \"  /opt/udh/%s/conf/init-metastore-db.sh \"   ",
-                serviceName,serviceName,stackServiceEntity.getDockerImage(),serviceName);
+        // todo 能捕获到执行日志吗？
+        String cmd = String.format("sudo docker  run --net=host -v /opt/udh/%s/conf:/opt/udh/%s/conf  -v /opt/udh/%s/log:/opt/udh/%s/log  %s sh -c \"  /opt/udh/%s/conf/init-metastore-db.sh \"   ",
+                serviceName,serviceName,serviceName,serviceName,stackServiceEntity.getDockerImage(),serviceName);
 
         // 选择metastore所在节点执行
         List<ServiceRoleInstanceEntity> roleInstanceEntities = roleInstanceRepository.findByServiceInstanceIdAndServiceRoleName(serviceInstanceId,"HIVE_SERVER2");
@@ -46,7 +46,8 @@ public class InitHiveMetastoreTask extends BaseUdhTask {
         log.info("在节点"+ip+"上执行命令:" + cmd);
         ClientSession clientSession = SshUtils.openConnectionByPassword(ip, nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getSshPassword());
         try {
-            SshUtils.execCmdWithResult(clientSession, cmd);
+            String result = SshUtils.execCmdWithResult(clientSession, cmd);
+            log.info(result);
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
