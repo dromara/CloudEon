@@ -43,10 +43,10 @@ const alertList: React.FC = () => {
       setRoleOptions(roleOptions.map(item=>{return {text:item, value: item}}))
       setHostnameOptions(hostnameOptions.map(item=>{return {text:item, value: item}}))
 
-      console.log('levelOptions:', levelOptions);
-      console.log('serviceOptions:', serviceOptions);
-      console.log('roleOptions:', roleOptions);
-      console.log('hostnameOptions:', hostnameOptions);
+      // console.log('levelOptions:', levelOptions);
+      // console.log('serviceOptions:', serviceOptions);
+      // console.log('roleOptions:', roleOptions);
+      // console.log('hostnameOptions:', hostnameOptions);
       
     }
     setLoading(false)
