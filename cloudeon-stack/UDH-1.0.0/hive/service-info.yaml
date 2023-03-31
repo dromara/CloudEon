@@ -30,6 +30,7 @@ roles:
     type: MASTER
     minNum: 1
     logFile: "hive-server2-${localhostname}.log"
+    linkExpression: "http://${localhostname}:${conf['hive.server2.webui.port']}"
 
 persistencePaths:
   - /opt/udh/${serviceInstanceId}/conf
@@ -109,7 +110,12 @@ configurations:
     valueType: InputNumber
     unit: MB
     description: "Hive metastore最大堆内存,单位MB"
-
+  - name: "hive.server2.webui.port"
+    recommendExpression: 10002
+    valueType: InputNumber
+    description: "hiveserver2 web访问端口"
+    configurableInWizard: true
+    confFile:  "hive-site.xml"
   - name: "hive.server2.thrift.port"
     recommendExpression: 10000
     valueType: InputNumber

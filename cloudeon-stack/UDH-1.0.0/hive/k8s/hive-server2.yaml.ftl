@@ -47,7 +47,18 @@ spec:
             value: "server2"
         image: "${dockerImage}"
         imagePullPolicy: "Always"
-
+        readinessProbe:
+          exec:
+            command:
+            - "/bin/bash"
+            - "-c"
+            - "curl --fail --connect-timeout 15 --max-time 15 \"http://`hostname`:${conf['hive.server2.webui.port']}/\"\
+            \n"
+          failureThreshold: 3
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
         name: "${roleServiceFullName}"
         resources:
           requests: {}

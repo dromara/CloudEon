@@ -12,7 +12,6 @@
 <#--    jmx监控-->
     <@property "hive.server2.metrics.enabled" "true"/>
     <@property "hive.metastore.metrics.enabled" "true"/>
-    <@property "hive.service.metrics.reporter" "JSON_FILE, JMX"/>
     <@property "hive.service.metrics.class" "org.apache.hadoop.hive.common.metrics.metrics2.CodahaleMetrics"/>
 <#--    hive.metastore.uris-->
     <#assign metastore=serviceRoles['HIVE_METASTORE'] metastore_uri=[]>

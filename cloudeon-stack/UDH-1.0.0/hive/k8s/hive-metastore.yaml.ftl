@@ -47,7 +47,11 @@ spec:
             value: "metastore"
         image: "${dockerImage}"
         imagePullPolicy: "Always"
-
+        readinessProbe:
+          tcpSocket:
+            port: ${conf['hive.metastore.thrift.port']}
+          initialDelaySeconds: 10
+          timeoutSeconds: 2
         name: "${roleServiceFullName}"
         resources:
           requests: {}
