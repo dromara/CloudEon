@@ -32,35 +32,10 @@ tyarn
 npm start
 ```
 
-# 其他操作命令
-
-### Start project
-
-```bash
-npm start
-```
-
-### Build project
-
+7. 生产环境打包
 ```bash
 npm run build
 ```
 
-### Check code style
-
-```bash
-npm run lint
-```
-
-You can also use script to auto fix some lint error:
-
-```bash
-npm run lint:fix
-```
-
-### Test code
-
-```bash
-npm test
-```
-
+# 代码说明
+1. 如果要修改websocket接口的地址，在src/services/apiConfig/index.ts文件修改
