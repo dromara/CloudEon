@@ -20,9 +20,5 @@ public class CloudEonApplication {
         return ActorSystem.create("udhActorSystem");
     }
 
-    @Bean("kubeClient")
-    public KubernetesClient kubeClient() {
-        KubernetesClient client = new KubernetesClientBuilder().build();
-        return client;
-    }
+
 }

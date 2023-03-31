@@ -10,6 +10,7 @@ import com.data.udh.dao.ClusterNodeRepository;
 import com.data.udh.dto.CheckHostInfo;
 import com.data.udh.dto.ResultDTO;
 import com.data.udh.entity.ClusterNodeEntity;
+import com.data.udh.service.KubeService;
 import com.data.udh.utils.ByteConverter;
 import com.data.udh.utils.SshUtils;
 import io.fabric8.kubernetes.api.model.Node;
@@ -42,7 +43,7 @@ public class NodeController {
     private ClusterNodeRepository clusterNodeRepository;
 
     @Resource
-    private KubernetesClient kubeClient;
+    private KubeService kubeService;
 
     @PostMapping("/add")
     public ResultDTO<Void> addNode(@RequestBody SaveNodeRequest req) throws IOException {
@@ -88,6 +89,7 @@ public class NodeController {
     public ResultDTO<List<NodeInfoVO>> listNode(Integer clusterId) {
         List<NodeInfoVO> result;
         // 获取k8s集群节点信息
+        KubernetesClient kubeClient = kubeService.getKubeClient(clusterId);
         NodeList nodeList = kubeClient.nodes().list();
         List<Node> items = nodeList.getItems();
         Map<String, Node> nodeMap = items.stream().collect(Collectors.toMap(new Function<Node, String>() {
@@ -115,7 +117,7 @@ public class NodeController {
      * 查询k8s节点信息详情
      */
     @GetMapping("/listK8sNode")
-    public ResultDTO<List<NodeInfoVO>> listK8sNode() {
+    public ResultDTO<List<NodeInfoVO>> listK8sNode(Integer clusterId) {
         // 从数据库查出已经和集群绑定的k8s节点
         Set<String> clusterIpSets = clusterNodeRepository.findAll().stream().map(new Function<ClusterNodeEntity, String>() {
             @Override
@@ -123,6 +125,9 @@ public class NodeController {
                 return clusterNodeEntity.getIp();
             }
         }).collect(Collectors.toSet());
+        // 通过集群id连接k8s集群
+        KubernetesClient kubeClient = kubeService.getKubeClient(clusterId);
+        // 获取k8s集群节点信息
         NodeList nodeList = kubeClient.nodes().list();
         List<Node> items = nodeList.getItems();
         List<NodeInfoVO> result = items.stream().filter(new Predicate<Node>() {

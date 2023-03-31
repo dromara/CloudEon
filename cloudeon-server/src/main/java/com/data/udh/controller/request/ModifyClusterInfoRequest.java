@@ -8,4 +8,5 @@ public class ModifyClusterInfoRequest {
     private Integer stackId;
     private String clusterName;
     private String clusterCode;
+    private String kubeConfig;
 }

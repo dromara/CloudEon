@@ -8,6 +8,7 @@ import com.data.udh.dao.StackServiceRoleRepository;
 import com.data.udh.entity.ServiceInstanceEntity;
 import com.data.udh.entity.ServiceRoleInstanceEntity;
 import com.data.udh.entity.StackServiceRoleEntity;
+import com.data.udh.service.KubeService;
 import com.data.udh.utils.Constant;
 import com.data.udh.enums.ServiceRoleState;
 import io.fabric8.kubernetes.client.KubernetesClient;
@@ -29,6 +30,8 @@ public class StopRoleK8sDeploymentTask extends BaseUdhTask {
         ServiceInstanceRepository serviceInstanceRepository = SpringUtil.getBean(ServiceInstanceRepository.class);
         StackServiceRoleRepository stackServiceRoleRepository = SpringUtil.getBean(StackServiceRoleRepository.class);
         ServiceRoleInstanceRepository serviceRoleInstanceRepository = SpringUtil.getBean(ServiceRoleInstanceRepository.class);
+        KubeService kubeService = SpringUtil.getBean(KubeService.class);
+
 
         UdhConfigProp udhConfigProp = SpringUtil.getBean(UdhConfigProp.class);
         String workHome = udhConfigProp.getWorkHome();
@@ -49,7 +52,7 @@ public class StopRoleK8sDeploymentTask extends BaseUdhTask {
         // 判断k8s资源文件是否存在
         if (new File(k8sServiceResourceFilePath).exists()) {
             log.info("在k8s上停止deployment ,使用本地资源文件: {}", k8sServiceResourceFilePath);
-            try (KubernetesClient client = new KubernetesClientBuilder().build();) {
+            try (KubernetesClient client = kubeService.getKubeClient(serviceInstanceEntity.getClusterId());) {
                 client.load(new FileInputStream(k8sServiceResourceFilePath))
                         .inNamespace("default")
                         .delete();

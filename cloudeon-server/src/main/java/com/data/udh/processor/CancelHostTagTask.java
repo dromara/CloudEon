@@ -5,6 +5,7 @@ import com.data.udh.dao.ServiceInstanceRepository;
 import com.data.udh.dao.StackServiceRoleRepository;
 import com.data.udh.entity.ServiceInstanceEntity;
 import com.data.udh.entity.StackServiceRoleEntity;
+import com.data.udh.service.KubeService;
 import com.data.udh.utils.ShellCommandExecUtil;
 import io.fabric8.kubernetes.api.model.NodeBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
@@ -22,6 +23,7 @@ public class CancelHostTagTask  extends BaseUdhTask{
     public void internalExecute() {
         StackServiceRoleRepository stackServiceRoleRepository = SpringUtil.getBean(StackServiceRoleRepository.class);
         ServiceInstanceRepository serviceInstanceRepository = SpringUtil.getBean(ServiceInstanceRepository.class);
+        KubeService kubeService = SpringUtil.getBean(KubeService.class);
 
         Integer serviceInstanceId = taskParam.getServiceInstanceId();
         ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(serviceInstanceId).get();
@@ -33,9 +35,8 @@ public class CancelHostTagTask  extends BaseUdhTask{
 
         String hostName = taskParam.getHostName();
         String roleServiceFullName = roleFullName + "-" + serviceInstanceEntity.getServiceName().toLowerCase();
-
         // kubectl label nodes node003 hadoop-yarn-timelineserver-yarn1-
-        KubernetesClient client = new KubernetesClientBuilder().build();
+        KubernetesClient client = kubeService.getKubeClient(serviceInstanceEntity.getClusterId());
         log.info("给k8s节点 {} 移除label :{}",hostName,roleServiceFullName);
         // 移除lable
         client.nodes().withName(hostName)

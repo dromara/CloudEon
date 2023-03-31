@@ -1,4 +1,4 @@
-package com.data.udh.service;
+package com.data.udh.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

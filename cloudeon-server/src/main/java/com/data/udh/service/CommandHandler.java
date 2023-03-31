@@ -2,6 +2,7 @@ package com.data.udh.service;
 
 import com.data.udh.dto.NodeInfo;
 import com.data.udh.dto.ServiceTaskGroupType;
+import com.data.udh.dto.SpecRoleHost;
 import com.data.udh.dto.TaskModel;
 import com.data.udh.enums.CommandType;
 import com.data.udh.enums.TaskGroupType;

@@ -18,7 +18,7 @@ import com.data.udh.entity.*;
 import com.data.udh.enums.*;
 import com.data.udh.processor.TaskParam;
 import com.data.udh.service.CommandHandler;
-import com.data.udh.service.SpecRoleHost;
+import com.data.udh.dto.SpecRoleHost;
 import com.data.udh.utils.*;
 import com.google.common.collect.Lists;
 import freemarker.cache.StringTemplateLoader;
@@ -42,7 +42,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.data.udh.utils.Constant.AdminUserId;
 

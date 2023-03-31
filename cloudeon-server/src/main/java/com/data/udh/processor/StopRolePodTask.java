@@ -2,11 +2,14 @@ package com.data.udh.processor;
 
 import cn.hutool.extra.spring.SpringUtil;
 import com.data.udh.dao.ClusterNodeRepository;
+import com.data.udh.dao.ServiceInstanceRepository;
 import com.data.udh.dao.ServiceRoleInstanceRepository;
 import com.data.udh.dao.StackServiceRoleRepository;
+import com.data.udh.entity.ServiceInstanceEntity;
 import com.data.udh.entity.ServiceRoleInstanceEntity;
 import com.data.udh.entity.StackServiceRoleEntity;
 import com.data.udh.enums.ServiceRoleState;
+import com.data.udh.service.KubeService;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
@@ -21,17 +24,20 @@ public class StopRolePodTask extends BaseUdhTask {
         StackServiceRoleRepository stackServiceRoleRepository = SpringUtil.getBean(StackServiceRoleRepository.class);
         ClusterNodeRepository clusterNodeRepository = SpringUtil.getBean(ClusterNodeRepository.class);
         ServiceRoleInstanceRepository serviceRoleInstanceRepository = SpringUtil.getBean(ServiceRoleInstanceRepository.class);
+        ServiceInstanceRepository serviceInstanceRepository = SpringUtil.getBean(ServiceInstanceRepository.class);
+        KubeService kubeService = SpringUtil.getBean(KubeService.class);
 
         String serviceInstanceName = taskParam.getServiceInstanceName();
         Integer serviceInstanceId = taskParam.getServiceInstanceId();
         String hostName = taskParam.getHostName();
+        ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(taskParam.getServiceInstanceId()).get();
 
         // 查询框架服务角色名获取模板名
         String roleName = taskParam.getRoleName();
         StackServiceRoleEntity stackServiceRoleEntity = stackServiceRoleRepository.findByServiceIdAndName(taskParam.getStackServiceId(), roleName);
         String roleFullName = stackServiceRoleEntity.getRoleFullName();
         String podLabel = String.format("app=%s-%s", roleFullName, serviceInstanceName);
-        try (KubernetesClient client = new KubernetesClientBuilder().build();) {
+        try (KubernetesClient client = kubeService.getKubeClient(serviceInstanceEntity.getClusterId());) {
 
             List<Pod> pods = client.pods().inNamespace("default").withLabel(podLabel).list().getItems();
             for (Pod pod : pods) {

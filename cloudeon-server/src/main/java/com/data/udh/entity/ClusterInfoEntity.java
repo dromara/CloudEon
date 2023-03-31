@@ -45,7 +45,7 @@ public class ClusterInfoEntity implements Serializable {
      */
     private Integer stackId;
 
-
+    private String kubeConfig;
 
 
 
