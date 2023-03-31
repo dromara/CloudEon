@@ -85,7 +85,7 @@ const alertList: React.FC = () => {
 
 
 
-  const columns = [
+  const activeColumns = [
     {
       title: '告警名称',
       dataIndex: 'alertName',
@@ -171,6 +171,87 @@ const alertList: React.FC = () => {
     }
   ]
 
+  const historyColumns = [
+    {
+      title: '告警名称',
+      dataIndex: 'alertName',
+      key: 'alertName',
+      render: (_: any, record:API.alertItem) => {
+        return (
+          <div style={{minWidth:'100px'}}>{record.alertName}</div>
+        )
+      },
+    },
+    {
+      title: '告警级别',
+      dataIndex: 'alertLevelMsg',
+      key: 'alertLevelMsg',
+      // filters: alertLevelOptions,
+      onFilter: true,
+      render: (_: any, record:API.alertItem) => {
+        return (
+          <div style={{minWidth:'100px'}}>{record.alertLevelMsg}</div>
+        )
+      }
+    },
+    {
+      title: '开始时间',
+      dataIndex: 'createTime',
+      key: 'createTime',
+      render: (_: any, record:API.alertItem) => {
+        return (
+          <div>{formatDate(record.createTime, 'yyyy-MM-dd hh:mm:ss')}</div>
+        )
+      },
+    },
+    {
+      title: '结束时间',
+      dataIndex: 'updateTime',
+      key: 'updateTime',
+      render: (_: any, record:API.alertItem) => {
+        return (
+          <div>{formatDate(record.createTime, 'yyyy-MM-dd hh:mm:ss')}</div>
+        )
+      },
+    },
+    {
+      title: '服务名',
+      dataIndex: 'serviceInstanceName',
+      key: 'serviceInstanceName',
+      // filters: serviceOptions,
+      // onFilter: true,
+      render: (_: any, record:API.alertItem) => {
+        return (
+          <div style={{minWidth:'100px'}}>{record.serviceInstanceName}</div>
+        )
+      },
+    },
+    {
+      title: '角色名',
+      dataIndex: 'serviceRoleLabel',
+      key: 'serviceRoleLabel',
+      // filters: roleOptions,
+      // onFilter: true,
+      render: (_: any, record:API.alertItem) => {
+        return (
+          <div style={{minWidth:'100px'}}>{record.serviceRoleLabel}</div>
+        )
+      },
+    },
+    {
+      title: '节点',
+      dataIndex: 'hostname',
+      key: 'hostname',
+      // filters: hostnameOptions,
+      // onFilter: true,
+      render: (_: any, record:API.alertItem) => {
+        return (
+          <div style={{minWidth:'100px'}}>{record.hostname}</div>
+        )
+      },
+    }
+  ]
+
   const onChange = (key: string) => {
     console.log(key);
     setCurrentTab(key)
@@ -190,7 +271,7 @@ const alertList: React.FC = () => {
         <ProTable 
           search={false} 
           rowKey="alertId" 
-          columns={columns} 
+          columns={activeColumns} 
           dataSource={activeListData}
           request={async (params = {}, sort, filter) => {
             return getActiveAlertAPI({ });;
@@ -205,7 +286,7 @@ const alertList: React.FC = () => {
         <ProTable 
           search={false} 
           rowKey="alertId" 
-          columns={columns} 
+          columns={historyColumns} 
           dataSource={historyListData}
           request={async (params = {}, sort, filter) => {
             return getHistoryAlertAPI({ });;
