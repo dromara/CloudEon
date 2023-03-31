@@ -148,8 +148,14 @@ configurations:
     recommendExpression: 100
     valueType: InputNumber
     confFile: "capacity-scheduler.xml"
-
-
+  - name: remote.app.log.dir
+    recommendExpression: "/var/log/hadoop-yarn/apps"
+    valueType: InputString
+    configurableInWizard: true
+  - name: mapreduce.am.staging.dir
+    recommendExpression: "/user"
+    valueType: InputString
+    configurableInWizard: true
   - name: mapreduce.job.max.split.locations
     recommendExpression: 500
     valueType: InputNumber
