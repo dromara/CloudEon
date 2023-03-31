@@ -45,6 +45,8 @@ spec:
         env:
           - name: "SERVICE_NAME"
             value: "server2"
+          - name: "HIVE_CONF_DIR"
+            value: "/opt/udh/${service.serviceName}/conf"
         image: "${dockerImage}"
         imagePullPolicy: "Always"
         readinessProbe:
