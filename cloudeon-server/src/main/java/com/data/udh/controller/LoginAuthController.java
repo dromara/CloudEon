@@ -2,10 +2,14 @@ package com.data.udh.controller;
 
 import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.dev33.satoken.stp.StpUtil;
+import com.data.udh.dao.UserRepository;
 import com.data.udh.dto.ResultDTO;
 import com.data.udh.entity.UserEntity;
+import com.data.udh.utils.PasswordUtil;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
 
 /**
  * Sa-Token 登录认证示例 
@@ -14,14 +18,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/acc/")
 public class LoginAuthController {
+	@Resource
+	private UserRepository userRepository;
 
 	// 会话登录接口  ---- http://localhost:8081/acc/doLogin?name=zhang&pwd=123456
 	@RequestMapping("doLogin")
 	public ResultDTO<String> doLogin(String name, String pwd) {
-		
-		// 第一步：比对前端提交的 账号名称 & 密码 是否正确，比对成功后开始登录 
-		// 		此处仅作模拟示例，真实项目需要从数据库中查询数据进行比对 
-		if("admin".equals(name) && "admin".equals(pwd)) {
+		UserEntity user = userRepository.findByUsername(name);
+		if (user == null) {
+			return ResultDTO.failed("登录失败");
+		}
+
+		// 第一步：比对前端提交的 账号名称 & 密码 是否正确，比对成功后开始登录
+		boolean validate = PasswordUtil.validate(pwd, user.getPassword());
+		if(validate) {
 			
 			// 第二步：根据账号id，进行登录 
 			// 		此处填入的参数应该保持用户表唯一，比如用户id，不可以直接填入整个 User 对象 
