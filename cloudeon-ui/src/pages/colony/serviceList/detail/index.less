@@ -1,3 +1,5 @@
+@import url('~@/assets/style/tab.less');
+
 .pageContentLayout{
     // background-color: #fff;
     .headerInfos{
@@ -29,33 +31,33 @@
         border-color: #52c41a;
     }
 
-    .tabsBar{
-        display: flex;
-        flex-direction: row;
-        // border-bottom: 1px solid rgba(0,0,0,.06);
-        height: 30px;
-        align-items: center;
-        >div{
-            min-width: 60px;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
+    // .tabsBar{
+    //     display: flex;
+    //     flex-direction: row;
+    //     // border-bottom: 1px solid rgba(0,0,0,.06);
+    //     height: 30px;
+    //     align-items: center;
+    //     >div{
+    //         min-width: 60px;
+    //         height: 100%;
+    //         display: flex;
+    //         justify-content: center;
+    //         align-items: center;
+    //         cursor: pointer;
 
-            &.actived{
-                background-color: #fff;
-                border-top-left-radius: 5px;
-                border-top-right-radius: 5px;
-            }
-        }
-    }
-    .tabContent{
-        min-height: 100px;
-        width: 100%;
-        padding: 20px;
-        background-color: #fff;
-    }
+    //         &.actived{
+    //             background-color: #fff;
+    //             border-top-left-radius: 5px;
+    //             border-top-right-radius: 5px;
+    //         }
+    //     }
+    // }
+    // .tabContent{
+    //     min-height: 100px;
+    //     width: 100%;
+    //     padding: 20px;
+    //     background-color: #fff;
+    // }
     :global {
         .ant-tabs-tab{
             border-radius: 5px 5px 0 0 !important;

@@ -3,7 +3,7 @@ import { Space, Card, Table, Tag, Button, Modal, Form, Progress, message, Spin }
 import React, { useState, useEffect, useRef } from 'react';
 import type { FormInstance } from 'antd/es/form';
 import { FormattedMessage, useIntl, history } from 'umi';
-import { getAlertAPI } from '@/services/ant-design-pro/colony';
+import { getActiveAlertAPI, getHistoryAlertAPI } from '@/services/ant-design-pro/colony';
 import { formatDate } from '@/utils/common'
 import styles from './index.less'
 import { RightOutlined } from '@ant-design/icons';
@@ -15,24 +15,27 @@ const alertList: React.FC = () => {
   const [serviceOptions, setServiceOptions] = useState<any[]>();
   const [roleOptions, setRoleOptions] = useState<any[]>();
   const [hostnameOptions, setHostnameOptions] = useState<any[]>();
-  const [actionListData, setNodeListData] = useState<any[]>();
+  const [activeListData, setActiveListData] = useState<any[]>();
+  const [historyListData, setHistoryListData] = useState<any[]>();
   const [loading, setLoading] = useState(false);
+  const [currentTab, setCurrentTab] = useState('activeAlert');
   const [form] = Form.useForm();
   // formRef = React.createRef<FormInstance>();
   // const form = useRef();
+  const getData = JSON.parse(sessionStorage.getItem('colonyData') || '{}')
 
-  const getTableData = async () => {
+  const getActiveData = async () => {
     setLoading(true)
-    const result: API.alertListResult =  await getAlertAPI();
+    const result: API.alertListResult =  await getActiveAlertAPI();
     if(result?.data){
       let levelOptions:any[] = []
       let serviceOptions:any[] = []
       let roleOptions:any[] = []
       let hostnameOptions:any[] = []
+      // 处理表头过滤问题
       for(let i = 0; i < result.data.length; i++){
         let item = result.data[i]
         const { alertLevelMsg, serviceInstanceName, serviceRoleLabel, hostname } = item
-        
         if(levelOptions.indexOf(alertLevelMsg) == -1) { levelOptions.push(alertLevelMsg||'') }
         if(serviceOptions.indexOf(serviceInstanceName) == -1) { serviceOptions.push(serviceInstanceName||'') }
         if(roleOptions.indexOf(serviceRoleLabel) == -1) { roleOptions.push(serviceRoleLabel||'') }
@@ -42,22 +45,41 @@ const alertList: React.FC = () => {
       setServiceOptions(serviceOptions.map(item=>{return {text:item, value: item}}))
       setRoleOptions(roleOptions.map(item=>{return {text:item, value: item}}))
       setHostnameOptions(hostnameOptions.map(item=>{return {text:item, value: item}}))
-
-      // console.log('levelOptions:', levelOptions);
-      // console.log('serviceOptions:', serviceOptions);
-      // console.log('roleOptions:', roleOptions);
-      // console.log('hostnameOptions:', hostnameOptions);
-      
     }
     setLoading(false)
-    setNodeListData(result?.data)
+    setActiveListData(result?.data)
   };
 
-  const getData = JSON.parse(sessionStorage.getItem('colonyData') || '{}')
+  const getHistoryData = async () => {
+    setLoading(true)
+    const result: API.alertListResult =  await getHistoryAlertAPI();
+    // if(result?.data){
+    //   let levelOptions:any[] = []
+    //   let serviceOptions:any[] = []
+    //   let roleOptions:any[] = []
+    //   let hostnameOptions:any[] = []
+    //   // 处理表头过滤问题
+    //   for(let i = 0; i < result.data.length; i++){
+    //     let item = result.data[i]
+    //     const { alertLevelMsg, serviceInstanceName, serviceRoleLabel, hostname } = item
+    //     if(levelOptions.indexOf(alertLevelMsg) == -1) { levelOptions.push(alertLevelMsg||'') }
+    //     if(serviceOptions.indexOf(serviceInstanceName) == -1) { serviceOptions.push(serviceInstanceName||'') }
+    //     if(roleOptions.indexOf(serviceRoleLabel) == -1) { roleOptions.push(serviceRoleLabel||'') }
+    //     if(hostnameOptions.indexOf(hostname) == -1) { hostnameOptions.push(hostname||'') }
+    //   }
+    //   setAlertLevelOptions(levelOptions.map(item=>{return {text:item, value: item}}))
+    //   setServiceOptions(serviceOptions.map(item=>{return {text:item, value: item}}))
+    //   setRoleOptions(roleOptions.map(item=>{return {text:item, value: item}}))
+    //   setHostnameOptions(hostnameOptions.map(item=>{return {text:item, value: item}}))
+    // }
+    setLoading(false)
+    setHistoryListData(result?.data)
+  };
+
 
 
   useEffect(() => {
-    getTableData()
+    getActiveData()
   }, []);
 
 
@@ -148,19 +170,93 @@ const alertList: React.FC = () => {
       },
     }
   ]
+
+  const onChange = (key: string) => {
+    console.log(key);
+    setCurrentTab(key)
+    // const params = {serviceInstanceId: serviceId}
+    switch(key){
+      case 'activeAlert':  getActiveData(); break;
+      case 'historyAlert': getHistoryData();break;
+      default:break;
+    }
+  };
+
+  const tabs = [
+    {
+      label:'活跃告警',
+      key:'activeAlert',
+      children:(
+        <ProTable 
+          search={false} 
+          rowKey="alertId" 
+          columns={columns} 
+          dataSource={activeListData}
+          request={async (params = {}, sort, filter) => {
+            return getActiveAlertAPI({ });;
+          }}
+        />
+      )
+    },
+    {
+      label:'历史告警',
+      key:'historyAlert',
+      children:(
+        <ProTable 
+          search={false} 
+          rowKey="alertId" 
+          columns={columns} 
+          dataSource={historyListData}
+          request={async (params = {}, sort, filter) => {
+            return getHistoryAlertAPI({ });;
+          }}
+        />
+      )
+    },
+    {
+      label:'告警规则',
+      key:'ruleAlert',
+      children:(
+        <div>待开发。。。</div>
+        // <ProTable 
+        //   search={false} 
+        //   rowKey="alertId" 
+        //   columns={columns} 
+        //   dataSource={activeListData}
+        //   request={async (params = {}, sort, filter) => {
+        //     return getActiveAlertAPI({ });;
+        //   }}
+        // />
+      )
+    }
+  ]
   
 
   return (
     <PageContainer>
-      <ProTable 
+      <div className={styles.tabsBar}>
+          {
+            tabs.map(item=>{
+              return (
+                <div className={`${currentTab == item.key? styles.actived : ''}`} key={item.key} onClick={(e)=>onChange(item.key)}>
+                  {item.label}
+                </div>
+              )
+            })
+          }
+        </div>
+        <div className={styles.tabContent}>
+          { tabs.filter(item=>{return item.key == currentTab})[0].children}
+        </div>
+      {/* <ProTable 
         search={false} 
         rowKey="alertId" 
         columns={columns} 
-        dataSource={actionListData}
+        dataSource={activeListData}
         request={async (params = {}, sort, filter) => {
-          return getAlertAPI({ });;
+          return getActiveAlertAPI({ });;
         }}
-      />
+      /> */}
     </PageContainer>
   );
 };

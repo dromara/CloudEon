@@ -300,8 +300,8 @@ export async function startRoleAPI(options?: { [key: string]: any }) {
   });
 }
 
-/** 获取告警列表 */
-export async function getAlertAPI(options?: { [key: string]: any }) {
+/** 获取活跃告警列表 */
+export async function getActiveAlertAPI(options?: { [key: string]: any }) {
   return request<API.alertListResult>('/apiPre/alert/active', {
     method: 'GET',
     params: {
@@ -310,3 +310,12 @@ export async function getAlertAPI(options?: { [key: string]: any }) {
   });
 }
 
+/** 获取历史告警列表 */
+export async function getHistoryAlertAPI(options?: { [key: string]: any }) {
+  return request<API.alertListResult>('/apiPre/alert/history', {
+    method: 'GET',
+    params: {
+      ...options,
+    },
+  });
+}

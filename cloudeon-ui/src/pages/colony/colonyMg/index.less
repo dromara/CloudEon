@@ -1,13 +1,8 @@
 @import (reference) '~antd/es/style/themes/index';
+@import url('~@/assets/style/flex.less');
 
-.flexCenter() {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.cardIcon {
+.stackWrap {
   .flexCenter();
-
   flex-direction: column;
   width: 100%;
   height: 100%;
@@ -17,8 +12,35 @@
   &:hover {
     color: @primary-color;
   }
+  .titleWrap{
+    width: 100%;
+    display: flex;
+    .cardIcon{
+      color: @primary-color;
+      width: 50px;
+      margin-left: 10px;
+    }
+    .stackTitle{
+      font-size: 16px;
+      flex: 1;
+      display: flex;
+      align-items: center;
+    }
+  }
+  .stackInfo {
+    width: 100%;
+    padding-left: 61px;
+    font-size: 14px;
+    .stackDesc{
+      font-size: 14px;
+      line-height: 20px;
+      color: var(--cloudeon-text-color-1);
+    }
+  }
 }
-.cardDescText {
-  margin-top: 5px;
-  font-size: 14px;
+.codeEditorWrap{
+  border: 1px solid #d9d9d9;
+}
+.inputWrap{
+  width: 500px !important;
 }

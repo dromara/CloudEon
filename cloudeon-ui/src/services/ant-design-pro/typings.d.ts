@@ -120,6 +120,8 @@ declare namespace API {
   }
 
   type ColonyItem = {
+    serviceCnt?: ReactNode;
+    nodeCnt?: ReactNode;
     id?: number,
     createBy?: string,
     createTime?: string,
