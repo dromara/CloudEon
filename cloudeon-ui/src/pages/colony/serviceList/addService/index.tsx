@@ -289,9 +289,9 @@ const serviceAdd: React.FC = () => {
         });
   }
 
-  // 角色分配校验
+  // 角色分配校验：检验是否符合节点选择规则
   const checkAllRolesRules = (serviceInfos:API.ServiceInfosItem[]) => {
-    if(!serviceInfos || serviceInfos.length == 0) return
+    if(!serviceInfos || serviceInfos.length == 0) return true
     setErrInfo([])
     let errStr = ''
     let errList:any[] = []
@@ -318,6 +318,7 @@ const serviceAdd: React.FC = () => {
     setCheckRoleParNext(errList && errList.length > 0 ? false : true)
     setErrInfo(errList)
     openNotificationWithIcon(errList)
+    return errList && errList.length > 0 ? false : true
   }
 
   useEffect(() => {
@@ -340,7 +341,7 @@ const serviceAdd: React.FC = () => {
           <div className={styles.stepsContent}>
             {(current == 0 && serviceListData ) && <ChooseService serviceList={serviceListData} changeStatus={changeStatus} />}
             { current == 1 && <ConfigSecurity selectListIds={selectListIds || []} setKerberosToParams={setKerberosToParams} />}
-            { current == 2 && <AssignRoles serviceList={ getSelectedService() || [] } sourceServiceInfos={serviceInfos || []} setServiceInfosToParams={setServiceInfosToParams} checkAllRolesRules={checkAllRolesRules} /> }
+            { current == 2 && <AssignRoles serviceList={ getSelectedService() || [] } sourceServiceInfos={serviceInfos || []} setServiceInfosToParams={setServiceInfosToParams} checkAllRolesRules={checkAllRolesRules} parentLoading={loading} /> }
             { current == 3 && <ConfigService setPresetConfListToParams={setPresetConfListToParams} />}
             <div className={styles.stepBottomBtns}>
               <Button style={{ marginRight: '5px' }}               
