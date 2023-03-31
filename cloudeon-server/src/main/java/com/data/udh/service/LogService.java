@@ -71,7 +71,7 @@ public class LogService {
 
             //String command = "ssh tpbbsc01 \"tail -" +count+ "f " +logPath+ "\""; //二级SSH跳板机在这里修改
             String command = String.format("tail -20f  /opt/udh/%s/log/%s", serviceInstanceEntity.getServiceName(), logFileName);
-            log.info("查看服务器"+host+"上的角色实例日志，command: " + command);
+            log.info("查看服务器" + host + "上的角色实例日志，command: " + command);
 
             //创建一个执行Shell命令的Channel
             ChannelExec channelExec = (ChannelExec) sshSession.openChannel("exec");
@@ -82,13 +82,11 @@ public class LogService {
             //包装为字符流，方便每次读取一行
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
             String buf = "";
-            while ((buf = reader.readLine()) != null) {
-                if (wsSession.isOpen()) {
-                    //往WebSocket中推送数据
-                    wsSession.sendMessage(new TextMessage(buf));
-                }
-
+            while ((buf = reader.readLine()) != null && wsSession.isOpen()) {
+                //往WebSocket中推送数据
+                wsSession.sendMessage(new TextMessage(buf));
             }
+            log.info("退出监听服务器日志: sessionID {}",wsSessionBean.getWsSessionId());
         }
 
     }

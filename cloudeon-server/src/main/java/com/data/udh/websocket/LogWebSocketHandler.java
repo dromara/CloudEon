@@ -1,5 +1,6 @@
 package com.data.udh.websocket;
 
+import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
 import com.data.udh.dao.ClusterNodeRepository;
 import com.data.udh.dao.ServiceRoleInstanceRepository;
@@ -23,6 +24,7 @@ import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadPoolExecutor;
 
 @Component
 @Slf4j
@@ -42,6 +44,8 @@ public class LogWebSocketHandler extends TextWebSocketHandler implements WebSock
     @Resource
     private ClusterNodeRepository clusterNodeRepository;
 
+
+    ThreadPoolExecutor threadPoolExecutor = ThreadUtil.newExecutor(5, 100);
 
     /**
      * 连接建立成功时调用
@@ -95,11 +99,19 @@ public class LogWebSocketHandler extends TextWebSocketHandler implements WebSock
                 //缓存当前已经创建的连接
                 WsSessionBean wsSessionBean = new WsSessionBean();
                 wsSessionBean.setWebSocketSession(session);
+                wsSessionBean.setWsSessionId(session.getId());
                 wsSessionBean.setSshSession(sshSession);
                 livingSessionMap.put(session.getId(), wsSessionBean);
 
                 //WebSocket的前后端建立连接成功，立即调用日志推动逻辑，将数据推送给客户端
-                logService.sendLog2BrowserClient(wsSessionBean, roleId);
+                threadPoolExecutor.execute(() -> {
+                    try {
+                        logService.sendLog2BrowserClient(wsSessionBean, roleId);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                });
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
