@@ -4,7 +4,7 @@ import cn.hutool.crypto.digest.MD5;
 
 public class PasswordUtil {
     public static String encode(String password) {
-        return MD5.create().digestHex("password" + Constant.SALT);
+        return MD5.create().digestHex(password + Constant.SALT);
     }
 
     /**
