@@ -13,7 +13,7 @@ public enum TaskType {
     INSTALL_ROLE_TO_HOST(4, "安装服务角色到节点", "com.data.udh.processor.InstallTask", true),
     CONFIG_ROLE_TO_HOST(5, "配置服务角色到节点", "com.data.udh.processor.ConfigTask", true),
     INIT_HDFS_NAMENODE(6, "初始化NameNode", "com.data.udh.processor.HdfsZkfcFormatTask", false),
-    HDFS_MKDIR(7, "HDFS上创建目录", "com.data.udh.processor.ExampleTask", false),
+    YARN_HDFS_MKDIR(7, "HDFS上创建目录", "com.data.udh.processor.InitYARNDirOnHDFSTask", false),
     CANCEL_TAG_HOST(8, "移除节点上的标签", "com.data.udh.processor.CancelHostTagTask", true),
     STOP_K8S_SERVICE(9, "停止K8s服务", "com.data.udh.processor.StopRoleK8sDeploymentTask", false),
     REGISTER_BE(10, "注册be节点", "com.data.udh.processor.RegisterBeTask", false),
@@ -24,6 +24,8 @@ public enum TaskType {
     SCALE_DOWN_K8S_SERVICE(15, "按规模减少k8s服务", "com.data.udh.processor.ScaleDownK8sServiceTask", false),
     SCALE_UP_K8S_SERVICE(16, "按规模增加k8s服务", "com.data.udh.processor.ScaleUpK8sServiceTask", false),
     UPDATE_SERVICE_STATE(17, "更新服务实例状态", "com.data.udh.processor.UpdateServiceStateTask", false),
+    INIT_HIVE_WAREHOUSE(17, "初始化hive仓库文件目录", "com.data.udh.processor.InitHiveWarehouseTask", false),
+    INIT_HIVE_METASTORE(18, "初始化hive Metastore", "com.data.udh.processor.InitHiveMetastoreTask", false),
 
 
 

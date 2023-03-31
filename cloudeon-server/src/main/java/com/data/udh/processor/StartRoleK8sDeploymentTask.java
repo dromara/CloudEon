@@ -5,6 +5,7 @@ import cn.hutool.extra.spring.SpringUtil;
 import com.data.udh.config.UdhConfigProp;
 import com.data.udh.dao.*;
 import com.data.udh.entity.*;
+import com.data.udh.service.KubeService;
 import com.data.udh.utils.Constant;
 import com.data.udh.enums.ServiceRoleState;
 import freemarker.template.Configuration;
@@ -38,6 +39,7 @@ public class StartRoleK8sDeploymentTask extends BaseUdhTask{
         StackServiceRoleRepository stackServiceRoleRepository = SpringUtil.getBean(StackServiceRoleRepository.class);
         ServiceRoleInstanceRepository serviceRoleInstanceRepository = SpringUtil.getBean(ServiceRoleInstanceRepository.class);
         ServiceInstanceConfigRepository configRepository = SpringUtil.getBean(ServiceInstanceConfigRepository.class);
+        KubeService kubeService = SpringUtil.getBean(KubeService.class);
 
         UdhConfigProp udhConfigProp = SpringUtil.getBean(UdhConfigProp.class);
         String workHome = udhConfigProp.getWorkHome();
@@ -102,7 +104,7 @@ public class StartRoleK8sDeploymentTask extends BaseUdhTask{
         }
 
         // 调用k8s命令启动资源
-        KubernetesClient client = new KubernetesClientBuilder().build();
+        KubernetesClient client = kubeService.getKubeClient(serviceInstanceEntity.getClusterId());
         String deploymentName ="";
         try {
             List<HasMetadata> metadata = client.load(new FileInputStream(outPutFile))

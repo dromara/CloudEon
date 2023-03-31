@@ -219,7 +219,7 @@ public class ConfigTask extends BaseUdhTask {
      */
     private void copyDependenceServiceConf(String stackServiceName, String[] depServiceInstanceIds, String outputConfPath,
                                            ServiceInstanceRepository serviceInstanceRepository, StackServiceRepository stackServiceRepository, String workHome) {
-        if (stackServiceName.equalsIgnoreCase(Constant.YARN_SERVICE_NAME)) {
+        if (stackServiceName.equalsIgnoreCase(Constant.YARN_SERVICE_NAME)||stackServiceName.equalsIgnoreCase(Constant.HIVE_SERVICE_NAME)) {
             List<Integer> instanceIds = Arrays.stream(depServiceInstanceIds).map(new Function<String, Integer>() {
                 @Override
                 public Integer apply(String s) {
@@ -257,6 +257,41 @@ public class ConfigTask extends BaseUdhTask {
                 String hdfsSiteFile = "hdfs-site.xml";
                 FileUtil.copy(depServiceDirConf + File.separator + hdfsSiteFile, outputConfPath, true);
                 log.info("拷贝依赖服务HDFS的配置文件{}到配置目录",hdfsSiteFile);
+            }
+
+
+        }
+
+        if (stackServiceName.equalsIgnoreCase(Constant.HIVE_SERVICE_NAME)) {
+            List<Integer> instanceIds = Arrays.stream(depServiceInstanceIds).map(new Function<String, Integer>() {
+                @Override
+                public Integer apply(String s) {
+                    return Integer.valueOf(s);
+                }
+            }).collect(Collectors.toList());
+            // 找出依赖的HDFS服务的实例名
+            String hdfsServiceInstanceName = serviceInstanceRepository.findAllById(instanceIds).stream()
+                    .filter(serviceInstanceEntity -> {
+                        // 过滤出框架服务名为YARN的服务实例
+                        Integer stackServiceId = serviceInstanceEntity.getStackServiceId();
+                        StackServiceEntity stackServiceEntity = stackServiceRepository.findById(stackServiceId).get();
+                        return stackServiceEntity.getName().equals(Constant.YARN_SERVICE_NAME);
+                    }).map(ServiceInstanceEntity::getServiceName).findFirst().get();
+            // 拷贝mapred-site和yarn-site
+            String depServiceDir = workHome + File.separator + hdfsServiceInstanceName;
+            if (FileUtil.exist(depServiceDir) && FileUtil.isDirectory(depServiceDir)) {
+                File file = new File(depServiceDir);
+
+                String firstNodeDir = Arrays.stream(file.list()).findFirst().get();
+                String depServiceDirConf = depServiceDir + File.separator + firstNodeDir + File.separator + CONF_DIR;
+
+                String yarnSiteFile = "yarn-site.xml";
+                FileUtil.copy(depServiceDirConf + File.separator + yarnSiteFile, outputConfPath, true);
+                log.info("拷贝依赖服务YARN的配置文件{}到配置目录",yarnSiteFile);
+
+                String mapredSiteFile = "mapred-site.xml";
+                FileUtil.copy(depServiceDirConf + File.separator + mapredSiteFile, outputConfPath, true);
+                log.info("拷贝依赖服务YARN的配置文件{}到配置目录",mapredSiteFile);
             }
 
 

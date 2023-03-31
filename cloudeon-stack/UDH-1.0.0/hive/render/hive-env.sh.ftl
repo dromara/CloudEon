@@ -45,10 +45,24 @@
 
 
 # Set HADOOP_HOME to point to a specific hadoop install directory
-# HADOOP_HOME=${bin}/../../hadoop
+HADOOP_HOME=${r"${HADOOP_HOME}"}
 
 # Hive Configuration Directory can be controlled by:
-# export HIVE_CONF_DIR=
+export HIVE_CONF_DIR=/opt/udh/${service.serviceName}/conf
 
+export HIVE_PID_DIR={{HIVE_PID_DIR}}
 # Folder containing extra libraries required for hive compilation/execution can be controlled by:
 # export HIVE_AUX_JARS_PATH=
+
+
+export HADOOP_CLIENT_OPTS="$HADOOP_CLIENT_OPTS -Dlog4j2.formatMsgNoLookups=true"
+
+# metastore服务器开启jmx监控
+if [ "$SERVICE" = "metastore" ]; then
+    JMX_OPTS="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.port=9919 -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=5549:/opt/udh/${service.serviceName}/conf/jmx_prometheus.yaml"
+    export HIVE_METASTORE_HADOOP_OPTS="$HIVE_METASTORE_HADOOP_OPTS -Xmx${conf['hive.metasotre.memory']?number?floor?c}m $JMX_OPTS"
+fi
+# server2服务开启jmx监控
+if [ "$SERVICE" = "hiveserver2" ]; then
+    export HADOOP_CLIENT_OPTS="$HADOOP_CLIENT_OPTS -Xmx${conf['hive.server2.memory']?number?floor?c}m -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.port=9920 -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=5550:/opt/udh/${service.serviceName}/conf/jmx_prometheus.yaml"
+fi

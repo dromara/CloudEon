@@ -1,6 +1,9 @@
-package com.data.udh.entity;
+package com.data.udh.controller.response;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -11,18 +14,11 @@ import java.util.Date;
  * 集群信息表
  *
  */
-@Entity
 @Data
-@Table(name = "udh_cluster_info")
-public class ClusterInfoEntity implements Serializable {
+public class ClusterInfoVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 主键
-     */
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
-    @GenericGenerator(name = "native", strategy = "native")
+
     private Integer id;
     /**
      * 创建人
@@ -46,6 +42,16 @@ public class ClusterInfoEntity implements Serializable {
     private Integer stackId;
 
     private String kubeConfig;
+
+    /**
+     * 绑定节点数
+     */
+    private Integer nodeCnt;
+
+    /**
+     * 服务数
+     */
+    private Integer serviceCnt;
 
 
 

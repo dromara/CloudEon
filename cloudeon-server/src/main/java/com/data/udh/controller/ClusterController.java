@@ -1,7 +1,10 @@
 package com.data.udh.controller;
 
 import com.data.udh.controller.request.ModifyClusterInfoRequest;
+import com.data.udh.controller.response.ClusterInfoVO;
 import com.data.udh.dao.ClusterInfoRepository;
+import com.data.udh.dao.ClusterNodeRepository;
+import com.data.udh.dao.ServiceInstanceRepository;
 import com.data.udh.dao.StackInfoRepository;
 import com.data.udh.dto.ResultDTO;
 import com.data.udh.entity.ClusterInfoEntity;
@@ -11,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.data.udh.utils.Constant.AdminUserName;
 
@@ -29,6 +34,12 @@ public class ClusterController {
 
     @Resource
     private StackInfoRepository stackInfoRepository;
+
+    @Resource
+    private ClusterNodeRepository clusterNodeRepository;
+
+    @Resource
+    private ServiceInstanceRepository serviceInstanceRepository;
 
 
     @PostMapping("/save")
@@ -64,10 +75,24 @@ public class ClusterController {
     }
 
     @GetMapping("/list")
-    public ResultDTO<List<ClusterInfoEntity>> listClusterInfo() {
-        List<ClusterInfoEntity> result;
-        result = clusterInfoRepository.findAll();
-        return ResultDTO.success(result);
+    public ResultDTO<List<ClusterInfoVO>> listClusterInfo() {
+        List<ClusterInfoVO> clusterInfoVOS = clusterInfoRepository.findAll().stream().map(new Function<ClusterInfoEntity, ClusterInfoVO>() {
+            @Override
+            public ClusterInfoVO apply(ClusterInfoEntity clusterInfoEntity) {
+                ClusterInfoVO clusterInfoVO = new ClusterInfoVO();
+                Integer clusterId = clusterInfoEntity.getId();
+                BeanUtils.copyProperties(clusterInfoEntity,clusterInfoVO);
+                // 查询节点数
+                Integer nodeCnt = clusterNodeRepository.countByClusterId(clusterId);
+                // 查询服务数
+                Integer serviceCnt = serviceInstanceRepository.countByClusterId(clusterId);
+                clusterInfoVO.setNodeCnt(nodeCnt);
+                clusterInfoVO.setKubeConfig(null);
+                clusterInfoVO.setServiceCnt(serviceCnt);
+                return clusterInfoVO;
+            }
+        }).collect(Collectors.toList());
+        return ResultDTO.success(clusterInfoVOS);
     }
 
 

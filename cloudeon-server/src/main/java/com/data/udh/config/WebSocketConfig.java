@@ -16,7 +16,8 @@ public class WebSocketConfig implements WebSocketConfigurer {
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         LogWebSocketHandler logWebSocketHandler = SpringUtil.getBean(LogWebSocketHandler.class);
         registry.addHandler(new ChatWebSocketHandler(), "/chat");
-        registry.addHandler(logWebSocketHandler, "/log");
+        // websocket一定要加上 * 匹配，否则前端连不上
+        registry.addHandler(logWebSocketHandler, "/log").setAllowedOriginPatterns("*");;
     }
  
 }

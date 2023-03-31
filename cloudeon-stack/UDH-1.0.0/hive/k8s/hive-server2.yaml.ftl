@@ -41,19 +41,27 @@ spec:
       hostNetwork: true
       containers:
       - args:
-        - "/home/doris/doris-fe/conf/fe_bootstrap.sh"
+          - "/opt/udh/${service.serviceName}/conf/bootstrap-hiveserver2.sh"
+        env:
+          - name: "SERVICE_NAME"
+            value: "server2"
+          - name: "HIVE_CONF_DIR"
+            value: "/opt/udh/${service.serviceName}/conf"
         image: "${dockerImage}"
         imagePullPolicy: "Always"
-        name: "${roleServiceFullName}"
         readinessProbe:
-          httpGet:
-            path: /api/health
-            port: ${conf['http_port']}
+          exec:
+            command:
+            - "/bin/bash"
+            - "-c"
+            - "curl --fail --connect-timeout 15 --max-time 15 \"http://`hostname`:${conf['hive.server2.webui.port']}/\"\
+            \n"
           failureThreshold: 3
-          initialDelaySeconds: 3
-          periodSeconds: 30
+          initialDelaySeconds: 10
+          periodSeconds: 10
           successThreshold: 1
-          timeoutSeconds: 15
+          timeoutSeconds: 1
+        name: "${roleServiceFullName}"
         resources:
           requests: {}
           limits: {}
@@ -66,7 +74,7 @@ spec:
           name: "log"
         - mountPath: "/etc/localtime"
           name: "timezone"
-        - mountPath: "/home/doris/doris-fe/conf"
+        - mountPath: "/opt/udh/${service.serviceName}/conf"
           name: "conf"
 
       nodeSelector:

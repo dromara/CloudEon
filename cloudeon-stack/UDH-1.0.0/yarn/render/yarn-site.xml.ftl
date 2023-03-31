@@ -22,8 +22,8 @@
     <@property "yarn.nodemanager.log-dirs" "/opt/udh/${service.serviceName}/log"/>
     <#--handle dependencies.hdfs-->
     <#assign hdfs=dependencies.HDFS >
-    <@property "yarn.nodemanager.remote-app-log-dir" "hdfs://${hdfs.conf['nameservices']}/var/log/hadoop-yarn/apps"/>
-    <@property "yarn.app.mapreduce.am.staging-dir" "hdfs://${hdfs.conf['nameservices']}/user"/>
+    <@property "yarn.nodemanager.remote-app-log-dir" "hdfs://${hdfs.conf['nameservices']}${conf['remote.app.log.dir']}"/>
+    <@property "yarn.app.mapreduce.am.staging-dir" "hdfs://${hdfs.conf['nameservices']}${conf['mapreduce.am.staging.dir']}"/>
 
 <#if serviceRoles['YARN_RESOURCEMANAGER']?? && serviceRoles['YARN_RESOURCEMANAGER']?size gt 1>
     <@property "yarn.resourcemanager.ha.enabled" "true"/>

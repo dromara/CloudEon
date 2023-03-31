@@ -9,6 +9,7 @@ import com.data.udh.entity.ServiceInstanceEntity;
 import com.data.udh.entity.ServiceRoleInstanceEntity;
 import com.data.udh.entity.StackServiceRoleEntity;
 import com.data.udh.enums.ServiceRoleState;
+import com.data.udh.service.KubeService;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
@@ -23,7 +24,7 @@ public class ScaleUpK8sServiceTask extends BaseUdhTask {
         ServiceInstanceRepository serviceInstanceRepository = SpringUtil.getBean(ServiceInstanceRepository.class);
         ClusterNodeRepository clusterNodeRepository = SpringUtil.getBean(ClusterNodeRepository.class);
         ServiceRoleInstanceRepository serviceRoleInstanceRepository = SpringUtil.getBean(ServiceRoleInstanceRepository.class);
-
+        KubeService kubeService = SpringUtil.getBean(KubeService.class);
 
         ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(taskParam.getServiceInstanceId()).get();
         String serviceName = serviceInstanceEntity.getServiceName();
@@ -38,7 +39,7 @@ public class ScaleUpK8sServiceTask extends BaseUdhTask {
         String deploymentName = String.format("%s-%s", roleFullName, serviceInstanceName);
         String tag = roleFullName + "-" + serviceName.toLowerCase();
 
-        try (KubernetesClient client = new KubernetesClientBuilder().build();) {
+        try (KubernetesClient client = kubeService.getKubeClient(serviceInstanceEntity.getClusterId());) {
             RollableScalableResource<Deployment> resource = client.apps().deployments().inNamespace("default").withName(deploymentName);
             Integer replicas = resource.get().getStatus().getReplicas();
             if (replicas == null) {

@@ -1,5 +1,6 @@
 package com.data.udh;
 
+import com.data.udh.dao.ClusterInfoRepository;
 import com.data.udh.utils.ByteConverter;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
@@ -26,6 +27,9 @@ import java.util.concurrent.TimeUnit;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class K8sTest {
+
+    @javax.annotation.Resource
+    private ClusterInfoRepository clusterInfoRepository;
 
     @Test
     public void listNode() {
@@ -160,5 +164,14 @@ public class K8sTest {
     @Test
     public void ip() throws UnknownHostException {
         System.out.println(InetAddress.getLocalHost().getHostAddress());
+    }
+
+    @Test
+    public void kubeconfig() {
+        String kubeConfig = clusterInfoRepository.findById(1).get().getKubeConfig();
+        KubernetesClient client = new KubernetesClientBuilder().withConfig(kubeConfig).build();
+        NodeList nodeList = client.nodes().list();
+        List<Node> items = nodeList.getItems();
+        System.out.println(items.size());
     }
 }
