@@ -23,8 +23,12 @@ jobs:
     - name: Build with Maven
       run: mvn  clean install  -DskipTests
     - name: upload build result
-      run: mkdir staging && cp cloudeon-server/target/cloudeon-server-*.jar staging/cloudeon-server.jar
+      run: mkdir staging && cp cloudeon-assembly/target/cloudeon-assembly-1.0.0-release.zip staging/cloudeon-assembly-1.0.0-release.zip && && cp cloudeon-assembly/target/cloudeon-assembly-1.0.0-release.tar.gz staging/cloudeon-assembly-1.0.0-release.tar.gz
     - uses: actions/upload-artifact@v1
       with:
-        name: cloudeon-server.jar
-        path: staging/cloudeon-server.jar
+        name: cloudeon-assembly-1.0.0-release.zip
+        path: staging/cloudeon-assembly-1.0.0-release.zip
+    - uses: actions/upload-artifact@v1
+      with:
+        name: cloudeon-assembly-1.0.0-release.tar.gz
+        path: staging/cloudeon-assembly-1.0.0-release.tar.gz
