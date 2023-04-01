@@ -23,6 +23,7 @@
     <modules>
         <module>cloudeon-server</module>
         <module>cloudeon-ui</module>
+        <module>cloudeon-assembly</module>
     </modules>
 
     <properties>
