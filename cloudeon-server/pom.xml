@@ -249,6 +249,9 @@
                                         <include>user/</include>
                                         <include>favicon.ico</include>
                                         <include>index.html</include>
+                                        <include>pro_icon.svg</include>
+                                        <include>logo.svg</include>
+                                        <include>asset-manifest.json</include>
                                     </includes>
                                 </resource>
                             </resources>
