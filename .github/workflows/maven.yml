@@ -21,18 +21,10 @@ jobs:
       with:
         java-version: 1.8
     - name: Build with Maven
-      run: mvn -B clean package -Pdev -DskipTests --file pom.xml
+      run: mvn  clean install  -DskipTests
     - name: upload build result
-      run: mkdir staging && cp powerjob-server/powerjob-server-starter/target/*.jar staging/powerjob-server.jar && cp powerjob-client/target/*.jar staging/powerjob-client.jar && cp powerjob-worker-agent/target/*.jar staging/powerjob-agent.jar
+      run: mkdir staging && cp cloudeon-server/target/cloudeon-server-*.jar staging/cloudeon-server.jar
     - uses: actions/upload-artifact@v1
       with:
-        name: powerjob-server.jar
-        path: staging/powerjob-server.jar
-    - uses: actions/upload-artifact@v1
-      with:
-        name: powerjob-client.jar
-        path: staging/powerjob-client.jar
-    - uses: actions/upload-artifact@v1
-      with:
-        name: powerjob-agent.jar
-        path: staging/powerjob-agent.jar
+        name: cloudeon-server.jar
+        path: staging/cloudeon-server.jar
