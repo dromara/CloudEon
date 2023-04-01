@@ -49,12 +49,12 @@
         </fileSet>
         <fileSet>
             <directory>../cloudeon-stack</directory>
-            <outputDirectory>/cloudeon-stack</outputDirectory>
+            <outputDirectory>/stack</outputDirectory>
 
         </fileSet>
         <fileSet>
             <directory>../remote-script</directory>
-            <outputDirectory>/remote-script</outputDirectory>
+            <outputDirectory>/script</outputDirectory>
             <includes>
                 <include>*.sh</include>
             </includes>
