@@ -22,10 +22,20 @@
         <commons.lang.version>3.12.0</commons.lang.version>
         <guava.version>31.1-jre</guava.version>
         <commons.io.version>2.7</commons.io.version>
-
+        <!-- 前端项目编译后的dist目录路径 -->
+        <frontend-project-dist-dir>${project.parent.basedir}/cloudeon-ui/dist</frontend-project-dist-dir>
+        <java.version>1.8</java.version>
+        <maven-clean-plugin>3.1.0</maven-clean-plugin>
+        <maven.resource.version>3.1.0</maven.resource.version>
     </properties>
 
     <dependencies>
+        <!-- 需要依赖前端模块,否则无法打包进后端系统,前端模块将会打一个空的jar包 -->
+        <dependency>
+            <groupId>io.bigdata</groupId>
+            <artifactId>cloudeon-ui</artifactId>
+            <version>1.0.0</version>
+        </dependency>
         <!-- lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -179,6 +189,72 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${springboot.version}</version>
+                <!--解决打包后，执行java -jar 命令，找不到主清单属性-->
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <!-- 插件maven-clean-plugin，用于在编译前，清除之前编译的文件、文件夹等，避免残留之前的内容 -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>${maven-clean-plugin}</version>
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <!-- 前端资源目录，即：存放前端包目录-->
+                            <directory>src/main/resources/static</directory>
+                        </fileset>
+<!--                        <fileset>-->
+<!--                            &lt;!&ndash; Vue项目打包自动生成的dist目录 &ndash;&gt;-->
+<!--                            <directory>${frontend-project-dist-dir}</directory>-->
+<!--                        </fileset>-->
+                    </filesets>
+                </configuration>
+            </plugin>
+
+            <!--资源插件，主要为了从前端项目里复制打包好的文件到springboot项目-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>${maven.resource.version}</version>
+                <executions>
+                    <execution>
+                        <id>copy static</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <!-- 复制前端打包文件到这里 -->
+                            <outputDirectory>src/main/resources/static</outputDirectory>
+                            <overwrite>true</overwrite>
+                            <resources>
+                                <resource>
+                                    <!-- 从前端打包的目录dist进行指定文件、文件夹内容的复制-->
+                                    <directory>${frontend-project-dist-dir}</directory>
+                                    <includes>
+                                        <!-- 具体根据实际前端代码、及目录结构进行配置-->
+                                        <include>*.css</include>
+                                        <include>*.js</include>
+                                        <include>colony/</include>
+                                        <include>icons/</include>
+                                        <include>static/</include>
+                                        <include>user/</include>
+                                        <include>favicon.ico</include>
+                                        <include>index.html</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
