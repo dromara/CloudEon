@@ -5,7 +5,7 @@
 2. [Umi3](https://v3.umijs.org/)
 3. [typescript](https://www.typescriptlang.org/zh/docs/)
 4. [React](https://zh-hans.reactjs.org/)
-5. [node](https://github.com/nodejs/node)，版本要在12.0.0 以上 
+5. [node](https://github.com/nodejs/node)，建议使用16.13.1版本 
 
 # 第一次启动项目
 1. cd web-ui
@@ -24,7 +24,6 @@ tyarn
     '/apiPre/': {
       target: 'http://192.168.31.30:7700', // 要代理的地址改成后端接口实际的地址
       changeOrigin: true,
-      pathRewrite: { '^/apiPre' : '' },
     }
    ```
 6. 启动项目

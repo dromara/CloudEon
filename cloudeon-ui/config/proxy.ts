@@ -20,7 +20,7 @@ export default {
       // 要代理的地址
       target: 'http://192.168.31.138:7700', // http://192.168.31.30:7700
       changeOrigin: true,
-      pathRewrite: { '^/apiPre' : '' },
+      // pathRewrite: { '^/apiPre' : '' },
     }
   },
   test: {
