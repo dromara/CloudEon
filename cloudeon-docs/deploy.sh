@@ -15,7 +15,8 @@ npm run build
 
 # 进入生成的文件夹
 cd $dist_path
-
+git config --global user.email "Pandas886@example.com"
+git config --global user.name "Pandas886"
 git init
 git remote add github $push_addr
 git add -A
