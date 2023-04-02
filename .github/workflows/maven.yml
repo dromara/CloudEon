@@ -34,7 +34,7 @@ jobs:
         path: staging/cloudeon-assembly-1.0.0-release.tar.gz
 
     - name: Build the Docker image
-      run: cp cloudeon-assembly/target/cloudeon-assembly-1.0.0-release ./docker
+      run: cp -r cloudeon-assembly/target/cloudeon-assembly-1.0.0-release ./docker
     - uses: docker/build-push-action@v1
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
