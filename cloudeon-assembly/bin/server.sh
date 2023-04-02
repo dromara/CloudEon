@@ -1,28 +1,8 @@
 #!/bin/bash
-#
-# The MIT License (MIT)
-#
-# Copyright (c) 2019 Code Technology Studio
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy of
-# this software and associated documentation files (the "Software"), to deal in
-# the Software without restriction, including without limitation the rights to
-# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-# the Software, and to permit persons to whom the Software is furnished to do so,
-# subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-# FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-# COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-# IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-#
 
-# description: Auto-starts jpom server
+
+
+# description: Auto-starts cloudeon server
 
 function absPath() {
 	dir="$1"
@@ -66,14 +46,14 @@ base=$(absPath "$bin_abs_path/../")
 
 conf_path="${base}/conf"
 Lib="${base}/lib/"
-LogPath="${base}/logs/"
+LogPath="${base}/log/"
 tmpdir="${base}/tmp/"
 Log="${LogPath}/stdout.log"
 logback_configurationFile="${conf_path}/logback.xml"
-application_conf="${conf_path}/application.yml"
+application_conf="${conf_path}/application.properties"
 pidfile="$base/bin/server.pid"
 
-PID_TAG="JPOM_SERVER_APPLICATION"
+PID_TAG="CloudEonApplication"
 server_log="${LogPath}/server.log"
 
 ## set java path
@@ -197,7 +177,7 @@ function start() {
 		touch "$server_log"
 	fi
 	# start
-	command="${JAVA} -Djpom.application.tag=${PID_TAG} ${JAVA_OPTS} -jar ${Lib}${RUN_JAR} ${MAIN_ARGS}"
+	command="${JAVA}  -Dcloudeon.home.path=$base -Djpom.application.tag=${PID_TAG} ${JAVA_OPTS} -jar ${Lib}${RUN_JAR} ${MAIN_ARGS}"
 	echo "$command" >"$Log"
 
 	eval "nohup $command >>$Log 2>&1 &"
@@ -210,7 +190,6 @@ function start() {
 		echo "silence auto exit 0,${pid}"
 		exit 0
 	fi
-	tail -fn 0 --pid="$pid" "$server_log"
 }
 
 function stop() {
@@ -223,9 +202,9 @@ function stop() {
 		killMode=${mode}
 	fi
 	if [ "$pid" != "" ]; then
-		echo -n "jpom server ( pid $pid) is running"
+		echo -n "cloudeon server ( pid $pid) is running"
 		echo
-		echo -n $"Shutting down (kill $killMode $pid) jpom server: "
+		echo -n $"Shutting down (kill $killMode $pid) cloudeon server: "
 		if [ "$killMode" == "" ]; then
 			kill "$pid"
 		else
@@ -242,7 +221,7 @@ function stop() {
 			sleep 1
 		done
 	else
-		echo "jpom server is stopped"
+		echo "cloudeon server is stopped"
 	fi
 	eval "$(rm -f "$pidfile")"
 }
@@ -251,9 +230,9 @@ function status() {
 	pid=$(getPid)
 	#echo "$pid"
 	if [ "$pid" != "" ]; then
-		echo "jpom server running:$pid"
+		echo "cloudeon server running:$pid"
 	else
-		echo "jpom server is stopped"
+		echo "cloudeon server is stopped"
 	fi
 }
 

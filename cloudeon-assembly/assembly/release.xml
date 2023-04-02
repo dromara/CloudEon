@@ -20,6 +20,8 @@
                 <include>*.sh</include>
             </includes>
             <lineEnding>unix</lineEnding>
+            <fileMode>0755</fileMode>
+            <directoryMode>0755</directoryMode>
         </fileSet>
 
         <!--复制外部配置文件-->
@@ -59,6 +61,8 @@
                 <include>*.sh</include>
             </includes>
             <lineEnding>unix</lineEnding>
+            <fileMode>0755</fileMode>
+            <directoryMode>0755</directoryMode>
         </fileSet>
         <fileSet>
             <directory>../cloudeon-server/target</directory>
