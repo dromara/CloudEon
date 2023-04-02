@@ -71,15 +71,7 @@ public class CommandEntity {
      */
     private Integer operateUserId;
 
-    /**
-     * 工作流实例Id
-     */
-    private Long powerjobWorkflowInstanceId;
 
-    /**
-     * App Id
-     */
-    private Long powerjobAppId;
 
     private Integer clusterId;
 }

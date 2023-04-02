@@ -74,7 +74,6 @@ public class CommandTaskEntity {
      */
     private Integer progress;
 
-    private Long powerjobInstanceId;
 
 }
 
