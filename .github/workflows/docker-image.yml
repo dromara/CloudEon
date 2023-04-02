@@ -1,9 +1,11 @@
 name: Docker Image CI
-
 on:
-  push:
-    branches: [ master ]
-
+  workflow_dispatch:
+    inputs:
+      dependency-workflow:
+        description: 'The workflow dependency to use'
+        required: true
+        default: 'Java CI with Maven'
 jobs:
 
   build:
@@ -12,8 +14,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    # 下载构建工件
+    - name: Download artifact
+      uses: actions/download-artifact@v2
+      with:
+        name: cloudeon-assembly-1.0.0-release.tar.gz
+        path: ./docker/cloudeon-assembly-1.0.0-release.tar.gz
     - name: Build the Docker image
-      run: mvn clean install  -DskipTests  && cp -r cloudeon-assembly/target/cloudeon-assembly-1.0.0-release docker/
+      run: tar zxvf ./docker/cloudeon-assembly-1.0.0-release.tar.gz -C  ./docker
     - uses: docker/build-push-action@v1
       with:
         username: ${{ secrets.DOCKER_USERNAME }}

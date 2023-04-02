@@ -5,6 +5,8 @@ on:
   push:
     branches:
       - master
+    paths:
+      - 'cloudeon-docs/**'
 jobs: # 工作流
   build:
     runs-on: ubuntu-latest #运行在虚拟机环境ubuntu-latest
