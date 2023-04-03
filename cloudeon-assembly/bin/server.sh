@@ -191,7 +191,7 @@ function start() {
 		exit 0
 	fi
 
-	tail -f "$Log"
+	tail -100f "$Log"
 }
 
 function stop() {
