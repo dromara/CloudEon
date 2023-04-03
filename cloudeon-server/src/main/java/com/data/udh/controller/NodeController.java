@@ -51,17 +51,35 @@ public class NodeController {
         Integer sshPort = req.getSshPort();
         String sshUser = req.getSshUser();
         String sshPassword = req.getSshPassword();
+        Integer clusterId = req.getClusterId();
         // 检查ip不能重复
         if (clusterNodeRepository.countByIp(ip) > 0) {
            return ResultDTO.failed("已添加ip为：" + ip + " 的节点(服务器)");
         }
         // 校验ssh服务
         checkSSH(ip, sshPort, sshUser, sshPassword);
-
+        KubernetesClient kubeClient = kubeService.getKubeClient(clusterId);
+        NodeList nodeList = kubeClient.nodes().list();
+        List<Node> items = nodeList.getItems();
+        // 获取该节点在k8s上的信息
+        NodeInfoVO k8sNodeInfoVO = items.stream().filter(new Predicate<Node>() {
+            @Override
+            public boolean test(Node node) {
+                String nodeIp = node.getStatus().getAddresses().get(0).getAddress();
+                return ip.equals(nodeIp);
+            }
+        }).map(new Function<Node, NodeInfoVO>() {
+            @Override
+            public NodeInfoVO apply(Node node) {
+                return getNodeInfoVO(node);
+            }
+        }).findFirst().get();
+        String containerRuntimeVersion = k8sNodeInfoVO.getContainerRuntimeVersion();
         // 保存到数据库
         ClusterNodeEntity newClusterNodeEntity = new ClusterNodeEntity();
         BeanUtil.copyProperties(req, newClusterNodeEntity);
         newClusterNodeEntity.setCreateTime(new Date());
+        newClusterNodeEntity.setRuntimeContainer(containerRuntimeVersion);
         clusterNodeRepository.save(newClusterNodeEntity);
 
 

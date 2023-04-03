@@ -40,6 +40,7 @@ public class ClusterNodeEntity implements Serializable {
      * 机架
      */
     private String rack;
+    private String runtimeContainer;
     /**
      * 核数
      */
