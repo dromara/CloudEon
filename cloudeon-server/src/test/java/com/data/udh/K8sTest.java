@@ -4,6 +4,8 @@ import com.data.udh.dao.ClusterInfoRepository;
 import com.data.udh.utils.ByteConverter;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
+import io.fabric8.kubernetes.client.Config;
+import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import io.fabric8.kubernetes.client.Watcher;
@@ -16,8 +18,7 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
@@ -167,9 +168,11 @@ public class K8sTest {
     }
 
     @Test
-    public void kubeconfig() {
+    public void kubeconfig() throws FileNotFoundException {
         String kubeConfig = clusterInfoRepository.findById(1).get().getKubeConfig();
-        KubernetesClient client = new KubernetesClientBuilder().withConfig(kubeConfig).build();
+
+        Config config = Config.fromKubeconfig(kubeConfig);
+        KubernetesClient client = new KubernetesClientBuilder().withConfig(config).build();
         NodeList nodeList = client.nodes().list();
         List<Node> items = nodeList.getItems();
         System.out.println(items.size());
