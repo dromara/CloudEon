@@ -191,7 +191,7 @@ function start() {
 		exit 0
 	fi
 
-	tail -fn 0 --pid="$pid" "$server_log"
+	tail -100f "$Log"
 }
 
 function stop() {
