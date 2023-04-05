@@ -94,7 +94,6 @@ public class ClusterController {
                 // 查询服务数
                 Integer serviceCnt = serviceInstanceRepository.countByClusterId(clusterId);
                 clusterInfoVO.setNodeCnt(nodeCnt);
-                clusterInfoVO.setKubeConfig(null);
                 clusterInfoVO.setServiceCnt(serviceCnt);
                 return clusterInfoVO;
             }
