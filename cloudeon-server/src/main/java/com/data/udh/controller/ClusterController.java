@@ -8,6 +8,8 @@ import com.data.udh.dao.ServiceInstanceRepository;
 import com.data.udh.dao.StackInfoRepository;
 import com.data.udh.dto.ResultDTO;
 import com.data.udh.entity.ClusterInfoEntity;
+import com.data.udh.service.KubeService;
+import io.fabric8.kubernetes.client.KubernetesClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,7 +42,8 @@ public class ClusterController {
 
     @Resource
     private ServiceInstanceRepository serviceInstanceRepository;
-
+    @Resource
+    private KubeService kubeService;
 
     @PostMapping("/save")
     public ResultDTO<Void> saveCluster(@RequestBody ModifyClusterInfoRequest req) {
@@ -52,12 +55,16 @@ public class ClusterController {
         stackInfoRepository.findById(stackId).orElseThrow(() -> new IllegalArgumentException("can't find stack info by stack Id:" + stackId));;
 
         Integer id = req.getId();
+        // 判断更新还是新建
         if (id == null) {
             clusterInfoEntity = new ClusterInfoEntity();
             clusterInfoEntity.setCreateTime(new Date());
         }else {
             clusterInfoEntity = clusterInfoRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("can't find cluster info by id:" + id));
         }
+        // 检验kubeconfig是否正确能连接k8s集群
+        KubernetesClient kubernetesClient = kubeService.getKubernetesClient(req.getKubeConfig());
+        kubeService.testConnect(kubernetesClient);
         BeanUtils.copyProperties(req, clusterInfoEntity);
         clusterInfoEntity.setCreateTime(new Date());
         clusterInfoEntity.setCreateBy(AdminUserName);
