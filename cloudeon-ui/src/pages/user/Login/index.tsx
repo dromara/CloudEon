@@ -21,6 +21,8 @@ import { FormattedMessage, history, SelectLang, useIntl, useModel } from 'umi';
 import { loginAPI } from '@/services/ant-design-pro/colonyLogin'
 import styles from './index.less';
 import loginImg from '../../../assets/images/login-img.png'
+import logoImg from '@/assets/images/logo2.png';
+
 
 const LoginMessage: React.FC<{
   content: string;
@@ -146,6 +148,7 @@ const Login: React.FC = () => {
         <div className={styles.loginRight}>
           <div className={styles.loginText}>
             <div className={styles.title}>
+              {/* <Image style={{width:'50px',marginRight:'10px'}} src={logoImg}></Image> */}
               CloudEon
             </div>
             <div className={styles.subTitle}>

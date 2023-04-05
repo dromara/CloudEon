@@ -1,9 +1,9 @@
 // 集群管理页面
 import { PageContainer, ProCard } from '@ant-design/pro-components';
-import { SlackOutlined, DeleteOutlined, EditOutlined, EllipsisOutlined } from '@ant-design/icons';
-import { Space, Popconfirm, Button, Modal, Form, Input, message, Spin, Select } from 'antd';
+import { SlackOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { Space, Popconfirm, Button, Modal, Form, Input, message, Spin, Select, Popover } from 'antd';
 import { FormattedMessage, useIntl, history, useModel } from 'umi';
-import { useState, useEffect, SetStateAction } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import styles from './index.less';
 import { getClusterListAPI, getStackListAPI, createClusterAPI } from '@/services/ant-design-pro/colony';
 
@@ -21,10 +21,16 @@ const Colony: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [stackLoading, setStackLoading] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
   const [clusterList, setClusterList] = useState<API.ColonyItem[]>();
   const [stackList, setStackList] = useState<API.StackItem[]>();
   const [kubeConfig, setKubeConfig] = useState('');
   const [colonyForm] = Form.useForm();
+  const [editColony, setEditColony] = useState<API.ColonyItem | null>(null);
+
+  const kubeConfigRef = useRef(kubeConfig)
+  kubeConfigRef.current = kubeConfig
+  
 
   const getClusterData = async (params: any) => {
     setLoading(true)
@@ -54,13 +60,15 @@ const Colony: React.FC = () => {
       .validateFields()
       .then(async (values) => {
         // console.log('values',values);
+        setConfirmLoading(true)
         const result: API.normalResult = await createClusterAPI(values)
-        if(result && result.success){
+        if(result?.success){
           message.success('新增成功');
           getClusterData({});
           colonyForm.resetFields()
-          setIsModalOpen(false);
+          setConfirmLoading(false)
         }
+        setIsModalOpen(false);
       })
       .catch((err) => {
         console.log('err: ', err);
@@ -114,6 +122,24 @@ const Colony: React.FC = () => {
   //   history.push('/colony/nodeList');
   // }
 
+  type formItem = {
+    clusterName?: string,
+    stackId?: number,
+    kubeConfig?: string | null
+  }
+
+  const handleUpdate = (item: API.ColonyItem) => {
+    setEditColony(item)
+    colonyForm.setFieldsValue({
+      clusterName: item.clusterName,
+      stackId: item.stackId,
+      kubeConfig: item.kubeConfig      
+    })
+    
+    showModal()
+    
+  }
+
   return (
     <PageContainer
       header={{
@@ -122,6 +148,7 @@ const Colony: React.FC = () => {
             type="primary"
             key="colonyadd"
             onClick={() => {
+              setEditColony(null)
               showModal();
             }}
           >
@@ -147,14 +174,19 @@ const Colony: React.FC = () => {
                     okText="确定"
                     cancelText="取消"
                   >
-                    <DeleteOutlined
-                      key="setting"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        console.log('SettingOutlined');
-                      }}
-                    />
+                    <Popover content="删除" title="">
+                      <DeleteOutlined
+                        key="setting"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          console.log('SettingOutlined');
+                        }}
+                      />
+                    </Popover>
                   </Popconfirm>,
+                  <Popover content="修改" title="">
+                    <EditOutlined onClick={(e)=>{ e.stopPropagation(); handleUpdate(cItem) }}/>
+                  </Popover>
                 ]}
                 onClick={() => {
                   // setClusterId(cItem.id || 0)
@@ -185,23 +217,23 @@ const Colony: React.FC = () => {
       </Space>
       </Spin>
       <Modal
-        title="新增集群"
-        forceRender={true}
-        destroyOnClose={false}
+        title={editColony ? "修改"+editColony.clusterName+"集群" : "新增集群"}
+        forceRender={false}
+        destroyOnClose={true}
         open={isModalOpen}
         onOk={handleOk}
-        width={800}
+        width={'80%'}
         onCancel={handleCancel}
+        confirmLoading={confirmLoading}
         // footer={null}
       >
         <div>
           <Form
             form={colonyForm}
-            name="新增集群"
+            name={editColony ? "修改"+editColony.clusterName+"集群" : "新增集群"}
             preserve={false}
             labelCol={{ span: 6 }}
             wrapperCol={{ span: 15 }}
-            initialValues={{ remember: true }}
             onFinish={onFinish}
             onFinishFailed={onFinishFailed}
             autoComplete="off"
@@ -211,29 +243,29 @@ const Colony: React.FC = () => {
               name="clusterName"
               rules={[{ required: true, message: '请输入集群名称!' }]}
             >
-              <Input className={styles.inputWrap}/>
+            <Input className={styles.inputWrap}/>
             </Form.Item>
-
             <Form.Item
               label="框架"
-              name="stackId"
+              name="stackId"              
               rules={[{ required: true, message: '请选择框架!' }]}
-            >
-              <Select
-                placeholder="请选择框架"
-                onChange={onSelectChange}
-                loading={stackLoading}
-                className={styles.inputWrap}
-                allowClear
-              >
-                {
-                  stackList && stackList.map(sItem=>{
-                    return (
-                      <Option key={sItem.stackCode} value={sItem.id}>{sItem.stackCode}</Option>
-                    )
-                  })
-                }
-              </Select>
+            >                
+                <Select
+                  disabled={editColony ? true : false}
+                  placeholder="请选择框架"
+                  onChange={onSelectChange}
+                  loading={stackLoading}
+                  className={styles.inputWrap}
+                  allowClear
+                >
+                  {
+                    stackList && stackList.map(sItem=>{
+                      return (
+                        <Option key={sItem.stackCode} value={sItem.id}>{sItem.stackCode}</Option>
+                      )
+                    })
+                  }
+                </Select>
             </Form.Item>
             <Form.Item
               label="kubeConfig"

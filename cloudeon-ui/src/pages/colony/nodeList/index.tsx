@@ -220,7 +220,7 @@ const nodeList: React.FC = () => {
               name="sshPassword"
               rules={[{ required: true, message: '请输入ssh密码!' }]}
             >
-              <Input />
+              <Input.Password />
             </Form.Item>
 
             <Form.Item
