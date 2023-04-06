@@ -40,7 +40,9 @@ theme:
     - content.code.annotate
     - content.tabs.link
     - navigation.top
+#    - navigation.tabs
     - navigation.tracking
+    - navigation.expand
     - search.highlight
     - search.share
     - search.suggest
@@ -51,6 +53,8 @@ nav:
   - instal.md
   - quickstart.md
   - FAQ.md
+  - Roadmap.md
+  - supportservice.md
   - 社区贡献:
       - 社区贡献/contribute.md
       - 社区贡献/develop.md
