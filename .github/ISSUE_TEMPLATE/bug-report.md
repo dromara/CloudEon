@@ -16,7 +16,7 @@ Steps to reproduce the behavior.
 A clear and concise description of what you expected to happen.
 
 **Environment**
- - PowerJob Version: [e.g. 3.0.0]
+ - CloudEon Version: [e.g. 1.0.0]
  - Java Version: [e.g. OpenJDK 8]
  - OS: [e.g. CentOS 8.1]
 

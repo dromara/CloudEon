@@ -1,6 +1,6 @@
 ## What is the purpose of the change
 
-For example: Making PowerJob better
+For example: Making CloudEon better
 
 ## Brief changelog
 
@@ -14,7 +14,7 @@ Test method?
 
 Follow this checklist to help us incorporate your contribution quickly and easily. Notice, `it would be helpful if you could finish the following 3 checklist before request the community to review your PR`.
 
-- [x] Make sure there is a [Github issue](https://github.com/PowerJob/PowerJob/issues) filed for the change (usually before you start working on it). Trivial changes like typos do not require a Github issue. Your pull request should address just this issue, without pulling in other changes - one PR resolves one issue. 
+- [x] Make sure there is a [Github issue](https://github.com/Pandas886/CloudEon/issues) filed for the change (usually before you start working on it). Trivial changes like typos do not require a Github issue. Your pull request should address just this issue, without pulling in other changes - one PR resolves one issue. 
 - [x] Write a pull request description that is detailed enough to understand what the pull request does, how, and why.
 - [x] Follow the git commit specification
     * feat: xxx ->      The feat type is used to identify production changes related to new backward-compatible abilities or functionality.
