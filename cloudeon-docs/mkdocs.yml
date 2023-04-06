@@ -1,0 +1,48 @@
+site_name: CloudEon Documentation
+site_description: 构建于kubernetes集群之上的大数据集群管理平台
+site_url: https://github.com/Pandas886/CloudEon
+site_author: Pandas886
+repo_name: Pandas886/CloudEon
+repo_url: https://github.com/Pandas886/CloudEon
+edit_uri: ""
+extra:
+  homepage: https://elaborate-kitsune-b20d64.netlify.app/
+  version:
+    provider: mike
+  social:
+    - icon: fontawesome/brands/twitter
+      link: https://github.com/Pandas886
+    - icon: fontawesome/brands/github
+      link: https://github.com/Pandas886
+
+copyright: Copyright &copy; 2013 Pandas886
+theme:
+  name: material
+  language: zh
+  logo: images/logo.png
+  favicon: images/favicon.ico
+  icon:
+    repo: fontawesome/brands/github
+  palette:
+    primary: deep orange
+    # - scheme: slate
+    #   toggle:
+    #     icon: material/toggle-switch-off-outline
+    #     name: Switch to dark mode
+    # - scheme: default
+    #   toggle:
+    #     icon: material/toggle-switch
+    #     name: Switch to light mode
+        
+  features:
+    - navigation.instant
+    - navigation.indexes
+    - content.code.annotate
+    - content.tabs.link
+    - navigation.top
+    - navigation.tracking
+    - search.highlight
+    - search.share
+    - search.suggest
+
+
