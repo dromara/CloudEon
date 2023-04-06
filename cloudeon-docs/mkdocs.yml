@@ -16,7 +16,7 @@ extra:
     - icon: fontawesome/brands/github
       link: https://github.com/Pandas886
 
-copyright: Copyright &copy; 2013 Pandas886
+copyright: Copyright &copy; 2023 Pandas886
 theme:
   name: material
   language: zh
