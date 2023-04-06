@@ -6,6 +6,7 @@ repo_name: Pandas886/CloudEon
 repo_url: https://github.com/Pandas886/CloudEon
 edit_uri: ""
 extra:
+  generator: false
   homepage: https://elaborate-kitsune-b20d64.netlify.app/
   version:
     provider: mike
