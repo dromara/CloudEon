@@ -1,9 +1,12 @@
 package com.data.udh.config;
 
+import cn.dev33.satoken.interceptor.SaInterceptor;
+import cn.dev33.satoken.stp.StpUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -21,6 +24,13 @@ public class WebConfig implements WebMvcConfigurer {
         configurePathMatch(configurer, webProperties.getApi());
     }
 
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        // 注册 Sa-Token 拦截器，校验规则为 StpUtil.checkLogin() 登录校验。
+        registry.addInterceptor(new SaInterceptor(handle -> StpUtil.checkLogin()))
+                .addPathPatterns("/apiPre/**")
+                .excludePathPatterns("/apiPre/acc/doLogin");
+    }
     /**
      * API 前缀：实现指定的controller 提供的 RESTFul API 的统一前缀
      *

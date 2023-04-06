@@ -20,4 +20,14 @@ public class GlobalExceptionHandler {
         ResultDTO<Void> resultDTO = ResultDTO.failed(ex.getCause().getMessage());
         return resultDTO;
     }
+
+    @ResponseBody
+    @ExceptionHandler( cn.dev33.satoken.exception.NotLoginException.class)
+    public ResultDTO<Void> checkTokenException(HttpServletResponse response, Exception ex) {
+        log.info("checkTokenException...");
+        log.info("错误代码：" + response.getStatus());
+        ex.printStackTrace();
+        ResultDTO<Void> resultDTO = ResultDTO.failed(ex.getMessage());
+        return resultDTO;
+    }
 }
