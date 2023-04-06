@@ -44,4 +44,4 @@ jobs:
         tags: latest
         path: docker/
     - name: build docker image for aliyun
-      run:  docker login --username=${{ secrets.ALIYUN_DOCKER_USERNAME }} --password  ${{ secrets.ALIYUN_DOCKER_PASSWORD }} registry.cn-hangzhou.aliyuncs.com  && docker build -f docker/Dockerfile -t cloudeon:1.0.0 ./docker  && docker tag cloudeon:1.0.0 registry.cn-hangzhou.aliyuncs.com/udh/cloudeon:1.0.0  && docker push registry.cn-hangzhou.aliyuncs.com/cum/cloudeon:1.0.0
+      run:  docker login --username=${{ secrets.ALIYUN_DOCKER_USERNAME }} --password  ${{ secrets.ALIYUN_DOCKER_PASSWORD }} registry.cn-hangzhou.aliyuncs.com  && docker build -f docker/Dockerfile -t cloudeon:1.0.0 ./docker  && docker tag cloudeon:1.0.0 registry.cn-hangzhou.aliyuncs.com/udh/cloudeon:1.0.0  && docker push registry.cn-hangzhou.aliyuncs.com/udh/cloudeon:1.0.0
