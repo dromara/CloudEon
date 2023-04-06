@@ -14,36 +14,39 @@
 </div><br>
 
 
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**目录**
-
-- [ℹ️ 项目简介](#-%E9%A1%B9%E7%9B%AE%E7%AE%80%E4%BB%8B)
-- [🔍 功能特点](#-功能特点)
-- [👨‍💻 项目地址](#-%E9%A1%B9%E7%9B%AE%E5%9C%B0%E5%9D%80)
-- [🔗 文档快链](#-%E6%96%87%E6%A1%A3%E5%BF%AB%E9%93%BE)
-- [🥰 感谢](##-%E6%84%9F%E8%B0%A2)
-- [🤗 另外](#-%E5%8F%A6%E5%A4%96)
-- [📝 使用登记](#-%E4%BD%BF%E7%94%A8%E7%99%BB%E8%AE%B0)
-- [💎 优秀软件推荐](#-%E4%BC%98%E7%A7%80%E8%BD%AF%E4%BB%B6%E6%8E%A8%E8%8D%90)
-- [🤝 贡献者](#-%E8%B4%A1%E7%8C%AE%E8%80%85)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## ℹ️ 项目简介
 
 `CloudEon`是一款基于`kubernetes`的开源大数据平台，旨在为用户提供一种简单、高效、可扩展的大数据解决方案。该平台支持多种大数据服务的部署和管理，如hadoop、doris、Spark、Flink、Hive等，能够满足不同规模和业务需求下的大数据处理和分析需求。
 
+## 🔗 文档快链
+
+项目相关介绍，使用，最佳实践等相关内容，都会在官方文档呈现，如有疑问，请先阅读官方文档，以下列举以下常用快链。
+
+- [官网地址](https://elaborate-kitsune-b20d64.netlify.app/)
+- [项目介绍](https://cloudeon.readthedocs.io/en/latest/)
+- [安装部署](https://cloudeon.readthedocs.io/en/latest/instal/)
+- [支持组件](https://cloudeon.readthedocs.io/en/latest/supportservice/)
+- [Roadmap](https://cloudeon.readthedocs.io/en/latest/Roadmap/)
+
+
 ## 🔍 功能特点
 
-- 🚀 快速搭建大数据集群：通过`CloudEon`，用户可以在kubernetes上快速搭建部署hadoop集群、doris集群等大数据集群，省去了手动安装和配置的繁琐过程。
-- 🐳 容器化运行所有大数据服务：`CloudEon`将所有大数据服务都以容器方式运行，使得这些服务的部署和管理更加灵活和便捷，同时也能更好地利用kubernetes的资源调度和管理能力。
-- 📈 支持监控告警等功能：`CloudEon`提供了监控告警等功能，帮助用户实时监控集群运行状态，及时发现和解决问题。
-- 🔧 支持配置修改等功能：`CloudEon`还提供了配置修改等功能，使得用户能够更加灵活地管理和配置自己的大数据集群。
-- 🤖自动化运维：`CloudEon`通过自动化运维，能够降低集群管理的难度和人力成本，同时也能提高集群的可用性和稳定性。
-- 👀 可视化管理界面：`CloudEon`提供了可视化的管理界面，使得用户能够更加直观地管理和监控自己的大数据集群
-- 🔌灵活的扩展性：提供了插件机制，让用户可以自定义拓展和安装更多的大数据服务。这个插件机制是基于开放API和标准化接口实现的，可以支持用户快速开发和集成新的服务。
-- 📊 多种大数据服务支持：除了hadoop和doris，`CloudEon`还支持其他多种大数据服务的部署和管理，如Spark、Flink、Hive、Kyuubi等。
+- 🚀 **快速搭建大数据集群**：通过`CloudEon`，用户可以在kubernetes上快速搭建部署hadoop集群、doris集群等大数据集群，省去了手动安装和配置的繁琐过程。
+
+- 🐳 **容器化运行所有大数据服务**：`CloudEon`将所有大数据服务都以容器方式运行，使得这些服务的部署和管理更加灵活和便捷，同时也能更好地利用kubernetes的资源调度和管理能力。
+
+- 📈 **支持监控告警等功能**：`CloudEon`提供了监控告警等功能，帮助用户实时监控集群运行状态，及时发现和解决问题。
+
+- 🔧 **支持配置修改等功能**：`CloudEon`还提供了配置修改等功能，使得用户能够更加灵活地管理和配置自己的大数据集群。
+
+- 🤖 **自动化运维**：`CloudEon`通过自动化运维，能够降低集群管理的难度和人力成本，同时也能提高集群的可用性和稳定性。
+
+- 👀 **可视化管理界面**：`CloudEon`提供了可视化的管理界面，使得用户能够更加直观地管理和监控自己的大数据集群
+
+- 🔌 **灵活的扩展性**：提供了插件机制，让用户可以自定义拓展和安装更多的大数据服务。这个插件机制是基于开放API和标准化接口实现的，可以支持用户快速开发和集成新的服务。
+
+- 📊 **多种大数据服务支持**：除了hadoop和doris，`CloudEon`还支持其他多种大数据服务的部署和管理，如Spark、Flink、Hive、Kyuubi等。
 
 **页面功能概览：**
 
@@ -63,15 +66,6 @@
 | 前端 | https://github.com/Pandas886/CloudEon/tree/master/cloudeon-ui | https://gitee.com/Pandas886/CloudEon/tree/master/cloudeon-ui  |
 
 
-## 🔗 文档快链
-
-项目相关介绍，使用，最佳实践等相关内容，都会在官方文档呈现，如有疑问，请先阅读官方文档，以下列举以下常用快链。
-
-- [官网地址](https://elaborate-kitsune-b20d64.netlify.app/)
-- [项目介绍](https://cloudeon.readthedocs.io/en/latest/)
-- [安装部署](https://cloudeon.readthedocs.io/en/latest/instal/)
-- [支持组件版本](https://cloudeon.readthedocs.io/en/latest/supportservice/)
-- [Roadmap](https://cloudeon.readthedocs.io/en/latest/Roadmap/)
 
 ## 🥰 感谢
 
