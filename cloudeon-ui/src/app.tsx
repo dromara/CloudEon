@@ -8,7 +8,7 @@ import { history, RequestConfig, useModel } from 'umi';
 import { message, Image, Badge } from 'antd';
 import defaultSettings from '../config/defaultSettings';
 import { currentUser as queryCurrentUser } from './services/ant-design-pro/api';
-import logoImg from '../src/assets/images/ic_launcher.png';
+import logoImg from '../src/assets/images/logo2.png';
 import userImg from '../src/assets/images/user.png'
 import React from 'react';
 import * as Icon from '@ant-design/icons';
@@ -46,7 +46,7 @@ const loginPath = '/user/login';
 
 // 接口请求全局配置
 export const request: RequestConfig = {
-  timeout: 10000,
+  timeout: 1000*60,
   errorHandler:(error)  => {
     if(error && error.name==="BizError"){
       const { response } = error;

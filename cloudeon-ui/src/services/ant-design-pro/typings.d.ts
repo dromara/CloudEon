@@ -127,7 +127,8 @@ declare namespace API {
     createTime?: string,
     clusterName?: string,
     clusterCode?: string,
-    stackId?: number
+    stackId?: number,
+    kubeConfig?: string
   }
 
   type ColonyList = {

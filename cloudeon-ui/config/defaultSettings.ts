@@ -22,7 +22,7 @@ const Settings: LayoutSettings & {
   colorWeak: false,
   title: 'CloudEon',
   pwa: false,
-  logo: '../src/assets/images/ic_launcher.png',//'https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg',
+  logo: '../src/assets/images/logo3.png',//'https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg',
   iconfontUrl: '',
 };
 
