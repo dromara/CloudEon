@@ -46,3 +46,11 @@ theme:
     - search.suggest
 
 
+nav:
+  - index.md
+  - instal.md
+  - quickstart.md
+  - FAQ.md
+  - 社区贡献:
+      - 社区贡献/contribute.md
+      - 社区贡献/develop.md
