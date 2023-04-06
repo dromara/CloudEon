@@ -1,17 +1,29 @@
-# Welcome to MkDocs
+# 项目介绍
+## 🚀 什么是CloudEon
+CloudEon是一款基于kubernetes的开源大数据平台，旨在为用户提供一种简单、高效、可扩展的大数据解决方案。该平台致力于简化多种大数据服务在kubernetes上的部署和管理，如hadoop、doris、Spark、Flink、Hive等，能够满足不同规模和业务需求下的大数据处理和分析需求。
+## 🔍特性
 
-For full documentation visit [mkdocs.org](https://mkdocs.org).
+- 快速搭建大数据集群
+- 容器化运行大数据服务
+- 支持监控告警等功能
+- 支持配置修改等功能
+- 自动化运维
+- 可视化管理界面
+- 灵活的扩展性
+## 💎架构
+![图片.png](images/architecture.png)
+## 🥰 感谢
+感谢如下优秀的项目，没有这些项目，不可能会有CloudEon：
 
-## Commands
-
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs help` - Print this help message.
-
-## Project layout
-
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+- 后端技术栈
+   - [springboot-v2.7.4](https://github.com/spring-projects/spring-boot)
+   - [lombok-v1.18.12](https://github.com/projectlombok/lombok)
+   - [hutool-v5.8.9](https://github.com/dromara/hutool)
+   - [hibernate-v5.6.11](https://github.com/hibernate/hibernate-orm)
+   - [freemarker-v2.3.31](https://github.com/apache/freemarker)
+- 前端技术栈
+   - [react](https://github.com/facebook/react)
+   - [ant-design](https://github.com/ant-design/ant-design)
+- 另外感谢
+   - [Ambari](https://github.com/apache/ambari)
+   - [datasophon](https://github.com/datasophon/datasophon)
