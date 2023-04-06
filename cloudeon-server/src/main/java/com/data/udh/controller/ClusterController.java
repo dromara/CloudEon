@@ -74,10 +74,10 @@ public class ClusterController {
     }
 
 
-    @GetMapping("/delete")
-    public ResultDTO<Void> deleteCluster(Integer appId) {
+    @PostMapping("/delete")
+    public ResultDTO<Void> deleteCluster(Integer id) {
         // todo 删除前确认节点和服务都删除了
-        clusterInfoRepository.deleteById(appId);
+        clusterInfoRepository.deleteById(id);
         return ResultDTO.success(null);
     }
 
