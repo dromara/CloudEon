@@ -25,6 +25,7 @@ theme:
     repo: fontawesome/brands/github
   palette:
     primary: deep orange
+    accent: deep orange
     # - scheme: slate
     #   toggle:
     #     icon: material/toggle-switch-off-outline
