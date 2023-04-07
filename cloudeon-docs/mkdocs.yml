@@ -56,7 +56,8 @@ nav:
   - quickstart.md
   - FAQ.md
   - Roadmap.md
-  - supportservice.md
   - 社区贡献:
       - 社区贡献/contribute.md
       - 社区贡献/develop.md
+  - 支持组件:
+      - supportservice.md
