@@ -51,14 +51,15 @@ export const request: RequestConfig = {
     if(error && error.name==="BizError"){
       const { response } = error;
       if ('success' in response && !response.success) {
-        if(('message' in response) && response?.message.includes('token失效')){
+        if(('message' in response) && response?.message.includes('Token无效')){
           history.push(loginPath);
-        }
-        message.error(`请求错误: ${('message' in response) ? response.message : '' }`, 3);
-        return {
-          success:false,
-          data:[],
-          message:''
+        }else{
+          message.error(`请求错误: ${('message' in response) ? response.message : '' }`, 3);
+          return {
+            success:false,
+            data:[],
+            message:''
+          }
         }
       }
     }
@@ -144,6 +145,15 @@ export async function getInitialState(): Promise<{
 
 let timer:any = null
 
+history.block((location, action) => {
+	//每次路由变动都会走这里
+  if(location.pathname.includes('user/login')){
+    // 清除定时任务
+    clearInterval(timer)
+  }
+  
+
+})
 
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
 export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) => {
@@ -219,13 +229,10 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
         const result = await getCountActiveAPI({clusterId:getData.clusterId})
           setActionCount(result?.data || 0)
       }
-      if(getData && getData.clusterId && !timer){
+      if(getData && getData.clusterId && !timer && !location.href.includes('user/login') && !location.href.includes('colony/colonyMg')){
         getCount()
         timer = setInterval(getCount,3000)
-      }
-      if(location.hash.includes('user/Login')){
-        clearInterval(timer)
-      }
+      }   
 
      return <div style={{height:'100%',display:'flex',justifyContent: 'center',flexDirection:'column', alignItems:'center',width:'100%'}} 
         onClick={() => {
