@@ -35,7 +35,6 @@ configurations:
   - name: "kafka.listeners.port"
     recommendExpression: 9092
     valueType: InputNumber
-    confFile:  "server.properties"
     description: "Kafka监听端口"
   - name: "kafka.server.memory"
     recommendExpression: 2048
