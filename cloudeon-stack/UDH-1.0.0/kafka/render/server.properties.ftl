@@ -10,7 +10,7 @@ broker.id=${host.id % 254 + 1}
 
 log.dirs=/opt/udh/${service.serviceName}/data
 
-listeners=PLAINTEXT://0.0.0.0:${conf['kafka.listeners.port']}
+listeners=PLAINTEXT://${localhostname}:${conf['kafka.listeners.port']}
 
 <#--handle dependent.zookeeper-->
 <#if dependencies.ZOOKEEPER??>
