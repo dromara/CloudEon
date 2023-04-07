@@ -9,6 +9,7 @@ import routes from './routes';
 const { REACT_APP_ENV } = process.env;
 
 export default defineConfig({
+  history: { type: 'hash' }, // 配合后端SpringBoot部署跳转，改成hash模式跳转
   hash: true,
   antd: {
     dark: false,

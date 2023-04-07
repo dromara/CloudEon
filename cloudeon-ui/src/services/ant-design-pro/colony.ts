@@ -64,6 +64,14 @@ export async function createClusterAPI(options?: { [key: string]: any }) {
   });
 }
 
+//删除集群
+export async function deleteClusterAPI(options?: { [key: string]: any }) {
+  return request<API.normalResult>('/apiPre/cluster/delete', {
+    method: 'POST',
+    params: {...(options || {})},
+  });
+}
+
 
 /** 获取k8s节点列表 */
 export async function getListK8sNodeAPI(options?: { [key: string]: any }) {

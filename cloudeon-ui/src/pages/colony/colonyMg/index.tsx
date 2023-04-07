@@ -5,7 +5,7 @@ import { Space, Popconfirm, Button, Modal, Form, Input, message, Spin, Select, P
 import { FormattedMessage, useIntl, history, useModel } from 'umi';
 import { useState, useEffect, useRef } from 'react';
 import styles from './index.less';
-import { getClusterListAPI, getStackListAPI, createClusterAPI } from '@/services/ant-design-pro/colony';
+import { getClusterListAPI, getStackListAPI, createClusterAPI, deleteClusterAPI } from '@/services/ant-design-pro/colony';
 
 import AceEditor from "react-ace";
 import "ace-builds/src-noconflict/mode-java";
@@ -61,9 +61,13 @@ const Colony: React.FC = () => {
       .then(async (values) => {
         // console.log('values',values);
         setConfirmLoading(true)
-        const result: API.normalResult = await createClusterAPI(values)
+        let params = values
+        if(editColony){
+          params={...params,id: editColony.id}
+        }
+        const result: API.normalResult = await createClusterAPI(params)
         if(result?.success){
-          message.success('新增成功');
+          message.success(editColony ? '修改成功' : '新增成功');
           getClusterData({});
           colonyForm.resetFields()
           setConfirmLoading(false)
@@ -80,10 +84,18 @@ const Colony: React.FC = () => {
     setIsModalOpen(false);
   };
 
-  const confirm = (e: any) => {
+  const confirm = async(e: any, id:any) => {
     e.stopPropagation();
     console.log(e);
-    message.success('已删除');
+    setLoading(true)
+    const result: API.normalResult = await deleteClusterAPI({id})
+    if(result?.success){
+      getClusterData({});
+      message.success('已删除');
+    }else{
+      message.error('删除失败：'+result.message);
+    }
+    setLoading(false)
   };
 
   const cancel = (e: any) => {
@@ -135,9 +147,7 @@ const Colony: React.FC = () => {
       stackId: item.stackId,
       kubeConfig: item.kubeConfig      
     })
-    
     showModal()
-    
   }
 
   return (
@@ -149,7 +159,8 @@ const Colony: React.FC = () => {
             key="colonyadd"
             onClick={() => {
               setEditColony(null)
-              showModal();
+              colonyForm.setFieldsValue({})
+              showModal()
             }}
           >
             新增集群
@@ -158,18 +169,18 @@ const Colony: React.FC = () => {
       }}
     >
       <Spin tip="Loading" size="small" spinning={loading}>
-      <Space>
+      <div className={styles.clusterLayout}>
         {clusterList&&clusterList.map(cItem=>{
           return(
               <ProCard
                 hoverable
                 key={cItem.id}
-                style={{ width: 250, height: 150, padding: 0, overflow: 'hidden' }}
+                className={styles.clusterBox}
                 bodyStyle={{ padding: 0 }}
                 actions={[
                   <Popconfirm
                     title="确定删除该集群吗?"
-                    onConfirm={confirm}
+                    onConfirm={(e)=>confirm(e, cItem.id)}
                     onCancel={cancel}
                     okText="确定"
                     cancelText="取消"
@@ -214,7 +225,7 @@ const Colony: React.FC = () => {
           )
         })}
         
-      </Space>
+      </div>
       </Spin>
       <Modal
         title={editColony ? "修改"+editColony.clusterName+"集群" : "新增集群"}

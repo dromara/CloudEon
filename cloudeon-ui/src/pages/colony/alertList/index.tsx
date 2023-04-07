@@ -294,22 +294,22 @@ const alertList: React.FC = () => {
         />
       )
     },
-    {
-      label:'告警规则',
-      key:'ruleAlert',
-      children:(
-        <div>待开发。。。</div>
-        // <ProTable 
-        //   search={false} 
-        //   rowKey="alertId" 
-        //   columns={columns} 
-        //   dataSource={activeListData}
-        //   request={async (params = {}, sort, filter) => {
-        //     return getActiveAlertAPI({ });;
-        //   }}
-        // />
-      )
-    }
+    // {
+    //   label:'告警规则',
+    //   key:'ruleAlert',
+    //   children:(
+    //     <div>待开发。。。</div>
+    //     // <ProTable 
+    //     //   search={false} 
+    //     //   rowKey="alertId" 
+    //     //   columns={columns} 
+    //     //   dataSource={activeListData}
+    //     //   request={async (params = {}, sort, filter) => {
+    //     //     return getActiveAlertAPI({ });;
+    //     //   }}
+    //     // />
+    //   )
+    // }
   ]
   
 
