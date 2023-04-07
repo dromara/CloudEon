@@ -51,6 +51,9 @@ export const request: RequestConfig = {
     if(error && error.name==="BizError"){
       const { response } = error;
       if ('success' in response && !response.success) {
+        if(('message' in response) && response?.message.includes('token失效')){
+          history.push(loginPath);
+        }
         message.error(`请求错误: ${('message' in response) ? response.message : '' }`, 3);
         return {
           success:false,
@@ -219,6 +222,9 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
       if(getData && getData.clusterId && !timer){
         getCount()
         timer = setInterval(getCount,3000)
+      }
+      if(location.hash.includes('user/Login')){
+        clearInterval(timer)
       }
 
      return <div style={{height:'100%',display:'flex',justifyContent: 'center',flexDirection:'column', alignItems:'center',width:'100%'}} 
