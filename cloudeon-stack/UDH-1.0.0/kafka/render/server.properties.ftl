@@ -18,7 +18,7 @@ listeners=PLAINTEXT://${localhostname}:${conf['kafka.listeners.port']}
 <#list zookeeper.serviceRoles['ZOOKEEPER_SERVER'] as role>
 <#assign quorum += [role.hostname + ":" + zookeeper.conf["zookeeper.client.port"]]>
 </#list>
-zookeeper.connect=${quorum?join(",")}
+zookeeper.connect=${quorum?join(",")}/${service.serviceName}
 </#if>
 
 <#list confFiles['server.properties']?keys as key>

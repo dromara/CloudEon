@@ -11,7 +11,7 @@ runAs: hadoop
 supportKerberos: true
 
 dashboard:
-  uid: WYNeBqdZz
+  uid: "DGHHkJKWk"
 
 roles:
   - name: KAFKA_BROKER
