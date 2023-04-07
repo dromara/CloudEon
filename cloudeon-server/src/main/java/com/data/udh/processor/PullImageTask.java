@@ -37,7 +37,8 @@ public class PullImageTask extends BaseUdhTask {
         ClientSession clientSession = SshUtils.openConnectionByPassword(nodeEntity.getIp(), nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getSshPassword());
         try {
             log.info("节点：" + taskParam.getHostName() + " 上执行命令：" + command);
-            SshUtils.execCmdWithResult(clientSession, command);
+            String result = SshUtils.execCmdWithResult(clientSession, command);
+            log.info(result);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

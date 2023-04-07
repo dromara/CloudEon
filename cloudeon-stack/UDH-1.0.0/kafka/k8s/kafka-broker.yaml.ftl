@@ -41,17 +41,13 @@ spec:
       hostNetwork: true
       containers:
       - args:
-          - "/opt/udh/${service.serviceName}/conf/bootstrap-metastore.sh"
-        env:
-          - name: "SERVICE_NAME"
-            value: "metastore"
-          - name: "HIVE_CONF_DIR"
-            value: "/opt/udh/${service.serviceName}/conf"
+          - "/opt/udh/${service.serviceName}/conf/bootstrap-kafkaserver.sh"
+
         image: "${dockerImage}"
         imagePullPolicy: "Always"
         readinessProbe:
           tcpSocket:
-            port: ${conf['hive.metastore.thrift.port']}
+            port: ${conf['kafka.listeners.port']}
           initialDelaySeconds: 10
           timeoutSeconds: 2
         name: "${roleServiceFullName}"
