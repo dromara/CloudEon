@@ -68,6 +68,15 @@ scrape_configs:
   - job_name: 'zkserver'
     file_sd_configs:
     - files: ['discovery_configs/zkserver.json']
+  - job_name: 'kafkabroker'
+    file_sd_configs:
+    - files: ['discovery_configs/kafka-broker.json']
+  - job_name: 'hbasemaster'
+    file_sd_configs:
+    - files: ['discovery_configs/hbase-master.json']
+  - job_name: 'regionserver'
+    file_sd_configs:
+    - files: ['discovery_configs/region-server.json']
   - job_name: 'PALO_CLUSTER'
     metrics_path: '/metrics'
     file_sd_configs:
