@@ -23,6 +23,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -68,6 +69,9 @@ public class AlertController {
                     String serviceRoleName = labels.getServiceRoleName();
                     // 查询服务角色实例
                     ServiceRoleInstanceEntity serviceRoleInstanceEntity = roleInstanceRepository.findByServiceRoleNameAndClusterIdAndHostname(clusterId, serviceRoleName, hostname);
+                    if (serviceRoleInstanceEntity == null) {
+                        return null;
+                    }
                     // 根据节点hostname查询节点id
                     ClusterNodeEntity roleClusterNode = clusterNodeRepository.findByHostname(hostname);
                     String severity = labels.getAlertLevel();
@@ -90,7 +94,7 @@ public class AlertController {
                             .build();
                     return alertMessageEntity;
                 }
-            }).collect(Collectors.toList());
+            }).filter(Objects::nonNull).collect(Collectors.toList());
 
             alertMessageRepository.saveAll(alertMessageEntities);
 

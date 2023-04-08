@@ -7,7 +7,7 @@ route:
 receivers:
 - name: 'web.hook'
   webhook_configs:
-  - url: '${cloudeonURL}/alert/webhook'
+  - url: '${cloudeonURL}/apiPre/alert/webhook'
 inhibit_rules:
   - source_match:
       severity: 'critical'

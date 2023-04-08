@@ -498,7 +498,7 @@ groups:
                
                 alertLevel: exception
                 clusterId: 1
-                serviceRoleName: ZkServer
+                serviceRoleName: ZOOKEEPER_SERVER
             annotations:
                
                 alertAdvice: ZookeeperServer宕机，请重新启动
