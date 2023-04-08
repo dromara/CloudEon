@@ -41,7 +41,7 @@ spec:
       hostNetwork: true
       containers:
       - args:
-          - "/opt/udh/${service.serviceName}/conf/bootstrap-metastore.sh"
+          - "/opt/udh/${service.serviceName}/conf/bootstrap-master.sh"
         env:
           - name: "USER"
             value: "${runAs}"
@@ -49,7 +49,7 @@ spec:
         imagePullPolicy: "Always"
         readinessProbe:
           tcpSocket:
-            port: ${conf['hive.metastore.thrift.port']}
+            port: ${conf['hbase.master.port']}
           initialDelaySeconds: 10
           timeoutSeconds: 2
         name: "${roleServiceFullName}"

@@ -2,7 +2,7 @@ name: HIVE
 label: "Hive"
 description: "hadoop离线数据仓库"
 version: 3.1.3
-dockerImage: "registry.mufankong.top/udh/hive:3.1.3"
+dockerImage: "registry.cn-hangzhou.aliyuncs.com/udh/hive:3.1.3"
 dependencies:
     - "HDFS"
     - "YARN"

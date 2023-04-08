@@ -2,7 +2,7 @@ name: KAFKA
 label: "Kafka"
 description: "Kafka分布式事件流系统"
 version: 2.8.2
-dockerImage: "registry.mufankong.top/udh/kafka:2.8.2"
+dockerImage: "registry.cn-hangzhou.aliyuncs.com/udh/kafka:2.8.2"
 dependencies:
   - "ZOOKEEPER"
 
