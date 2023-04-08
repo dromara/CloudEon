@@ -109,16 +109,40 @@ const serviceList: React.FC = () => {
                     hoverable
                     key={sItem.serviceName}
                     style={{ width: 300 }}
-                    actions={[
-                      <Popover content="启动" title="">
-                        <PlayCircleOutlined onClick={()=>{ handleACT('start',sItem.id) }}/>
-                      </Popover>,
+                    actions={[                      
+                      <Popconfirm
+                            key='startPop'
+                            title="确定要启动吗?"
+                            onConfirm={()=>{ handleACT('start',sItem.id) }}
+                            okText="确定"
+                            cancelText="取消"
+                      >
+                        <Popover content="启动" title="">
+                          <PlayCircleOutlined/>
+                        </Popover>
+                      </Popconfirm>,
+                      <Popconfirm
+                            key='stopPop'
+                            title="确定要停止吗?"
+                            onConfirm={()=>{ handleACT('stop',sItem.id) }}
+                            okText="确定"
+                            cancelText="取消"
+                      >
                       <Popover content="停止" title="">
-                        <PoweroffOutlined onClick={()=>{ handleACT('stop',sItem.id) }}/>
-                      </Popover>,
+                        <PoweroffOutlined />
+                      </Popover>
+                      </Popconfirm>,
+                      <Popconfirm
+                            key='restartPop'
+                            title="确定要重启吗?"
+                            onConfirm={()=>{ handleACT('restart',sItem.id) }}
+                            okText="确定"
+                            cancelText="取消"
+                      >
                       <Popover content="重启" title="">
-                        <ReloadOutlined onClick={()=>{ handleACT('restart',sItem.id) }}/>
-                      </Popover>,
+                        <ReloadOutlined />
+                      </Popover>
+                      </Popconfirm>,
                       <Popover content="删除" title="">
                         <Popconfirm
                           title="确定删除该服务吗？"

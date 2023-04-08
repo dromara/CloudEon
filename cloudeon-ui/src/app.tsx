@@ -147,12 +147,12 @@ let timer:any = null
 
 history.block((location, action) => {
 	//每次路由变动都会走这里
-  if(location.pathname.includes('user/login')){
+  if(location.pathname.includes('user/login') && timer){
+    console.log("location.pathname.includes('user/login'):", location.pathname.includes('user/login'));
     // 清除定时任务
     clearInterval(timer)
+    timer = null
   }
-  
-
 })
 
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
@@ -221,7 +221,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     collapsedButtonRender: false,
     menuFooterRender:()=><></>,
     menuItemRender: (itemProps: any, defaultDom: any, props: any) => {
-      // console.log('--itemProps: ',itemProps,props);
+      // console.log('--menuItemRender: ');
       
       const getData = JSON.parse(sessionStorage.getItem('colonyData') || '{}')
       const { actionCount, setActionCount } = useModel('colonyModel', model => ({ actionCount: model.actionCount, setActionCount: model.setActionCountModel }));

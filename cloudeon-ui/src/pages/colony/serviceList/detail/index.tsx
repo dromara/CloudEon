@@ -1,5 +1,5 @@
 import { PageContainer, ProCard } from '@ant-design/pro-components';
-import { Button, Popover, Radio, Typography, Tabs, message, Spin } from 'antd';
+import { Button, Popover, Popconfirm, Typography, Tabs, message, Spin } from 'antd';
 import type { TabsProps } from 'antd';
 import { PoweroffOutlined, PlayCircleOutlined, ReloadOutlined, ExceptionOutlined, DeleteOutlined, LinkOutlined  } from '@ant-design/icons';
 import { FormattedMessage, useIntl, history } from 'umi';
@@ -152,67 +152,103 @@ const serviceListDetail: React.FC = () => {
           title: <>{serviceName}</>,
           extra: [
             <div className={styles.btnsWrap} key="serviceDetailPageBtns" >
-              <Button 
-                key="start" 
-                size='small'
-                type="primary" ghost
-                // type="primary"
-                // className={styles.btnStart}
-                loading={btnLoadingStatus('start')} 
-                disabled={btnDisabledStatus('start')} 
-                onClick={()=> handleACT('start')}
-                icon={<PlayCircleOutlined key="startIcon"/>}
+              <Popconfirm
+                    key='startPop'
+                    title="确定要启动吗?"
+                    onConfirm={()=>handleACT('start')}
+                    okText="确定"
+                    cancelText="取消"
               >
-                启动
-              </Button>
-              <Button 
-                key="stop" 
-                size='small'
-                type="primary" ghost
-                // type="primary" 
-                // className={styles.btnStop}
-                loading={btnLoadingStatus('stop')} 
-                disabled={btnDisabledStatus('stop')}  
-                onClick={()=> handleACT('stop')}
-                icon={<PoweroffOutlined key="stopIcon" />}
+                    <Button 
+                      key="start" 
+                      size='small'
+                      type="primary" ghost
+                      loading={btnLoadingStatus('start')} 
+                      disabled={btnDisabledStatus('start')} 
+                      // onClick={()=> handleACT('start')}
+                      icon={<PlayCircleOutlined key="startIcon"/>}
+                    >
+                      启动
+                    </Button>
+              </Popconfirm>
+              <Popconfirm
+                    key='stopPop'
+                    title="确定要停止吗?"
+                    onConfirm={()=>handleACT('stop')}
+                    okText="确定"
+                    cancelText="取消"
               >
-                停止
-              </Button>
-              <Button 
-                key="restart" 
-                size='small'
-                type="primary" ghost
-                loading={btnLoadingStatus('restart')} 
-                disabled={btnDisabledStatus('restart')}  
-                onClick={()=> handleACT('restart')}
-                icon={<ReloadOutlined key="restartIcon" />}
+                <Button 
+                  key="stop" 
+                  size='small'
+                  type="primary" ghost
+                  loading={btnLoadingStatus('stop')} 
+                  disabled={btnDisabledStatus('stop')}  
+                  // onClick={()=> handleACT('stop')}
+                  icon={<PoweroffOutlined key="stopIcon" />}
+                >
+                  停止
+                </Button>
+              </Popconfirm>
+              <Popconfirm
+                    key='restartPop'
+                    title="确定要重启吗?"
+                    onConfirm={()=>handleACT('restart')}
+                    okText="确定"
+                    cancelText="取消"
               >
-                重启
-              </Button>
-              <Button 
-                key="update" 
-                size='small'
-                type="primary" ghost
-                // className={styles.btnUpdate}
-                loading={btnLoadingStatus('update')} 
-                disabled={btnDisabledStatus('update')}  
-                onClick={()=> handleACT('update')}
-                icon={<ExceptionOutlined key="updateIcon"  />}
+                <Button 
+                  key="restart" 
+                  size='small'
+                  type="primary" ghost
+                  loading={btnLoadingStatus('restart')} 
+                  disabled={btnDisabledStatus('restart')}  
+                  // onClick={()=> handleACT('restart')}
+                  icon={<ReloadOutlined key="restartIcon" />}
+                >
+                  重启
+                </Button>
+              </Popconfirm>
+              <Popconfirm
+                    key='updatePop'
+                    title="确定要更新配置吗?"
+                    onConfirm={()=>handleACT('update')}
+                    okText="确定"
+                    cancelText="取消"
               >
-                  更新配置
-              </Button>
-              <Button 
-                key="delete" 
-                size='small'
-                type="primary" ghost
-                // danger
-                loading={btnLoadingStatus('delete')} 
-                disabled={btnDisabledStatus('delete')}  
-                onClick={()=> handleACT('delete')}
-                icon={<DeleteOutlined key="deleteIcon" />}
+                <Button 
+                  key="update" 
+                  size='small'
+                  type="primary" ghost
+                  // className={styles.btnUpdate}
+                  loading={btnLoadingStatus('update')} 
+                  disabled={btnDisabledStatus('update')}  
+                  // onClick={()=> handleACT('update')}
+                  icon={<ExceptionOutlined key="updateIcon"  />}
+                >
+                    更新配置
+                </Button>
+              </Popconfirm>
+              <Popconfirm
+                    key='updatePop'
+                    title="确定要删除吗?"
+                    onConfirm={()=>handleACT('delete')}
+                    okText="确定"
+                    cancelText="取消"
               >
-                删除
-              </Button>
+                  <Button 
+                    key="delete" 
+                    size='small'
+                    type="primary" ghost
+                    // danger
+                    loading={btnLoadingStatus('delete')} 
+                    disabled={btnDisabledStatus('delete')}  
+                    // onClick={()=> handleACT('delete')}
+                    icon={<DeleteOutlined key="deleteIcon" />}
+                  >
+                    删除
+                  </Button>
+              </Popconfirm>
             </div> 
           ]
       }}
