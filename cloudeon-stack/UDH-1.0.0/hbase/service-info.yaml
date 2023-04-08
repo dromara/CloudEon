@@ -12,7 +12,7 @@ runAs: hbase
 supportKerberos: true
 
 dashboard:
-  uid: WYNeBqdZz
+  uid: _S8XBqOWz
 
 roles:
   - name: HBASE_MASTER
@@ -53,12 +53,12 @@ configurations:
     configurableInWizard: true
     confFile:  "hbase-site.xml"
   - name: "hbase.master.port"
-    recommendExpression: "16010"
+    recommendExpression: "16011"
     valueType: InputNumber
     configurableInWizard: true
     confFile:  "hbase-site.xml"
   - name: "hbase.regionserver.port"
-    recommendExpression: "16020"
+    recommendExpression: "16021"
     valueType: InputNumber
     configurableInWizard: true
     confFile:  "hbase-site.xml"

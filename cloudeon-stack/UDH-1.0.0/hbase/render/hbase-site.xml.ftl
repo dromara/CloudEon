@@ -21,7 +21,7 @@
       <#assign quorum += [role.hostname + ":" + zookeeper.conf["zookeeper.client.port"]]>
     </#list>
     <@property "hbase.zookeeper.quorum" quorum?join(",")/>
-    <@property "zookeeper.znode.parent" "/" + ${service.serviceName} />
+    <@property "zookeeper.znode.parent" "/${service.serviceName}"  />
   </#if>
 
 
