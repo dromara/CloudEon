@@ -12,6 +12,7 @@ const nodeList: React.FC = () => {
   const [nodeListData, setNodeListData] = useState<any[]>();
   const [loading, setLoading] = useState(false);
   const [k8sListloading, setK8sListLoading] = useState(false);
+  const [createLoading, setCreateLoading] = useState(false);
   const [form] = Form.useForm();
   const [ipList, setIpList] = useState<any[]>()
 
@@ -69,6 +70,7 @@ const nodeList: React.FC = () => {
           sshPort: values.sshPort,
           sshUser: values.sshUser,
         }
+        setCreateLoading(true)
         const result: API.normalResult = await createNodeAPI({...params, clusterId: getData.clusterId})
         if(result && result.success){
           message.success('新增成功');
@@ -78,6 +80,7 @@ const nodeList: React.FC = () => {
         }else{
           message.error(result.message);
         }
+        setCreateLoading(false)
       })
       .catch((err) => {
         console.log('err: ', err);
@@ -179,7 +182,7 @@ const nodeList: React.FC = () => {
         destroyOnClose={true}
         open={isModalOpen}
         onOk={handleOk}
-        confirmLoading={loading || k8sListloading}
+        confirmLoading={createLoading}
         onCancel={handleCancel}
         // footer={null}
       >

@@ -6,6 +6,9 @@
  * For details, please see
  * https://pro.ant.design/docs/deploy
  */
+import { devHost } from './apiConfig'
+
+
 export default {
   dev: {
     // localhost:8000/api/** -> https://preview.pro.ant.design/api/**
@@ -18,10 +21,10 @@ export default {
     },
     '/apiPre/': {
       // 要代理的地址
-      target: 'http://192.168.31.138:7700', // http://192.168.31.30:7700
+      target: `http://${devHost}`, // http://192.168.31.30:7700
       changeOrigin: true,
       // pathRewrite: { '^/apiPre' : '' },
-    }
+    },
   },
   test: {
     '/api/': {

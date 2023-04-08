@@ -1,9 +1,11 @@
 // https://umijs.org/config/
 import { defineConfig } from 'umi';
+import { devHost } from './apiConfig'
 
 export default defineConfig({
   define: {
     "process.env.UMI_ENV": process.env.UMI_ENV,
+    "process.env.API_HOST": devHost,
   },
   plugins: [
     // https://github.com/zthxxx/react-dev-inspector

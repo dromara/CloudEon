@@ -5,7 +5,6 @@ import { AlertFilled } from '@ant-design/icons';
 import { useState, useEffect, useRef } from 'react';
 import styles from './index.less'
 import { startRoleAPI, stopRoleAPI, getServiceRolesAPI } from '@/services/ant-design-pro/colony';
-import { wsAPI } from '@/services/apiConfig';
 
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/hljs';
@@ -38,7 +37,7 @@ const roleTab:React.FC<{ serviceId: any}> = ({serviceId}) => {
 
     const getLog = (id: any) => {
         try {
-            let url = wsAPI; //'ws://192.168.31.138:7700/log' //   // 'ws://bsvksx.natappfree.cc/log' //'ws://192.168.31.58:8000/dev-server/947/3mkfo4n2/websocket' 
+            let url = `ws://${process.env.API_HOST}/log` //'ws://192.168.31.138:7700/log' //   // 'ws://bsvksx.natappfree.cc/log' //'ws://192.168.31.58:8000/dev-server/947/3mkfo4n2/websocket' 
             let socket = new window.WebSocket(url)
             setSocketRef(socket)
             socket.onopen = function(){ // socket已连接

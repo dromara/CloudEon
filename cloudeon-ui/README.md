@@ -19,12 +19,9 @@ npm install yarn tyarn -g
 tyarn
 ```
 5. 本地环境启动修改接口地址
-   在config/proxy.ts文件修改：
+   在config/apiConfig.ts文件修改：
    ```bash
-    '/apiPre/': {
-      target: 'http://192.168.31.30:7700', // 要代理的地址改成后端接口实际的地址
-      changeOrigin: true,
-    }
+    devHost = "192.168.31.30:7700" // 修改成要代理的地址
    ```
 6. 启动项目
 ```bash
@@ -36,5 +33,3 @@ npm start
 npm run build
 ```
 
-# 代码说明
-1. 如果要修改websocket接口的地址，在src/services/apiConfig/index.ts文件修改
