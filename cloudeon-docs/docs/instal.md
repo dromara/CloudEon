@@ -45,10 +45,10 @@ spring.servlet.multipart.max-request-size=209715200
 spring.main.allow-circular-references=true
 
 ####### udh properties #######
-udh.stack.load.path=${cloudeon.home.path}/stack
-udh.remote.script.path=${cloudeon.home.path}/script
-udh.task.log=${cloudeon.home.path}/log
-udh.work.home=${cloudeon.home.path}/work
+cloudeon.stack.load.path=${cloudeon.home.path}/stack
+cloudeon.remote.script.path=${cloudeon.home.path}/script
+cloudeon.task.log=${cloudeon.home.path}/log
+cloudeon.work.home=${cloudeon.home.path}/work
 
 logging.config=${cloudeon.home.path}/conf/logback.xml
 

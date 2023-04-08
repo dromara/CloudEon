@@ -21,7 +21,7 @@
     </appender>
 
     <!--    任务执行日志-->
-    <springProperty scope="context" name="taskLogHome" source="udh.task.log"/>
+    <springProperty scope="context" name="taskLogHome" source="cloudeon.task.log"/>
     <appender name="TASK-LOG" class="ch.qos.logback.classic.sift.SiftingAppender">
         <discriminator>
             <key>taskId</key>
@@ -37,12 +37,12 @@
             </appender>
         </sift>
     </appender>
-    <logger name="com.data.udh.processor" level="INFO">
+    <logger name="com.data.cloudeon.processor" level="INFO">
         <appender-ref ref="TASK-LOG"/>
     </logger>
 
     <!-- Quit timing logs, which seems disordered. -->
-    <logger name="tech.powerjob.server.com.data.udh.service.timing" level="WARN" additivity="false">
+    <logger name="tech.powerjob.server.com.data.cloudeon.service.timing" level="WARN" additivity="false">
         <appender-ref ref="CONSOLE"/>
     </logger>
 

@@ -27,7 +27,7 @@
         <java.version>1.8</java.version>
         <maven-clean-plugin>3.1.0</maven-clean-plugin>
         <maven.resource.version>3.1.0</maven.resource.version>
-        <start-class>com.data.udh.CloudEonApplication</start-class>
+        <start-class>com.data.cloudeon.CloudEonApplication</start-class>
         <bouncycastle.version>1.68</bouncycastle.version>
 
     </properties>
