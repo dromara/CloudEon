@@ -148,17 +148,17 @@ public class FreemarkerTest {
         service.put("datanode.http-port", "7843");
         service.put("datanode.ipc-port", "9345");
         service.put("namenode.container.limits.memory", "-1");
-        service.put("namenode.memory.ratio", "-1");
-        service.put("namenode.memory", "1024");
+        service.put("hdfs.namenode.memory.ratio", "-1");
+        service.put("hdfs.namenode.memory", "1024");
         service.put("zkfc.container.limits.memory", "-1");
-        service.put("zkfc.memory.ratio", "-1");
-        service.put("zkfc.memory", "1024");
+        service.put("hdfs.zkfc.memory.ratio", "-1");
+        service.put("hdfs.zkfc.memory", "1024");
         service.put("datanode.container.limits.memory", "-1");
-        service.put("datanode.memory.ratio", "-1");
-        service.put("datanode.memory", "1024");
+        service.put("hdfs.datanode.memory.ratio", "-1");
+        service.put("hdfs.datanode.memory", "1024");
         service.put("journalnode.container.limits.memory", "-1");
-        service.put("journalnode.memory.ratio", "-1");
-        service.put("journalnode.memory", "1024");
+        service.put("hdfs.journalnode.memory.ratio", "-1");
+        service.put("hdfs.journalnode.memory", "1024");
         service.put("plugins", Lists.newArrayList("ranger"));
 
         // 安全
@@ -222,17 +222,17 @@ public class FreemarkerTest {
         service.put("resourcemanager.admin.port", "8084");
         service.put("resourcemanager.webapp.port", "8044");
         service.put("resourcemanager.container.limits.memory", "1");
-        service.put("resourcemanager.memory", "1");
-        service.put("resourcemanager.memory.ratio", "1");
+        service.put("yarn.resourcemanager.memory", "1");
+        service.put("yarn.resourcemanager.memory.ratio", "1");
         service.put("nodemanager.container.limits.memory", "1");
-        service.put("nodemanager.memory.ratio", "1");
-        service.put("nodemanager.memory", "1");
+        service.put("yarn.nodemanager.memory.ratio", "1");
+        service.put("yarn.nodemanager.memory", "1");
         service.put("historyserver.container.limits.memory", "1");
-        service.put("historyserver.memory.ratio", "1");
-        service.put("historyserver.memory", "1");
+        service.put("yarn.historyserver.memory.ratio", "1");
+        service.put("yarn.historyserver.memory", "1");
         service.put("timelineserver.container.limits.memory", "1");
-        service.put("timelineserver.memory.ratio", "1");
-        service.put("timelineserver.memory", "1");
+        service.put("yarn.timelineserver.memory.ratio", "1");
+        service.put("yarn.timelineserver.memory", "1");
         service.put("plugins", Lists.newArrayList("ranger"));
 
         // 安全

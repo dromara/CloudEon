@@ -48,64 +48,24 @@ export HADOOP_OPTS="$HADOOP_OPTS -Djava.net.preferIPv4Stack=true $HADOOP_CLIENT_
 
 # Command specific options appended to HADOOP_OPTS when specified
 # Export namenode memory
-<#if conf['namenode.container.limits.memory'] != "-1" && conf['namenode.memory.ratio'] != "-1">
-  <#assign limitsMemory = conf['namenode.container.limits.memory']?number
-    memoryRatio = conf['namenode.memory.ratio']?number
-    namenodeMemory = limitsMemory * memoryRatio * 1024>
-<#else>
-  <#if conf['namenode.memory']??>
-    <#assign namenodeMemory=conf['namenode.memory']?trim?number>
-  <#else>
-    <#assign namenodeMemory=24000>
-  </#if>
-</#if>
+<#assign namenodeMemory=conf['hdfs.namenode.memory']?trim?number>
+
 export NAMENODE_MEMORY=${namenodeMemory?floor?c}m
 export HADOOP_NAMENODE_OPTS="-Xmx${namenodeMemory?floor?c}m -XX:+UseConcMarkSweepGC -XX:+ExplicitGCInvokesConcurrent -Dcom.sun.management.jmxremote.port=9912 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=5542:/opt/udh/${service.serviceName}/conf/jmx_prometheus.yaml $HADOOP_NAMENODE_OPTS"
 export HADOOP_SECONDARYNAMENODE_OPTS="-Xmx${namenodeMemory?floor?c}m -Dcom.sun.management.jmxremote.port=9913 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=5543:/opt/udh/${service.serviceName}/conf/jmx_prometheus.yaml $HADOOP_SECONDARYNAMENODE_OPTS"
 
 # Export zkfc memory
-<#if conf['zkfc.container.limits.memory'] != "-1" && conf['zkfc.memory.ratio'] != "-1">
-  <#assign limitsMemory = conf['zkfc.container.limits.memory']?number
-    memoryRatio = conf['zkfc.memory.ratio']?number
-    zkfcMemory = limitsMemory * memoryRatio * 1024>
-<#else>
-  <#if  conf['zkfc.memory']??>
-    <#assign zkfcMemory=conf['zkfc.memory']?trim?number>
-  <#else>
-    <#assign zkfcMemory=1024>
-  </#if>
-</#if>
+<#assign zkfcMemory=conf['hdfs.zkfc.memory']?trim?number>
 export ZKFC_MEMORY=${zkfcMemory?floor?c}m
 export HADOOP_ZKFC_OPTS="-Xmx${zkfcMemory?floor?c}m -Dcom.sun.management.jmxremote.port=9914 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=5544:/opt/udh/${service.serviceName}/conf/jmx_prometheus.yaml $HADOOP_ZKFC_OPTS"
 
 # Export datanode memory
-<#if conf['datanode.container.limits.memory'] != "-1" && conf['datanode.memory.ratio'] != "-1">
-    <#assign limitsMemory = conf['datanode.container.limits.memory']?number
-    memoryRatio = conf['datanode.memory.ratio']?number
-    datanodeMemory = limitsMemory * memoryRatio * 1024>
-<#else>
-    <#if  conf['datanode.memory']??>
-        <#assign datanodeMemory=conf['datanode.memory']?trim?number>
-    <#else>
-        <#assign datanodeMemory=8192>
-    </#if>
-</#if>
+<#assign datanodeMemory=conf['hdfs.datanode.memory']?trim?number>
 export DATANODE_MEMORY=${datanodeMemory?floor?c}m
 export HADOOP_DATANODE_OPTS="-Xmx${datanodeMemory?floor?c}m -Dcom.sun.management.jmxremote.port=9915 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=5545:/opt/udh/${service.serviceName}/conf/jmx_prometheus.yaml $HADOOP_DATANODE_OPTS"
 
 # Export journalnode memory
-<#if conf['journalnode.container.limits.memory'] != "-1" && conf['journalnode.memory.ratio'] != "-1">
-  <#assign limitsMemory = conf['journalnode.container.limits.memory']?number
-    memoryRatio = conf['journalnode.memory.ratio']?number
-    journalnodeMemory = limitsMemory * memoryRatio * 1024>
-<#else>
-  <#if conf['journalnode.memory']??>
-    <#assign journalnodeMemory=conf['journalnode.memory']?trim?number>
-  <#else>
-    <#assign journalnodeMemory=4096>
-  </#if>
-</#if>
-export JOURNALNODE_MEMORY=${journalnodeMemory?floor?c}m
+<#assign journalnodeMemory=conf['hdfs.journalnode.memory']?trim?number>export JOURNALNODE_MEMORY=${journalnodeMemory?floor?c}m
 export HADOOP_JOURNALNODE_OPTS="-Xmx${journalnodeMemory?floor?c}m -Dcom.sun.management.jmxremote.port=9916 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=5546:/opt/udh/${service.serviceName}/conf/jmx_prometheus.yaml $HADOOP_JOURNALNODE_OPTS"
 
 export HADOOP_BALANCER_OPTS="-Xmx4096m -Dcom.sun.management.jmxremote $HADOOP_BALANCER_OPTS"
@@ -129,41 +89,6 @@ export HADOOP_SECURE_DN_PID_DIR=${r"${HADOOP_PID_DIR}"}
 
 # A string representing this instance of hadoop. $USER by default.
 #export HADOOP_IDENT_STRING=$USER
-
-<#--export CLUSTER=${service.serviceName}-->
-
-<#--<#assign namenodes=serviceRoles["HDFS_NAMENODE"]>-->
-<#--<#if namenodes?size == 1>-->
-<#--    <#if namenodes[0].hostname == .data_model["localhostname"]>-->
-<#--        export NAMENODE_NAMESERVICE=${service.serviceName}-->
-<#--        export HDFS_HA=false-->
-<#--    </#if>-->
-<#--<#elseif namenodes?size == 2>-->
-<#--    <#if namenodes[0].id lt namenodes[1].id>-->
-<#--        <#assign nn1=namenodes[0]>-->
-<#--        <#assign nn2=namenodes[1]>-->
-<#--    <#else>-->
-<#--        <#assign nn1=namenodes[1]>-->
-<#--        <#assign nn2=namenodes[0]>-->
-<#--    </#if>-->
-
-<#--    <#if nn1.hostname == .data_model["localhostname"]>-->
-<#--        export NAMENODE_NAMESERVICE=${service.serviceName}-->
-<#--        export HDFS_HA=true-->
-<#--        export NAMENODE_ORDINAL=0-->
-<#--    <#elseif nn2.hostname == .data_model["localhostname"]>-->
-<#--        export NAMENODE_NAMESERVICE=${service.serviceName}-->
-<#--        export HDFS_HA=true-->
-<#--        export NAMENODE_ORDINAL=1-->
-<#--        <#if conf["namenode.http-port"]??>-->
-<#--            <#assign nn1HttpPort=conf["namenode.http-port"]>-->
-<#--        </#if>-->
-<#--        export NAMENODE_PRIMARY_JMX_URL=http://${nn1.hostname}:${nn1HttpPort}/jmx-->
-<#--    </#if>-->
-<#--<#else>-->
-<#--    <#stop "more than 2 NameNodes in the same NameService not supported">-->
-<#--</#if>-->
-
 
 
 # Export journalnode config

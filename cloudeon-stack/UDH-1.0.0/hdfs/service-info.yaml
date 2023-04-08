@@ -197,7 +197,7 @@ configurations:
     confFile:  "core-site.xml"
 
 
-  - name: namenode.memory
+  - name: hdfs.namenode.memory
     recommendExpression: 2048
     min: 1024
     max: 65536
@@ -205,7 +205,7 @@ configurations:
     unit: MB
     configurableInWizard: true
 
-  - name: zkfc.memory
+  - name: hdfs.zkfc.memory
     recommendExpression: 1024
     min: 1024
     max: 65536
@@ -214,7 +214,7 @@ configurations:
     configurableInWizard: true
 
 
-  - name: journalnode.memory
+  - name: hdfs.journalnode.memory
     recommendExpression: 1024
     min: 1024
     max: 65536
@@ -223,7 +223,7 @@ configurations:
     configurableInWizard: true
 
 
-  - name: datanode.memory
+  - name: hdfs.datanode.memory
     recommendExpression: 1024
     min: 1024
     max: 65536
@@ -232,213 +232,8 @@ configurations:
     configurableInWizard: true
 
 
-  - name: namenode.container.limits.memory
-    recommendExpression: -1
-    min: -1
-    max: 65536
-    valueType: Slider
-    unit: MB
-    configurableInWizard: true
+ 
 
-
-  - name: namenode.container.limits.cpu
-    recommendExpression: -1
-    min: -1
-    max: 256
-    valueType: Slider
-    unit: core
-    configurableInWizard: true
-
-
-  - name: namenode.container.requests.memory
-    recommendExpression: -1
-    min: -1
-    max: 65536
-    valueType: Slider
-    unit: MB
-    configurableInWizard: true
-
-
-  - name: namenode.container.requests.cpu
-    recommendExpression: -1
-    min: -1
-    max: 256
-    valueType: Slider
-    unit: core
-    configurableInWizard: true
-
-
-  - name: namenode.memory.ratio
-    recommendExpression: -1
-    valueType: InputNumber
-    configurableInWizard: true
-
-
-  - name: zkfc.container.limits.memory
-    recommendExpression: -1
-    min: -1
-    max: 65536
-    valueType: Slider
-    unit: MB
-    configurableInWizard: true
-
-
-  - name: zkfc.container.limits.cpu
-    recommendExpression: -1
-    min: -1
-    max: 256
-    valueType: Slider
-    unit: core
-    configurableInWizard: true
-
-
-  - name: zkfc.container.requests.memory
-    recommendExpression: -1
-    min: -1
-    max: 65536
-    valueType: Slider
-    unit: MB
-    configurableInWizard: true
-
-
-  - name: zkfc.container.requests.cpu
-    recommendExpression: -1
-    min: -1
-    max: 256
-    valueType: Slider
-    unit: core
-    configurableInWizard: true
-
-
-  - name: zkfc.memory.ratio
-    recommendExpression: -1
-    valueType: InputNumber
-    configurableInWizard: true
-
-
-  - name: journalnode.container.limits.memory
-    recommendExpression: -1
-    min: -1
-    max: 65536
-    valueType: Slider
-    unit: MB
-    configurableInWizard: true
-
-
-  - name: journalnode.container.limits.cpu
-    recommendExpression: -1
-    min: -1
-    max: 256
-    valueType: Slider
-    unit: core
-    configurableInWizard: true
-
-
-  - name: journalnode.container.requests.memory
-    recommendExpression: -1
-    min: -1
-    max: 65536
-    valueType: Slider
-    unit: MB
-    configurableInWizard: true
-
-
-  - name: journalnode.container.requests.cpu
-    recommendExpression: -1
-    min: -1
-    max: 256
-    valueType: Slider
-    unit: core
-    configurableInWizard: true
-
-
-  - name: journalnode.memory.ratio
-    recommendExpression: -1
-    valueType: InputNumber
-    configurableInWizard: true
-
-
-  - name: datanode.container.limits.memory
-    recommendExpression: -1
-    min: -1
-    max: 65536
-    valueType: Slider
-    unit: MB
-    configurableInWizard: true
-
-
-  - name: datanode.container.limits.cpu
-    recommendExpression: -1
-    min: -1
-    max: 256
-    valueType: Slider
-    unit: core
-    configurableInWizard: true
-
-
-  - name: datanode.container.requests.memory
-    recommendExpression: -1
-    min: -1
-    max: 65536
-    valueType: Slider
-    unit: MB
-    configurableInWizard: true
-
-
-  - name: datanode.container.requests.cpu
-    recommendExpression: -1
-    min: -1
-    max: 256
-    valueType: Slider
-    unit: core
-    configurableInWizard: true
-
-
-  - name: datanode.memory.ratio
-    recommendExpression: -1
-    valueType: InputNumber
-    configurableInWizard: true
-
-
-  - name: httpfs.container.limits.memory
-    recommendExpression: -1
-    min: -1
-    max: 65536
-    valueType: Slider
-    unit: MB
-    configurableInWizard: true
-
-
-  - name: httpfs.container.limits.cpu
-    recommendExpression: -1
-    min: -1
-    max: 256
-    valueType: Slider
-    unit: core
-    configurableInWizard: true
-
-
-  - name: httpfs.container.requests.memory
-    recommendExpression: -1
-    min: -1
-    max: 65536
-    valueType: Slider
-    unit: MB
-    configurableInWizard: true
-
-
-  - name: httpfs.container.requests.cpu
-    recommendExpression: -1
-    min: -1
-    max: 256
-    valueType: Slider
-    unit: core
-    configurableInWizard: true
-
-
-  - name: httpfs.memory.ratio
-    recommendExpression: -1
-    valueType: InputNumber
-    configurableInWizard: true
+ 
 
 

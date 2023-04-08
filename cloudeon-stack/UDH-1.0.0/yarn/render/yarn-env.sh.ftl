@@ -43,56 +43,16 @@ fi
 JAVA=$JAVA_HOME/bin/java
 JAVA_HEAP_MAX=-Xmx4096m
 <#--resource manager memory-->
-<#if conf['resourcemanager.container.limits.memory'] != "-1" && conf['resourcemanager.memory.ratio'] != "-1">
-  <#assign limitsMemory = conf['resourcemanager.container.limits.memory']?number
-  memoryRatio = conf['resourcemanager.memory.ratio']?number
-  resourcemanagerMemory = limitsMemory * memoryRatio * 1024>
-<#else>
-  <#if conf['resourcemanager.memory']??>
-    <#assign resourcemanagerMemory=conf['resourcemanager.memory']?trim?number>
-  <#else>
-    <#assign resourcemanagerMemory=4096>
-  </#if>
-</#if>
+<#assign resourcemanagerMemory=conf['yarn.resourcemanager.memory']?trim?number>
 export YARN_RESOURCEMANAGER_HEAPSIZE=${resourcemanagerMemory?floor?c}m
 <#--node manager memory-->
-<#if conf['nodemanager.container.limits.memory'] != "-1" && conf['nodemanager.memory.ratio'] != "-1">
-  <#assign limitsMemory = conf['nodemanager.container.limits.memory']?number
-  memoryRatio = conf['nodemanager.memory.ratio']?number
-  nodemanagerMemory = limitsMemory * memoryRatio * 1024>
-<#else>
-  <#if conf['nodemanager.memory']??>
-    <#assign nodemanagerMemory=conf['nodemanager.memory']?trim?number>
-  <#else>
-    <#assign nodemanagerMemory=4096>
-  </#if>
-</#if>
+<#assign nodemanagerMemory=conf['yarn.nodemanager.memory']?trim?number>
 export YARN_NODEMANAGER_HEAPSIZE=${nodemanagerMemory?floor?c}m
 <#--historyserver memory-->
-<#if conf['historyserver.container.limits.memory'] != "-1" && conf['historyserver.memory.ratio'] != "-1">
-  <#assign limitsMemory = conf['historyserver.container.limits.memory']?number
-  memoryRatio = conf['historyserver.memory.ratio']?number
-  historyserverMemory = limitsMemory * memoryRatio * 1024>
-<#else>
-  <#if conf['historyserver.memory']??>
-    <#assign historyserverMemory=conf['historyserver.memory']?trim?number>
-  <#else>
-    <#assign historyserverMemory=4096>
-  </#if>
-</#if>
+<#assign historyserverMemory=conf['yarn.historyserver.memory']?trim?number>
 export YARN_HISTORYSERVER_HEAPSIZE=${historyserverMemory?floor?c}m
 <#--timelineserver memory-->
-<#if conf['timelineserver.container.limits.memory'] != "-1" && conf['timelineserver.memory.ratio'] != "-1">
-  <#assign limitsMemory = conf['timelineserver.container.limits.memory']?number
-  memoryRatio = conf['timelineserver.memory.ratio']?number
-  timelineserverMemory = limitsMemory * memoryRatio * 1024>
-<#else>
-  <#if conf['timelineserver.memory']??>
-    <#assign timelineserverMemory=conf['timelineserver.memory']?trim?number>
-  <#else>
-    <#assign timelineserverMemory=4096>
-  </#if>
-</#if>
+<#assign timelineserverMemory=conf['yarn.timelineserver.memory']?trim?number>
 export YARN_TIMELINESERVER_HEAPSIZE=${timelineserverMemory?floor?c}m
 
 # 添加jmx监控开放

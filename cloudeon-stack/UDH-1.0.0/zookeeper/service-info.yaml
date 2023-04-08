@@ -94,35 +94,6 @@ configurations:
     configurableInWizard: true
 
 
-  - name: zookeeper.container.limits.memory
-    recommendExpression: -1
-    valueType: InputNumber
-    configurableInWizard: true
-
-
-  - name: zookeeper.container.limits.cpu
-    recommendExpression: -1
-    valueType: InputNumber
-    configurableInWizard: true
-
-
-  - name: zookeeper.container.requests.memory
-    recommendExpression: -1
-    valueType: InputNumber
-    configurableInWizard: true
-
-
-  - name: zookeeper.container.requests.cpu
-    recommendExpression: -1
-    valueType: InputNumber
-    configurableInWizard: true
-
-
-  - name: zookeeper.memory.ratio
-    recommendExpression: -1
-    valueType: InputNumber
-    configurableInWizard: true
-
 
   - name: sasl.oauth2.enabled
     recommendExpression: true

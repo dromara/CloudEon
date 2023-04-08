@@ -325,139 +325,36 @@ configurations:
     recommendExpression: 19888
     valueType: InputNumber
     configurableInWizard: true
-  - name: resourcemanager.memory
+    
+  - name: yarn.resourcemanager.memory
     recommendExpression: 1024
     min: 1024
     max: 65536
     valueType: Slider
     unit: MB
     configurableInWizard: true
-  - name: historyserver.memory
+  - name: yarn.nodemanager.memory
     recommendExpression: 1024
     min: 1024
     max: 65536
     valueType: Slider
     unit: MB
     configurableInWizard: true
-  - name: timelineserver.memory
+  - name: yarn.historyserver.memory
     recommendExpression: 1024
     min: 1024
     max: 65536
     valueType: Slider
     unit: MB
     configurableInWizard: true
-  - name: resourcemanager.container.limits.memory
-    recommendExpression: -1
-    min: -1
+  - name: yarn.timelineserver.memory
+    recommendExpression: 1024
+    min: 1024
     max: 65536
     valueType: Slider
     unit: MB
-  - name: resourcemanager.container.limits.cpu
-    recommendExpression: -1
-    min: -1
-    max: 256
-    valueType: Slider
-    unit: core
-  - name: resourcemanager.container.requests.memory
-    recommendExpression: -1
-    min: -1
-    max: 65536
-    valueType: Slider
-    unit: MB
-  - name: resourcemanager.container.requests.cpu
-    recommendExpression: -1
-    min: -1
-    max: 256
-    valueType: Slider
-    unit: core
-  - name: resourcemanager.memory.ratio
-    recommendExpression: -1
-    valueType: InputNumber
-
-  - name: nodemanager.container.limits.memory
-    recommendExpression: -1
-    min: -1
-    max: 65536
-    valueType: Slider
-    unit: MB
-  - name: nodemanager.container.limits.cpu
-    recommendExpression: -1
-    min: -1
-    max: 256
-    valueType: Slider
-    unit: core
-  - name: nodemanager.container.requests.memory
-    recommendExpression: -1
-    min: -1
-    max: 65536
-    valueType: Slider
-    unit: MB
-  - name: nodemanager.container.requests.cpu
-    recommendExpression: -1
-    min: -1
-    max: 256
-    valueType: Slider
-    unit: core
-  - name: nodemanager.memory.ratio
-    recommendExpression: -1
-    valueType: InputNumber
-
-  - name: historyserver.container.limits.memory
-    recommendExpression: -1
-    min: -1
-    max: 65536
-    valueType: Slider
-    unit: MB
-  - name: historyserver.container.limits.cpu
-    recommendExpression: -1
-    min: -1
-    max: 256
-    valueType: Slider
-    unit: core
-  - name: historyserver.container.requests.memory
-    recommendExpression: -1
-    min: -1
-    max: 65536
-    valueType: Slider
-    unit: MB
-  - name: historyserver.container.requests.cpu
-    recommendExpression: -1
-    min: -1
-    max: 256
-    valueType: Slider
-    unit: core
-  - name: historyserver.memory.ratio
-    recommendExpression: -1
-    valueType: InputNumber
-
-  - name: timelineserver.container.limits.memory
-    recommendExpression: -1
-    min: -1
-    max: 65536
-    valueType: Slider
-    unit: MB
-  - name: timelineserver.container.limits.cpu
-    recommendExpression: -1
-    min: -1
-    max: 256
-    valueType: Slider
-    unit: core
-  - name: timelineserver.container.requests.memory
-    recommendExpression: -1
-    min: -1
-    max: 65536
-    valueType: Slider
-    unit: MB
-  - name: timelineserver.container.requests.cpu
-    recommendExpression: -1
-    min: -1
-    max: 256
-    valueType: Slider
-    unit: core
-  - name: timelineserver.memory.ratio
-    recommendExpression: -1
-    valueType: InputNumber
-
+    configurableInWizard: true
+ 
 
 
 

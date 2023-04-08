@@ -6,13 +6,7 @@ export ZOOPIDFILE="/opt/udh/${service.serviceName}/data/zookeeper-server.pid"
 
 export SERVER_JVMFLAGS="-Dcom.sun.management.jmxremote.port=${conf['zookeeper.jmxremote.port']} -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false"
 
-<#if conf['zookeeper.container.limits.memory'] != "-1" && conf['zookeeper.memory.ratio'] != "-1">
-  <#assign limitsMemory = conf['zookeeper.container.limits.memory']?number
-    memoryRatio = conf['zookeeper.memory.ratio']?number
-    memory = limitsMemory * memoryRatio * 1024>
-<#else>
-  <#assign memory = conf['zookeeper.server.memory']?number>
-</#if>
+<#assign memory = conf['zookeeper.server.memory']?number>
 export SERVER_JVMFLAGS="-Xmx${memory?floor?c}m $SERVER_JVMFLAGS"
 
 export SERVER_JVMFLAGS="-Dzookeeper.log.dir=/opt/udh/${service.serviceName}/log -Dzookeeper.root.logger=INFO,ROLLINGFILE $SERVER_JVMFLAGS"
