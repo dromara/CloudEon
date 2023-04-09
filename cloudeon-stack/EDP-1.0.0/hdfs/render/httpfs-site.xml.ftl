@@ -8,7 +8,7 @@
 </#macro>
 <configuration>
 
-    <@property "httpfs.hadoop.config.dir" "/opt/udh/${service.serviceName}/conf"/>
+    <@property "httpfs.hadoop.config.dir" "/opt/edp/${service.serviceName}/conf"/>
     <@property "httpfs.http.port" "${conf['httpfs.http-port']}"/>
 
 

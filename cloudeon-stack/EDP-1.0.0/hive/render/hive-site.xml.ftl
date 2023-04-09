@@ -24,7 +24,7 @@
     >
     <#if operationLog == "true">
     <@property "hive.server2.logging.operation.enabled" operationLog/>
-    <@property "hive.server2.logging.operation.log.location" "/opt/udh/${service.serviceName}/log/operation_logs"/>
+    <@property "hive.server2.logging.operation.log.location" "/opt/edp/${service.serviceName}/log/operation_logs"/>
     <@property "hive.server2.logging.operation.level" "${conf['hive.server2.logging.operation.level']}"/>
     </#if>
 

@@ -19,7 +19,7 @@ alerting:
 rule_files:
   # - "first_rules.yml"
   # - "second_rules.yml"
-  - "/opt/udh/${service.serviceName}/conf/rule/rules*.yml"
+  - "/opt/edp/${service.serviceName}/conf/rule/rules*.yml"
 <#assign node_exporters=[]>
 <#list serviceRoles['MONITOR_NODEEXPORTER'] as role>
   <#assign node_exporters += ["'"+role.hostname + ":" + conf["nodeexporter.http.port"]+"'"]>

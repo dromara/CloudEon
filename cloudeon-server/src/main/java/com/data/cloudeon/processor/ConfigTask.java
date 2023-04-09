@@ -137,7 +137,7 @@ public class ConfigTask extends BaseCloudeonTask {
             e.printStackTrace();
             throw new RuntimeException("打开sftp失败："+e);
         }
-        String remoteConfDirPath = "/opt/udh/" + serviceInstanceEntity.getServiceName() +"/conf/";
+        String remoteConfDirPath = "/opt/edp/" + serviceInstanceEntity.getServiceName() +"/conf/";
         log.info("拷贝本地配置目录：" + outputConfPath + " 到节点" + taskParam.getHostName() + "的：" + remoteConfDirPath);
         try {
             SshUtils.uploadDirectory(sftp,new File(outputConfPath),remoteConfDirPath);
@@ -160,7 +160,7 @@ public class ConfigTask extends BaseCloudeonTask {
         // 特殊处理
         if (stackServiceEntity.getName().equals(Constant.ZOOKEEPER_SERVICE_NAME)) {
             try {
-                String remoteDataDirPath = "/opt/udh/" + serviceInstanceEntity.getServiceName()  +"/data";
+                String remoteDataDirPath = "/opt/edp/" + serviceInstanceEntity.getServiceName()  +"/data";
                 String command = "mv " + remoteConfDirPath + File.separator + "myid " + remoteDataDirPath;
                 log.info("移动myid文件到data目录 {}", remoteDataDirPath);
                 log.info("ssh执行命令： {}", command);

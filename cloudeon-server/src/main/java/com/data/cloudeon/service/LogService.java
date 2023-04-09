@@ -69,7 +69,7 @@ public class LogService {
             String host = sshSession.getHost();
 
             //String command = "ssh tpbbsc01 \"tail -" +count+ "f " +logPath+ "\""; //二级SSH跳板机在这里修改
-            String command = String.format("tail -20f  /opt/udh/%s/log/%s", serviceInstanceEntity.getServiceName(), logFileName);
+            String command = String.format("tail -20f  /opt/edp/%s/log/%s", serviceInstanceEntity.getServiceName(), logFileName);
             log.info("查看服务器" + host + "上的角色实例日志，command: " + command);
 
             //创建一个执行Shell命令的Channel

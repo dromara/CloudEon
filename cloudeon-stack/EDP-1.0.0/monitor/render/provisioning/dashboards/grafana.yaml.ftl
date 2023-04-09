@@ -6,4 +6,4 @@ providers:
     type: file
     updateIntervalSeconds: 10
     options:
-      path: /opt/udh/${service.serviceName}/conf/provisioning/dashboards/grafana
+      path: /opt/edp/${service.serviceName}/conf/provisioning/dashboards/grafana

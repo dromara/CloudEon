@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-HADOOP_CONF_DIR="/opt/udh/${service.serviceName}/conf"
+HADOOP_CONF_DIR="/opt/edp/${service.serviceName}/conf"
 HDFS_HOME="${r"${HADOOP_HOME}"}"
 HIVE_WAREHOUSE_DIR="${conf['hive.metastore.warehouse.dir']}"
 HIVE_TMP_DIR="${conf['hive.exec.scratchdir']}"

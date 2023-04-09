@@ -21,7 +21,7 @@ packages = org.apache.hadoop.hive.ql.log
 # list of properties
 property.hive.log.level = INFO
 property.hive.root.logger = DRFA
-property.hive.log.dir = /opt/udh/${service.serviceName}/log
+property.hive.log.dir = /opt/edp/${service.serviceName}/log
 property.hive.log.file = hive-${r"$${env:SERVICE_NAME}"}-${r"$${env:HOSTNAME}"}.log
 property.hive.perflogger.log.level = INFO
 

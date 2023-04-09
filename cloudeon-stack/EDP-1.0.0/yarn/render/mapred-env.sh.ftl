@@ -20,10 +20,10 @@ export HADOOP_JOB_HISTORYSERVER_HEAPSIZE=1000
 export HADOOP_MAPRED_ROOT_LOGGER=INFO,RFA
 
 #export HADOOP_JOB_HISTORYSERVER_OPTS=
-export HADOOP_MAPRED_LOG_DIR=/opt/udh/${service.serviceName}/log
+export HADOOP_MAPRED_LOG_DIR=/opt/edp/${service.serviceName}/log
 # Where log files are stored.  $HADOOP_MAPRED_HOME/logs by default.
 #export HADOOP_JHS_LOGGER=INFO,RFA # Hadoop JobSummary logger.
-export HADOOP_MAPRED_PID_DIR=/opt/udh/${service.serviceName}/data
+export HADOOP_MAPRED_PID_DIR=/opt/edp/${service.serviceName}/data
 # The pid files are stored. /tmp by default.
 export HADOOP_MAPRED_IDENT_STRING=yarn
 #A string representing this instance of hadoop. $USER by default

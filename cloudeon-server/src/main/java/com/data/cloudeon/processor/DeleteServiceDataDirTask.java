@@ -19,7 +19,7 @@ public class DeleteServiceDataDirTask extends BaseCloudeonTask {
         ClusterNodeEntity nodeEntity = clusterNodeRepository.findByHostname(taskParam.getHostName());
 
         try (ClientSession clientSession = SshUtils.openConnectionByPassword(nodeEntity.getIp(), nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getSshPassword());) {
-            String remoteDataDirPath = "/opt/udh/" + serviceInstanceName;
+            String remoteDataDirPath = "/opt/edp/" + serviceInstanceName;
             String command = "rm -rf " + remoteDataDirPath;
             log.info("执行远程命令：" + command);
             SshUtils.execCmdWithResult(clientSession, command);

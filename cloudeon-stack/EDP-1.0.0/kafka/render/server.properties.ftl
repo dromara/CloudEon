@@ -8,7 +8,7 @@ broker.id=${host.id % 254 + 1}
     </#if>
 </#list>
 
-log.dirs=/opt/udh/${service.serviceName}/data
+log.dirs=/opt/edp/${service.serviceName}/data
 
 listeners=PLAINTEXT://${localhostname}:${conf['kafka.listeners.port']}
 

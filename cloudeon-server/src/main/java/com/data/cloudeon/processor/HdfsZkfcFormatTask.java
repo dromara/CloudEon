@@ -35,7 +35,7 @@ public class HdfsZkfcFormatTask extends BaseCloudeonTask {
         String serviceName = serviceInstanceEntity.getServiceName();
         // containerd ==> ctr  run --mount  type=bind,src=/tmp,dst=/hostdir,options=rbind:rw --rm  --net-host -t  registry.cn-hangzhou.aliyuncs.com/udh/doris:1.1.5 cc2 bash
         // hdfs 这个zkfc format命令每次执行都会删除然后创建的。todo 能捕获到执行日志吗？
-        String cmd = String.format("sudo docker  run --net=host -v /opt/udh/%s/conf:/opt/udh/%s/conf  %s sh -c \"  yes Y| hdfs --config  /opt/udh/%s/conf zkfc -formatZK \"   ",
+        String cmd = String.format("sudo docker  run --net=host -v /opt/edp/%s/conf:/opt/edp/%s/conf  %s sh -c \"  yes Y| hdfs --config  /opt/edp/%s/conf zkfc -formatZK \"   ",
                 serviceName,serviceName,stackServiceEntity.getDockerImage(),serviceName);
 
         // 选择namenode所在节点执行

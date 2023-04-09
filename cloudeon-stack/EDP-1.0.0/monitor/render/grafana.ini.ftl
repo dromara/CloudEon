@@ -15,19 +15,19 @@ force_migration = false
 #################################### Paths ###############################
 [paths]
 # Path to where grafana can store temp files, sessions, and the sqlite3 db (if that is used)
-data = /opt/udh/${service.serviceName}/data/grafana
+data = /opt/edp/${service.serviceName}/data/grafana
 
 # Temporary files in `data` directory older than given duration will be removed
 temp_data_lifetime = 24h
 
 # Directory where grafana can store logs
-logs = /opt/udh/${service.serviceName}/log
+logs = /opt/edp/${service.serviceName}/log
 
 # Directory where grafana will automatically scan and look for plugins
 plugins = data/plugins
 
 # folder that contains provisioning config files that grafana will apply on startup and while running.
-provisioning = /opt/udh/${service.serviceName}/conf/provisioning
+provisioning = /opt/edp/${service.serviceName}/conf/provisioning
 
 #################################### Server ##############################
 [server]

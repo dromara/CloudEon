@@ -3,7 +3,7 @@
 
 
 HDFS_HOME="$HADOOP_HOME"
-HDFS_CONF_DIR="/opt/udh/${service.serviceName}/conf"
+HDFS_CONF_DIR="/opt/edp/${service.serviceName}/conf"
 YARN_LOGS_DIR="${conf['remote.app.log.dir']}"
 MAPREDUCE_STAGE_DIR="${conf['mapreduce.am.staging.dir']}"
 

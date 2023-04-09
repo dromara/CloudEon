@@ -26,7 +26,7 @@ export JAVA_HOME=${r"${JAVA_HOME}"}
 # The jsvc implementation to use. Jsvc is required to run secure datanodes.
 #export JSVC_HOME=${r"${JSVC_HOME}"}
 
-export HADOOP_CONF_DIR=/opt/udh/${service.serviceName}/conf
+export HADOOP_CONF_DIR=/opt/edp/${service.serviceName}/conf
 
 # Extra Java CLASSPATH elements.  Automatically insert capacity-scheduler.
 for f in $HADOOP_HOME/contrib/capacity-scheduler/*.jar; do
@@ -57,13 +57,13 @@ export HADOOP_ZKFC_OPTS="-Xmx256m $HADOOP_ZKFC_OPTS"
 export HADOOP_SECURE_DN_USER=${r"${HADOOP_SECURE_DN_USER}"}
 
 # Where log files are stored.  $HADOOP_HOME/logs by default.
-export HADOOP_LOG_DIR=/opt/udh/${service.serviceName}/log
+export HADOOP_LOG_DIR=/opt/edp/${service.serviceName}/log
 
 # Where log files are stored in the secure data environment.
 export HADOOP_SECURE_DN_LOG_DIR=${r"${HADOOP_LOG_DIR}"}
 
 # The directory where pid files are stored. /tmp by default.
-export HADOOP_PID_DIR=/opt/udh/${service.serviceName}/data
+export HADOOP_PID_DIR=/opt/edp/${service.serviceName}/data
 export HADOOP_SECURE_DN_PID_DIR=${r"${HADOOP_PID_DIR}"}
 
 # A string representing this instance of hadoop. $USER by default.

@@ -18,8 +18,8 @@
 <configuration>
 
 
-    <@property "yarn.nodemanager.local-dirs" "/opt/udh/${service.serviceName}/data/local"/>
-    <@property "yarn.nodemanager.log-dirs" "/opt/udh/${service.serviceName}/log"/>
+    <@property "yarn.nodemanager.local-dirs" "/opt/edp/${service.serviceName}/data/local"/>
+    <@property "yarn.nodemanager.log-dirs" "/opt/edp/${service.serviceName}/log"/>
     <#--handle dependencies.hdfs-->
     <#assign hdfs=dependencies.HDFS >
     <@property "yarn.nodemanager.remote-app-log-dir" "hdfs://${hdfs.conf['nameservices']}${conf['remote.app.log.dir']}"/>
@@ -79,7 +79,7 @@
     <@property "yarn.timeline-service.webapp.address" timelineServer + ":${conf['timelineserver.http.port']}"/>
 </#if>
 
-    <@property "yarn.resourcemanager.nodes.exclude-path" "/opt/udh/" + serviceName + "/conf/yarn.exclude"/>
+    <@property "yarn.resourcemanager.nodes.exclude-path" "/opt/edp/" + serviceName + "/conf/yarn.exclude"/>
 <#--Take properties from the context-->
 <#list confFiles['yarn-site.xml'] as key, value>
     <@property key value/>

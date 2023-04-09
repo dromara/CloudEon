@@ -34,7 +34,7 @@ public class InitHiveWarehouseTask extends BaseCloudeonTask {
         StackServiceEntity stackServiceEntity = stackServiceRepository.findById(serviceInstanceEntity.getStackServiceId()).get();
         String serviceName = serviceInstanceEntity.getServiceName();
         // todo 能捕获到执行日志吗？
-        String cmd = String.format("sudo docker  run --net=host -v /opt/udh/%s/conf:/opt/udh/%s/conf  %s sh -c \"  /opt/udh/%s/conf/init-warehouse-dir.sh \"   ",
+        String cmd = String.format("sudo docker  run --net=host -v /opt/edp/%s/conf:/opt/edp/%s/conf  %s sh -c \"  /opt/edp/%s/conf/init-warehouse-dir.sh \"   ",
                 serviceName,serviceName,stackServiceEntity.getDockerImage(),serviceName);
 
         // 选择metastore所在节点执行

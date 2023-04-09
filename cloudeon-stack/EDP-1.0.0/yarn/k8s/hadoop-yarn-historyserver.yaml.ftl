@@ -41,7 +41,7 @@ spec:
       hostNetwork: true
       containers:
       - args:
-        - "/opt/udh/${service.serviceName}/conf/historyserver-bootstrap.sh"
+        - "/opt/edp/${service.serviceName}/conf/historyserver-bootstrap.sh"
         image: "${dockerImage}"
         imagePullPolicy: "Always"
         name: "${roleServiceFullName}"
@@ -63,13 +63,13 @@ spec:
         securityContext:
           privileged: true
         volumeMounts:
-        - mountPath: "/opt/udh/${service.serviceName}/data"
+        - mountPath: "/opt/edp/${service.serviceName}/data"
           name: "data"
-        - mountPath: "/opt/udh/${service.serviceName}/log"
+        - mountPath: "/opt/edp/${service.serviceName}/log"
           name: "log"
         - mountPath: "/etc/localtime"
           name: "timezone"
-        - mountPath: "/opt/udh/${service.serviceName}/conf"
+        - mountPath: "/opt/edp/${service.serviceName}/conf"
           name: "conf"
 
       nodeSelector:
@@ -77,15 +77,15 @@ spec:
       terminationGracePeriodSeconds: 30
       volumes:
       - hostPath:
-          path: "/opt/udh/${service.serviceName}/data"
+          path: "/opt/edp/${service.serviceName}/data"
         name: "data"
       - hostPath:
-          path: "/opt/udh/${service.serviceName}/log"
+          path: "/opt/edp/${service.serviceName}/log"
         name: "log"
       - hostPath:
           path: "/etc/localtime"
         name: "timezone"
       - hostPath:
-          path: "/opt/udh/${service.serviceName}/conf"
+          path: "/opt/edp/${service.serviceName}/conf"
         name: "conf"
 

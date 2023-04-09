@@ -1,5 +1,5 @@
 <#compress>
-dataDir=/opt/udh/${service.serviceName}/data
+dataDir=/opt/edp/${service.serviceName}/data
 clientPort=${conf['zookeeper.client.port']}
 admin.enableServer=false
 

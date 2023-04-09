@@ -413,7 +413,7 @@ public class FreemarkerTest {
     public void template() {
         TemplateEngine engine = TemplateUtil.createEngine(new TemplateConfig());
         String serviceInstanceId = "zookeeper1";
-        String persistencePaths = "/opt/udh/etc/${serviceInstanceId}/conf,/opt/udh/var/log/${serviceInstanceId},/opt/udh/var/${serviceInstanceId}";
+        String persistencePaths = "/opt/edp/etc/${serviceInstanceId}/conf,/opt/edp/var/log/${serviceInstanceId},/opt/edp/var/${serviceInstanceId}";
         String result = Arrays.stream(persistencePaths.split(",")).map(new Function<String, String>() {
             @Override
             public String apply(String pathTemplate) {

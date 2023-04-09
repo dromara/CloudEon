@@ -27,8 +27,8 @@ public class SshTest {
                 "root",
                 "Ltcyhlwylym@admin2021zi!");
 
-//        SshUtils.uploadFile(session,"/opt/udh/ZOOKEEPER1/conf", "/Users/huzekang/Downloads/apache-zookeeper-3.6.3-bin.tar.gz");
-//        SshUtils.uploadLocalDirToRemote(session,"/opt/udh/ZOOKEEPER1/conf","/Volumes/Samsung_T5/opensource/e-mapreduce/work/ZOOKEEPER1/fl001/conf");
+//        SshUtils.uploadFile(session,"/opt/edp/ZOOKEEPER1/conf", "/Users/huzekang/Downloads/apache-zookeeper-3.6.3-bin.tar.gz");
+//        SshUtils.uploadLocalDirToRemote(session,"/opt/edp/ZOOKEEPER1/conf","/Volumes/Samsung_T5/opensource/e-mapreduce/work/ZOOKEEPER1/fl001/conf");
     }
 
     @Test
@@ -64,7 +64,7 @@ public class SshTest {
         session.connect();
 
         Channel channel = session.openChannel("exec");
-        ((com.jcraft.jsch.ChannelExec) channel).setCommand("tail -f /opt/udh/monitor1/log/grafana.log\n");
+        ((com.jcraft.jsch.ChannelExec) channel).setCommand("tail -f /opt/edp/monitor1/log/grafana.log\n");
 
         InputStream in = channel.getInputStream();
         channel.connect();

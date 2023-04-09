@@ -23,9 +23,9 @@ roles:
     logFile: "server.log"
 
 persistencePaths:
-  - /opt/udh/${serviceInstanceId}/conf
-  - /opt/udh/${serviceInstanceId}/log
-  - /opt/udh/${serviceInstanceId}/data
+  - /opt/edp/${serviceInstanceId}/conf
+  - /opt/edp/${serviceInstanceId}/log
+  - /opt/edp/${serviceInstanceId}/data
 
 
 customConfigFiles:

@@ -63,7 +63,7 @@ public class InitHiveMetastoreTask extends BaseCloudeonTask {
             log.info("检查到hive元数据库已经初始化过，无需执行初始化脚本...");
         } else {
             // todo 能捕获到执行日志吗？
-            String cmd = String.format("sudo docker  run --net=host -v /opt/udh/%s/conf:/opt/udh/%s/conf  -v /opt/udh/%s/log:/opt/udh/%s/log  %s sh -c \"  /opt/udh/%s/conf/init-metastore-db.sh \"   ",
+            String cmd = String.format("sudo docker  run --net=host -v /opt/edp/%s/conf:/opt/edp/%s/conf  -v /opt/edp/%s/log:/opt/edp/%s/log  %s sh -c \"  /opt/edp/%s/conf/init-metastore-db.sh \"   ",
                     serviceName, serviceName, serviceName, serviceName, stackServiceEntity.getDockerImage(), serviceName);
 
             // 选择metastore所在节点执行

@@ -22,7 +22,7 @@ packages = org.apache.hadoop.hive.ql.log
 property.hive.log.level = INFO
 property.hive.root.logger = FA
 property.hive.query.id = hadoop
-property.hive.log.dir = /opt/udh/${service.serviceName}/log
+property.hive.log.dir = /opt/edp/${service.serviceName}/log
 property.hive.log.file = ${r"${sys:hive.query.id}"}.log
 
 # list of all appenders

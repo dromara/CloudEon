@@ -48,9 +48,9 @@
 </#if>
 
 <#--handle data dir-->
-<@property "dfs.datanode.data.dir" "/opt/udh/${serviceName}/data/datanode"/>
-<@property "dfs.namenode.name.dir" "/opt/udh/${serviceName}/data/namenode"/>
-<@property "dfs.journalnode.edits.dir" "/opt/udh/${serviceName}/data/journal"/>
+<@property "dfs.datanode.data.dir" "/opt/edp/${serviceName}/data/datanode"/>
+<@property "dfs.namenode.name.dir" "/opt/edp/${serviceName}/data/namenode"/>
+<@property "dfs.journalnode.edits.dir" "/opt/edp/${serviceName}/data/journal"/>
 
 <#--handle journalnode-->
 <#assign useWildcard=conf['journalnode.use.wildcard']
@@ -66,10 +66,10 @@
     <@property "dfs.datanode.http.address" hostname + ":" + conf["datanode.http-port"]/>
     <@property "dfs.datanode.ipc.address" hostname + ":" + conf["datanode.ipc-port"]/>
 <#--handleOther-->
-    <@property "dfs.hosts.exclude" "/opt/udh/${serviceName}/conf/dfs.exclude"/>
+    <@property "dfs.hosts.exclude" "/opt/edp/${serviceName}/conf/dfs.exclude"/>
 
 <#--    dn_socket需要其父目录权限为755，否则会报错   -->
-<#--    <@property "dfs.domain.socket.path" "/opt/udh/${serviceName}/data/dn_socket"/>-->
+<#--    <@property "dfs.domain.socket.path" "/opt/edp/${serviceName}/data/dn_socket"/>-->
 
 <#--Take properties from the context-->
 <#list confFiles['hdfs-site.xml'] as key, value>

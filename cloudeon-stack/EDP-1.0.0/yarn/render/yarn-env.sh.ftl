@@ -17,10 +17,10 @@
 export HADOOP_YARN_USER=${r"${HADOOP_YARN_USER:-yarn}"}
 
 # resolve links - $0 may be a softlink
-export YARN_LOG_DIR=/opt/udh/${service.serviceName}/log
-export HADOOP_CONF_DIR=/opt/udh/${service.serviceName}/conf
-export HDFS_CONF_DIR=/opt/udh/${service.serviceName}/conf
-export NODEMANAGER_LOCAL_DIRS=/opt/udh/${service.serviceName}/data/local
+export YARN_LOG_DIR=/opt/edp/${service.serviceName}/log
+export HADOOP_CONF_DIR=/opt/edp/${service.serviceName}/conf
+export HDFS_CONF_DIR=/opt/edp/${service.serviceName}/conf
+export NODEMANAGER_LOCAL_DIRS=/opt/edp/${service.serviceName}/data/local
 
 export YARN_RESOURCEMANAGER_ADDRRESS=${serviceRoles['YARN_RESOURCEMANAGER'][0]['hostname']}
 <#if serviceRoles['YARN_TIMELINESERVER']??>
@@ -56,8 +56,8 @@ export YARN_HISTORYSERVER_HEAPSIZE=${historyserverMemory?floor?c}m
 export YARN_TIMELINESERVER_HEAPSIZE=${timelineserverMemory?floor?c}m
 
 # 添加jmx监控开放
-export YARN_NODEMANAGER_OPTS="$YARN_NODEMANAGER_OPTS -Dcom.sun.management.jmxremote.port=9917 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=5547:/opt/udh/${service.serviceName}/conf/jmx_prometheus.yaml"
-export YARN_RESOURCEMANAGER_OPTS="$YARN_RESOURCEMANAGER_OPTS -Dcom.sun.management.jmxremote.port=9918 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=5548:/opt/udh/${service.serviceName}/conf/jmx_prometheus.yaml"
+export YARN_NODEMANAGER_OPTS="$YARN_NODEMANAGER_OPTS -Dcom.sun.management.jmxremote.port=9917 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=5547:/opt/edp/${service.serviceName}/conf/jmx_prometheus.yaml"
+export YARN_RESOURCEMANAGER_OPTS="$YARN_RESOURCEMANAGER_OPTS -Dcom.sun.management.jmxremote.port=9918 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=5548:/opt/edp/${service.serviceName}/conf/jmx_prometheus.yaml"
 
 # check envvars which might override default args
 if [ "$YARN_HEAPSIZE" != "" ]; then
