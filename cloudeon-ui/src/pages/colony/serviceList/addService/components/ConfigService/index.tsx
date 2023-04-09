@@ -2,7 +2,9 @@
 import styles from './index.less'
 import React, { useState, useEffect, useRef } from 'react';
 import { Menu, Form, Table, Button, Typography, Popconfirm, InputNumber, Input, Tooltip, Modal, Select, Slider, Switch } from 'antd';
+import { QuestionCircleFilled } from '@ant-design/icons';
 import { getServiceConfAPI } from '@/services/ant-design-pro/colony';
+import {cloneDeep} from 'lodash'
 const { TextArea } = Input;
 
 const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( {setPresetConfListToParams} )=>{
@@ -17,6 +19,11 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( {setPresetCon
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [customFileNames, setCustomFileNamesData] = useState<any>(); // 当前服务的配置文件
     const [currentNames, setCurrentNames] = useState<any[]>([]); // 当前服务的所有配置项名称，用来校验新增自定义配置的时候配置项名称重复
+    const [fileGroupMap, setFileGroupMap] = useState<any>(); // 配置文件名和tag的json数据
+    const [fileNameList, setFileList] = useState<any[]>(); // 配置文件名数组
+    const [currentFile, setCurrentFile] = useState<any>(); // 当前选中的配置文件tab
+    const [currentTag, setCurrentTag] = useState<any>(); // 当前选中的标签tag
+    const [filterTableList, setFilterTableList] = useState<any[]>(); // 过滤后的table数据
     
     const getData = JSON.parse(sessionStorage.getItem('colonyData') || '{}')
 
@@ -48,6 +55,7 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( {setPresetCon
     const getConfListData = async (params: any) => {
         if(confData && confData[params.serviceId]){
             setCurrentConfList(confData[params.serviceId])
+            setFilterTableList(confData[params.serviceId])
             setCurrentNames(confData[params.serviceId].map((item: { name: any; })=>{return item.name}))
             const customFileNamesObj = JSON.parse(sessionStorage.getItem('customFileNamesObj') || '{}') 
             setCustomFileNamesData(customFileNamesObj[params.serviceId] || [])
@@ -62,7 +70,17 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( {setPresetCon
                         ...item,
                     }
                 })
+            const fileMap = result?.data?.fileGroupMap
+            let files = []
+            for(let key in fileMap){
+                files.push(key)
+            }
+            console.log('---files: ', fileMap, files);            
+            setFileGroupMap(fileMap)
+            setFileList(files)
+            setCurrentFile(files[0])
             setCurrentConfList(confs)
+            setFilterTableList(confs)
             setCurrentNames(confs?.map((item2)=>{return item2.name}) || [])
             const customFileNamesObj = JSON.parse(sessionStorage.getItem('customFileNamesObj') || '{}') 
             customFileNamesObj[params.serviceId] = result?.data?.customFileNames
@@ -98,63 +116,34 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( {setPresetCon
     };
 
     const handleDelete = (record: Item) => {
-        const newData = [...(currentConfList||[])];
+        const newData = cloneDeep(currentConfList||[]);
         const index = newData.findIndex(item => record.name === item.name);
         if(index > -1){
             newData.splice(index,1)
             setCurrentConfList(newData);
+            deleteFilterData(record) // 处理过滤表格的数据
         }
     }
 
     const resetSource = (record: Item) => {
-        console.log('---record: ', record);
         const row = {...record, recommendExpression: record.sourceValue}
-        const newData = [...(currentConfList||[])];
+        const newData = cloneDeep(currentConfList||[]);
         const index = newData.findIndex(item => row.name === item.name);
-        dealItemData(index,newData,row)
-        // if (index > -1) {
-        //     const item = newData[index];
-        //     newData.splice(index, 1, {
-        //     ...item,
-        //     ...row,
-        //     });
-        //     setCurrentConfList(newData);
-        //     setEditingKey('');
-        // }else{
-        //     newData.push(row);
-        //     setCurrentConfList(newData);
-        //     setEditingKey('');
-        // }
-        // let confResult = serviceId ? {...confData,[serviceId]:newData} : {...confData}
-        // updateConfig(confResult)
-        
+        dealItemData(index,newData,row)// 处理保存编辑的逻辑
+        dealFilterData(record.name,row) // 处理过滤表格的数据
     }
-    const save = async (key: React.Key) => {        
+    const save = async (key: string) => {        
         try {
             const row = (await form.validateFields()) as Item;
-            const newData = [...(currentConfList||[])];
-            const index = newData.findIndex(item => key === item.name);
-            dealItemData(index,newData,row)
-            // if (index > -1) {
-            //     const item = newData[index];
-            //     newData.splice(index, 1, {
-            //     ...item,
-            //     ...row,
-            //     });
-            //     setCurrentConfList(newData);
-            //     setEditingKey('');
-            // }else{
-            //     newData.push(row);
-            //     setCurrentConfList(newData);
-            //     setEditingKey('');
-            // }
-            // let confResult = serviceId ? {...confData,[serviceId]:newData} : {...confData}
-            // updateConfig(confResult)
+            const newData = cloneDeep(currentConfList||[])
+            const index = newData.findIndex(item => key === item.name); // name是唯一值，所以用name做主键
+            dealItemData(index,newData,row) // 处理保存编辑的逻辑
+            dealFilterData(key,row) // 处理过滤表格的数据
         } catch (errInfo) {
             console.log('Validate Failed:', errInfo);
         }
     }
-
+    // 处理总数据的编辑逻辑
     const dealItemData = (index:number,newData:any[],row:any) =>{
         if (index > -1) {
             const item = newData[index];
@@ -171,6 +160,56 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( {setPresetCon
         }
         let confResult = serviceId ? {...confData,[serviceId]:newData} : {...confData}
         updateConfig(confResult)
+    }
+
+    // 处理过滤表格数据（过滤文件配置、标签）的编辑逻辑
+    const dealFilterData = (key:string, row:any) =>{
+        if(filterTableList && filterTableList.length>0){
+            const newData = cloneDeep(filterTableList)
+            const index = newData?.findIndex(item => key === item.name);
+            if (index > -1) {
+                const item = newData[index];
+                newData.splice(index, 1, {
+                    ...item,
+                    ...row,
+                });
+                setFilterTableList(newData)
+            }else if(row.fileName == currentFile || row.confFile == currentFile || currentFile=="全部"){
+                newData.push(row);
+                setFilterTableList(newData)
+            }
+        }
+    }
+    // 处理过滤数据的删除逻辑
+    const deleteFilterData = (record:Item) =>{
+        const newData = cloneDeep(filterTableList||[]);
+        const index = newData.findIndex(item => record.name === item.name);
+        if(index > -1){
+            newData.splice(index,1)
+            setFilterTableList(newData);
+        }
+    }
+
+    // 处理过滤数据怎么得到的，从总数据过滤得到
+    const handleFiflterTableData = (tag: string, fileName: string)=>{
+        if(fileName == '全部' && !tag){
+            return currentConfList
+        }else if(fileName == '全部' && tag){
+            let arr = currentConfList?.filter(item=>{
+                return item.tag == tag
+            })
+            return arr
+        }else if(fileName != "全部" && !tag){
+            let arr = currentConfList?.filter(item=>{
+                return item.confFile == fileName
+            })
+            return arr
+        }else{
+            let arr = currentConfList?.filter(item=>{
+                return item.confFile == fileName && item.tag == tag
+            })
+            return arr
+        }
     }
 
     interface Item {
@@ -260,20 +299,32 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( {setPresetCon
             title: '配置项',
             dataIndex: 'name',
             editable: false,
-        },{
-            title: '配置类型',
-            dataIndex: 'isCustomConf',
-            width: 110,
-            editable: false,
             render: (_: any, record: Item)=>{
-                return (record.isCustomConf?'自定义配置':'预设配置')
+                return (<>
+                <span>
+                    {record.name} 
+                    {record.description? <Tooltip title={record.description}><QuestionCircleFilled style={{marginLeft:'5px'}} /></Tooltip>:''}
+                </span>
+              </>)
             }
-        },{
+            
+        },
+        // {
+        //     title: '配置类型',
+        //     dataIndex: 'isCustomConf',
+        //     width: 110,
+        //     editable: false,
+        //     render: (_: any, record: Item)=>{
+        //         return (record.isCustomConf?'自定义配置':'预设配置')
+        //     }
+        // },
+        {
             title: '配置文件',
             dataIndex: 'confFile',
             width: 120,
             editable: false,
-        },{
+        },
+        {
             title: '值',
             dataIndex: 'recommendExpression',
             editable: true,
@@ -294,14 +345,16 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( {setPresetCon
                   return  <span>{record.recommendExpression}&nbsp;{record.unit?record.unit:''}</span>
                 // );
             },
-        },{
-            title: '描述',
-            dataIndex: 'description',
-            editable: false,
-            render: (_: any, record: Item)=>{
-                return (record.description||'-')
-            }
-        },{
+        },
+        // {
+        //     title: '描述',
+        //     dataIndex: 'description',
+        //     editable: false,
+        //     render: (_: any, record: Item)=>{
+        //         return (record.description||'-')
+        //     }
+        // },
+        {
             title: '操作',
             width: 120,
             dataIndex: 'operation',
@@ -359,20 +412,21 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( {setPresetCon
         };
       });
 
-    
+    // 点击"添加自定义配置"的确认按钮
       const handleOk = () => {
         // console.log(form.getFieldsValue());
         addConfigForm
           .validateFields()
           .then(async (values) => {
             const row = {...values, isCustomConf: true, recommendExpression: values.value};
-            const newData = [...(currentConfList||[])];
+            const newData = cloneDeep(currentConfList||[]);
             const index = newData.findIndex(item => values.name === item.name);
             if(index == -1){
                 const params = [...currentNames, values.name]
                 setCurrentNames(params)
             }
             dealItemData(index,newData,row)
+            dealFilterData(values.name,row)
             setIsModalOpen(false)
             // const result: API.normalResult = await createNodeAPI({...values, clusterId: getData.clusterId})
             // if(result && result.success){
@@ -419,27 +473,69 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( {setPresetCon
                         添加自定义配置
                     </Button>
                 </div>
-                <div>
-                <Form form={form} component={false}>
-                    <Table
-                        components={{
-                            body: {
-                                cell: EditableCell,
-                            },
-                        }}
-                        scroll={{
-                            y:600
-                        }}
-                        rowKey="name"
-                        pagination={false}
-                        bordered
-                        loading={loading}
-                        dataSource={currentConfList}
-                        columns={mergedColumns}
-                        rowClassName="editable-row"
-                    />
-                </Form>
+                <div className={styles.fileTabLayout}>
+                    <div className={styles.fileTabBar}>
+                        {fileNameList?.map(item => {
+                            return (
+                                <div 
+                                    key={item} 
+                                    className={`${styles.fileTabItem} ${currentFile == item ? styles.active:''}`} 
+                                    onClick={()=>{
+                                        setCurrentTag('')
+                                        setCurrentFile(item)
+                                        setFilterTableList(handleFiflterTableData('',item))
+                                    }}
+                                >
+                                    {item}
+                                </div>
+                            )
+                        })}
+                    </div>
+                    <div className={styles.fileTabContent}>
+                        <div className={styles.tagListWrap}>
+                            {
+                                fileGroupMap && fileGroupMap[currentFile] && fileGroupMap[currentFile].map((item:any)=>{
+                                    return (
+                                        <div 
+                                            key={item} 
+                                            className={`${styles.tagItem} ${currentTag == item ? styles.activeTag:''}`}
+                                            onClick={()=>{
+                                                setCurrentTag(item)
+                                                setFilterTableList(handleFiflterTableData(item,currentFile))
+                                            }}
+                                        >
+                                                {item}
+                                        </div>
+                                    )
+                                })
+                            }
+                        </div>
+                        <div className={styles.fileTabTable}>
+                            <div>
+                                <Form form={form} component={false}>
+                                    <Table
+                                        components={{
+                                            body: {
+                                                cell: EditableCell,
+                                            },
+                                        }}
+                                        scroll={{
+                                            y:600
+                                        }}
+                                        rowKey="name"
+                                        pagination={false}
+                                        // bordered
+                                        loading={loading}
+                                        dataSource={filterTableList} //{currentConfList}
+                                        columns={mergedColumns}
+                                        rowClassName="editable-row"
+                                    />
+                                </Form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+                
             </div>
             <Modal
                 key="addconfigmodal"

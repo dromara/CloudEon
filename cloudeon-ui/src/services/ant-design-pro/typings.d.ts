@@ -188,7 +188,8 @@ declare namespace API {
     message?: string;
     data?: {
       confs?: ConfItem[],
-      customFileNames?: string[]
+      customFileNames?: string[],
+      fileGroupMap?: object,
     };
   };
 

@@ -253,19 +253,19 @@ const AssignRoles : React.FC<{
                 {
                     serviceInfos?.map(serItem=>{
                         return (
-                            <div className={styles.serviceRow}>
+                            <div className={styles.serviceRow} key={serItem.stackServiceId}>
                                 <div className={styles.serviceName}>{serItem.stackServiceName}</div>
                                 <div className={styles.roleWrap}>
                                     
                                     {
                                         serItem?.roles?.map(roleItem=>{
                                             return (
-                                                <div className={styles.roleBox} onClick={()=>handleRoleBox(serItem.stackServiceId,roleItem.stackRoleName)}>
+                                                <div className={styles.roleBox} key={roleItem.stackRoleName} onClick={()=>handleRoleBox(serItem.stackServiceId,roleItem.stackRoleName)}>
                                                     <div className={styles.roleName}>{roleItem.stackRoleName}</div>
                                                     <div className={styles.roleNodeListBox}>
                                                     {roleItem.nodeIds?.map(nodeItem=>{
                                                         return (
-                                                            <div className={styles.nodeItemBox}>{nodeJsonData[nodeItem]}</div>
+                                                            <div className={styles.nodeItemBox} key={nodeItem}>{nodeJsonData[nodeItem]}</div>
                                                         )
                                                     })}
                                                     </div>
