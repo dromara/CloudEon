@@ -56,7 +56,7 @@ roles:
 
   - name: GRAFANA
     label: Grafana
-    roleFullName: monitor-grafana
+    roleFullName: grafana
     linkExpression: "http://${localhostname}:${conf['grafana.http.port']}"
     sortNum: 4
     type: MASTER
