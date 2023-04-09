@@ -178,6 +178,10 @@ public class StackController {
                             return strings;
                         }));
 
+        // 全部的标签
+        List<String> allTags = stackConfigurations.stream().map(e -> e.getTag()).distinct().collect(Collectors.toList());
+        fileGroup.put("全部", allTags);
+
         result.setFileGroupMap(fileGroup);
         result.setConfs(stackConfigurations);
         result.setCustomFileNames(customFileNames);

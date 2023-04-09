@@ -342,7 +342,7 @@ public class ClusterServiceController {
                     if (StrUtil.isNotBlank(stackServiceConfEntity.getConfFile())) {
                         serviceInstanceConfigEntity.setConfFile(stackServiceConfEntity.getConfFile());
                     }
-
+                    serviceInstanceConfigEntity.setTag(stackServiceConfEntity.getTag());
                     serviceInstanceConfigEntity.setServiceInstanceId(serviceInstanceEntityId);
                     serviceInstanceConfigEntity.setUserId(AdminUserId);
                     return serviceInstanceConfigEntity;
@@ -738,6 +738,9 @@ public class ClusterServiceController {
                             List<String> strings = stringListEntry.getValue().stream().map(ServiceConfiguration::getTag).distinct().collect(Collectors.toList());
                             return strings;
                         }));
+        // all tags
+        List<String> allTags = serviceConfigurations.stream().map(e -> e.getTag()).collect(Collectors.toList());
+        fileGroup.put("全部", allTags);
 
         result.setFileGroupMap(fileGroup);
         result.setConfs(serviceConfigurations);
