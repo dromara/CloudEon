@@ -37,18 +37,11 @@
             </appender>
         </sift>
     </appender>
-    <logger name="com.data.cloudeon.processor" level="INFO">
+    <logger name="org.dromara.cloudeon.processor" level="INFO">
         <appender-ref ref="TASK-LOG"/>
     </logger>
 
-    <!-- Quit timing logs, which seems disordered. -->
-    <logger name="tech.powerjob.server.com.data.cloudeon.service.timing" level="WARN" additivity="false">
-        <appender-ref ref="CONSOLE"/>
-    </logger>
 
-    <logger name="tech.powerjob" level="DEBUG" additivity="false">
-        <appender-ref ref="CONSOLE"/>
-    </logger>
 
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
