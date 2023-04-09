@@ -65,6 +65,7 @@ public class AlertController {
                     String instance = labels.getInstance();
                     String hostname = instance.split(":")[0];
                     String serviceRoleName = labels.getServiceRoleName();
+                    log.info("根据告警信息查找服务角色：{} , hostname: {}",serviceRoleName,hostname);
                     // 查询服务角色实例
                     ServiceRoleInstanceEntity serviceRoleInstanceEntity = roleInstanceRepository.findByServiceRoleNameAndClusterIdAndHostname(clusterId, serviceRoleName, hostname);
                     if (serviceRoleInstanceEntity == null) {
@@ -103,6 +104,7 @@ public class AlertController {
                 String startsAt = alert.getStartsAt();
                 AlertLabels labels = alert.getLabels();
                 String alertname = labels.getAlertname();
+                log.info("根据告警信息查找活跃告警, alertName:{} , startsAt: {}",alertname,startsAt);
 
                 AlertMessageEntity alertMessageEntity = alertMessageRepository.findByFireTimeAndAlertName(startsAt, alertname);
                 if (alertMessageEntity != null) {
