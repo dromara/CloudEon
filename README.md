@@ -52,9 +52,9 @@
 
 |           ![集群](https://user-images.githubusercontent.com/123344357/230782193-d2830fa7-92c8-4efc-a44e-df0e8742b012.png)           | ![告警](https://user-images.githubusercontent.com/123344357/230778648-653dc9a7-f78e-4f1d-9aaa-7689ad257f10.png)  |
 |:---------------------------------------------------------------------------------------:|---------------------------------------------------------------------|
-|  ![服务详情](https://uni-1253355096.cos.ap-guangzhou.myqcloud.com/img/20230407231009.png)   |  ![角色实例](https://user-images.githubusercontent.com/123344357/230778761-0accabf4-209e-4666-8b7d-0fe8dcd52056.png)  |
-|           ![配置](https://user-images.githubusercontent.com/123344357/230782069-93574212-8628-4af5-934a-b09ea0c073e5.png)           | ![指令详情](https://user-images.githubusercontent.com/123344357/230778699-a152755b-8c66-40a8-8fdc-27aa1f8e239c.png) |
-|           ![指令日志](https://user-images.githubusercontent.com/123344357/230778679-6520b845-e354-4a73-a661-fb5b7596f217.png)       | ![图片](https://user-images.githubusercontent.com/123344357/230782108-b9e322b3-c1de-4ad1-a34d-d89ab0319252.png)  |
+|  ![服务列表](https://user-images.githubusercontent.com/123344357/230782384-01f56645-60b6-4ffe-941e-8598cfd598b5.png)  |  ![新增服务](https://user-images.githubusercontent.com/123344357/230782108-b9e322b3-c1de-4ad1-a34d-d89ab0319252.png)  |
+|           ![配置](https://user-images.githubusercontent.com/123344357/230782069-93574212-8628-4af5-934a-b09ea0c073e5.png)           | ![角色实例](https://user-images.githubusercontent.com/123344357/230778761-0accabf4-209e-4666-8b7d-0fe8dcd52056.png)  |
+|           ![指令日志](https://user-images.githubusercontent.com/123344357/230778679-6520b845-e354-4a73-a661-fb5b7596f217.png)       | ![指令详情](https://user-images.githubusercontent.com/123344357/230778699-a152755b-8c66-40a8-8fdc-27aa1f8e239c.png) |
 
 
 
