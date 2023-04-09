@@ -13,14 +13,14 @@ dashboard:
   uid: dd4t3A6nz
 
 persistencePaths:
-  - /opt/edp/${serviceInstanceId}/conf
-  - /opt/edp/${serviceInstanceId}/conf/discovery_configs
-  - /opt/edp/${serviceInstanceId}/log
-  - /opt/edp/${serviceInstanceId}/data
-  - /opt/edp/${serviceInstanceId}/data/grafana
-  - /opt/edp/${serviceInstanceId}/data/prometheus
-  - /opt/edp/${serviceInstanceId}/data/alertmanager
-  - /opt/edp/${serviceInstanceId}/data/nodeexporter
+  - /opt/edp/${service.serviceName}/conf
+  - /opt/edp/${service.serviceName}/conf/discovery_configs
+  - /opt/edp/${service.serviceName}/log
+  - /opt/edp/${service.serviceName}/data
+  - /opt/edp/${service.serviceName}/data/grafana
+  - /opt/edp/${service.serviceName}/data/prometheus
+  - /opt/edp/${service.serviceName}/data/alertmanager
+  - /opt/edp/${service.serviceName}/data/nodeexporter
 
 
 roles:

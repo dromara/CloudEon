@@ -15,9 +15,9 @@ dashboard:
   uid: -ZErfqOWz
 
 persistencePaths:
-  - /opt/edp/${serviceInstanceId}/conf
-  - /opt/edp/${serviceInstanceId}/log
-  - /opt/edp/${serviceInstanceId}/data
+  - /opt/edp/${service.serviceName}/conf
+  - /opt/edp/${service.serviceName}/log
+  - /opt/edp/${service.serviceName}/data
 
 
 roles:

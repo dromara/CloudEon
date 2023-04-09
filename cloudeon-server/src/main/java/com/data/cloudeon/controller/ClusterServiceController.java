@@ -153,7 +153,7 @@ public class ClusterServiceController {
             serviceInstanceEntity.setServiceState(ServiceState.INIT_SERVICE);
             // 生成持久化宿主机路径
             String persistencePaths = stackServiceRepository.findById(stackServiceId).get().getPersistencePaths();
-            serviceInstanceEntity.setPersistencePaths(genPersistencePaths(persistencePaths, serviceName));
+            serviceInstanceEntity.setPersistencePaths(genPersistencePaths(persistencePaths, serviceInstanceEntity));
 
             // 持久化service信息
             serviceInstanceRepository.save(serviceInstanceEntity);
@@ -467,7 +467,7 @@ public class ClusterServiceController {
     /**
      * 通过模板生成服务实例持久化到宿主机的目录
      */
-    private String genPersistencePaths(String persistencePaths, String serviceInstanceId) {
+    private String genPersistencePaths(String persistencePaths, ServiceInstanceEntity serviceInstance) {
         String result = Arrays.stream(persistencePaths.split(",")).map(new Function<String, String>() {
             @Override
             public String apply(String pathTemplate) {
@@ -477,7 +477,7 @@ public class ClusterServiceController {
                 cfg.setTemplateLoader(stringLoader);
                 try (Writer out = new StringWriter(2048);) {
                     Template temp = cfg.getTemplate("myTemplate", "utf-8");
-                    temp.process(Dict.create().set("serviceInstanceId", serviceInstanceId), out);
+                    temp.process(Dict.create().set("service", serviceInstance), out);
                     return out.toString();
                 } catch (IOException | TemplateException e) {
                     e.printStackTrace();
