@@ -7,7 +7,7 @@
     <artifactId>cloudeon-server</artifactId>
     <version>1.0.0</version>
     <parent>
-        <groupId>io.bigdata</groupId>
+        <groupId>org.dromara</groupId>
         <artifactId>cloudeon</artifactId>
         <version>1.0.0</version>
     </parent>
@@ -27,7 +27,7 @@
         <java.version>1.8</java.version>
         <maven-clean-plugin>3.1.0</maven-clean-plugin>
         <maven.resource.version>3.1.0</maven.resource.version>
-        <start-class>com.data.cloudeon.CloudEonApplication</start-class>
+        <start-class>org.dromara.cloudeon.CloudEonApplication</start-class>
         <bouncycastle.version>1.68</bouncycastle.version>
 
     </properties>
@@ -35,7 +35,7 @@
     <dependencies>
         <!-- 需要依赖前端模块,否则无法打包进后端系统,前端模块将会打一个空的jar包 -->
         <dependency>
-            <groupId>io.bigdata</groupId>
+            <groupId>org.dromara</groupId>
             <artifactId>cloudeon-ui</artifactId>
             <version>1.0.0</version>
         </dependency>
