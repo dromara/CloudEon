@@ -11,7 +11,7 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-public class CancelHostTagTask  extends BaseUdhTask{
+public class CancelHostTagTask  extends BaseCloudeonTask {
     @Override
     public void internalExecute() {
         StackServiceRoleRepository stackServiceRoleRepository = SpringUtil.getBean(StackServiceRoleRepository.class);

@@ -1,4 +1,4 @@
-create table udh_cluster_info
+create table ce_cluster_info
 (
     id           int auto_increment
         primary key,
@@ -10,7 +10,7 @@ create table udh_cluster_info
 );
 
 
-create table udh_cluster_node
+create table ce_cluster_node
 (
     id               int auto_increment
         primary key,
@@ -31,14 +31,14 @@ create table udh_cluster_node
 );
 
 
-create table udh_stack_info
+create table ce_stack_info
 (
     id         int auto_increment
         primary key,
     stack_code varchar(255) null
 );
 
-create table udh_stack_service
+create table ce_stack_service
 (
     id                             int auto_increment
         primary key,
@@ -62,7 +62,7 @@ create table udh_stack_service
     stack_id                       int          null
 );
 
-create table udh_stack_service_role
+create table ce_stack_service_role
 (
     id                    int auto_increment
         primary key,

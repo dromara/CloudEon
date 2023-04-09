@@ -10,7 +10,7 @@ import org.apache.sshd.client.session.ClientSession;
 import java.io.IOException;
 
 @NoArgsConstructor
-public class DeleteServiceDataDirTask extends BaseUdhTask {
+public class DeleteServiceDataDirTask extends BaseCloudeonTask {
 
     @Override
     public void internalExecute() {

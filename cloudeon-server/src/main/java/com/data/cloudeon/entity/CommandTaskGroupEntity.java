@@ -9,7 +9,7 @@ import javax.persistence.*;
  * 指令任务表
  */
 @Entity
-@Table(name = "udh_command_task_group")
+@Table(name = "ce_command_task_group")
 @Data
 public class CommandTaskGroupEntity {
     private static final long serialVersionUID = 1L;

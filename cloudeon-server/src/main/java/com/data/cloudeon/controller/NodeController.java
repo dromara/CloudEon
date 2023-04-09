@@ -3,7 +3,7 @@ package com.data.cloudeon.controller;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Assert;
-import com.data.cloudeon.config.UdhConfigProp;
+import com.data.cloudeon.config.CloudeonConfigProp;
 import com.data.cloudeon.controller.request.SaveNodeRequest;
 import com.data.cloudeon.controller.response.NodeInfoVO;
 import com.data.cloudeon.dao.ClusterNodeRepository;
@@ -18,7 +18,6 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 import org.apache.sshd.client.session.ClientSession;
 import org.apache.sshd.sftp.client.SftpClientFactory;
 import org.apache.sshd.sftp.client.fs.SftpFileSystem;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -36,7 +35,7 @@ import java.util.stream.Collectors;
 public class NodeController {
 
     @Resource
-    private UdhConfigProp udhConfigProp;
+    private CloudeonConfigProp cloudeonConfigProp;
 
 
     @Resource
@@ -93,7 +92,7 @@ public class NodeController {
 
         ClientSession session = SshUtils.openConnectionByPassword(sshHost, sshPort, sshUser, password);
         SftpFileSystem sftp = SftpClientFactory.instance().createSftpFileSystem(session);
-        SshUtils.uploadFile("/tmp/", udhConfigProp.getRemoteScriptPath() + FileUtil.FILE_SEPARATOR + "check.sh",sftp);
+        SshUtils.uploadFile("/tmp/", cloudeonConfigProp.getRemoteScriptPath() + FileUtil.FILE_SEPARATOR + "check.sh",sftp);
         String result = SshUtils.execCmdWithResult(session, "sh /tmp/check.sh");
         Assert.equals(result,"ok!!!");
         session.close();

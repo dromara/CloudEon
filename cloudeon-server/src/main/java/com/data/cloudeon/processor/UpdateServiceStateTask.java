@@ -10,7 +10,7 @@ import com.data.cloudeon.enums.ServiceState;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-public class UpdateServiceStateTask extends BaseUdhTask {
+public class UpdateServiceStateTask extends BaseCloudeonTask {
 
     @Override
     public void internalExecute() {

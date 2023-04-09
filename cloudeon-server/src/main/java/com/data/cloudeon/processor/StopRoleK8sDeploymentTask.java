@@ -1,7 +1,7 @@
 package com.data.cloudeon.processor;
 
 import cn.hutool.extra.spring.SpringUtil;
-import com.data.cloudeon.config.UdhConfigProp;
+import com.data.cloudeon.config.CloudeonConfigProp;
 import com.data.cloudeon.dao.ServiceInstanceRepository;
 import com.data.cloudeon.dao.ServiceRoleInstanceRepository;
 import com.data.cloudeon.dao.StackServiceRoleRepository;
@@ -23,7 +23,7 @@ import java.util.List;
  * 为角色实例删除k8s deployment
  */
 @NoArgsConstructor
-public class StopRoleK8sDeploymentTask extends BaseUdhTask {
+public class StopRoleK8sDeploymentTask extends BaseCloudeonTask {
     @Override
     public void internalExecute() {
         ServiceInstanceRepository serviceInstanceRepository = SpringUtil.getBean(ServiceInstanceRepository.class);
@@ -32,8 +32,8 @@ public class StopRoleK8sDeploymentTask extends BaseUdhTask {
         KubeService kubeService = SpringUtil.getBean(KubeService.class);
 
 
-        UdhConfigProp udhConfigProp = SpringUtil.getBean(UdhConfigProp.class);
-        String workHome = udhConfigProp.getWorkHome();
+        CloudeonConfigProp cloudeonConfigProp = SpringUtil.getBean(CloudeonConfigProp.class);
+        String workHome = cloudeonConfigProp.getWorkHome();
 
         // 获取服务实例信息
         Integer serviceInstanceId = taskParam.getServiceInstanceId();

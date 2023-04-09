@@ -3,7 +3,7 @@ package com.data.cloudeon.processor;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
-import com.data.cloudeon.config.UdhConfigProp;
+import com.data.cloudeon.config.CloudeonConfigProp;
 import com.data.cloudeon.dao.*;
 import com.data.cloudeon.dto.RoleNodeInfo;
 import com.data.cloudeon.entity.*;
@@ -33,7 +33,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @NoArgsConstructor
-public class ConfigTask extends BaseUdhTask {
+public class ConfigTask extends BaseCloudeonTask {
 
 
     private static final String CONF_DIR = "conf";
@@ -47,7 +47,7 @@ public class ConfigTask extends BaseUdhTask {
         ServiceRoleInstanceRepository roleInstanceRepository = SpringUtil.getBean(ServiceRoleInstanceRepository.class);
         ServiceInstanceConfigRepository configRepository = SpringUtil.getBean(ServiceInstanceConfigRepository.class);
 
-        UdhConfigProp udhConfigProp = SpringUtil.getBean(UdhConfigProp.class);
+        CloudeonConfigProp cloudeonConfigProp = SpringUtil.getBean(CloudeonConfigProp.class);
         Environment environment = SpringUtil.getBean(Environment.class);
 
         TaskParam taskParam = getTaskParam();
@@ -63,7 +63,7 @@ public class ConfigTask extends BaseUdhTask {
 
         // todo 加载依赖服务的配置到本地conf目录，例如spark依赖core-site.xml和hdfs-site.xml还有hive-site.xml文件
         // 创建工作目录  ${workHome}/zookeeper1/node001/conf
-        String workHome = udhConfigProp.getWorkHome();
+        String workHome = cloudeonConfigProp.getWorkHome();
         String taskExecuteHostName = taskParam.getHostName();
         String outputConfPath = workHome + File.separator + serviceInstanceEntity.getServiceName() + File.separator + taskExecuteHostName + File.separator + CONF_DIR;
         // 先删除清空
@@ -75,7 +75,7 @@ public class ConfigTask extends BaseUdhTask {
         Configuration config = new Configuration(Configuration.getVersion());
         // 设置加载的目录
         try {
-            String renderDir = udhConfigProp.getStackLoadPath() + File.separator + stackCode + File.separator + stackServiceName + File.separator + RENDER_DIR;
+            String renderDir = cloudeonConfigProp.getStackLoadPath() + File.separator + stackCode + File.separator + stackServiceName + File.separator + RENDER_DIR;
             log.info("加载配置文件模板目录：" + renderDir);
             File renderDirFile = new File(renderDir);
             config.setDirectoryForTemplateLoading(renderDirFile);

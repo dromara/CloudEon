@@ -3,7 +3,7 @@ package com.data.cloudeon.processor;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-public class ExampleTask extends BaseUdhTask{
+public class ExampleTask extends BaseCloudeonTask {
 
     @Override
     public void internalExecute() {

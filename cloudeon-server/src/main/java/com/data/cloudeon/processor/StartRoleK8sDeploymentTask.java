@@ -2,7 +2,7 @@ package com.data.cloudeon.processor;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.extra.spring.SpringUtil;
-import com.data.cloudeon.config.UdhConfigProp;
+import com.data.cloudeon.config.CloudeonConfigProp;
 import com.data.cloudeon.dao.*;
 import com.data.cloudeon.entity.*;
 import com.data.cloudeon.service.KubeService;
@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
  * 为角色实例创建k8s deployment
  */
 @NoArgsConstructor
-public class StartRoleK8sDeploymentTask extends BaseUdhTask{
+public class StartRoleK8sDeploymentTask extends BaseCloudeonTask {
     @Override
     public void internalExecute() {
         StackServiceRepository stackServiceRepository = SpringUtil.getBean(StackServiceRepository.class);
@@ -40,8 +40,8 @@ public class StartRoleK8sDeploymentTask extends BaseUdhTask{
         ServiceInstanceConfigRepository configRepository = SpringUtil.getBean(ServiceInstanceConfigRepository.class);
         KubeService kubeService = SpringUtil.getBean(KubeService.class);
 
-        UdhConfigProp udhConfigProp = SpringUtil.getBean(UdhConfigProp.class);
-        String workHome = udhConfigProp.getWorkHome();
+        CloudeonConfigProp cloudeonConfigProp = SpringUtil.getBean(CloudeonConfigProp.class);
+        String workHome = cloudeonConfigProp.getWorkHome();
 
         // 查询框架服务角色名获取模板名
         String roleName = taskParam.getRoleName();
@@ -68,7 +68,7 @@ public class StartRoleK8sDeploymentTask extends BaseUdhTask{
 
         // 渲染生成k8s资源
         String k8sTemplateFileName = roleFullName + ".yaml.ftl";
-        String k8sTemplateDir = udhConfigProp.getStackLoadPath() + File.separator + stackCode + File.separator + stackServiceName + File.separator + Constant.K8S_DIR;
+        String k8sTemplateDir = cloudeonConfigProp.getStackLoadPath() + File.separator + stackCode + File.separator + stackServiceName + File.separator + Constant.K8S_DIR;
         log.info("加载服务实例角色k8s资源模板目录："+k8sTemplateDir);
 
         // 查询本服务实例拥有的指定角色节点数

@@ -15,7 +15,7 @@ import java.util.Date;
  * 服务实例表
  */
 @Entity
-@Table(name = "udh_service_instance")
+@Table(name = "ce_service_instance")
 @Data
 @Builder
 @AllArgsConstructor

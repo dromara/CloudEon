@@ -17,7 +17,7 @@ import java.util.Date;
  */
 @Entity
 @Data
-@Table(name = "udh_alert_message")
+@Table(name = "ce_alert_message")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

@@ -21,7 +21,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 @NoArgsConstructor
-public class InitHiveMetastoreTask extends BaseUdhTask {
+public class InitHiveMetastoreTask extends BaseCloudeonTask {
 
 
     @Override

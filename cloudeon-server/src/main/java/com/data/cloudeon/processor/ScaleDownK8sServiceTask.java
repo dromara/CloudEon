@@ -12,7 +12,7 @@ import io.fabric8.kubernetes.client.dsl.RollableScalableResource;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-public class ScaleDownK8sServiceTask extends BaseUdhTask {
+public class ScaleDownK8sServiceTask extends BaseCloudeonTask {
     @Override
     public void internalExecute() {
         StackServiceRoleRepository stackServiceRoleRepository = SpringUtil.getBean(StackServiceRoleRepository.class);

@@ -11,7 +11,7 @@ import java.io.Serializable;
  */
 
 @Entity
-@Table(name = "udh_service_role_instance_webuis")
+@Table(name = "ce_service_role_instance_webuis")
 @Data
 public class ServiceRoleInstanceWebuisEntity implements Serializable {
     private static final long serialVersionUID = 1L;

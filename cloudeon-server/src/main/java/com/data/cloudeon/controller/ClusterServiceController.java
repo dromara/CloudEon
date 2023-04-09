@@ -9,7 +9,7 @@ import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.data.cloudeon.actor.CommandExecuteActor;
-import com.data.cloudeon.config.UdhConfigProp;
+import com.data.cloudeon.config.CloudeonConfigProp;
 import com.data.cloudeon.controller.request.InitServiceRequest;
 import com.data.cloudeon.controller.request.ServiceConfUpgradeRequest;
 import com.data.cloudeon.controller.response.*;
@@ -27,7 +27,6 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -57,7 +56,7 @@ public class ClusterServiceController {
     ExecutorService flowSchedulerThreadPool = ThreadUtil.newExecutor(5, 10, 1024);
 
     @Resource
-    private UdhConfigProp udhConfigProp;
+    private CloudeonConfigProp cloudeonConfigProp;
 
 
     @Resource
@@ -92,8 +91,8 @@ public class ClusterServiceController {
     @Resource
     private CommandHandler commandHandler;
 
-    @Resource(name = "udhActorSystem")
-    private ActorSystem udhActorSystem;
+    @Resource(name = "cloudeonActorSystem")
+    private ActorSystem cloudeonActorSystem;
 
     @Resource
     private ClusterNodeRepository clusterNodeRepository;
@@ -257,7 +256,7 @@ public class ClusterServiceController {
         Integer commandId = buildServiceCommand(serviceInstanceEntities, clusterId, CommandType.INSTALL_SERVICE);
 
         //  调用workflow
-        udhActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
+        cloudeonActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
 
 
         return ResultDTO.success(null);
@@ -409,7 +408,7 @@ public class ClusterServiceController {
         Integer commandId = buildServiceCommand(serviceInstanceEntities, serviceInstanceEntity.getClusterId(), CommandType.STOP_SERVICE);
 
         //  调用workflow
-        udhActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
+        cloudeonActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
         // 更新服务实例状态
         serviceInstanceEntity.setServiceState(ServiceState.STOPPING_SERVICE);
         serviceInstanceRepository.save(serviceInstanceEntity);
@@ -426,7 +425,7 @@ public class ClusterServiceController {
         Integer commandId = buildServiceCommand(serviceInstanceEntities, serviceInstanceEntity.getClusterId(), CommandType.UPGRADE_SERVICE_CONFIG);
 
         //  调用workflow
-        udhActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
+        cloudeonActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
 
 
         return ResultDTO.success(null);
@@ -440,7 +439,7 @@ public class ClusterServiceController {
         Integer commandId = buildServiceCommand(serviceInstanceEntities, serviceInstanceEntity.getClusterId(), CommandType.RESTART_SERVICE);
 
         //  调用workflow
-        udhActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
+        cloudeonActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
         // 更新服务实例状态
         serviceInstanceEntity.setServiceState(ServiceState.RESTARTING_SERVICE);
         serviceInstanceRepository.save(serviceInstanceEntity);
@@ -456,7 +455,7 @@ public class ClusterServiceController {
         Integer commandId = buildServiceCommand(serviceInstanceEntities, serviceInstanceEntity.getClusterId(), CommandType.START_SERVICE);
 
         //  调用workflow
-        udhActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
+        cloudeonActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
 
         // 更新服务实例状态
         serviceInstanceEntity.setServiceState(ServiceState.STARTING_SERVICE);
@@ -595,7 +594,7 @@ public class ClusterServiceController {
             commandTaskEntity.setServiceInstanceName(serviceInstanceEntity.getServiceName());
             commandTaskRepository.saveAndFlush(commandTaskEntity);
             // 更新日志路径
-            commandTaskEntity.setTaskLogPath(udhConfigProp.getTaskLog() + File.separator + commandEntity.getId() + "-" + commandTaskEntity.getId() + ".log");
+            commandTaskEntity.setTaskLogPath(cloudeonConfigProp.getTaskLog() + File.separator + commandEntity.getId() + "-" + commandTaskEntity.getId() + ".log");
             // 更新任务参数
             TaskParam taskParam = buildTaskParam(taskModel, commandEntity, serviceInstanceEntity, commandTaskEntity);
             commandTaskEntity.setTaskParam(JSONObject.toJSONString(taskParam));
@@ -631,7 +630,7 @@ public class ClusterServiceController {
         Integer commandId = buildRoleCommand(serviceInstanceEntities, Lists.newArrayList(roleInstanceEntity),
                 serviceInstanceEntity.getClusterId(), CommandType.STOP_ROLE);
         //  调用workflow
-        udhActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
+        cloudeonActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
 
         return ResultDTO.success(null);
     }
@@ -649,7 +648,7 @@ public class ClusterServiceController {
         Integer commandId = buildRoleCommand(serviceInstanceEntities, Lists.newArrayList(roleInstanceEntity),
                 serviceInstanceEntity.getClusterId(), CommandType.START_ROLE);
         //  调用workflow
-        udhActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
+        cloudeonActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
 
         return ResultDTO.success(null);
     }
@@ -825,7 +824,7 @@ public class ClusterServiceController {
         List<ServiceInstanceEntity> serviceInstanceEntities = Lists.newArrayList(serviceInstanceEntity);
         Integer commandId = buildServiceCommand(serviceInstanceEntities, serviceInstanceEntity.getClusterId(), CommandType.DELETE_SERVICE);
         //  调用workflow
-        udhActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
+        cloudeonActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
 
         // 更新服务实例状态
         serviceInstanceEntity.setServiceState(ServiceState.DELETING_SERVICE);

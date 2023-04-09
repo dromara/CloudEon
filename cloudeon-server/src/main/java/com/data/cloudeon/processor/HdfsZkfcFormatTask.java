@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.util.List;
 
 @NoArgsConstructor
-public class HdfsZkfcFormatTask extends BaseUdhTask {
+public class HdfsZkfcFormatTask extends BaseCloudeonTask {
 
 
     @Override

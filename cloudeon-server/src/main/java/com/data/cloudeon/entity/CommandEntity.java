@@ -12,7 +12,7 @@ import java.util.Date;
  * 指令表
  */
 @Entity
-@Table(name = "udh_command")
+@Table(name = "ce_command")
 @Data
 public class CommandEntity {
     private static final long serialVersionUID = 1L;

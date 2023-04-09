@@ -15,7 +15,7 @@ import java.util.Date;
  */
 @Entity
 @Data
-@Table(name = "udh_cluster_alert_quota")
+@Table(name = "ce_cluster_alert_quota")
 public class ClusterAlertQuotaEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 

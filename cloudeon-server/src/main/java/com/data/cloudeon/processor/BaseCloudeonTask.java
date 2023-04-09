@@ -19,7 +19,7 @@ import java.util.Date;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public abstract class BaseUdhTask implements Runnable {
+public abstract class BaseCloudeonTask implements Runnable {
 
     protected Logger log = LoggerFactory.getLogger(getClass().getName());
 

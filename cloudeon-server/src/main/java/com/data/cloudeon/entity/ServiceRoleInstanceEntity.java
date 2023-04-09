@@ -13,7 +13,7 @@ import java.util.Date;
  *
  */
 @Entity
-@Table(name = "udh_service_role_instance")
+@Table(name = "ce_service_role_instance")
 @Data
 public class ServiceRoleInstanceEntity implements Serializable {
     private static final long serialVersionUID = 1L;

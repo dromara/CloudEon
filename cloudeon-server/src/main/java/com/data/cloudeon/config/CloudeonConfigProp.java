@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 @NoArgsConstructor
 @Component
-public class UdhConfigProp {
+public class CloudeonConfigProp {
     @Value("${cloudeon.stack.load.path}")
     private String stackLoadPath;
     @Value("${cloudeon.remote.script.path}")

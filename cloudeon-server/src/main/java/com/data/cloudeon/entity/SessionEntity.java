@@ -10,7 +10,7 @@ import java.util.Date;
 
 
 @Entity
-@Table(name = "udh_session")
+@Table(name = "ce_session")
 @Data
 public class SessionEntity implements Serializable {
     private static final long serialVersionUID = 1L;

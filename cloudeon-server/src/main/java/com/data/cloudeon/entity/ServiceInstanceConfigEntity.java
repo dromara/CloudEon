@@ -11,7 +11,7 @@ import java.util.Date;
  * 服务实例配置表
  */
 @Entity
-@Table(name = "udh_service_instance_config")
+@Table(name = "ce_service_instance_config")
 @Data
 public class ServiceInstanceConfigEntity implements Serializable {
     private static final long serialVersionUID = 1L;

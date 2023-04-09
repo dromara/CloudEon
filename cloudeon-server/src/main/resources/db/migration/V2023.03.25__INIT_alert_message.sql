@@ -1,4 +1,4 @@
-create table udh_alert_message
+create table ce_alert_message
 (
     id                       int auto_increment comment '主键'
         primary key,

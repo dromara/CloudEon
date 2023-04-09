@@ -11,7 +11,7 @@ import java.util.Date;
  * 指令任务表
  */
 @Entity
-@Table(name = "udh_command_task")
+@Table(name = "ce_command_task")
 @Data
 public class CommandTaskEntity {
     private static final long serialVersionUID = 1L;

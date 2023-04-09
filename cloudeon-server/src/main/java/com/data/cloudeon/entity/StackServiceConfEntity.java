@@ -13,7 +13,7 @@ import java.io.Serializable;
  */
 @Data
 @Entity
-@Table(name = "udh_stack_service_conf")
+@Table(name = "ce_stack_service_conf")
 public class StackServiceConfEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 

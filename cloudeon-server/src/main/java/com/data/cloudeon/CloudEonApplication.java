@@ -13,9 +13,9 @@ public class CloudEonApplication {
 		SpringApplication.run(CloudEonApplication.class, args);
 	}
 
-    @Bean("udhActorSystem")
-    public ActorSystem udhActorSystem() {
-        return ActorSystem.create("udhActorSystem");
+    @Bean("cloudeonActorSystem")
+    public ActorSystem cloudeonActorSystem() {
+        return ActorSystem.create("cloudeonActorSystem");
     }
 
 

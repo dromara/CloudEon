@@ -12,7 +12,7 @@ import org.apache.sshd.client.session.ClientSession;
 import java.io.IOException;
 
 @NoArgsConstructor
-public class PullImageTask extends BaseUdhTask {
+public class PullImageTask extends BaseCloudeonTask {
 
 
     @Override

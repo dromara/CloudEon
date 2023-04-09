@@ -16,7 +16,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 @NoArgsConstructor
-public class RegisterBeTask extends BaseUdhTask {
+public class RegisterBeTask extends BaseCloudeonTask {
 
     @Override
     public void internalExecute() {

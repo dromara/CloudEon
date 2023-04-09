@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.function.Consumer;
 
 @NoArgsConstructor
-public class InstallTask extends BaseUdhTask {
+public class InstallTask extends BaseCloudeonTask {
 
 
     @Override

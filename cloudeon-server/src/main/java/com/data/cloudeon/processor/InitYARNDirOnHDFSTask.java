@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.util.List;
 
 @NoArgsConstructor
-public class InitYARNDirOnHDFSTask extends BaseUdhTask {
+public class InitYARNDirOnHDFSTask extends BaseCloudeonTask {
 
 
     @Override

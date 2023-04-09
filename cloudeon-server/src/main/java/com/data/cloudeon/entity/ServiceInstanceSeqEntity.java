@@ -13,7 +13,7 @@ import java.io.Serializable;
  * 服务实例序号表
  */
 @Entity
-@Table(name = "udh_service_instance_seq")
+@Table(name = "ce_service_instance_seq")
 @Data
 @Builder
 @AllArgsConstructor

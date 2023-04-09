@@ -10,7 +10,7 @@ import com.data.cloudeon.dao.CommandRepository;
 import com.data.cloudeon.dao.CommandTaskRepository;
 import com.data.cloudeon.entity.CommandEntity;
 import com.data.cloudeon.entity.CommandTaskEntity;
-import com.data.cloudeon.processor.BaseUdhTask;
+import com.data.cloudeon.processor.BaseCloudeonTask;
 import com.data.cloudeon.processor.TaskParam;
 import com.data.cloudeon.enums.CommandState;
 import lombok.AllArgsConstructor;
@@ -65,7 +65,7 @@ public class CommandExecuteActor extends AbstractActor {
             @Override
             public Runnable apply(CommandTaskEntity commandTaskEntity) {
                 // 反射生成任务对象
-                BaseUdhTask o = ReflectUtil.newInstance(commandTaskEntity.getProcessorClassName());
+                BaseCloudeonTask o = ReflectUtil.newInstance(commandTaskEntity.getProcessorClassName());
                 // 填充任务参数
                 o.setTaskParam(JSONObject.parseObject(commandTaskEntity.getTaskParam(), TaskParam.class));
                 return o;

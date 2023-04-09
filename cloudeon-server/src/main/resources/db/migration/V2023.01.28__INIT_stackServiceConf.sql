@@ -1,4 +1,4 @@
-create table udh_stack_service_conf
+create table ce_stack_service_conf
 (
     id                    int auto_increment
         primary key,

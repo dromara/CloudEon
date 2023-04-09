@@ -1,7 +1,7 @@
 package com.data.cloudeon.processor;
 
 import cn.hutool.extra.spring.SpringUtil;
-import com.data.cloudeon.config.UdhConfigProp;
+import com.data.cloudeon.config.CloudeonConfigProp;
 import com.data.cloudeon.dao.ServiceInstanceRepository;
 import com.data.cloudeon.dao.StackServiceRoleRepository;
 import com.data.cloudeon.entity.ServiceInstanceEntity;
@@ -12,7 +12,7 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-public class TagHostLabelTask extends BaseUdhTask {
+public class TagHostLabelTask extends BaseCloudeonTask {
 
     @Override
     public void internalExecute() {
@@ -20,8 +20,8 @@ public class TagHostLabelTask extends BaseUdhTask {
         ServiceInstanceRepository serviceInstanceRepository = SpringUtil.getBean(ServiceInstanceRepository.class);
         KubeService kubeService = SpringUtil.getBean(KubeService.class);
 
-        UdhConfigProp udhConfigProp = SpringUtil.getBean(UdhConfigProp.class);
-        String workHome = udhConfigProp.getWorkHome();
+        CloudeonConfigProp cloudeonConfigProp = SpringUtil.getBean(CloudeonConfigProp.class);
+        String workHome = cloudeonConfigProp.getWorkHome();
         // 查询框架服务角色名获取模板名
         StackServiceRoleEntity stackServiceRoleEntity = stackServiceRoleRepository.findByServiceIdAndName(taskParam.getStackServiceId(), taskParam.getRoleName());
         String roleFullName = stackServiceRoleEntity.getRoleFullName();

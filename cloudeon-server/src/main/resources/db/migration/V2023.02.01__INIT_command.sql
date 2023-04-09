@@ -1,4 +1,4 @@
-create table udh_command
+create table ce_command
 (
     id                            int auto_increment
         primary key,
@@ -13,7 +13,7 @@ create table udh_command
     type                          varchar(255) null
 );
 
-create table udh_command_task_group
+create table ce_command_task_group
 (
     id                    int auto_increment
         primary key,
@@ -26,7 +26,7 @@ create table udh_command_task_group
     step_sort_num         int          null
 );
 
-create table udh_command_task
+create table ce_command_task
 (
     id                    int auto_increment
         primary key,

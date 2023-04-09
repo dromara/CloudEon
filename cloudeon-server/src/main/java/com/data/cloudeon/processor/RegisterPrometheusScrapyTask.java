@@ -2,7 +2,7 @@ package com.data.cloudeon.processor;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.extra.spring.SpringUtil;
-import com.data.cloudeon.config.UdhConfigProp;
+import com.data.cloudeon.config.CloudeonConfigProp;
 import com.data.cloudeon.dao.*;
 import com.data.cloudeon.dto.RoleNodeInfo;
 import com.data.cloudeon.entity.*;
@@ -27,7 +27,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @NoArgsConstructor
-public class RegisterPrometheusScrapyTask extends BaseUdhTask {
+public class RegisterPrometheusScrapyTask extends BaseCloudeonTask {
     private static final String PROMETHEUS_DIR = "prometheus";
     private static final String PROMETHEUS_OUT_DIR = "prometheus-resource";
 
@@ -39,7 +39,7 @@ public class RegisterPrometheusScrapyTask extends BaseUdhTask {
         ServiceInstanceRepository serviceInstanceRepository = SpringUtil.getBean(ServiceInstanceRepository.class);
         ClusterNodeRepository clusterNodeRepository = SpringUtil.getBean(ClusterNodeRepository.class);
 
-        UdhConfigProp udhConfigProp = SpringUtil.getBean(UdhConfigProp.class);
+        CloudeonConfigProp cloudeonConfigProp = SpringUtil.getBean(CloudeonConfigProp.class);
         TaskParam taskParam = getTaskParam();
         Integer serviceInstanceId = taskParam.getServiceInstanceId();
 
@@ -48,8 +48,8 @@ public class RegisterPrometheusScrapyTask extends BaseUdhTask {
         String stackCode = stackServiceEntity.getStackCode();
         String stackServiceName = stackServiceEntity.getName().toLowerCase();
 
-        String renderDir = udhConfigProp.getStackLoadPath() + File.separator + stackCode + File.separator + stackServiceName + File.separator + PROMETHEUS_DIR;
-        String workHome = udhConfigProp.getWorkHome();
+        String renderDir = cloudeonConfigProp.getStackLoadPath() + File.separator + stackCode + File.separator + stackServiceName + File.separator + PROMETHEUS_DIR;
+        String workHome = cloudeonConfigProp.getWorkHome();
         File renderDirFile = new File(renderDir);
 
         // 查出当前集群已安装的Monitor服务

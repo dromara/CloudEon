@@ -5,7 +5,7 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
-import com.data.cloudeon.config.UdhConfigProp;
+import com.data.cloudeon.config.CloudeonConfigProp;
 import com.data.cloudeon.dao.StackInfoRepository;
 import com.data.cloudeon.dao.StackServiceConfRepository;
 import com.data.cloudeon.dao.StackServiceRepository;
@@ -20,7 +20,6 @@ import com.data.cloudeon.entity.StackServiceRoleEntity;
 import com.data.cloudeon.enums.ConfValueType;
 import com.data.cloudeon.utils.ImageUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -38,7 +37,7 @@ import static com.data.cloudeon.utils.Constant.*;
 public class StackLoadService implements ApplicationRunner {
 
     @Resource
-    private UdhConfigProp udhConfigProp;
+    private CloudeonConfigProp cloudeonConfigProp;
 
     @Resource
     private StackInfoRepository stackInfoRepository;
@@ -55,7 +54,7 @@ public class StackLoadService implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         Yaml yaml = new Yaml();
-        File[] stackPath = FileUtil.ls(udhConfigProp.getStackLoadPath());
+        File[] stackPath = FileUtil.ls(cloudeonConfigProp.getStackLoadPath());
         for (File file : stackPath) {
             // 获取框架名
             String stackName = file.getName();

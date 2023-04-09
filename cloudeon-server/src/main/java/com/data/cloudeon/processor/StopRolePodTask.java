@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 @NoArgsConstructor
-public class StopRolePodTask extends BaseUdhTask {
+public class StopRolePodTask extends BaseCloudeonTask {
     @Override
     public void internalExecute() {
         StackServiceRoleRepository stackServiceRoleRepository = SpringUtil.getBean(StackServiceRoleRepository.class);

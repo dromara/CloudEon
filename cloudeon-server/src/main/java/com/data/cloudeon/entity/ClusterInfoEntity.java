@@ -13,7 +13,7 @@ import java.util.Date;
  */
 @Entity
 @Data
-@Table(name = "udh_cluster_info")
+@Table(name = "ce_cluster_info")
 public class ClusterInfoEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 

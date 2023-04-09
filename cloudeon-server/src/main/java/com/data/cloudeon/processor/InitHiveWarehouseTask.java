@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.util.List;
 
 @NoArgsConstructor
-public class InitHiveWarehouseTask extends BaseUdhTask {
+public class InitHiveWarehouseTask extends BaseCloudeonTask {
 
 
     @Override

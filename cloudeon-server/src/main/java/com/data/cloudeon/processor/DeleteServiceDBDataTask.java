@@ -5,7 +5,7 @@ import com.data.cloudeon.service.DeleteClusterService;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-public class DeleteServiceDBDataTask extends BaseUdhTask {
+public class DeleteServiceDBDataTask extends BaseCloudeonTask {
 
     @Override
     public void internalExecute() {
