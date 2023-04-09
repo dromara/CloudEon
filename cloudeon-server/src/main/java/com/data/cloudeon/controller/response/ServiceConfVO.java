@@ -20,6 +20,7 @@ public class ServiceConfVO {
     private String confFile;
     private Integer min;
     private Integer max;
+    private String tag;
     /**
      * 单位
      */

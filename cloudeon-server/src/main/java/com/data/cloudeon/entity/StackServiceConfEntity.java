@@ -36,6 +36,7 @@ public class StackServiceConfEntity implements Serializable {
 	 * 角色名称
 	 */
 	private String name;
+	private String tag;
 
 	/**
 	 * 前端显示时的名字

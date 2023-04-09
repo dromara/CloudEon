@@ -53,14 +53,14 @@ configurations:
     options: ["INFO","DEBUG","WARN","ERROR"]
     confFile: "be.conf"
     configurableInWizard: true
-    label: "BE服务日志级别"
+    description: "BE服务日志级别"
     tag: "常用参数"
 
   - name: fragment_pool_queue_size
     recommendExpression: 2048
     valueType: InputNumber
     confFile:  "be.conf"
-    label: "单节点上能够处理的查询请求上限"
+    description: "单节点上能够处理的查询请求上限"
     tag: "性能"
 
   - name: fragment_pool_thread_num_max
@@ -85,7 +85,7 @@ configurations:
     configurableInWizard: true
     valueType: InputNumber
     confFile:  "be.conf"
-    label: "Be web页面访问端口"
+    description: "Be web页面访问端口"
     tag: "端口"
 
 
@@ -94,7 +94,7 @@ configurations:
     valueType: InputNumber
     confFile:  "be.conf"
     configurableInWizard: true
-    label: "BE Rpc端口"
+    description: "BE Rpc端口"
     tag: "端口"
 
   - name: heartbeat_service_port
@@ -102,7 +102,7 @@ configurations:
     valueType: InputNumber
     confFile:  "be.conf"
     configurableInWizard: true
-    label: "BE心跳服务端口"
+    description: "BE心跳服务端口"
     tag: "端口"
 
   - name: rpc_port
@@ -152,5 +152,5 @@ configurations:
     configurableInWizard: true
     label: "集群ID"
     description: "如果节点（FE 或 BE）具有相同的集群 id，则将认为它们属于同一个Doris 集群"
-
+    tag: "常用参数"
 

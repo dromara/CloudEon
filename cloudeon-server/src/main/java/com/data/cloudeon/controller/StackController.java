@@ -12,6 +12,7 @@ import com.data.cloudeon.controller.response.StackServiceConfVO;
 import com.data.cloudeon.controller.response.StackServiceVO;
 import com.data.cloudeon.dao.*;
 import com.data.cloudeon.dto.ResultDTO;
+import com.data.cloudeon.dto.ServiceConfiguration;
 import com.data.cloudeon.entity.*;
 import org.springframework.data.domain.Example;
 import org.springframework.web.bind.annotation.*;
@@ -167,6 +168,17 @@ public class StackController {
         // 查找该服务的自定义配置文件
         ArrayList<String> customFileNames = ListUtil.toList(stackServiceEntity.getCustomConfigFiles().split(","));
 
+        // fileGroup
+        Map<String, List<ServiceConfVO>> collect = stackConfigurations.stream().filter(e->StrUtil.isNotBlank(e.getConfFile())).collect(Collectors.groupingBy(ServiceConfVO::getConfFile));
+        Map<String, List<String>> fileGroup = collect.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey, // key使用原始key
+                        stringListEntry -> {  // 单独转换value
+                            List<String> strings = stringListEntry.getValue().stream().map(ServiceConfVO::getTag).distinct().collect(Collectors.toList());
+                            return strings;
+                        }));
+
+        result.setFileGroupMap(fileGroup);
         result.setConfs(stackConfigurations);
         result.setCustomFileNames(customFileNames);
         return ResultDTO.success(result);

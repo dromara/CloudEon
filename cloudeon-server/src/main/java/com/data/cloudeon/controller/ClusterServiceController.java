@@ -317,7 +317,7 @@ public class ClusterServiceController {
                 if (StrUtil.isNotBlank(stackServiceConfEntity.getConfFile())) {
                     serviceInstanceConfigEntity.setConfFile(stackServiceConfEntity.getConfFile());
                 }
-
+                serviceInstanceConfigEntity.setTag(stackServiceConfEntity.getTag());
                 serviceInstanceConfigEntity.setUpdateTime(new Date());
                 serviceInstanceConfigEntity.setCreateTime(new Date());
                 serviceInstanceConfigEntity.setServiceInstanceId(serviceInstanceEntityId);
@@ -729,6 +729,17 @@ public class ClusterServiceController {
         // 查找该服务的自定义配置文件
         ArrayList<String> customFileNames = ListUtil.toList(stackServiceEntity.getCustomConfigFiles().split(","));
 
+        // fileGroup
+        Map<String, List<ServiceConfiguration>> collect = serviceConfigurations.stream().filter(e->StrUtil.isNotBlank(e.getConfFile())).collect(Collectors.groupingBy(ServiceConfiguration::getConfFile));
+        Map<String, List<String>> fileGroup = collect.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey, // key使用原始key
+                        stringListEntry -> {  // 单独转换value
+                            List<String> strings = stringListEntry.getValue().stream().map(ServiceConfiguration::getTag).distinct().collect(Collectors.toList());
+                            return strings;
+                        }));
+
+        result.setFileGroupMap(fileGroup);
         result.setConfs(serviceConfigurations);
         result.setCustomFileNames(customFileNames);
         return ResultDTO.success(result);

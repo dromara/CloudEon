@@ -14,6 +14,7 @@ public class ServiceConfiguration {
     private String valueType;
     private String confFile;
     private String value;
+    private String tag;
     private Boolean isCustomConf;
     private Integer min;
     private Integer max;

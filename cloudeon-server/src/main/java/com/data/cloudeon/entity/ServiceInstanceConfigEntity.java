@@ -46,6 +46,7 @@ public class ServiceInstanceConfigEntity implements Serializable {
      * 所属配置文件
      */
     private String confFile;
+    private String tag;
 
     /**
      * 是否属于自定义配置

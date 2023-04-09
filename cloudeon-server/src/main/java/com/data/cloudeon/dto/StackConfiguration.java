@@ -8,6 +8,7 @@ public class StackConfiguration {
     private String name;
     private String description;
     private String label;
+    private String tag;
     private String recommendExpression;
     private String valueType;
     private boolean configurableInWizard;
