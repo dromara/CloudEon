@@ -22,6 +22,7 @@ roles:
     type: MASTER
     fixedNum : 2
     logFile: "hbase-hbase-master-${localhostname}.log"
+    linkExpression: "http://${localhostname}:${conf['hbase.master.info.port']}"
 
   - name: HBASE_REGIONSERVER
     label: "Hbase Regionserver"
@@ -30,6 +31,7 @@ roles:
     type: SLAVE
     minNum: 1
     logFile: "hbase-hbase-regionserver-${localhostname}.log"
+    linkExpression: "http://${localhostname}:${conf['hbase.regionserver.info.port']}"
 
 persistencePaths:
   - /opt/edp/${service.serviceName}/conf
@@ -45,7 +47,7 @@ configurations:
   - name: "hbase.wal.provider"
     recommendExpression: "filesystem"
     valueType: InputString
-    configurableInWizard: true
+    configurableInWizard: false
     confFile:  "hbase-site.xml"
   - name: "hbase.unsafe.stream.capability.enforce"
     recommendExpression: "false"
@@ -53,14 +55,29 @@ configurations:
     configurableInWizard: true
     confFile:  "hbase-site.xml"
   - name: "hbase.master.port"
+    recommendExpression: "16001"
+    valueType: InputNumber
+    configurableInWizard: true
+    description: "Hbase master 端口"
+    confFile:  "hbase-site.xml"
+  - name: "hbase.master.info.port"
     recommendExpression: "16011"
     valueType: InputNumber
     configurableInWizard: true
+    description: "Hbase master http 服务端口"
     confFile:  "hbase-site.xml"
   - name: "hbase.regionserver.port"
     recommendExpression: "16021"
     valueType: InputNumber
     configurableInWizard: true
     confFile:  "hbase-site.xml"
+    description: "Region Server 端口"
+  - name: "hbase.regionserver.info.port"
+    recommendExpression: "16030"
+    valueType: InputNumber
+    configurableInWizard: true
+    confFile:  "hbase-site.xml"
+    description: "Region Server http 端口"
+
 
 
