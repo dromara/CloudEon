@@ -36,50 +36,59 @@ configurations:
     recommendExpression: 9092
     valueType: InputNumber
     description: "Kafka监听端口"
+    tag: "端口"
   - name: "kafka.server.memory"
     recommendExpression: 2048
     valueType: InputNumber
     unit: MB
     description: "Kafka 最大堆内存,单位MB"
+    tag: "资源管理"
   - name: "num.partitions"
     recommendExpression: 8
     valueType: InputNumber
     confFile:  "server.properties"
     description: "Kafka分区数"
+    tag: "常用参数"
   - name: "offsets.topic.replication.factor"
     recommendExpression: 2
     valueType: InputNumber
     confFile:  "server.properties"
     description: "内置Topic副本数"
+    tag: "常用参数"
   - name: "default.replication.factor"
     recommendExpression: 2
     valueType: InputNumber
     confFile:  "server.properties"
     description: "Topic副本数"
+    tag: "常用参数"
   - name: "log.retention.hours"
     recommendExpression: 168
     valueType: InputNumber
     confFile:  "server.properties"
     description: "数据保留时间"
     unit: Hour
+    tag: "常用参数"
   - name: "auto.create.topics.enable"
     recommendExpression: "false"
     valueType: Switch
     configurableInWizard: true
     description: 是否允许自动创建Topic
     confFile:  "server.properties"
+    tag: "常用参数"
   - name: "unclean.leader.election.enable"
     recommendExpression: "false"
     valueType: Switch
     configurableInWizard: true
     description: "是否允许Unclean Leader选举"
     confFile:  "server.properties"
+    tag: "高级参数"
   - name: "auto.leader.rebalance.enable"
     recommendExpression: "true"
     valueType: Switch
     configurableInWizard: true
     description: "是否允许Leader重平衡"
     confFile:  "server.properties"
+    tag: "高级参数"
   - name: "message.max.bytes"
     recommendExpression: "1000012"
     valueType: InputNumber
@@ -87,6 +96,7 @@ configurations:
     unit: bytes
     description: "Broker能够接收的一条消息最大大小"
     confFile:  "server.properties"
+    tag: "性能"
   - name: "message.max.bytes"
     recommendExpression: "1048576"
     valueType: InputNumber
@@ -94,24 +104,28 @@ configurations:
     unit: bytes
     description: "kafka接收单个消息size的最大限制,默认为1M左右 message.max.bytes必须小于等于replica.fetch.max.bytes"
     confFile:  "server.properties"
+    tag: "性能"
   - name: "num.network.threads"
     recommendExpression: "3"
     valueType: InputNumber
     configurableInWizard: false
     description: "server用来处理网络请求的网络线程数目"
     confFile:  "server.properties"
+    tag: "性能"
   - name: "num.io.threads"
     recommendExpression: "12"
     valueType: InputNumber
     configurableInWizard: true
     description: "server用来处理请求的I/O线程的数目；这个线程数目至少要等于硬盘的个数。"
     confFile:  "server.properties"
+    tag: "性能"
   - name: "queued.max.requests"
     recommendExpression: "500"
     valueType: InputNumber
     configurableInWizard: false
     description: "在网络线程停止读取新请求之前，可以排队等待I/O线程处理的最大请求个数"
     confFile:  "server.properties"
+    tag: "性能"
   - name: "socket.receive.buffer.bytes"
     recommendExpression: "102400"
     valueType: InputNumber
@@ -119,6 +133,7 @@ configurations:
     description: "socket接收服务的缓存区大小"
     confFile:  "server.properties"
     unit: bytes
+    tag: "性能"
   - name: "socket.send.buffer.bytes"
     recommendExpression: "102400"
     valueType: InputNumber
@@ -126,6 +141,7 @@ configurations:
     description: "socket发送服务的缓存区大小"
     confFile:  "server.properties"
     unit: bytes
+    tag: "性能"
   - name: "socket.request.max.bytes"
     recommendExpression: "102857600"
     valueType: InputNumber
@@ -133,6 +149,7 @@ configurations:
     description: "socket每次请求的最大字节数"
     confFile:  "server.properties"
     unit: bytes
+    tag: "性能"
   - name: "zookeeper.connection.timeout.ms"
     recommendExpression: "18000"
     valueType: InputNumber
@@ -140,3 +157,4 @@ configurations:
     description: "Zookeeper连接超时时长"
     confFile:  "server.properties"
     unit: Ms
+    tag: "高级参数"

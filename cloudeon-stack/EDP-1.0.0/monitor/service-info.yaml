@@ -77,18 +77,22 @@ configurations:
     recommendExpression: 9090
     valueType: InputNumber
     configurableInWizard: true
+    tag: "端口"
   - name: nodeexporter.http.port
     recommendExpression: 9101
     valueType: InputNumber
     configurableInWizard: true
+    tag: "端口"
   - name: alertmanager.http.port
     recommendExpression: 9093
     valueType: InputNumber
     configurableInWizard: true
+    tag: "端口"
   - name: grafana.http.port
     recommendExpression: 3000
     valueType: InputNumber
     configurableInWizard: true
+    tag: "端口"
 
 
 

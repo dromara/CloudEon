@@ -74,58 +74,69 @@ configurations:
     recommendExpression: hdfscluster1
     valueType: InputString
     configurableInWizard: true
+    tag: "常用参数"
 
   - name: namenode.http-port
     recommendExpression: 50070
     valueType: InputNumber
     configurableInWizard: true
+    tag: "端口"
 
   - name: namenode.rpc-port
     recommendExpression: 8020
     valueType: InputNumber
     configurableInWizard: true
+    tag: "端口"
 
   - name: httpfs.http-port
     recommendExpression: 14000
     valueType: InputNumber
     configurableInWizard: true
+    tag: "端口"
 
 
   - name: datanode.http-port
     recommendExpression: 50075
     valueType: InputNumber
     configurableInWizard: true
+    tag: "端口"
 
 
   - name: datanode.port
     recommendExpression: 50011
     valueType: InputNumber
     configurableInWizard: true
+    tag: "端口"
 
   - name: datanode.ipc-port
     recommendExpression: 50020
     valueType: InputNumber
     configurableInWizard: true
+    tag: "端口"
 
   - name: journalnode.http-port
     recommendExpression: 8480
     valueType: InputNumber
     configurableInWizard: true
+    tag: "端口"
 
   - name: journalnode.rpc-port
     recommendExpression: 8485
     valueType: InputNumber
     configurableInWizard: true
+    tag: "端口"
 
   - name: journalnode.use.wildcard
     recommendExpression: true
     valueType: Switch
     configurableInWizard: true
+    tag: "常用参数"
 
   - name: datanode.use.wildcard
     recommendExpression: true
     valueType: Switch
     configurableInWizard: true
+    tag: "常用参数"
 
 
 
@@ -134,67 +145,79 @@ configurations:
     valueType: InputNumber
     confFile:  "hdfs-site.xml"
     configurableInWizard: true
+    tag: "高级参数"
 
   - name: dfs.data.transfer.protection
     recommendExpression: authentication
     valueType: InputString
     confFile:  "hdfs-site.xml"
+    tag: "安全"
 
   - name: dfs.datanode.handler.count
     recommendExpression: 30
     valueType: InputNumber
     confFile:  "hdfs-site.xml"
+    tag: "性能"
 
   - name: dfs.namenode.handler.count
     recommendExpression: 100
     valueType: InputNumber
     confFile:  "hdfs-site.xml"
+    tag: "性能"
 
   - name: dfs.client.read.shortcircuit
     recommendExpression: false
     valueType: Switch
     confFile:  "hdfs-site.xml"
+    tag: "性能"
 
   - name: dfs.client.socket-timeout
     recommendExpression: 120000
     unit: MILLISECONDS
     valueType: InputNumber
     confFile:  "hdfs-site.xml"
+    tag: "高级参数"
 
   - name: dfs.ha.fencing.methods
     recommendExpression: shell(/bin/true)
     valueType: InputString
     confFile:  "core-site.xml"
+    tag: "高级参数"
 
   - name: hadoop.http.staticuser.user
     recommendExpression: hdfs
     valueType: InputString
     description: WebHDFS页面上访问的静态用户名
     confFile: "core-site.xml"
+    tag: "常用参数"
 
 
   - name: dfs.datanode.data.dir.perm
     recommendExpression: 755
     valueType: InputNumber
     confFile:  "hdfs-site.xml"
+    tag: "安全"
 
 
   - name: dfs.permissions.superusergroup
     recommendExpression: "supergroup"
     valueType: InputString
     confFile:  "hdfs-site.xml"
+    tag: "安全"
 
 
   - name: dfs.namenode.acls.enabled
     recommendExpression: true
     valueType: Switch
     confFile:  "hdfs-site.xml"
+    tag: "安全"
 
   - name: fs.trash.interval
     recommendExpression: 1440
     unit: minutes
     valueType: InputNumber
     confFile:  "core-site.xml"
+    tag: "常用参数"
 
 
   - name: hdfs.namenode.memory
@@ -204,6 +227,7 @@ configurations:
     valueType: Slider
     unit: MB
     configurableInWizard: true
+    tag: "资源管理"
 
   - name: hdfs.zkfc.memory
     recommendExpression: 1024
@@ -212,6 +236,7 @@ configurations:
     valueType: Slider
     unit: MB
     configurableInWizard: true
+    tag: "资源管理"
 
 
   - name: hdfs.journalnode.memory
@@ -221,6 +246,7 @@ configurations:
     valueType: Slider
     unit: MB
     configurableInWizard: true
+    tag: "资源管理"
 
 
   - name: hdfs.datanode.memory
@@ -230,6 +256,7 @@ configurations:
     valueType: Slider
     unit: MB
     configurableInWizard: true
+    tag: "资源管理"
 
 
  

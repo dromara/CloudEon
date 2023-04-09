@@ -76,102 +76,127 @@ configurations:
     recommendExpression: "*"
     valueType: InputString
     confFile:  "capacity-scheduler.xml"
+    tag: "资源管理"
   - name: yarn.scheduler.capacity.maximum-applications
     recommendExpression: 10000
     valueType: InputNumber
     confFile:  "capacity-scheduler.xml"
+    tag: "资源管理"
   - name: yarn.scheduler.capacity.root.maximum-capacity
     recommendExpression: 100
     valueType: InputNumber
     confFile: "capacity-scheduler.xml"
+    tag: "资源管理"
   - name: yarn.scheduler.capacity.root.maximum-am-resource-percent
     recommendExpression: 0.1
     valueType: InputNumber
     confFile: "capacity-scheduler.xml"
+    tag: "资源管理"
   - name: yarn.scheduler.capacity.root.user-limit-factor
     recommendExpression: 1
     valueType: InputNumber
     confFile: "capacity-scheduler.xml"
+    tag: "资源管理"
   - name: yarn.scheduler.capacity.root.state
     recommendExpression: RUNNING
     valueType: InputString
     confFile: "capacity-scheduler.xml"
+    tag: "资源管理"
   - name: yarn.scheduler.capacity.root.acl_administer_queue
     recommendExpression: "*"
     valueType: InputString
     confFile: "capacity-scheduler.xml"
+    tag: "资源管理"
   - name: yarn.scheduler.capacity.node-locality-delay
     recommendExpression: -1
     valueType: InputNumber
     confFile: "capacity-scheduler.xml"
+    tag: "资源管理"
   - name: yarn.scheduler.capacity.root.queues
     recommendExpression: default
     valueType: InputString
     confFile: "capacity-scheduler.xml"
+    tag: "资源管理"
   - name: org.apache.hadoop.yarn.util.resource.DominantResourceCalculator
     recommendExpression: default
     valueType: InputString
     confFile: "capacity-scheduler.xml"
+    tag: "资源管理"
   - name: yarn.scheduler.capacity.root.default.user-limit-factor
     recommendExpression: 1
     valueType: InputNumber
     confFile: "capacity-scheduler.xml"
+    tag: "资源管理"
   - name: yarn.scheduler.capacity.root.default.maximum-capacity
     recommendExpression: 100
     valueType: InputNumber
     confFile: "capacity-scheduler.xml"
+    tag: "资源管理"
   - name: yarn.scheduler.capacity.root.default.capacity
     recommendExpression: 100
     valueType: InputNumber
     confFile: "capacity-scheduler.xml"
+    tag: "资源管理"
   - name: yarn.scheduler.capacity.root.default.state
     recommendExpression: RUNNING
     valueType: InputString
     confFile: "capacity-scheduler.xml"
+    tag: "资源管理"
   - name: yarn.scheduler.capacity.root.maximum-applications
     recommendExpression: 10000
     valueType: InputNumber
     confFile: "capacity-scheduler.xml"
+    tag: "资源管理"
   - name: yarn.scheduler.capacity.maximum-am-resource-percent
     recommendExpression: 0.1
     valueType: InputNumber
     confFile: "capacity-scheduler.xml"
+    tag: "资源管理"
   - name: yarn.scheduler.capacity.root.acl_submit_applications
     recommendExpression: "*"
     valueType: InputString
     confFile: "capacity-scheduler.xml"
+    tag: "资源管理"
   - name: yarn.scheduler.capacity.root.default.acl_administer_queue
     recommendExpression: "*"
     valueType: InputString
     confFile: "capacity-scheduler.xml"
+    tag: "资源管理"
   - name: yarn.scheduler.capacity.root.capacity
     recommendExpression: 100
     valueType: InputNumber
     confFile: "capacity-scheduler.xml"
+    tag: "资源管理"
   - name: remote.app.log.dir
     recommendExpression: "/var/log/hadoop-yarn/apps"
     valueType: InputString
     configurableInWizard: true
+    tag: "资源管理"
   - name: mapreduce.am.staging.dir
     recommendExpression: "/user"
     valueType: InputString
     configurableInWizard: true
+    tag: "资源管理"
   - name: mapreduce.job.max.split.locations
     recommendExpression: 500
     valueType: InputNumber
     confFile: "mapred-site.xml"
+    tag: "资源管理"
   - name: mapreduce.framework.name
     recommendExpression: yarn
     valueType: InputString
     confFile: "mapred-site.xml"
+    tag: "资源管理"
   - name: mapreduce.map.speculative
     recommendExpression: true
     valueType: Switch
     confFile: "mapred-site.xml"
+    tag: "资源管理"
   - name: raid.distraid.max.files
     recommendExpression: 300
     valueType: InputNumber
     confFile: "mapred-site.xml"
+    tag: "资源管理"
   - name: mapred.child.heapsize
     recommendExpression: 2048
     min: 1024
@@ -180,26 +205,32 @@ configurations:
     unit: MB
     confFile: "mapred-site.xml"
     configurableInWizard: true
+    tag: "资源管理"
   - name: raidnode.files.fix.per.job
     recommendExpression: 500
     valueType: InputNumber
     confFile: "mapred-site.xml"
+    tag: "高级参数"
   - name: mapreduce.job.reduce.slowstart.completedmaps
     recommendExpression: 1
     valueType: InputNumber
     confFile: "mapred-site.xml"
+    tag: "高级参数"
   - name: mapreduce.job.maps
     recommendExpression: 1
     valueType: InputNumber
     confFile: "mapred-site.xml"
+    tag: "高级参数"
   - name: mapreduce.reduce.speculative
     recommendExpression: false
     valueType: Switch
     confFile: "mapred-site.xml"
+    tag: "高级参数"
   - name: raid.distraid.max.jobs
     recommendExpression: 10
     valueType: InputNumber
     confFile: "mapred-site.xml"
+    tag: "高级参数"
 
 
 
@@ -207,37 +238,46 @@ configurations:
     recommendExpression: 8033
     valueType: InputNumber
     configurableInWizard: true
+    tag: "端口"
   - name: resourcemanager.port
     recommendExpression: 8032
     valueType: InputNumber
     configurableInWizard: true
+    tag: "端口"
   - name: resourcemanager.resource-tracker.port
     recommendExpression: 8031
     valueType: InputNumber
     configurableInWizard: true
+    tag: "端口"
   - name: resourcemanager.scheduler.port
     recommendExpression: 8030
     valueType: InputNumber
     configurableInWizard: true
+    tag: "端口"
   - name: resourcemanager.webapp.port
     recommendExpression: 8088
     valueType: InputNumber
     configurableInWizard: true
+    tag: "端口"
   - name: nodemanager.webapp.port
     recommendExpression: 8042
     valueType: InputNumber
     configurableInWizard: true
+    tag: "端口"
   - name: timelineserver.port
     recommendExpression: 10021
     valueType: InputNumber
     configurableInWizard: true
+    tag: "端口"
   - name: timelineserver.http.port
     recommendExpression: 8188
     valueType: InputNumber
     configurableInWizard: true
+    tag: "端口"
   - name: mapreduce.shuffle.port
     recommendExpression: 13562
     valueType: InputNumber
+    tag: "端口"
 
 
 
@@ -248,6 +288,7 @@ configurations:
     confFile: "yarn-site.xml"
     recommendExpression: "${HADOOP_HOME}/etc/hadoop,${HADOOP_HOME}/share/hadoop/common/lib/*,${HADOOP_HOME}/share/hadoop/common/*,${HADOOP_HOME}/share/hadoop/hdfs,${HADOOP_HOME}/share/hadoop/hdfs/lib/*,${HADOOP_HOME}/share/hadoop/hdfs/*,${HADOOP_HOME}/share/hadoop/mapreduce/lib/*,${HADOOP_HOME}/share/hadoop/mapreduce/*,${HADOOP_HOME}/share/hadoop/yarn,${HADOOP_HOME}/share/hadoop/yarn/lib/*,${HADOOP_HOME}/share/hadoop/yarn/*"
     configurableInWizard: true
+    tag: "高级参数"
   - name: yarn.scheduler.maximum-allocation-mb
     recommendExpression: 98304
     min: 1024
@@ -256,6 +297,7 @@ configurations:
     unit: MB
     confFile: "yarn-site.xml"
     configurableInWizard: true
+    tag: "资源管理"
   - name: yarn.scheduler.maximum-allocation-vcores
     recommendExpression: 96
     min: 10
@@ -264,26 +306,32 @@ configurations:
     unit: core
     confFile: "yarn-site.xml"
     configurableInWizard: true
+    tag: "资源管理"
   - name: yarn.nodemanager.vmem-check-enabled
     recommendExpression: false
     valueType: Switch
     confFile: "yarn-site.xml"
+    tag: "资源管理"
   - name: yarn.resourcemanager.scheduler.class
     recommendExpression: org.apache.hadoop.yarn.server.resourcemanager.scheduler.capacity.CapacityScheduler
     valueType: InputString
     confFile: "yarn-site.xml"
+    tag: "高级参数"
   - name: yarn.nodemanager.aux-services.mapreduce_shuffle.class
     recommendExpression: org.apache.hadoop.mapred.ShuffleHandler
     valueType: InputString
     confFile: "yarn-site.xml"
+    tag: "高级参数"
   - name: yarn.nodemanager.pmem-check-enabled
     recommendExpression: false
     valueType: Switch
     confFile: "yarn-site.xml"
+    tag: "资源管理"
   - name: yarn.nodemanager.aux-services
     recommendExpression: mapreduce_shuffle
     valueType: InputString
     confFile: "yarn-site.xml"
+    tag: "高级参数"
   - name: yarn.nodemanager.resource.cpu-vcores
     recommendExpression: 6
     min: 2
@@ -292,6 +340,7 @@ configurations:
     unit: core
     confFile: "yarn-site.xml"
     configurableInWizard: true
+    tag: "资源管理"
   - name: yarn.nodemanager.resource.memory-mb
     recommendExpression: 65536
     min: 1024
@@ -300,6 +349,7 @@ configurations:
     unit: MB
     confFile: "yarn-site.xml"
     configurableInWizard: true
+    tag: "资源管理"
   - name: yarn.nodemanager.delete.debug-delay-sec
     recommendExpression: 86400
     min: 1
@@ -307,24 +357,29 @@ configurations:
     valueType: Slider
     unit: SECONDS
     confFile: "yarn-site.xml"
+    tag: "高级参数"
   - name: yarn.log-aggregation-enable
     recommendExpression: false
     valueType: Switch
     confFile: "yarn-site.xml"
+    tag: "高级参数"
 
 
   - name: historyserver.port
     recommendExpression: 10020
     valueType: InputNumber
     configurableInWizard: true
+    tag: "端口"
   - name: historyserver.admin-port
     recommendExpression: 10033
     valueType: InputNumber
     configurableInWizard: true
+    tag: "端口"
   - name: historyserver.http-port
     recommendExpression: 19888
     valueType: InputNumber
     configurableInWizard: true
+    tag: "端口"
     
   - name: yarn.resourcemanager.memory
     recommendExpression: 1024
@@ -333,6 +388,7 @@ configurations:
     valueType: Slider
     unit: MB
     configurableInWizard: true
+    tag: "端口"
   - name: yarn.nodemanager.memory
     recommendExpression: 1024
     min: 1024
@@ -340,6 +396,7 @@ configurations:
     valueType: Slider
     unit: MB
     configurableInWizard: true
+    tag: "端口"
   - name: yarn.historyserver.memory
     recommendExpression: 1024
     min: 1024
@@ -347,6 +404,7 @@ configurations:
     valueType: Slider
     unit: MB
     configurableInWizard: true
+    tag: "端口"
   - name: yarn.timelineserver.memory
     recommendExpression: 1024
     min: 1024
@@ -354,6 +412,7 @@ configurations:
     valueType: Slider
     unit: MB
     configurableInWizard: true
+    tag: "端口"
  
 
 
