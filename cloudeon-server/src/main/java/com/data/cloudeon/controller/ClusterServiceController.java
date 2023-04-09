@@ -729,7 +729,10 @@ public class ClusterServiceController {
         // 查找该服务的自定义配置文件
         ArrayList<String> customFileNames = ListUtil.toList(stackServiceEntity.getCustomConfigFiles().split(","));
 
-        // fileGroup
+        Map<String, List<String>> treeMap = new LinkedHashMap<>();        // all tags
+        List<String> allTags = serviceConfigurations.stream().map(e -> e.getTag()).collect(Collectors.toList());
+        treeMap.put("全部", allTags);
+        // fileGroup tags
         Map<String, List<ServiceConfiguration>> collect = serviceConfigurations.stream().filter(e->StrUtil.isNotBlank(e.getConfFile())).collect(Collectors.groupingBy(ServiceConfiguration::getConfFile));
         Map<String, List<String>> fileGroup = collect.entrySet().stream()
                 .collect(Collectors.toMap(
@@ -738,11 +741,9 @@ public class ClusterServiceController {
                             List<String> strings = stringListEntry.getValue().stream().map(ServiceConfiguration::getTag).distinct().collect(Collectors.toList());
                             return strings;
                         }));
-        // all tags
-        List<String> allTags = serviceConfigurations.stream().map(e -> e.getTag()).collect(Collectors.toList());
-        fileGroup.put("全部", allTags);
+        treeMap.putAll(fileGroup);
 
-        result.setFileGroupMap(fileGroup);
+        result.setFileGroupMap(treeMap);
         result.setConfs(serviceConfigurations);
         result.setCustomFileNames(customFileNames);
         return ResultDTO.success(result);

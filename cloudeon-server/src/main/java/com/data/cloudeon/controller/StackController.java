@@ -167,7 +167,10 @@ public class StackController {
 
         // 查找该服务的自定义配置文件
         ArrayList<String> customFileNames = ListUtil.toList(stackServiceEntity.getCustomConfigFiles().split(","));
-
+        Map<String, List<String>> treeMap = new LinkedHashMap<>();
+        // all tags
+        List<String> allTags = stackConfigurations.stream().map(e -> e.getTag()).distinct().collect(Collectors.toList());
+        treeMap.put("全部", allTags);
         // fileGroup
         Map<String, List<ServiceConfVO>> collect = stackConfigurations.stream().filter(e->StrUtil.isNotBlank(e.getConfFile())).collect(Collectors.groupingBy(ServiceConfVO::getConfFile));
         Map<String, List<String>> fileGroup = collect.entrySet().stream()
@@ -177,12 +180,10 @@ public class StackController {
                             List<String> strings = stringListEntry.getValue().stream().map(ServiceConfVO::getTag).distinct().collect(Collectors.toList());
                             return strings;
                         }));
+        treeMap.putAll(fileGroup);
 
-        // 全部的标签
-        List<String> allTags = stackConfigurations.stream().map(e -> e.getTag()).distinct().collect(Collectors.toList());
-        fileGroup.put("全部", allTags);
 
-        result.setFileGroupMap(fileGroup);
+        result.setFileGroupMap(treeMap);
         result.setConfs(stackConfigurations);
         result.setCustomFileNames(customFileNames);
         return ResultDTO.success(result);
