@@ -15,7 +15,7 @@ const ChooseService: React.FC<{
       <div className={styles.selectedWrap}>
       <Checkbox.Group style={{ width: '100%' }} onChange={onChange}>
         {serviceList.map((sitem: any) => {
-          return (<div className={styles.checkItem} >
+          return (<div className={styles.checkItem} key={sitem.id} >
           <Checkbox style={{ width: '100%' }} value={sitem.id} key={sitem.id} disabled={sitem.installedInCluster}>
             <ServiceItem key={sitem.id} item={sitem} type={1} changeStatus={changeStatus} />
           </Checkbox>

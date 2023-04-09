@@ -148,8 +148,8 @@ const Login: React.FC = () => {
         <div className={styles.loginRight}>
           <div className={styles.loginText}>
             <div className={styles.title}>
-              {/* <Image style={{width:'50px',marginRight:'10px'}} src={logoImg}></Image> */}
-              CloudEon
+              <Image style={{width:'150px',marginRight:'10px',marginBottom:'20px'}} src={logoImg}></Image>
+              {/* CloudEon */}
             </div>
             <div className={styles.subTitle}>
               基于kubernetes安装和运维大数据集群

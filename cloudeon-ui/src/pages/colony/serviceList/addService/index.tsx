@@ -19,6 +19,7 @@ const serviceAdd: React.FC = () => {
   const [current, setCurrent] = useState(0);
   const [serviceListData, setServiceListData] = useState<any[]>();
   const [loading, setLoading] = useState(false);
+  const [checkServiceLoading, setCheckServiceLoading] = useState(false);
   const [allParams, setSubmitallParams] = useState<API.SubmitServicesParams>(); // 安装提交的params
   const [serviceInfos, setServiceInfos] = useState<API.ServiceInfosItem[]>()
   const [rolesAllNodeIds, setRolesAllNodeIds] = useState<API.rolesValidResult>() //获取所有角色的推荐节点
@@ -60,6 +61,7 @@ const serviceAdd: React.FC = () => {
     const result: API.rolesValidResult =  await getRolesAllocationAPI(params);
     setLoading(false)
     setRolesAllNodeIds(result?.data)
+    return result?.data
   };
 
   const getSelectedService = ()=>{
@@ -204,10 +206,10 @@ const serviceAdd: React.FC = () => {
         return (selectList && selectList.length > 0 ? true : false)
       ;break;
       case 1:
-        return true
+        return checkRoleParNext
       ;break;
       case 2:
-        return checkRoleParNext
+        return true
       ;break;
       case 3:
         return true
@@ -226,7 +228,7 @@ const serviceAdd: React.FC = () => {
 
   let stepList: any[] = [
     { title: '选择服务', status: '' },
-    { title: '配置安全', status: '' },
+    // { title: '配置安全', status: '' },
     { title: '分配角色', status: '' },
     { title: '配置服务', status: '' },
     // { title: '服务总览', status: '' },
@@ -236,14 +238,17 @@ const serviceAdd: React.FC = () => {
     // setCurrent(value);
   };
 
-  const initServiceInfos = () =>{    
+  const initServiceInfos = (values: any) =>{    
+    console.log("initServiceInfos: ", values);
+    
+    const nodesIds = values || rolesAllNodeIds
     const serArr = getSelectedService()?.map(item=>{
         return {
             stackServiceId: item.id,
             stackServiceName: item.name,
             stackServiceLabel: item.label,
             roles: item.roles.map((role: any)=>{
-              let roles = rolesAllNodeIds && rolesAllNodeIds[item.id].filter((roleItem: { stackRoleName: any; })=>{ return roleItem.stackRoleName == role}) 
+              let roles = nodesIds && nodesIds[item.id].filter((roleItem: { stackRoleName: any; })=>{ return roleItem.stackRoleName == role}) 
               let nodeIds = roles && roles.length>0 && roles[0].nodeIds || []
               let validRule = roles[0]
                 return {
@@ -340,9 +345,9 @@ const serviceAdd: React.FC = () => {
           </div>
           <div className={styles.stepsContent}>
             {(current == 0 && serviceListData ) && <ChooseService serviceList={serviceListData} changeStatus={changeStatus} />}
-            { current == 1 && <ConfigSecurity selectListIds={selectListIds || []} setKerberosToParams={setKerberosToParams} />}
-            { current == 2 && <AssignRoles serviceList={ getSelectedService() || [] } sourceServiceInfos={serviceInfos || []} setServiceInfosToParams={setServiceInfosToParams} checkAllRolesRules={checkAllRolesRules} parentLoading={loading} /> }
-            { current == 3 && <ConfigService setPresetConfListToParams={setPresetConfListToParams} />}
+            {/* { current == 1 && <ConfigSecurity selectListIds={selectListIds || []} setKerberosToParams={setKerberosToParams} />} */}
+            { current == 1 && <AssignRoles serviceList={ getSelectedService() || [] } sourceServiceInfos={serviceInfos || []} setServiceInfosToParams={setServiceInfosToParams} checkAllRolesRules={checkAllRolesRules} parentLoading={loading} /> }
+            { current == 2 && <ConfigService setPresetConfListToParams={setPresetConfListToParams} />}
             <div className={styles.stepBottomBtns}>
               <Button style={{ marginRight: '5px' }}               
                 onClick={()=>{
@@ -358,7 +363,7 @@ const serviceAdd: React.FC = () => {
               {contextHolder}
               <Button type="primary" 
                 disabled={!checkNext()} 
-                loading={loading}
+                loading={loading || checkServiceLoading}
                 onClick={async ()=>{
                   if(current == 0){
                     const params = {
@@ -366,24 +371,32 @@ const serviceAdd: React.FC = () => {
                       "stackId":colonyData.stackId,
                       "installStackServiceIds": selectListIds
                     }
-                    checkService(params).then(checkResult=>{
+                    setCheckServiceLoading(true)
+                    checkService(params).then(async checkResult=>{
                       if(checkResult) {
                         sessionStorage.setItem('colonyData',JSON.stringify({...colonyData , selectedServiceList: getSelectedService()}) )
-                        setCurrent(current + 1);
+                        
                         const ids = serviceListData?.map(sItem=>{return sItem.id})
-                        getRolesAll({ clusterId: colonyData.clusterId, stackServiceIds: ids})
+                        const nodesIds = await getRolesAll({ clusterId: colonyData.clusterId, stackServiceIds: ids})
+                        initServiceInfos(nodesIds)
+                        setCurrent(current + 1);
                       }
+                    }).finally(()=>{
+                      setCheckServiceLoading(false)
                     })
-                  } else if(current == 1){ // 配置安全下一步
-                    setCurrent(current + 1);
-                    initServiceInfos()
+                  } 
+                  // else if(current == 1){ // 配置安全下一步
+                  //   setCurrent(current + 1);
+                  //   initServiceInfos()
 
-                  } else if(current == 2){ // 分配角色下一步
+                  // } 
+                  else if(current == 1){ // 分配角色下一步
+                    // initServiceInfos()
                     // 校验节点
                     serviceInfos && checkAllRolesRules(serviceInfos)
                     setCurrent(current + 1);
                     
-                  } else if(current == 3){ // 安装
+                  } else if(current == 2){ // 安装
                     const resultParams = await setPresetConfListToParams()
                     console.log('---resultParams: ', resultParams);
                     
