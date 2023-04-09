@@ -851,7 +851,7 @@ public class ClusterServiceController {
         // 通过服务框架的dashboard和Grafana地址拼接完整url
         Integer monitorServiceInstanceId = monitorServiceInstance.getId();
         String grafanaHttpPort = serviceInstanceConfigRepository.findByServiceInstanceIdAndName(monitorServiceInstanceId, "grafana.http.port").getValue();
-        ServiceRoleInstanceEntity grafana = roleInstanceRepository.findByServiceInstanceIdAndServiceRoleName(monitorServiceInstanceId, "MONITOR_GRAFANA").get(0);
+        ServiceRoleInstanceEntity grafana = roleInstanceRepository.findByServiceInstanceIdAndServiceRoleName(monitorServiceInstanceId, "GRAFANA").get(0);
         Integer grafanaNodeId = grafana.getNodeId();
         ClusterNodeEntity grafanaNodeEntity = clusterNodeRepository.findById(grafanaNodeId).get();
         String dashboardUid = stackServiceEntity.getDashboardUid();

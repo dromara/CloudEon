@@ -8,7 +8,7 @@ datasources:
     type: prometheus
     # Access mode - proxy (server in the UI) or direct (browser in the UI).
     access: proxy
-    url: http://${serviceRoles['MONITOR_PROMETHEUS'][0].hostname}:${conf['prometheus.http.port']}
+    url: http://${serviceRoles['PROMETHEUS'][0].hostname}:${conf['prometheus.http.port']}
     jsonData:
       httpMethod: POST
       manageAlerts: true

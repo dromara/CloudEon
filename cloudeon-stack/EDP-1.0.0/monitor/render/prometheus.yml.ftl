@@ -10,8 +10,8 @@ alerting:
   - static_configs:
     - targets:
       # - alertmanager:9093
-      <#if serviceRoles['MONITOR_ALERTMANAGER']?size gt 0>
-        - ${serviceRoles['MONITOR_ALERTMANAGER'][0].hostname}:${conf['alertmanager.http.port']}
+      <#if serviceRoles['ALERTMANAGER']?size gt 0>
+        - ${serviceRoles['ALERTMANAGER'][0].hostname}:${conf['alertmanager.http.port']}
       </#if>
 
 
@@ -21,7 +21,7 @@ rule_files:
   # - "second_rules.yml"
   - "/opt/edp/${service.serviceName}/conf/rule/rules*.yml"
 <#assign node_exporters=[]>
-<#list serviceRoles['MONITOR_NODEEXPORTER'] as role>
+<#list serviceRoles['NODEEXPORTER'] as role>
   <#assign node_exporters += ["'"+role.hostname + ":" + conf["nodeexporter.http.port"]+"'"]>
 </#list>
 # A scrape configuration containing exactly one endpoint to scrape:
@@ -32,13 +32,13 @@ scrape_configs:
 #    - targets: ['localhost:9091']
   - job_name: 'prometheus'
     static_configs:
-    - targets: ['${serviceRoles['MONITOR_PROMETHEUS'][0].hostname}:${conf['prometheus.http.port']}']
+    - targets: ['${serviceRoles['PROMETHEUS'][0].hostname}:${conf['prometheus.http.port']}']
   - job_name: 'grafana'
     static_configs:
-    - targets: ['${serviceRoles['MONITOR_GRAFANA'][0].hostname}:${conf['grafana.http.port']}']
+    - targets: ['${serviceRoles['GRAFANA'][0].hostname}:${conf['grafana.http.port']}']
   - job_name: 'alertmanager'
     static_configs:
-    - targets: ['${serviceRoles['MONITOR_ALERTMANAGER'][0].hostname}:${conf['alertmanager.http.port']}']
+    - targets: ['${serviceRoles['ALERTMANAGER'][0].hostname}:${conf['alertmanager.http.port']}']
   - job_name: node_exporter
     honor_timestamps: true
     scrape_interval: 5s

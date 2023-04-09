@@ -24,9 +24,9 @@ persistencePaths:
 
 
 roles:
-  - name: MONITOR_PROMETHEUS
+  - name: PROMETHEUS
     label: Prometheus
-    roleFullName: monitor-prometheus
+    roleFullName: prometheus
     linkExpression: "http://${localhostname}:${conf['prometheus.http.port']}"
     sortNum: 1
     type: MASTER
@@ -34,9 +34,9 @@ roles:
     fixedNum: 1
     logFile: "prometheus-${localhostname}.out"
 
-  - name: MONITOR_ALERTMANAGER
+  - name: ALERTMANAGER
     label: "Alert Manager"
-    roleFullName: monitor-alert-manager
+    roleFullName: alert-manager
     linkExpression: "http://${localhostname}:${conf['alertmanager.http.port']}"
     sortNum: 2
     type: MASTER
@@ -44,9 +44,9 @@ roles:
     fixedNum: 1
     logFile: "alertmanager-${localhostname}.out"
 
-  - name: MONITOR_NODEEXPORTER
+  - name: NODEEXPORTER
     label: "Node Exporter"
-    roleFullName: monitor-node-exporter
+    roleFullName: node-exporter
     linkExpression: "http://${localhostname}:${conf['nodeexporter.http.port']}"
     sortNum: 3
     type: SLAVE
@@ -54,7 +54,7 @@ roles:
     minNum: 1
     logFile: "nodeexporter-${localhostname}.out"
 
-  - name: MONITOR_GRAFANA
+  - name: GRAFANA
     label: Grafana
     roleFullName: monitor-grafana
     linkExpression: "http://${localhostname}:${conf['grafana.http.port']}"

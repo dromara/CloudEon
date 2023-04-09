@@ -103,7 +103,7 @@ public class RegisterPrometheusScrapyTask extends BaseCloudeonTask {
 
         log.info("上传prometheus采集的配置文件到prometheus配置目录....");
         // 找出promethus安装节点
-        ServiceRoleInstanceEntity monitorPrometheus = roleInstanceRepository.findByServiceInstanceIdAndServiceRoleName(monitorServiceInstance.getId(), "MONITOR_PROMETHEUS").get(0);
+        ServiceRoleInstanceEntity monitorPrometheus = roleInstanceRepository.findByServiceInstanceIdAndServiceRoleName(monitorServiceInstance.getId(), "PROMETHEUS").get(0);
         Integer monitorPrometheusNodeId = monitorPrometheus.getNodeId();
         ClusterNodeEntity prometheusNodeEntity = clusterNodeRepository.findById(monitorPrometheusNodeId).get();
         ClientSession clientSession = SshUtils.openConnectionByPassword(prometheusNodeEntity.getIp(), prometheusNodeEntity.getSshPort(), prometheusNodeEntity.getSshUser(), prometheusNodeEntity.getSshPassword());
