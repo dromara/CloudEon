@@ -2,7 +2,7 @@
 
 
 
-create table udh_service_instance_config
+create table ce_service_instance_config
 (
     id                int auto_increment
         primary key,
@@ -19,7 +19,7 @@ create table udh_service_instance_config
 
 );
 
-create table udh_service_instance
+create table ce_service_instance
 (
     id                              int auto_increment
         primary key,
@@ -37,7 +37,7 @@ create table udh_service_instance
     update_time                     datetime(6)  null
 );
 
-create table udh_service_role_instance
+create table ce_service_role_instance
 (
     id                  int auto_increment
         primary key,
@@ -54,7 +54,7 @@ create table udh_service_role_instance
     update_time         datetime(6)  null
 );
 
-create table udh_service_role_instance_webuis
+create table ce_service_role_instance_webuis
 (
     id                       int auto_increment
         primary key,
@@ -65,7 +65,7 @@ create table udh_service_role_instance_webuis
     web_ip_url               varchar(255) null
 );
 
-create table udh_user
+create table ce_user
 (
     id          int auto_increment
         primary key,
@@ -77,7 +77,7 @@ create table udh_user
     username    varchar(255) null
 );
 
-create table udh_session
+create table ce_session
 (
     id              varchar(255) not null
         primary key,

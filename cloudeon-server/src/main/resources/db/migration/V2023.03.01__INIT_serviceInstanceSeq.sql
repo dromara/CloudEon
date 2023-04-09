@@ -1,4 +1,4 @@
-create table udh_service_instance_seq
+create table ce_service_instance_seq
 (
     id                            int auto_increment
         primary key,

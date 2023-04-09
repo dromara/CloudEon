@@ -50,12 +50,12 @@
 
 **页面功能概览：**
 
-|            ![登录页面](http://image-picgo.test.upcdn.net/img/20230322182700.png)            | ![节点列表](http://image-picgo.test.upcdn.net/img/20230322182617.png)  |
+|            ![登录页面](http://image-picgo.test.upcdn.net/img/20230322182700.png)            | ![告警](https://user-images.githubusercontent.com/123344357/230778648-653dc9a7-f78e-4f1d-9aaa-7689ad257f10.png)  |
 |:---------------------------------------------------------------------------------------:|---------------------------------------------------------------------|
-|  ![服务详情](https://uni-1253355096.cos.ap-guangzhou.myqcloud.com/img/20230407231009.png)   |  ![服务角色](http://image-picgo.test.upcdn.net/img/20230322181531.png)  |
-|            ![服务配置](http://image-picgo.test.upcdn.net/img/20230316100517.png)            | ![指令执行详情](http://image-picgo.test.upcdn.net/img/20230316100553.png) |
-|            ![指令日志](http://image-picgo.test.upcdn.net/img/20230316100634.png)            | ![新增服务](https://uni-1253355096.cos.ap-guangzhou.myqcloud.com/img/20230407230829.png)   |
-|  ![分配角色](https://uni-1253355096.cos.ap-guangzhou.myqcloud.com/img/20230407230916.png)   | ![自定义配置](http://image-picgo.test.upcdn.net/img/20230316100833.png)  |
+|  ![服务详情](https://uni-1253355096.cos.ap-guangzhou.myqcloud.com/img/20230407231009.png)   |  ![角色实例](https://user-images.githubusercontent.com/123344357/230778761-0accabf4-209e-4666-8b7d-0fe8dcd52056.png)  |
+|            ![服务配置](http://image-picgo.test.upcdn.net/img/20230316100517.png)            | ![指令详情](https://user-images.githubusercontent.com/123344357/230778699-a152755b-8c66-40a8-8fdc-27aa1f8e239c.png) |
+|           ![指令日志](https://user-images.githubusercontent.com/123344357/230778679-6520b845-e354-4a73-a661-fb5b7596f217.png)       | ![新增服务](https://uni-1253355096.cos.ap-guangzhou.myqcloud.com/img/20230407230829.png)   |
+
 
 
 ## 👨‍💻 项目地址

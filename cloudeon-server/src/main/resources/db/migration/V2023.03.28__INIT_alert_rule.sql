@@ -1,4 +1,4 @@
-create table udh_stack_alert_rule
+create table ce_stack_alert_rule
 (
     id                int          null,
     rule_name         varchar(255) null,
@@ -11,7 +11,7 @@ create table udh_stack_alert_rule
     alert_advice text null
 );
 
-create table udh_alert_rule_define
+create table ce_alert_rule_define
 (
     id                int          null,
     cluster_id                int          null,
