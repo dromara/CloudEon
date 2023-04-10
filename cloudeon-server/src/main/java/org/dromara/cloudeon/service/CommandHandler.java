@@ -48,6 +48,9 @@ public class CommandHandler {
                 if (stackServiceName.equals(HIVE_SERVICE_NAME)) {
                     taskGroupTypes.add(TaskGroupType.INIT_HIVE);
                 }
+                if (stackServiceName.equals(SPARK_SERVICE_NAME)) {
+                    taskGroupTypes.add(TaskGroupType.INIT_SPARK);
+                }
 
                 taskGroupTypes.add(TaskGroupType.TAG_AND_START_K8S_SERVICE);
 
