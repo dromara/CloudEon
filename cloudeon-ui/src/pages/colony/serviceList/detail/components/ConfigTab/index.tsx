@@ -84,7 +84,7 @@ const ConfigService:React.FC<{serviceId: number}> = ( {serviceId} )=>{
     const resetSource = (record: Item, index:number) => {
         // console.log('---record: ', record);
         record.value = record.recommendExpression
-        setCurrentConfList(JSON.parse(JSON.stringify(currentConfList)));
+        setCurrentConfList(cloneDeep(currentConfList));
         // console.log('---currentConfList: ', currentConfList);
         form.setFieldValue(`${record.name}-value`, record.recommendExpression)
     }
@@ -138,8 +138,8 @@ const ConfigService:React.FC<{serviceId: number}> = ( {serviceId} )=>{
     }
 
     const actionOnChange = (e:any, record: Item) => {
-        // console.log('--val: ', e.target.value);        
-        record.value = e.target.value
+        // console.log('--record: ', e.target.value);        
+        record.value = e
         let cdata = cloneDeep(filterTableList || [])
         cdata && setFilterTableList(cdata)
     }
@@ -173,7 +173,7 @@ const ConfigService:React.FC<{serviceId: number}> = ( {serviceId} )=>{
             dataIndex: 'value',
             editable: true,
             render: (_: any, record: Item, index: any) => {
-                <span>{record.value}&nbsp;{record.unit?record.unit:''}</span>
+                // <span>{record.value}&nbsp;{record.unit?record.unit:''}</span>
                 let inputNode = <Input onChange={(e)=>actionOnChange(e,record)} addonAfter={record?.unit || ''} />
                 // const inputNode = inputType === 'number' ? <InputNumber /> : <Input />;
                 switch(record.valueType){
@@ -270,10 +270,10 @@ const ConfigService:React.FC<{serviceId: number}> = ( {serviceId} )=>{
         return {
           ...col,
         };
-      });
+    });
 
     
-      const handleOk = () => {
+    const handleOk = () => {
         // console.log(form.getFieldsValue());
         addConfigForm
           .validateFields()
@@ -298,12 +298,12 @@ const ConfigService:React.FC<{serviceId: number}> = ( {serviceId} )=>{
           .catch((err) => {
             console.log('err: ', err);
           });
-      };
+    };
     
-      const handleCancel = () => {
+    const handleCancel = () => {
         addConfigForm.resetFields()
         setIsModalOpen(false);
-      };
+    };
 
     const getFormInitData = (listdata: any[]) => {
         let formList:{ [key: string]: any } = {}
@@ -390,9 +390,9 @@ const ConfigService:React.FC<{serviceId: number}> = ( {serviceId} )=>{
                                 disabled={!serviceId || loading}
                                 onClick={() => {
                                     setCurrentConfList(cloneDeep(initConfList))
+                                    setFilterTableList(handleFiflterTableData(currentTag,currentFile,cloneDeep(initConfList)))
                                     // console.log('--initConfList:', initConfList, getFormInitData(initConfList||[]));
                                     form.setFieldsValue(getFormInitData(initConfList||[]))
-                                    // form.resetFields();
                                     setIsEditMode(false)
                                 }}
                             >
