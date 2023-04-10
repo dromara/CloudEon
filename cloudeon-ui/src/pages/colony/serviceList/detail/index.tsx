@@ -230,7 +230,7 @@ const serviceListDetail: React.FC = () => {
                 </Button>
               </Popconfirm>
               <Popconfirm
-                    key='updatePop'
+                    key='deletePop'
                     title="确定要删除吗?"
                     onConfirm={()=>handleACT('delete')}
                     okText="确定"

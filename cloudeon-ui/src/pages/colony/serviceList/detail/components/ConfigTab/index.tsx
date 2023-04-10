@@ -3,6 +3,7 @@ import styles from './index.less'
 import React, { useState, useEffect, useRef } from 'react';
 import { Menu, Form, Table, Button, Typography, Popconfirm, InputNumber, Input, Tooltip, Modal, Select, Slider, Switch, message } from 'antd';
 import { getServiceConfAPI, getListConfsAPI, saveServiceConfAPI } from '@/services/ant-design-pro/colony';
+import { QuestionCircleFilled } from '@ant-design/icons';
 const { TextArea } = Input;
 import {cloneDeep} from 'lodash'
 
@@ -13,28 +14,19 @@ const ConfigService:React.FC<{serviceId: number}> = ( {serviceId} )=>{
     const [currentConfList, setCurrentConfList] = useState<any[]>();
     const [loading, setLoading] = useState(false);
     // const [serviceId, setServiceId] = useState(null);
-    const [editingKey, setEditingKey] = useState('');
+    // const [editingKey, setEditingKey] = useState('');
     const [isEditMode, setIsEditMode] = useState(false);
     // const [confData, setConfData] = useState({});
     const [addConfigForm] = Form.useForm()
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [customFileNames, setCustomFileNamesData] = useState<any>(); // 当前服务的配置文件
     const [currentNames, setCurrentNames] = useState<any[]>([]); // 当前服务的所有配置项名称，用来校验新增自定义配置的时候配置项名称重复
+    const [fileGroupMap, setFileGroupMap] = useState<any>(); // 配置文件名和tag的json数据
+    const [fileNameList, setFileList] = useState<any[]>(); // 配置文件名数组
+    const [currentFile, setCurrentFile] = useState<any>('全部'); // 当前选中的配置文件tab
+    const [currentTag, setCurrentTag] = useState<any>(); // 当前选中的标签tag
+    const [filterTableList, setFilterTableList] = useState<any[]>(); // 过滤后的table数据
     
-    // const getData = JSON.parse(sessionStorage.getItem('colonyData') || '{}')
-
-    // const serviceMenu = getData.selectedServiceList.map((sItem: { label: any; id: any; })=>{
-    //     return {
-    //         label: sItem.label,
-    //         key: sItem.id + '',
-    //     }
-    // })|| []
-
-    // const updateConfig = (value:any) => {
-    //     sessionStorage.setItem('allConfData', JSON.stringify(value))
-    //     setConfData(value)
-    // }
-
 
     useEffect(()=>{
         getConfListData()
@@ -43,103 +35,70 @@ const ConfigService:React.FC<{serviceId: number}> = ( {serviceId} )=>{
 
     const getConfListData = async () => {
         const params = {serviceInstanceId: serviceId}
-        // if(confData && confData[params.serviceId]){
-        //     setCurrentConfList(confData[params.serviceId])
-        //     setCurrentNames(confData[params.serviceId].map((item: { name: any; })=>{return item.name}))
-        //     const customFileNamesObj = JSON.parse(sessionStorage.getItem('customFileNamesObj') || '{}') 
-        //     setCustomFileNamesData(customFileNamesObj[params.serviceId] || [])
-        //     return
-        // }else{
-            setLoading(true)
-            const result: API.ConfList =  await getListConfsAPI(params);
-            setLoading(false)
-            const confs = result?.data?.confs?.map((item,index)=>{
-                // console.log('item: ', item, 'index:', index);
-                    return {
-                        sourceValue: item.valueType == "Switch" ? eval(item.recommendExpression||'false') : item.recommendExpression,
-                        ...item,
-                        value: item.valueType == "Switch" ? eval(item.value||'false') : item.value,
-                        recommendExpression: item.valueType == "Switch" ? eval(item.recommendExpression||'false') : item.recommendExpression,
-                    }
-                })
-            // const deepCf = JSON.parse(JSON.stringify(confs))
-            setInitConfList(cloneDeep(confs))
-            setCurrentConfList(cloneDeep(confs))
-            setCurrentNames(confs?.map((item2)=>{return item2.name}) || [])
-            const customFileNames = result?.data?.customFileNames
-            setCustomFileNamesData(customFileNames)
-            // const customFileNamesObj = JSON.parse(sessionStorage.getItem('customFileNamesObj') || '{}') 
-            // customFileNamesObj[params.serviceId] = result?.data?.customFileNames
-            // sessionStorage.setItem('customFileNamesObj', JSON.stringify(customFileNamesObj))
-            // setCustomFileNamesData(result?.data?.customFileNames || [])
-            // let confResult = {...(confData||{}),[params.serviceId]:confs}
-            // updateConfig(confResult)
-        // }
-      };
-
-    // const onSelectService = function(value: any){
-    //     // if(serviceId){// 保存切换前的数据
-    //     //     let confResult = {...confData,[serviceId]:currentConfList}
-    //     //     updateConfig(confResult)
-    //     // }
-    //     setServiceId(value.key)
-    //     const params = {
-    //         serviceId: value.key,
-    //         inWizard: true
-    //     }
-    //     getConfListData(params)
-    // }
-
-    // const isEditing = (record: Item) => record.name === editingKey;
-
-    // const edit = (record: Item) => {
-    //     form.setFieldsValue({ ...record });
-    //     setEditingKey(record.name || '');
-    // };
-    
-    // const cancel = () => {
-    //     setEditingKey('');
-    // };
+        setLoading(true)
+        const result: API.ConfList =  await getListConfsAPI(params);
+        setLoading(false)
+        const confs = result?.data?.confs?.map((item,index)=>{
+            // console.log('item: ', item, 'index:', index);
+                return {
+                    sourceValue: item.valueType == "Switch" ? eval(item.recommendExpression||'false') : item.recommendExpression,
+                    ...item,
+                    value: item.valueType == "Switch" ? eval(item.value||'false') : item.value,
+                    recommendExpression: item.valueType == "Switch" ? eval(item.recommendExpression||'false') : item.recommendExpression,
+                }
+            })
+        setInitConfList(cloneDeep(confs))
+        setCurrentConfList(cloneDeep(confs))
+        setFilterTableList(handleFiflterTableData(currentTag,currentFile,cloneDeep(confs)))
+        setCurrentNames(confs?.map((item2)=>{return item2.name}) || [])
+        const customFileNames = result?.data?.customFileNames
+        setCustomFileNamesData(customFileNames)
+        const fileMap = result?.data?.fileGroupMap
+        let files = []
+        for(let key in fileMap){
+            files.push(key)
+        }
+        setFileGroupMap(fileMap)
+        setFileList(files)
+        setCurrentFile(files[0])
+    };
 
     const handleDelete = (record: Item) => {
-        const newData = [...(JSON.parse(JSON.stringify(currentConfList))||[])];
+        // 处理总配置数据的删除
+        const newData = cloneDeep(currentConfList || []);
         const index = newData.findIndex(item => record.name === item.name);
         if(index > -1){
             newData.splice(index,1)
             console.log('--newData: ', newData);
-            
             setCurrentConfList(newData);
+        }
+        // 处理当前过滤数据的删除
+        const filterData = cloneDeep(filterTableList || []);
+        const filterIndex = filterData.findIndex(item => record.name === item.name);
+        if(filterIndex > -1){
+            filterData.splice(filterIndex,1)
+            setFilterTableList(filterData)
         }
     }
 
     const resetSource = (record: Item, index:number) => {
-        console.log('---record: ', record);
+        // console.log('---record: ', record);
         record.value = record.recommendExpression
         setCurrentConfList(JSON.parse(JSON.stringify(currentConfList)));
-        console.log('---currentConfList: ', currentConfList);
-        form.setFieldValue(`${index}-value`, record.recommendExpression)
-        // const row = {...record, value: record.recommendExpression}
-        // const newData = [...(currentConfList||[])];
-        // const index = newData.findIndex(item => row.name === item.name);
-        // dealItemData(index,newData,row)
-        
+        // console.log('---currentConfList: ', currentConfList);
+        form.setFieldValue(`${record.name}-value`, record.recommendExpression)
     }
 
-    // const addRow = (row:any) => {
-    //     let newData = [...(currentConfList||[])];
-    //     newData.push(row)
-    //     setCurrentConfList(newData);
-    // }
-
     const submitEdit = async() => {
-        const presetConfList = currentConfList?.filter(f=> !f.isCustomConf).map(item=>{
+        const curConfList = saveCurrentTable() || currentConfList; // 获取最新修改后的数据
+        const presetConfList = curConfList?.filter(f=> !f.isCustomConf).map(item=>{
             return {
                 name: item.name,
                 value: item.value,
                 id: item.id,
             }
         })
-        const customConfList = currentConfList?.filter(f=> f.isCustomConf).map(item=>{
+        const customConfList = curConfList?.filter(f=> f.isCustomConf).map(item=>{
             return {
                 name: item.name,
                 value: item.value,
@@ -155,44 +114,14 @@ const ConfigService:React.FC<{serviceId: number}> = ( {serviceId} )=>{
         }
         console.log('---params:', params);
         
-        const result = await saveServiceConfAPI(params)
-        if(result && result.success){
-            message.success('保存成功')
-            setIsEditMode(false)
-            getConfListData()
-          }
+        // const result = await saveServiceConfAPI(params)
+        // if(result && result.success){
+        //     message.success('保存成功')
+        //     setIsEditMode(false)
+        //     getConfListData()
+        // }
 
     }
-
-    // const save = async (key: React.Key) => {        
-    //     try {
-    //         const row = (await form.validateFields()) as Item;
-    //         const newData = [...(currentConfList||[])];
-    //         const index = newData.findIndex(item => key === item.name);
-    //         dealItemData(index,newData,row)
-    //     } catch (errInfo) {
-    //         console.log('Validate Failed:', errInfo);
-    //     }
-    // }
-
-    // const dealItemData = (index:number,newData:any[],row:any) =>{
-    //     if (index > -1) {
-    //         const item = newData[index];
-    //         newData.splice(index, 1, {
-    //             ...item,
-    //             ...row,
-    //         });
-    //         setCurrentConfList(newData);
-    //         setEditingKey('');
-    //     }else{
-    //         newData.push(row);
-    //         setCurrentConfList(newData);
-    //         setEditingKey('');
-    //     }
-    //     // let confResult = serviceId ? {...confData,[serviceId]:newData} : {...confData}
-    //     // updateConfig(confResult)
-    // }
-
     interface Item {
         id?: number;
         value?: any;
@@ -209,82 +138,11 @@ const ConfigService:React.FC<{serviceId: number}> = ( {serviceId} )=>{
         description: string
     }
 
-    // interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
-    //     editing: boolean;
-    //     dataIndex: string;
-    //     title: any;
-    //     inputType: 'InputNumber' | 'InputString' | 'Slider' | 'Switch' | 'Select';
-    //     record: Item;
-    //     index: number;
-    //     children: React.ReactNode;
-    //   }
-
-    // const EditableCell: React.FC<EditableCellProps> = ({
-    //     editing,
-    //     dataIndex,
-    //     title,
-    //     inputType,
-    //     record,
-    //     index,
-    //     children,
-    //     ...restProps
-    //   }) => {
-    //     let inputNode = <Input addonAfter={record?.unit || ''} />
-    //     // const inputNode = inputType === 'number' ? <InputNumber /> : <Input />;
-    //     switch(inputType){
-    //         case 'InputNumber':
-    //             inputNode = <InputNumber max={record.max || Number.MAX_SAFE_INTEGER} min={record.min || Number.MIN_SAFE_INTEGER} addonAfter={record.unit || ''} />
-    //             ;break;
-    //         case 'InputString':;break;
-    //         case 'Slider':
-    //             inputNode = <Slider max={record.max || 100} min={record.min || 0} />
-    //             ;break;
-    //         case 'Switch':
-    //             inputNode = <Switch />
-    //             ;break;
-    //         case 'Select':
-    //             inputNode = 
-    //                     <Select
-    //                             style={{ width: 120 }}
-    //                             options={
-    //                                 record.options.map((opItem: any)=>{
-    //                                     return { value: opItem, label: opItem }
-    //                                 })}
-    //                         />
-                        
-    //             ;break;
-    //     }
-      
-    //     return (
-    //       <td {...restProps} className={(record?.sourceValue != record?.recommendExpression && !editing && !record.isCustomConf) ? styles.hasEdited:''}>
-    //         {editing ? (
-    //           <Form.Item
-    //             name={dataIndex}
-    //             style={{ margin: 0 }}
-    //             rules={[
-    //               {
-    //                 required: true,
-    //                 message: `请输入 ${title}!`,
-    //               },
-    //             ]}
-    //           >
-    //             {inputNode}
-    //           </Form.Item>
-    //         ) : (
-    //           children
-    //         )}
-    //       </td>
-    //     );
-    //   };
-
-    // const actionBlur = (e:any, record: Item)=>{
-    //     console.log(e.target.value)
-    //     record.value = e.target.value
-    // }
-    const actionOnChange = (val:any, record: Item) => {
-        record.value = val
-        let cdata = currentConfList ? JSON.parse(JSON.stringify(currentConfList)) :[]
-        cdata && setCurrentConfList(cdata)
+    const actionOnChange = (e:any, record: Item) => {
+        // console.log('--val: ', e.target.value);        
+        record.value = e.target.value
+        let cdata = cloneDeep(filterTableList || [])
+        cdata && setFilterTableList(cdata)
     }
 
     const configColumns = [
@@ -292,20 +150,26 @@ const ConfigService:React.FC<{serviceId: number}> = ( {serviceId} )=>{
             title: '配置项',
             dataIndex: 'name',
             editable: false,
-        },{
-            title: '配置类型',
-            dataIndex: 'isCustomConf',
-            width: 110,
-            editable: false,
+            // width: 300,
             render: (_: any, record: Item)=>{
-                return (record.isCustomConf?'自定义配置':'预设配置')
+                return (
+                    <span>
+                        {record.name} 
+                        {record.description? <Tooltip title={record.description}><QuestionCircleFilled style={{marginLeft:'5px'}} /></Tooltip>:''}
+                    </span>
+                )
             }
-        },{
-            title: '配置文件',
-            dataIndex: 'confFile',
-            width: 120,
-            editable: false,
-        },{
+        },
+        // {
+        //     title: '配置类型',
+        //     dataIndex: 'isCustomConf',
+        //     width: 110,
+        //     editable: false,
+        //     render: (_: any, record: Item)=>{
+        //         return (record.isCustomConf?'自定义配置':'预设配置')
+        //     }
+        // },
+        {
             title: '值',
             dataIndex: 'value',
             editable: true,
@@ -338,7 +202,7 @@ const ConfigService:React.FC<{serviceId: number}> = ( {serviceId} )=>{
                 }
                   return  isEditMode?(
                     <Form.Item
-                        name={`${index}-value`}
+                        name={`${record.name}-value`}
                         initialValue={record.value}
                         // key={record.name}
                         style={{ margin: 0 }}
@@ -353,23 +217,31 @@ const ConfigService:React.FC<{serviceId: number}> = ( {serviceId} )=>{
                     </Form.Item>                    
                   ):(<> <span>{record.valueType == "Switch" ?record.value.toString() : record.value}&nbsp;{record.unit?record.unit:''}</span> </>)
             },
-        },{
-            title: '描述',
-            dataIndex: 'description',
+        },
+        {
+            title: '配置文件',
+            dataIndex: 'confFile',
+            // width: 200,
             editable: false,
-            render: (_: any, record: Item)=>{
-                return (record.description||'-')
-            }
-        },{
+        },
+        // {
+        //     title: '描述',
+        //     dataIndex: 'description',
+        //     editable: false,
+        //     render: (_: any, record: Item)=>{
+        //         return (record.description||'-')
+        //     }
+        // },
+        {
             title: '操作',
-            width: 120,
+            width: 180,
             dataIndex: 'operation',
             render: (_: any, record: Item, index:any) => {
                 let resultDom1 = <></>
                 let resultDom2 = <></>
                 const formData = form.getFieldsValue(true)
                 if(isEditMode){
-                    if(formData[`${index}-value`] != record.recommendExpression && !record.isCustomConf){
+                    if(formData[`${record.name}-value`] != record.recommendExpression && !record.isCustomConf){
                         resultDom1 = (<div style={{marginRight: '5px'}}>
                             <Popconfirm title="确定恢复到初始值吗?" onConfirm={()=>resetSource(record,index)}>
                                 <a >恢复初始值</a>
@@ -388,41 +260,8 @@ const ConfigService:React.FC<{serviceId: number}> = ( {serviceId} )=>{
                     }
                 }
                 return <>{resultDom1}{resultDom2}</>
-                // console.log('record',record);
-                // const editable = isEditing(record);
-                // return editable ? (
-                //     <span>
-                //     <Typography.Link onClick={() => save(record.name)} style={{ marginRight: 8 }}>
-                //         确定
-                //     </Typography.Link>
-                //     <Typography.Link onClick={() => cancel()}>
-                //         取消
-                //     </Typography.Link>
-                //     {/* <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
-                //         <a>取消</a>
-                //     </Popconfirm> */}
-                //     </span>
-                // ) : (
-                //     <div className={styles.actionBtnWrap}>
-                //         <Typography.Link disabled={editingKey !== ''} style={{marginRight: '20px'}} onClick={() => edit(record)}>
-                //         编辑
-                //         </Typography.Link>
-                //         {
-                //             !record.isCustomConf?
-                //             (record.sourceValue != record.recommendExpression) && (
-                //                 <Popconfirm title="确定恢复到初始值吗?" onConfirm={()=>resetSource(record)}>
-                //                     <a>恢复初始值</a>
-                //                 </Popconfirm>
-                //             ):(
-                //                 <Popconfirm title="确定删除吗?" onConfirm={()=>handleDelete(record)}>
-                //                     <a>删除</a>
-                //                 </Popconfirm>
-                //             )
-                //         }
-                //     </div>
-                // );
             },
-          },
+        },
     ]
 
     const mergedColumns = configColumns.map(col => {
@@ -431,13 +270,6 @@ const ConfigService:React.FC<{serviceId: number}> = ( {serviceId} )=>{
         }
         return {
           ...col,
-        //   onCell: (record: Item) => ({
-        //     record,
-        //     inputType: record.valueType,//'text', //col.dataIndex === 'age' ? 'number' : 'text',
-        //     dataIndex: col.dataIndex,
-        //     title: col.title,
-        //     editing: isEditMode,//isEditing(record),
-        //   }),
         };
       });
 
@@ -448,7 +280,7 @@ const ConfigService:React.FC<{serviceId: number}> = ( {serviceId} )=>{
           .validateFields()
           .then(async (values) => {
             const row = {...values, isCustomConf: true, recommendExpression: values.value};
-            const newData = currentConfList||[];
+            const newData = cloneDeep(currentConfList||[]);
             const index = newData.findIndex(item => values.name === item.name);
             if(index == -1){
                 const params = [...currentNames, values.name]
@@ -457,6 +289,11 @@ const ConfigService:React.FC<{serviceId: number}> = ( {serviceId} )=>{
             // dealItemData(index,newData,row)
             newData.push(row)
             setCurrentConfList(newData);
+            if(values.confFile == currentFile){
+                let filterData = cloneDeep(filterTableList||[])
+                filterData?.push(row)
+                setFilterTableList(filterData)
+            }
             setIsModalOpen(false)
           })
           .catch((err) => {
@@ -472,29 +309,54 @@ const ConfigService:React.FC<{serviceId: number}> = ( {serviceId} )=>{
     const getFormInitData = (listdata: any[]) => {
         let formList:{ [key: string]: any } = {}
         for(let i =0;i<listdata.length;i++){
-            formList[`${i}-value`] = listdata[i].value
+            formList[`${listdata[i].name}-value`] = listdata[i].value
         }
         return formList
-        // let formList = []
-        // for(let i =0;i<listdata.length;i++){
-        //     formList.push(listdata[i].value)
-        // }
-        // return formList
+    }
+
+    // 处理过滤数据怎么得到的，从总数据过滤得到
+    const handleFiflterTableData = (tag: string, fileName: string, confListData?:any[])=>{
+        const confList = confListData || currentConfList
+        if(fileName == '全部' && !tag){
+            return confList
+        }else if(fileName == '全部' && tag){
+            let arr = confList?.filter(item=>{
+                return item.tag == tag
+            })
+            return arr
+        }else if(fileName != "全部" && !tag){
+            let arr = confList?.filter(item=>{
+                return item.confFile == fileName
+            })
+            return arr
+        }else{
+            let arr = confList?.filter(item=>{
+                return item.confFile == fileName && item.tag == tag
+            })
+            return arr
+        }
+    }
+
+    const saveCurrentTable = () => {
+        if(filterTableList && currentConfList){
+            let newData = cloneDeep(currentConfList)
+            for(let i = 0; i < filterTableList?.length; i++){
+                let filterItem = filterTableList[i]
+                let index = currentConfList.findIndex(item=>{ return item.name == filterItem.name})
+                if(index > -1){
+                    newData[index] = filterItem
+                }else{
+                    newData.push(filterItem)
+                }
+            }
+            setCurrentConfList(newData);
+            return newData
+        }
+        return ''
     }
 
     return (
         <div className={styles.ConfigTabLayout}>
-            {/* <div className={styles.CSLeft}>
-                {serviceMenu && serviceMenu[0] && serviceMenu[0].key && (
-                    <Menu 
-                        mode="inline" 
-                        items={serviceMenu} 
-                        defaultSelectedKeys={[serviceMenu[0].key]}
-                        className={styles.CSLeftMenu} 
-                        onSelect={onSelectService} 
-                    />
-                )}
-            </div> */}
             <div className={styles.CSRight}>
                 <div className={styles.btnsBar}>
                     {
@@ -552,7 +414,66 @@ const ConfigService:React.FC<{serviceId: number}> = ( {serviceId} )=>{
                         </>)
                     }
                 </div>
-                <div>
+                <div className={styles.fileTabLayout}>
+                    <div className={styles.fileTabBar}>
+                        {fileNameList?.map(item => {
+                            return (
+                                <div 
+                                    key={item} 
+                                    className={`${styles.fileTabItem} ${currentFile == item ? styles.active:''}`} 
+                                    onClick={()=>{
+                                        setCurrentTag('')
+                                        setCurrentFile(item)
+                                        setFilterTableList(handleFiflterTableData('',item))
+                                        saveCurrentTable()
+                                    }}
+                                >
+                                    {item}
+                                </div>
+                            )
+                        })}
+                    </div>
+                    <div className={styles.fileTabContent}>
+                        <div className={styles.tagListWrap}>
+                            {
+                                fileGroupMap && fileGroupMap[currentFile] && fileGroupMap[currentFile].map((item:any)=>{
+                                    return (
+                                        <div 
+                                            key={item} 
+                                            className={`${styles.tagItem} ${currentTag == item ? styles.activeTag:''}`}
+                                            onClick={()=>{
+                                                setCurrentTag(item)
+                                                setFilterTableList(handleFiflterTableData(item,currentFile))
+                                                saveCurrentTable()
+                                            }}
+                                        >
+                                                {item}
+                                        </div>
+                                    )
+                                })
+                            }
+                        </div>
+                        <div className={styles.fileTabTable}>
+                            <div>
+                            <Form form={form} component={false}>
+                                <Table
+                                    scroll={{
+                                        y:600
+                                    }}
+                                    rowKey="name" // 以为新增的自定义配置项没有id，所以不能使用id
+                                    pagination={false}
+                                    bordered
+                                    loading={loading}
+                                    dataSource={filterTableList}
+                                    columns={mergedColumns}
+                                    rowClassName="editable-row"
+                                />
+                            </Form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {/* <div>
                 <Form form={form} component={false}>
                     <Table
                         // components={{
@@ -572,7 +493,7 @@ const ConfigService:React.FC<{serviceId: number}> = ( {serviceId} )=>{
                         rowClassName="editable-row"
                     />
                 </Form>
-                </div>
+                </div> */}
             </div>
             <Modal
                 key="addconfigmodal"

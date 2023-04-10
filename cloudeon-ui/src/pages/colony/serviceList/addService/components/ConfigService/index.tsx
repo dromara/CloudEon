@@ -300,14 +300,13 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( {setPresetCon
             dataIndex: 'name',
             editable: false,
             render: (_: any, record: Item)=>{
-                return (<>
-                <span>
-                    {record.name} 
-                    {record.description? <Tooltip title={record.description}><QuestionCircleFilled style={{marginLeft:'5px'}} /></Tooltip>:''}
-                </span>
-              </>)
+                return (
+                    <span>
+                        {record.name} 
+                        {record.description? <Tooltip title={record.description}><QuestionCircleFilled style={{marginLeft:'5px'}} /></Tooltip>:''}
+                    </span>
+                )
             }
-            
         },
         // {
         //     title: '配置类型',
@@ -504,7 +503,7 @@ const ConfigService:React.FC<{setPresetConfListToParams: any}> = ( {setPresetCon
                                                 setFilterTableList(handleFiflterTableData(item,currentFile))
                                             }}
                                         >
-                                                {item}
+                                            {item}
                                         </div>
                                     )
                                 })
