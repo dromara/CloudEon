@@ -15,7 +15,7 @@ const ConfigService:React.FC<{serviceId: number}> = ( {serviceId} )=>{
     const [loading, setLoading] = useState(false);
     // const [serviceId, setServiceId] = useState(null);
     // const [editingKey, setEditingKey] = useState('');
-    const [isEditMode, setIsEditMode] = useState(false);
+    const [isEditMode, setIsEditMode] = useState(false); // 是否是编辑模式
     // const [confData, setConfData] = useState({});
     const [addConfigForm] = Form.useForm()
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -114,13 +114,12 @@ const ConfigService:React.FC<{serviceId: number}> = ( {serviceId} )=>{
         }
         console.log('---params:', params);
         
-        // const result = await saveServiceConfAPI(params)
-        // if(result && result.success){
-        //     message.success('保存成功')
-        //     setIsEditMode(false)
-        //     getConfListData()
-        // }
-
+        const result = await saveServiceConfAPI(params)
+        if(result && result.success){
+            message.success('保存成功')
+            setIsEditMode(false)
+            getConfListData()
+        }
     }
     interface Item {
         id?: number;
