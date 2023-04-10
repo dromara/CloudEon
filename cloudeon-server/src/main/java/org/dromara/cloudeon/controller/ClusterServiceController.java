@@ -356,6 +356,7 @@ public class ClusterServiceController {
                 ServiceInstanceConfigEntity serviceInstanceConfigEntity = new ServiceInstanceConfigEntity();
                 BeanUtil.copyProperties(initServiceCustomConf, serviceInstanceConfigEntity);
                 serviceInstanceConfigEntity.setCustomConf(true);
+                serviceInstanceConfigEntity.setTag("自定义");
                 serviceInstanceConfigEntity.setCreateTime(new Date());
                 serviceInstanceConfigEntity.setUpdateTime(new Date());
                 serviceInstanceConfigEntity.setServiceInstanceId(serviceInstanceEntityId);
