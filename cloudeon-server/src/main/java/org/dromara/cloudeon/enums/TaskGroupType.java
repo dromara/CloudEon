@@ -25,6 +25,7 @@ public enum TaskGroupType {
     START_ROLE(13, "启动服务的角色实例", Lists.newArrayList(TaskType.TAG_HOST,TaskType.SCALE_UP_K8S_SERVICE), true),
     UPDATE_SERVICE_STATE(14, "更新服务实例状态", Lists.newArrayList(TaskType.UPDATE_SERVICE_STATE), false),
     INIT_HIVE(15, "初始化HIVE", Lists.newArrayList(TaskType.INIT_HIVE_METASTORE,TaskType.INIT_HIVE_WAREHOUSE), false),
+    INIT_SPARK(16, "初始化SPARK", Lists.newArrayList(TaskType.SPARK_HDFS_MKDIR), false),
 
     ;
 

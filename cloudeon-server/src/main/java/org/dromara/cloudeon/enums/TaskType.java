@@ -26,6 +26,7 @@ public enum TaskType {
     UPDATE_SERVICE_STATE(17, "更新服务实例状态", "org.dromara.cloudeon.processor.UpdateServiceStateTask", false),
     INIT_HIVE_WAREHOUSE(17, "初始化hive仓库文件目录", "org.dromara.cloudeon.processor.InitHiveWarehouseTask", false),
     INIT_HIVE_METASTORE(18, "初始化hive Metastore", "org.dromara.cloudeon.processor.InitHiveMetastoreTask", false),
+    SPARK_HDFS_MKDIR(19, "HDFS上创建Spark History目录", "org.dromara.cloudeon.processor.InitSparkHistoryDirOnHDFSTask", false),
 
 
 
