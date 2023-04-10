@@ -24,6 +24,7 @@ const serviceAdd: React.FC = () => {
   const [serviceInfos, setServiceInfos] = useState<API.ServiceInfosItem[]>()
   const [rolesAllNodeIds, setRolesAllNodeIds] = useState<API.rolesValidResult>() //获取所有角色的推荐节点
   const [checkRoleParNext, setCheckRoleParNext] = useState(true); // 判断分配角色的按钮是否disabled
+  const [checkCofParNext, setCheckCofParNext] = useState(true);
   // const [warnInfo, setWarnInfo] = useState<any[]>([]); // 校验角色配置选择
   const [errInfo, setErrInfo] = useState<any[]>([]); // 校验角色配置选择
 
@@ -148,7 +149,7 @@ const serviceAdd: React.FC = () => {
           presetConfData[key].push({
             name: item.name,
             recommendedValue: item.sourceValue,
-            value: item.recommendExpression
+            value: item.value
           })
         }
       })
@@ -209,7 +210,7 @@ const serviceAdd: React.FC = () => {
         return checkRoleParNext
       ;break;
       case 2:
-        return true
+        return checkCofParNext;
       ;break;
       case 3:
         return true
@@ -326,6 +327,10 @@ const serviceAdd: React.FC = () => {
     return errList && errList.length > 0 ? false : true
   }
 
+  const checkConfNext = (val:any) => {
+    setCheckCofParNext(val)
+  }
+
   useEffect(() => {
     getServiceData({ clusterId: colonyData.clusterId });
   }, []);
@@ -347,7 +352,7 @@ const serviceAdd: React.FC = () => {
             {(current == 0 && serviceListData ) && <ChooseService serviceList={serviceListData} changeStatus={changeStatus} />}
             {/* { current == 1 && <ConfigSecurity selectListIds={selectListIds || []} setKerberosToParams={setKerberosToParams} />} */}
             { current == 1 && <AssignRoles serviceList={ getSelectedService() || [] } sourceServiceInfos={serviceInfos || []} setServiceInfosToParams={setServiceInfosToParams} checkAllRolesRules={checkAllRolesRules} parentLoading={loading} /> }
-            { current == 2 && <ConfigService setPresetConfListToParams={setPresetConfListToParams} />}
+            { current == 2 && <ConfigService checkConfNext={checkConfNext} />}
             <div className={styles.stepBottomBtns}>
               <Button style={{ marginRight: '5px' }}               
                 onClick={()=>{
@@ -398,7 +403,7 @@ const serviceAdd: React.FC = () => {
                     
                   } else if(current == 2){ // 安装
                     const resultParams = await setPresetConfListToParams()
-                    console.log('---resultParams: ', resultParams);
+                    // console.log('---resultParams: ', resultParams);
                     
                     let initParams = {
                       ...resultParams, 
@@ -422,8 +427,8 @@ const serviceAdd: React.FC = () => {
                         }
                       })
                     }
+                    console.log('--initParams: ', initParams);
                     installService(initParams)
-                    // console.log('--initParams: ', initParams);
 
                   }else{
                     setCurrent(current + 1);

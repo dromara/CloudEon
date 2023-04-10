@@ -10,7 +10,7 @@ import {cloneDeep} from 'lodash'
 const ConfigService:React.FC<{serviceId: number}> = ( {serviceId} )=>{
 
     const [form] = Form.useForm()
-    const [initConfList, setInitConfList] = useState<any[]>();
+    const [initConfList, setInitConfList] = useState<any[]>(); // 保存编辑前的数据，取消的时候可以恢复编辑前数据
     const [currentConfList, setCurrentConfList] = useState<any[]>();
     const [loading, setLoading] = useState(false);
     // const [serviceId, setServiceId] = useState(null);

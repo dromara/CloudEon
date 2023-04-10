@@ -24,6 +24,9 @@
         display: flex;
         margin: 0 0 10px;
         justify-content: flex-start;
+        :not(:last-child){
+            margin-right: 10px;
+        }
     }
     .actionBtnWrap{
         display: flex;
@@ -130,6 +133,9 @@
             .ant-menu-title-content{
                 height: 40px !important;
             }
+        }
+        .ant-input-number-group-wrapper{
+            width: 100%;
         }
     }
 }
