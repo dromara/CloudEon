@@ -729,7 +729,7 @@ public class ClusterServiceController {
         ArrayList<String> customFileNames = ListUtil.toList(stackServiceEntity.getCustomConfigFiles().split(","));
 
         Map<String, List<String>> treeMap = new LinkedHashMap<>();        // all tags
-        List<String> allTags = serviceConfigurations.stream().map(e -> e.getTag()).collect(Collectors.toList());
+        List<String> allTags = serviceConfigurations.stream().map(e -> e.getTag()).distinct().collect(Collectors.toList());
         treeMap.put("全部", allTags);
         // fileGroup tags
         Map<String, List<ServiceConfiguration>> collect = serviceConfigurations.stream().filter(e->StrUtil.isNotBlank(e.getConfFile())).collect(Collectors.groupingBy(ServiceConfiguration::getConfFile));
