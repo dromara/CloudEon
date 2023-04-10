@@ -49,7 +49,7 @@ configurations:
     configurableInWizard: true
     description: "metastore依赖数据库的jdbc驱动类"
     confFile:  "hive-site.xml"
-    tag: "端口"
+    tag: "常用参数"
 
   - name: "javax.jdo.option.ConnectionUserName"
     recommendExpression: "root"
@@ -57,7 +57,7 @@ configurations:
     configurableInWizard: true
     description: "metastore依赖数据库的登录账户"
     confFile:  "hive-site.xml"
-    tag: "端口"
+    tag: "常用参数"
 
   - name: "javax.jdo.option.ConnectionPassword"
     recommendExpression: "bigdata"
@@ -65,7 +65,7 @@ configurations:
     configurableInWizard: true
     description: "metastore依赖数据库的登录密码"
     confFile:  "hive-site.xml"
-    tag: "端口"
+    tag: "常用参数"
 
   - name: "javax.jdo.option.ConnectionURL"
     recommendExpression: "jdbc:mysql://10.81.17.8:33066/hive_db_ce?createDatabaseIfNotExist=true&amp;useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"
@@ -73,7 +73,7 @@ configurations:
     configurableInWizard: true
     description: "metastore依赖数据库的jdbc访问地址"
     confFile:  "hive-site.xml"
-    tag: "端口"
+    tag: "常用参数"
 
   - name: "hive.server2.enable.doAs"
     recommendExpression: "false"
