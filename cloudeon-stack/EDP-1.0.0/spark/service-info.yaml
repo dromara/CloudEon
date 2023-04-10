@@ -6,7 +6,7 @@ dockerImage: "registry.cn-hangzhou.aliyuncs.com/udh/spark:3.2.3"
 dependencies:
     - "HDFS"
     - "YARN"
-    - "Hive"
+    - "HIVE"
 
 runAs: spark
 
@@ -22,6 +22,7 @@ roles:
     sortNum: 1
     type: MASTER
     minNum : 1
+    logFile: "spark-spark-org.apache.spark.sql.hive.thriftserver.HiveThriftServer2-1-${localhostname}.out"
 
   - name: SPARK_HISTORY_SERVER
     label: "Spark History Server"
@@ -29,11 +30,14 @@ roles:
     sortNum: 2
     type: MASTER
     minNum: 1
+    linkExpression: "http://${localhostname}:${conf['spark.history.ui.port']}"
+    logFile: "spark-spark-org.apache.spark.deploy.history.HistoryServer-1-${localhostname}.out"
 
 persistencePaths:
   - /opt/edp/${service.serviceName}/conf
   - /opt/edp/${service.serviceName}/log
   - /opt/edp/${service.serviceName}/data
+  - /opt/edp/${service.serviceName}/data/local
 
 
 customConfigFiles:
@@ -81,8 +85,8 @@ configurations:
     tag: "常用参数"
 
   - name: "spark.history.fs.logDirectory"
-    recommendExpression: "/app/spark/history"
-    valueType: inputString
+    recommendExpression: "hdfs:///app/spark/history"
+    valueType: InputString
     configurableInWizard: true
     description: "spark history server的日志目录"
     confFile:  "spark-defaults.conf"
@@ -105,7 +109,7 @@ configurations:
     tag: "常用参数"
 
   - name: "spark.eventLog.dir"
-    recommendExpression: "/app/spark/history"
+    recommendExpression: "hdfs:///app/spark/history"
     valueType: InputString
     configurableInWizard: true
     description: "spark event log的目录"

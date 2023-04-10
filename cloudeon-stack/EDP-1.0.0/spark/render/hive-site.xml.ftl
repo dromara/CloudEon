@@ -1,3 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+
 <#macro property key value>
     <property>
         <name>${key}</name>

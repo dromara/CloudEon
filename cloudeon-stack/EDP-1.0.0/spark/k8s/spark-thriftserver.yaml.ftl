@@ -45,6 +45,8 @@ spec:
         env:
           - name: "HADOOP_CONF_DIR"
             value: "/opt/edp/${service.serviceName}/conf"
+          - name: "USER"
+            value: "spark"
         image: "${dockerImage}"
         imagePullPolicy: "Always"
         readinessProbe:
