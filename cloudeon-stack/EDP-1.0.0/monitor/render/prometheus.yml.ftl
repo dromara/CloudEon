@@ -81,3 +81,9 @@ scrape_configs:
     metrics_path: '/metrics'
     file_sd_configs:
     - files: ['discovery_configs/doris.json']
+  - job_name: 'hivemetastore'
+    file_sd_configs:
+    - files: ['discovery_configs/metastore.json']
+  - job_name: 'hiveserver2'
+    file_sd_configs:
+    - files: ['discovery_configs/hiveserver2.json']
