@@ -21,7 +21,7 @@ export default {
     },
     '/apiPre/': {
       // 要代理的地址
-      target: `http://${devHost}`, // http://192.168.31.30:7700
+      target: `http://${devHost}`,
       changeOrigin: true,
       // pathRewrite: { '^/apiPre' : '' },
     },

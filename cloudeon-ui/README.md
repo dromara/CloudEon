@@ -7,28 +7,27 @@
 4. [React](https://zh-hans.reactjs.org/)
 5. [node](https://github.com/nodejs/node)，建议使用16.13.1版本 
 
-# 第一次启动项目
-1. cd web-ui
-2. 如果有node_modules和src/.umi文件夹，删除node_modules和src/.umi文件夹
-3. 安装tyarn：
+# 启动项目
+1. 第一次启动，如果有node_modules和src/.umi文件夹，建议删除node_modules和src/.umi文件夹
+2. 第一次启动，安装tyarn：
 ```bash
 npm install yarn tyarn -g
 ```
-4. 用tyarn安装依赖：
+3. 第一次启动，用tyarn安装依赖：
 ```bash
 tyarn
 ```
-5. 本地环境启动修改接口地址
+4. 问后端接口地址，本地环境启动修改接口地址
    在config/apiConfig.ts文件修改：
    ```bash
-    devHost = "192.168.31.30:7700" // 修改成要代理的地址
+    devHost = "XX.XX.XX.XX:7700" // 修改成要代理的地址
    ```
-6. 启动项目
+5. 启动项目的命令
 ```bash
 npm start
 ```
 
-7. 生产环境打包
+6. 生产环境打包
 ```bash
 npm run build
 ```
