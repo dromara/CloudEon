@@ -6,12 +6,13 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 
 
 @Data
 @Entity
-@Table(name = "ce_stack_alert_rule")
-public class StackAlertRuleEntity implements Serializable {
+@Table(name = "ce_alert_rule_define")
+public class ClusterAlertRuleEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
@@ -20,10 +21,8 @@ public class StackAlertRuleEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
     @GenericGenerator(name = "native", strategy = "native")    private Integer id;
-    /**
-     * 框架id
-     */
-    private Integer stackId;
+
+    private Integer clusterId;
 
     private String ruleName;
 
@@ -41,7 +40,15 @@ public class StackAlertRuleEntity implements Serializable {
 
     private String alertAdvice;
 
+    /**
+     * 开始时间
+     */
+    private Date createTime;
 
-   
+    private Date updateTime;
+
+
+
+
 
 }

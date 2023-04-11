@@ -1,12 +1,11 @@
 package org.dromara.cloudeon.controller;
 
+import cn.hutool.core.bean.BeanUtil;
 import org.dromara.cloudeon.controller.request.ModifyClusterInfoRequest;
 import org.dromara.cloudeon.controller.response.ClusterInfoVO;
-import org.dromara.cloudeon.dao.ClusterInfoRepository;
-import org.dromara.cloudeon.dao.ClusterNodeRepository;
-import org.dromara.cloudeon.dao.ServiceInstanceRepository;
-import org.dromara.cloudeon.dao.StackInfoRepository;
+import org.dromara.cloudeon.dao.*;
 import org.dromara.cloudeon.dto.ResultDTO;
+import org.dromara.cloudeon.entity.ClusterAlertRuleEntity;
 import org.dromara.cloudeon.entity.ClusterInfoEntity;
 import org.dromara.cloudeon.service.KubeService;
 import io.fabric8.kubernetes.client.KubernetesClient;
@@ -43,10 +42,18 @@ public class ClusterController {
 
     @Resource
     private ServiceInstanceRepository serviceInstanceRepository;
+
+    @Resource
+    StackAlertRuleRepository stackAlertRuleRepository;
+
+    @Resource
+    private ClusterAlertRuleRepository clusterAlertRuleRepository;
+
     @Resource
     private KubeService kubeService;
 
     @PostMapping("/save")
+    @Transactional(rollbackFor = Exception.class)
     public ResultDTO<Void> saveCluster(@RequestBody ModifyClusterInfoRequest req) {
 
         ClusterInfoEntity clusterInfoEntity;
@@ -71,6 +78,16 @@ public class ClusterController {
         clusterInfoEntity.setCreateBy(AdminUserName);
 
         clusterInfoRepository.saveAndFlush(clusterInfoEntity);
+        // 加载默认规则到集群中
+        stackAlertRuleRepository.findByStackId(stackId).forEach(stackAlertRuleEntity -> {
+            ClusterAlertRuleEntity clusterAlertRuleEntity = new ClusterAlertRuleEntity();
+            BeanUtil.copyProperties(stackAlertRuleEntity, clusterAlertRuleEntity);
+            clusterAlertRuleEntity.setClusterId(clusterInfoEntity.getId());
+            clusterAlertRuleEntity.setCreateTime(new Date());
+            clusterAlertRuleEntity.setUpdateTime(new Date());
+            clusterAlertRuleRepository.save(clusterAlertRuleEntity);
+        });
+
         return ResultDTO.success(null);
     }
 

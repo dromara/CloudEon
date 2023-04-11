@@ -4,19 +4,14 @@ import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.cloudeon.controller.response.ActiveAlertVO;
 import org.dromara.cloudeon.controller.response.HistoryAlertVO;
-import org.dromara.cloudeon.dao.AlertMessageRepository;
-import org.dromara.cloudeon.dao.ClusterNodeRepository;
-import org.dromara.cloudeon.dao.ServiceInstanceRepository;
-import org.dromara.cloudeon.dao.ServiceRoleInstanceRepository;
+import org.dromara.cloudeon.dao.*;
 import org.dromara.cloudeon.dto.*;
 import org.dromara.cloudeon.entity.AlertMessageEntity;
+import org.dromara.cloudeon.entity.ClusterAlertRuleEntity;
 import org.dromara.cloudeon.entity.ClusterNodeEntity;
 import org.dromara.cloudeon.entity.ServiceRoleInstanceEntity;
 import org.dromara.cloudeon.enums.AlertLevel;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -41,6 +36,8 @@ public class AlertController {
 
     @Resource
     private ClusterNodeRepository clusterNodeRepository;
+    @Resource
+    private ClusterAlertRuleRepository clusterAlertRuleRepository;
 
     /**
      * 接收alertmanager告警回调
@@ -65,7 +62,7 @@ public class AlertController {
                     String instance = labels.getInstance();
                     String hostname = instance.split(":")[0];
                     String serviceRoleName = labels.getServiceRoleName();
-                    log.info("根据告警信息查找服务角色：{} , hostname: {}",serviceRoleName,hostname);
+                    log.info("根据告警信息查找服务角色：{} , hostname: {}", serviceRoleName, hostname);
                     // 查询服务角色实例
                     ServiceRoleInstanceEntity serviceRoleInstanceEntity = roleInstanceRepository.findByServiceRoleNameAndClusterIdAndHostname(clusterId, serviceRoleName, hostname);
                     if (serviceRoleInstanceEntity == null) {
@@ -104,7 +101,7 @@ public class AlertController {
                 String startsAt = alert.getStartsAt();
                 AlertLabels labels = alert.getLabels();
                 String alertname = labels.getAlertname();
-                log.info("根据告警信息查找活跃告警, alertName:{} , startsAt: {}",alertname,startsAt);
+                log.info("根据告警信息查找活跃告警, alertName:{} , startsAt: {}", alertname, startsAt);
 
                 AlertMessageEntity alertMessageEntity = alertMessageRepository.findByFireTimeAndAlertName(startsAt, alertname);
                 if (alertMessageEntity != null) {
@@ -147,7 +144,7 @@ public class AlertController {
             }
         }).collect(Collectors.toList());
 
-        return ResultDTO.success(activeAlertVOS) ;
+        return ResultDTO.success(activeAlertVOS);
     }
 
     @GetMapping("/history")
@@ -176,7 +173,21 @@ public class AlertController {
             }
         }).collect(Collectors.toList());
 
-        return ResultDTO.success(historyAlertVOS) ;
+        return ResultDTO.success(historyAlertVOS);
     }
 
+    @GetMapping("/listRule")
+    public ResultDTO<List<ClusterAlertRuleEntity>> listRule(Integer clusterId) {
+        List<ClusterAlertRuleEntity> clusterAlertRuleEntities = clusterAlertRuleRepository.findByClusterId(clusterId);
+
+        return ResultDTO.success(clusterAlertRuleEntities);
+    }
+
+    @PostMapping("saveRule")
+    public ResultDTO<Void> saveRule(@RequestBody ClusterAlertRuleEntity clusterAlertRuleEntity) {
+
+        clusterAlertRuleRepository.save(clusterAlertRuleEntity);
+
+        return ResultDTO.success(null);
+    }
 }
