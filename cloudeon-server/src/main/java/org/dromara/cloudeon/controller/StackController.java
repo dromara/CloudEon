@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Lists;
 import org.dromara.cloudeon.controller.request.RoleAllocationRequest;
 import org.dromara.cloudeon.controller.request.ValidServicesDepRequest;
 import org.dromara.cloudeon.controller.response.AllocationRoleVO;
@@ -171,7 +172,7 @@ public class StackController {
         List<String> allTags = stackConfigurations.stream().map(e -> e.getTag()).distinct().collect(Collectors.toList());
         treeMap.put("全部", allTags);
         // fileGroup
-        Map<String, List<ServiceConfVO>> collect = stackConfigurations.stream().filter(e->StrUtil.isNotBlank(e.getConfFile())).collect(Collectors.groupingBy(ServiceConfVO::getConfFile));
+        Map<String, List<ServiceConfVO>> collect = stackConfigurations.stream().filter(e -> StrUtil.isNotBlank(e.getConfFile())).collect(Collectors.groupingBy(ServiceConfVO::getConfFile));
         Map<String, List<String>> fileGroup = collect.entrySet().stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey, // key使用原始key
@@ -258,4 +259,24 @@ public class StackController {
         return ResultDTO.success(null);
     }
 
+    @GetMapping("/mapStackServiceRoles")
+    public ResultDTO<Map<String, List<String>>> mapStackServiceRoles(Integer stackId) {
+        Map<String, List<String>> result = new HashMap<>();
+        List<StackServiceEntity> serviceEntities = serviceRepository.findByStackId(stackId);
+        serviceEntities.stream().forEach(e->{
+            // 查詢角色
+            Integer serviceId = e.getId();
+            String serviceName = e.getName();
+            serviceRoleRepository.findByServiceIdAndStackId(serviceId, stackId).stream().forEach(r->{
+                String roleName = r.getName();
+                List<String> roles = result.get(serviceName);
+                if (roles == null) {
+                    result.put(serviceName, Lists.newArrayList(roleName));
+                }else{
+                    roles.add(roleName);
+                }
+            });
+        });
+        return ResultDTO.success(result);
+    }
 }

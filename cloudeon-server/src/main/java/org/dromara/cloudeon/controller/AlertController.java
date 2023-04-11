@@ -118,8 +118,8 @@ public class AlertController {
 
 
     @GetMapping("/active")
-    public ResultDTO<List<ActiveAlertVO>> getActiveMessage() {
-        List<ActiveAlertVO> activeAlertVOS = alertMessageRepository.findByIsResolve(false).stream().map(new Function<AlertMessageEntity, ActiveAlertVO>() {
+    public ResultDTO<List<ActiveAlertVO>> getActiveMessage(Integer clusterId) {
+        List<ActiveAlertVO> activeAlertVOS = alertMessageRepository.findByIsResolve(false,clusterId).stream().map(new Function<AlertMessageEntity, ActiveAlertVO>() {
             @Override
             public ActiveAlertVO apply(AlertMessageEntity alertMessageEntity) {
                 Integer serviceInstanceId = alertMessageEntity.getServiceInstanceId();
@@ -148,8 +148,8 @@ public class AlertController {
     }
 
     @GetMapping("/history")
-    public ResultDTO<List<HistoryAlertVO>> getHistoryMessage() {
-        List<HistoryAlertVO> historyAlertVOS = alertMessageRepository.findByIsResolve(true).stream().map(new Function<AlertMessageEntity, HistoryAlertVO>() {
+    public ResultDTO<List<HistoryAlertVO>> getHistoryMessage(Integer clusterId) {
+        List<HistoryAlertVO> historyAlertVOS = alertMessageRepository.findByIsResolve(true,clusterId).stream().map(new Function<AlertMessageEntity, HistoryAlertVO>() {
             @Override
             public HistoryAlertVO apply(AlertMessageEntity alertMessageEntity) {
                 Integer serviceInstanceId = alertMessageEntity.getServiceInstanceId();
