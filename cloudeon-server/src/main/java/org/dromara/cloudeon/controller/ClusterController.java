@@ -11,6 +11,7 @@ import org.dromara.cloudeon.entity.ClusterInfoEntity;
 import org.dromara.cloudeon.service.KubeService;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import org.springframework.beans.BeanUtils;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -75,9 +76,16 @@ public class ClusterController {
 
 
     @PostMapping("/delete")
-    public ResultDTO<Void> deleteCluster(Integer id) {
-        // todo 删除前确认节点和服务都删除了
+    @Transactional
+    public ResultDTO<String> deleteCluster(Integer id) {
+        // 判断服务是否删除
+        Integer serviceCnt = serviceInstanceRepository.countByClusterId(id);
+        if (serviceCnt > 0) {
+            return ResultDTO.failed("请先删除集群下的服务");
+        }
+
         clusterInfoRepository.deleteById(id);
+        clusterNodeRepository.deleteByClusterId(id);
         return ResultDTO.success(null);
     }
 
