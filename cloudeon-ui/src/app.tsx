@@ -5,7 +5,7 @@ import type { Settings as LayoutSettings } from '@ant-design/pro-components';
 import { PageLoading, SettingDrawer } from '@ant-design/pro-components';
 import type { RunTimeLayoutConfig } from 'umi';
 import { history, RequestConfig, useModel } from 'umi';
-import { message, Image, Badge } from 'antd';
+import { message, Image, notification } from 'antd';
 import defaultSettings from '../config/defaultSettings';
 import { currentUser as queryCurrentUser } from './services/ant-design-pro/api';
 import logoImg from '../src/assets/images/logo2.png';
@@ -54,7 +54,15 @@ export const request: RequestConfig = {
         if(('message' in response) && response?.message.includes('Token无效')){
           history.push(loginPath);
         }else{
-          message.error(`请求错误: ${('message' in response) ? response.message : '' }`, 3);
+          notification.error({
+            message: '请求错误',
+            description:<>{`${('message' in response) ? response.message : '接口报错' }`}</>,
+            duration:3,
+            style: {
+                width: 500
+            }
+          });
+          // message.error(`请求错误: ${('message' in response) ? response.message : '' }`, 3);
           return {
             success:false,
             data:[],
