@@ -17,3 +17,6 @@ spring.datasource.password=root
 ![img.png](../images/img2.png)
 看到控制台如下内容，即启动成功。
 ![img.png](../images/img3.png)
+此时打开浏览器访问`http://localhost:7700/#/user/login` ，即可看到
+
+![img.png](../images/img4.png)
