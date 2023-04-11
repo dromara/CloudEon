@@ -115,7 +115,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Pandas886"><img src="https://avatars.githubusercontent.com/u/123344357?v=4?s=100" width="100px;" alt="Pandas886"/><br /><sub><b>Pandas886</b></sub></a><br /><a href="https://github.com/Pandas886/CloudEon/commits?author=Pandas886" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Mericol"><img src="https://avatars.githubusercontent.com/u/39690226?v=4?s=100" width="100px;" alt="Mericol"/><br /><sub><b>Mericol</b></sub></a><br /><a href="https://github.com/Pandas886/CloudEon/commits?author=Mericol" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/huzk8"><img src="https://avatars.githubusercontent.com/u/18548053?v=4?s=100" width="100px;" alt="huzk"/><br /><sub><b>Pine</b></sub></a><br /><a href="#infra-huzk8" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> </td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/koyfin"><img src="https://avatars.githubusercontent.com/u/18548053?v=4?s=100" width="100px;" alt="koyfin"/><br /><sub><b>koyfin</b></sub></a><br /><a href="#infra-koyfin" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> </td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/mechaelyoung"><img src="https://avatars.githubusercontent.com/u/44049993?v=4?s=100" width="100px;" alt="mechaelyoung"/><br /><sub><b>mechaelyoung</b></sub></a><br /><a href="https://github.com/Pandas886/CloudEon/commits?author=mechaelyoung" title="Code">💻</a></td>
     </tr>
   </tbody>
