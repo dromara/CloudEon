@@ -52,7 +52,10 @@ theme:
 
 nav:
   - index.md
-  - instal.md
+  - 安装部署:
+      - 安装部署/install_pre.md
+      - 安装部署/docker.md
+      - 安装部署/local.md
   - quickstart.md
   - FAQ.md
   - Roadmap.md
