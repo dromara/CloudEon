@@ -87,3 +87,6 @@ scrape_configs:
   - job_name: 'hiveserver2'
     file_sd_configs:
     - files: ['discovery_configs/hiveserver2.json']
+  - job_name: 'sparkhistoryserver'
+    file_sd_configs:
+    - files: ['discovery_configs/sparkhistoryserver.json']

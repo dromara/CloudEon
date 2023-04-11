@@ -6,17 +6,13 @@ import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
 import org.dromara.cloudeon.config.CloudeonConfigProp;
-import org.dromara.cloudeon.dao.StackInfoRepository;
-import org.dromara.cloudeon.dao.StackServiceConfRepository;
-import org.dromara.cloudeon.dao.StackServiceRepository;
-import org.dromara.cloudeon.dao.StackServiceRoleRepository;
+import org.dromara.cloudeon.dao.*;
 import org.dromara.cloudeon.dto.StackConfiguration;
+import org.dromara.cloudeon.dto.StackServiceAlertRuleInfo;
 import org.dromara.cloudeon.dto.StackServiceInfo;
 import org.dromara.cloudeon.dto.StackServiceRole;
-import org.dromara.cloudeon.entity.StackInfoEntity;
-import org.dromara.cloudeon.entity.StackServiceConfEntity;
-import org.dromara.cloudeon.entity.StackServiceEntity;
-import org.dromara.cloudeon.entity.StackServiceRoleEntity;
+import org.dromara.cloudeon.entity.*;
+import org.dromara.cloudeon.enums.AlertLevel;
 import org.dromara.cloudeon.enums.ConfValueType;
 import org.dromara.cloudeon.utils.ImageUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -51,6 +47,9 @@ public class StackLoadService implements ApplicationRunner {
     @Resource
     StackServiceConfRepository stackServiceConfRepository;
 
+    @Resource
+    private StackAlertRuleRepository alertRuleRepository;
+
     @Override
     public void run(ApplicationArguments args) throws Exception {
         Yaml yaml = new Yaml();
@@ -77,6 +76,7 @@ public class StackLoadService implements ApplicationRunner {
             // 遍历每一个service并加载文件信息到数据库中
             for (File servicePath : servicePaths) {
                 String serviceInfoYamlFilePath = servicePath + FileUtil.FILE_SEPARATOR + StackPackageInfoYAML;
+                String serviceAlertRuleYaml = servicePath + FileUtil.FILE_SEPARATOR + StackPackageAlertRuleYAML;
                 String iconAppFilePath = servicePath + FileUtil.FILE_SEPARATOR + DIR_ICON + FileUtil.FILE_SEPARATOR + ICON_APP;
                 String iconDefaultFilePath = servicePath + FileUtil.FILE_SEPARATOR + DIR_ICON + FileUtil.FILE_SEPARATOR + ICON_DEFAULT;
                 String iconDangerFilePath = servicePath + FileUtil.FILE_SEPARATOR + DIR_ICON + FileUtil.FILE_SEPARATOR + ICON_DANGER;
@@ -147,6 +147,31 @@ public class StackLoadService implements ApplicationRunner {
                         }
                         stackServiceConfRepository.save(stackServiceConfEntity);
                     }
+
+                    // 读取alert-rule.yaml文件
+                    InputStream alertInputStream = new FileInputStream(serviceAlertRuleYaml);
+                    StackServiceAlertRuleInfo stackServiceAlertRuleInfo = yaml.loadAs(alertInputStream, StackServiceAlertRuleInfo.class);
+                    // 保存告警规则
+                    stackServiceAlertRuleInfo.getRules().forEach(stackServiceAlertRule -> {
+                        String ruleName = stackServiceAlertRule.getAlert();
+                        String serviceRoleName = stackServiceAlertRule.getServiceRoleName();
+
+                        // 查找是否已存在该告警规则
+                        StackAlertRuleEntity stackAlertRuleEntity = alertRuleRepository.findByRuleNameAndStackRoleName(ruleName, serviceRoleName);
+                        if (stackAlertRuleEntity == null) {
+                            stackAlertRuleEntity = new StackAlertRuleEntity();
+                        }
+
+                        stackAlertRuleEntity.setStackId(stackInfoEntityId);
+                        stackAlertRuleEntity.setAlertAdvice(stackServiceAlertRule.getAlertAdvice());
+                        stackAlertRuleEntity.setAlertInfo(stackServiceAlertRule.getAlertInfo());
+                        stackAlertRuleEntity.setAlertLevel(AlertLevel.valueOf(stackServiceAlertRule.getAlertLevel().toUpperCase()));
+                        stackAlertRuleEntity.setRuleName(ruleName);
+                        stackAlertRuleEntity.setStackServiceName(serviceInfo.getName());
+                        stackAlertRuleEntity.setStackRoleName(serviceRoleName);
+                        stackAlertRuleEntity.setPromql(stackServiceAlertRule.getPromql());
+                        alertRuleRepository.save(stackAlertRuleEntity);
+                    });
 
 
                     // close file stream
