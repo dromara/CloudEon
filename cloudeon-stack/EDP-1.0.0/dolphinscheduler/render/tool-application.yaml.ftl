@@ -14,15 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
 spring:
-  application:
-    name: alert-server
-  jackson:
-    time-zone: UTC
-    date-format: "yyyy-MM-dd HH:mm:ss"
-  banner:
-    charset: UTF-8
+  main:
+    banner-mode: off
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://127.0.0.1:5432/dolphinscheduler
@@ -40,36 +34,6 @@ spring:
       leak-detection-threshold: 0
       initialization-fail-timeout: 1
 
-server:
-  port: 50053
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,metrics,prometheus
-  endpoint:
-    health:
-      enabled: true
-      show-details: always
-  health:
-    db:
-      enabled: true
-    defaults:
-      enabled: false
-  metrics:
-    tags:
-      application: ${spring.application.name}
-
-alert:
-  port: 50052
-  # Mark each alert of alert server if late after x milliseconds as failed.
-  # Define value is (0 = infinite), and alert server would be waiting alert result.
-  wait-timeout: 0
-
-metrics:
-  enabled: true
-
 # Override by profile
 
 ---
@@ -79,6 +43,13 @@ spring:
       on-profile: mysql
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler
-    username: root
-    password: root
+    url: ${conf['jdbc.mysql.address']}
+    username: ${conf['jdbc.mysql.username']}
+    password: ${conf['jdbc.mysql.password']}
+---
+spring:
+  config:
+    activate:
+      on-profile: postgresql
+  datasource:
+    driver-class-name: org.postgresql.Driver

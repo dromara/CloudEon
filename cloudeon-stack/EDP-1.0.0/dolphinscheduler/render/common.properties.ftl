@@ -16,13 +16,13 @@
 #
 
 # user data local directory path, please make sure the directory exists and have read write permissions
-data.basedir.path=/tmp/dolphinscheduler
+data.basedir.path=/opt/edp/${service.serviceName}/
 
 # resource view suffixs
 #resource.view.suffixs=txt,log,sh,bat,conf,cfg,py,java,sql,xml,hql,properties,json,yml,yaml,ini,js
 
 # resource storage type: HDFS, S3, NONE
-resource.storage.type=NONE
+resource.storage.type=HDFS
 # resource store on HDFS/S3 path, resource file will store to this base path, self configuration, please make sure the directory exists on hdfs and have read write permissions. "/dolphinscheduler" is recommended
 resource.storage.upload.base.path=/dolphinscheduler
 
@@ -59,9 +59,9 @@ kerberos.expire.time=2
 
 
 # resourcemanager port, the default value is 8088 if not specified
-resource.manager.httpaddress.port=8088
+resource.manager.httpaddress.port=${conf['resource.manager.httpaddress.port']}
 # if resourcemanager HA is enabled, please set the HA IPs; if resourcemanager is single, keep this value empty
-yarn.resourcemanager.ha.rm.ids=192.168.xx.xx,192.168.xx.xx
+yarn.resourcemanager.ha.rm.ids=${conf['yarn.resourcemanager.ha.rm.ids']}
 # if resourcemanager HA is enabled or not use resourcemanager, please keep the default value; If resourcemanager is single, you only need to replace ds1 to actual resourcemanager hostname
 yarn.application.status.address=http://ds1:%s/ws/v1/cluster/apps/%s
 # job history status url when application number threshold is reached(default 10000, maybe it was set to 1000)
@@ -93,13 +93,13 @@ sudo.enable=true
 #dolphin.scheduler.network.priority.strategy=default
 
 # system env path
-#dolphinscheduler.env.path=dolphinscheduler_env.sh
+dolphinscheduler.env.path=/opt/edp/${service.serviceName}/conf/dolphinscheduler_env.sh
 
 # development state
 development.state=false
 
 # rpc port
-alert.rpc.port=50052
+alert.rpc.port=${conf['alert.rpc.port']}
 
 # Url endpoint for zeppelin RESTful API
 zeppelin.rest.url=http://localhost:8080

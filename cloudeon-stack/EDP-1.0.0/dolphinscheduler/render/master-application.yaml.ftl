@@ -86,7 +86,7 @@ registry:
     digest: ~
 
 master:
-  listen-port: 5678
+  listen-port: ${conf['master.server.listern.port']}
   # master fetch command num
   fetch-command-num: 10
   # master prepare execute thread number to limit handle commands in parallel
@@ -116,7 +116,7 @@ master:
   kill-yarn-job-when-task-failover: true
 
 server:
-  port: 5679
+  port: ${conf['master.server.port']}
 
 management:
   endpoints:
@@ -134,7 +134,7 @@ management:
       enabled: false
   metrics:
     tags:
-      application: ${spring.application.name}
+      application: ${r"${spring.application.name}"}
 
 metrics:
   enabled: true
@@ -148,9 +148,9 @@ spring:
       on-profile: mysql
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler
-    username: root
-    password: root
+    url: ${conf['jdbc.mysql.address']}
+    username: ${conf['jdbc.mysql.username']}
+    password: ${conf['jdbc.mysql.password']}
   quartz:
     properties:
       org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate

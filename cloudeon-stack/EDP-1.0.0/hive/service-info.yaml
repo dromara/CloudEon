@@ -60,7 +60,7 @@ configurations:
     tag: "常用参数"
 
   - name: "javax.jdo.option.ConnectionPassword"
-    recommendExpression: "bigdata"
+    recommendExpression: "root"
     valueType: InputString
     configurableInWizard: true
     description: "metastore依赖数据库的登录密码"
@@ -68,7 +68,7 @@ configurations:
     tag: "常用参数"
 
   - name: "javax.jdo.option.ConnectionURL"
-    recommendExpression: "jdbc:mysql://10.81.17.8:33066/hive_db_ce?createDatabaseIfNotExist=true&amp;useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"
+    recommendExpression: "jdbc:mysql://localhost:33066/hive_db_ce?createDatabaseIfNotExist=true&amp;useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"
     valueType: InputString
     configurableInWizard: true
     description: "metastore依赖数据库的jdbc访问地址"

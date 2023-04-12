@@ -16,7 +16,7 @@
 #
 
 server:
-  port: 12345
+  port: ${conf['api.server.port']}
   servlet:
     session:
       timeout: 120m
@@ -95,7 +95,7 @@ management:
       enabled: false
   metrics:
     tags:
-      application: ${spring.application.name}
+      application: ${r"${spring.application.name}"}
 
 registry:
   type: zookeeper
@@ -178,9 +178,9 @@ spring:
       on-profile: mysql
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler
-    username: root
-    password: root
+    url: ${conf['jdbc.mysql.address']}
+    username: ${conf['jdbc.mysql.username']}
+    password: ${conf['jdbc.mysql.password']}
   quartz:
     properties:
       org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate

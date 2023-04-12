@@ -14,14 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
 spring:
-  banner:
-    charset: UTF-8
   application:
-    name: worker-server
+    name: alert-server
   jackson:
     time-zone: UTC
     date-format: "yyyy-MM-dd HH:mm:ss"
+  banner:
+    charset: UTF-8
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://127.0.0.1:5432/dolphinscheduler
@@ -39,50 +40,8 @@ spring:
       leak-detection-threshold: 0
       initialization-fail-timeout: 1
 
-registry:
-  type: zookeeper
-  zookeeper:
-    namespace: dolphinscheduler
-    connect-string: localhost:2181
-    retry-policy:
-      base-sleep-time: 60ms
-      max-sleep: 300ms
-      max-retries: 5
-    session-timeout: 30s
-    connection-timeout: 9s
-    block-until-connected: 600ms
-    digest: ~
-
-worker:
-  # worker listener port
-  listen-port: 1234
-  # worker execute thread number to limit task instances in parallel
-  exec-threads: 100
-  # worker heartbeat interval
-  heartbeat-interval: 10s
-  # Worker heart beat task error threshold, if the continuous error count exceed this count, the worker will close.
-  heartbeat-error-threshold: 5
-  # worker host weight to dispatch tasks, default value 100
-  host-weight: 100
-  # worker tenant auto create
-  tenant-auto-create: true
-  # worker max cpuload avg, only higher than the system cpu load average, worker server can be dispatched tasks. default value -1: the number of cpu cores * 2
-  max-cpu-load-avg: -1
-  # worker reserved memory, only lower than system available memory, worker server can be dispatched tasks. default value 0.3, the unit is G
-  reserved-memory: 0.3
-  # for multiple worker groups, use hyphen before group name, e.g.
-  # groups:
-  #   - default
-  #   - group1
-  #   - group2
-  groups:
-    - default
-  # alert server listen host
-  alert-listen-host: localhost
-  alert-listen-port: 50052
-
 server:
-  port: 1235
+  port: ${conf['alert.server.port']}
 
 management:
   endpoints:
@@ -100,7 +59,13 @@ management:
       enabled: false
   metrics:
     tags:
-      application: ${spring.application.name}
+      application: ${r"${spring.application.name}"}
+
+alert:
+  port: 50052
+  # Mark each alert of alert server if late after x milliseconds as failed.
+  # Define value is (0 = infinite), and alert server would be waiting alert result.
+  wait-timeout: 0
 
 metrics:
   enabled: true
@@ -114,6 +79,6 @@ spring:
       on-profile: mysql
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler
-    username: root
-    password: root
+    url: ${conf['jdbc.mysql.address']}
+    username: ${conf['jdbc.mysql.username']}
+    password: ${conf['jdbc.mysql.password']}
