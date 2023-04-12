@@ -407,4 +407,29 @@ declare namespace API {
     data?: alertItem[];
   }
 
+  type alertRulesItem = {
+    ruleName?: string,
+    id?: number,
+    alertLevel?: string,
+    promql?: string,
+    alertInfo?: string,
+    alertAdvice?: string,
+    stackServiceName?: string,
+    stackRoleName?: string,
+    updateTime?: string,
+    createTime?: string,
+  }
+
+  type alertRulesListResult = {
+    success?: boolean;
+    message?: string;
+    data?: alertRulesItem[];
+  }
+
+  type anyResult = {
+    success?: boolean;
+    message?: string;
+    data?: any;
+  }
+
 }

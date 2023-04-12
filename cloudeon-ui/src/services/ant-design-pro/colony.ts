@@ -327,3 +327,36 @@ export async function getHistoryAlertAPI(options?: { [key: string]: any }) {
     },
   });
 }
+
+/** 获取告警规则列表 */
+export async function getRulesAlertAPI(options?: { [key: string]: any }) {
+  return request<API.alertListResult>('/apiPre/alert/listRule', {
+    method: 'GET',
+    params: {
+      ...options,
+    },
+  });
+}
+
+/** 保存告警规则 */
+export async function saveRulesAlertAPI(options?: { [key: string]: any }) {
+  return request<API.alertRulesListResult>('/apiPre/alert/saveRule', {
+    method: 'POST',
+    data: {
+      ...options,
+    },
+  });
+}
+
+ 
+/** 获取框架服务列表 */
+export async function getStackServiceRolesAPI(options?: { [key: string]: any }) {
+  return request<API.anyResult>('/apiPre/stack/mapStackServiceRoles', {
+    method: 'GET',
+    params: {
+      ...options,
+    },
+  });
+}       
+
+

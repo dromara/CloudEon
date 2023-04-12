@@ -1,5 +1,6 @@
 package org.dromara.cloudeon.controller;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.cloudeon.controller.response.ActiveAlertVO;
@@ -118,8 +119,8 @@ public class AlertController {
 
 
     @GetMapping("/active")
-    public ResultDTO<List<ActiveAlertVO>> getActiveMessage() {
-        List<ActiveAlertVO> activeAlertVOS = alertMessageRepository.findByIsResolve(false).stream().map(new Function<AlertMessageEntity, ActiveAlertVO>() {
+    public ResultDTO<List<ActiveAlertVO>> getActiveMessage(Integer clusterId) {
+        List<ActiveAlertVO> activeAlertVOS = alertMessageRepository.findByIsResolve(false, clusterId).stream().map(new Function<AlertMessageEntity, ActiveAlertVO>() {
             @Override
             public ActiveAlertVO apply(AlertMessageEntity alertMessageEntity) {
                 Integer serviceInstanceId = alertMessageEntity.getServiceInstanceId();
@@ -148,8 +149,8 @@ public class AlertController {
     }
 
     @GetMapping("/history")
-    public ResultDTO<List<HistoryAlertVO>> getHistoryMessage() {
-        List<HistoryAlertVO> historyAlertVOS = alertMessageRepository.findByIsResolve(true).stream().map(new Function<AlertMessageEntity, HistoryAlertVO>() {
+    public ResultDTO<List<HistoryAlertVO>> getHistoryMessage(Integer clusterId) {
+        List<HistoryAlertVO> historyAlertVOS = alertMessageRepository.findByIsResolve(true, clusterId).stream().map(new Function<AlertMessageEntity, HistoryAlertVO>() {
             @Override
             public HistoryAlertVO apply(AlertMessageEntity alertMessageEntity) {
                 Integer serviceInstanceId = alertMessageEntity.getServiceInstanceId();
@@ -186,7 +187,17 @@ public class AlertController {
     @PostMapping("saveRule")
     public ResultDTO<Void> saveRule(@RequestBody ClusterAlertRuleEntity clusterAlertRuleEntity) {
 
-        clusterAlertRuleRepository.save(clusterAlertRuleEntity);
+        ClusterAlertRuleEntity updateClusterAlertRuleEntity = clusterAlertRuleRepository.findById(clusterAlertRuleEntity.getId()).get();
+        if (updateClusterAlertRuleEntity != null) {
+            BeanUtil.copyProperties(clusterAlertRuleEntity, updateClusterAlertRuleEntity);
+            updateClusterAlertRuleEntity.setUpdateTime(new Date());
+            clusterAlertRuleRepository.save(updateClusterAlertRuleEntity);
+        }else {
+            Date createTime = new Date();
+            clusterAlertRuleEntity.setCreateTime(createTime);
+            clusterAlertRuleEntity.setUpdateTime(createTime);
+            clusterAlertRuleRepository.save(clusterAlertRuleEntity);
+        }
 
         return ResultDTO.success(null);
     }
