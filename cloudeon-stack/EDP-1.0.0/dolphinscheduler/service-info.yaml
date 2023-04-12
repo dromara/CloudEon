@@ -1,0 +1,104 @@
+name: DOLPHINSCHEDULER
+label: "DolphinScheduler"
+description: "可视化分布式任务调度与计算平台"
+version: 3.0.5
+dockerImage: "registry.cn-hangzhou.aliyuncs.com/udh/dolphinscheduler:3.0.5"
+dependencies: []
+
+runAs: root
+
+supportKerberos: false
+
+dashboard:
+  uid: ""
+
+roles:
+  - name: DS_API_SERVER
+    label: "DolphinScheduler ApiServer"
+    roleFullName: "ds-api-server"
+    linkExpression: "http://${localhostname}:${conf['api.server.port']}/"
+    sortNum: 1
+    type: MASTER
+    jmxPort: 9232
+    fixedNum : 1
+    logFile: "fe.log"
+
+  - name: DS_MASTER_SERVER
+    label: "DolphinScheduler MasterServer"
+    roleFullName: "ds-master-server"
+    linkExpression: "http://${localhostname}:${conf['master.server.port']}/"
+    sortNum: 2
+    type: MASTER
+    minNum: 1
+    logFile: "be.INFO"
+
+  - name: DS_WORKER_SERVER
+    label: "DolphinScheduler WorkerServer"
+    roleFullName: "ds-worker-server"
+    linkExpression: "http://${localhostname}:${conf['worker.server.port']}/"
+    sortNum: 3
+    type: SLAVE
+    minNum: 1
+    logFile: "be.INFO"
+
+  - name: DS_ALERT_SERVER
+    label: "DolphinScheduler AlertServer"
+    roleFullName: "ds-alert-server"
+    linkExpression: "http://${localhostname}:${conf['alert.server.port']}/"
+    sortNum: 4
+    type: SLAVE
+    minNum: 1
+    logFile: "be.INFO"
+
+persistencePaths:
+  - /opt/edp/${service.serviceName}/conf
+  - /opt/edp/${service.serviceName}/log
+  - /opt/edp/${service.serviceName}/data
+
+
+customConfigFiles: []
+
+configurations:
+
+  - name: api.server.port
+    recommendExpression: 2048
+    valueType: InputNumber
+    description: "ApiServer端口"
+    tag: "端口"
+    configurableInWizard: true
+  - name: master.server.port
+    recommendExpression: 2048
+    valueType: InputNumber
+    description: "MasterServer端口"
+    tag: "端口"
+    configurableInWizard: true
+  - name: worker.server.port
+    recommendExpression: 2048
+    valueType: InputNumber
+    description: "WorkerServer端口"
+    tag: "端口"
+    configurableInWizard: true
+  - name: alert.server.port
+    recommendExpression: 2048
+    valueType: InputNumber
+    description: "AlertServer端口"
+    tag: "端口"
+    configurableInWizard: true
+  - name: mysql.address
+    recommendExpression: 512
+    valueType: InputString
+    description: "MySQL数据库地址"
+    tag: "常用参数"
+    configurableInWizard: true
+  - name: mysql.username
+    recommendExpression: 512
+    valueType: InputString
+    description: "MySQL数据库用户名"
+    tag: "常用参数"
+    configurableInWizard: true
+  - name: mysql.password
+    recommendExpression: 512
+    valueType: InputString
+    description: "MySQL数据库密码"
+    tag: "常用参数"
+    configurableInWizard: true
