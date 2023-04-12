@@ -7,7 +7,8 @@
 
 ## Kubernetes环境准备（必须）
 CloudEon需要一个可访问的Kubernetes集群，目前已知支持的版本是`1.21+` ，如果没有Kubernetes环境可以使用 [kubekey](https://github.com/kubesphere/kubekey) 快速搭建一个。
-部分大数据服务也支持在k3s上部署，后续会逐渐全部适配，欢迎大家一起来完善。
+也支持在k3s上部署。
+container runtime目前只支持docker，后续会逐渐适配，欢迎大家一起来完善。
 
 ## SSH服务准备（必须）
 CloudEon需要访问Kubernetes集群中节点的SSH服务，所以必须保证网络可通
