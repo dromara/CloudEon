@@ -174,7 +174,7 @@ const ConfigService:React.FC<{serviceId: number}> = ( {serviceId} )=>{
             editable: true,
             render: (_: any, record: Item, index: any) => {
                 // <span>{record.value}&nbsp;{record.unit?record.unit:''}</span>
-                let inputNode = <Input onChange={(e)=>actionOnChange(e,record)} addonAfter={record?.unit || ''} />
+                let inputNode = <Input onChange={(e)=>actionOnChange(e.target.value,record)} addonAfter={record?.unit || ''} />
                 // const inputNode = inputType === 'number' ? <InputNumber /> : <Input />;
                 switch(record.valueType){
                     case 'InputNumber':

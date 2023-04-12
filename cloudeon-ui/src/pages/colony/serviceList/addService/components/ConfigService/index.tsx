@@ -98,23 +98,26 @@ const ConfigService:React.FC<{checkConfNext: any}> = ( {checkConfNext} )=>{
             updateConfig(confResult)
         }
       };
-
-    const onSelectService = function(value: any){
-        // if(serviceId){// 保存切换前的数据
-        //     let confResult = {...confData,[serviceId]:currentConfList}
-        //     updateConfig(confResult)
-        // }
+    
+    const handleMenuClick = () => {
         if(isEditMode){
-            notification.open({
+            notification.warn({
                 message: '温馨提示',
                 description:<>请先处理当前编辑配置项</>,
-                duration:null,
+                duration:3,
                 style: {
                     width: 500
                 }
               });
             return
         }
+    }
+
+    const onSelectService = function(value: any){
+        // if(serviceId){// 保存切换前的数据
+        //     let confResult = {...confData,[serviceId]:currentConfList}
+        //     updateConfig(confResult)
+        // }
         setServiceId(value.key)
         const params = {
             serviceId: value.key,
@@ -355,7 +358,7 @@ const ConfigService:React.FC<{checkConfNext: any}> = ( {checkConfNext} )=>{
             editable: true,
             render: (_: any, record: Item, index: any) => {
                 // <span>{record.value}&nbsp;{record.unit?record.unit:''}</span>
-                let inputNode = <Input style={{ width: '100%' }} onChange={(e)=>actionOnChange(e,record)} addonAfter={record?.unit || ''} />
+                let inputNode = <Input style={{ width: '100%' }} onChange={(e)=>actionOnChange(e.target.value,record)} addonAfter={record?.unit || ''} />
                 // const inputNode = inputType === 'number' ? <InputNumber /> : <Input />;
                 switch(record.valueType){
                     case 'InputNumber':
@@ -517,6 +520,8 @@ const ConfigService:React.FC<{checkConfNext: any}> = ( {checkConfNext} )=>{
                         items={serviceMenu} 
                         defaultSelectedKeys={[serviceMenu[0].key]}
                         className={styles.CSLeftMenu} 
+                        selectable={!isEditMode}
+                        onClick={handleMenuClick}
                         onSelect={onSelectService} 
                     />
                 )}
