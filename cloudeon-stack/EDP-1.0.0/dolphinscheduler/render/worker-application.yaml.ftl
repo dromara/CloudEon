@@ -55,7 +55,7 @@ registry:
 
 worker:
   # worker listener port
-  listen-port: 1234
+  listen-port: ${conf['worker.server.listern.port']}
   # worker execute thread number to limit task instances in parallel
   exec-threads: 100
   # worker heartbeat interval

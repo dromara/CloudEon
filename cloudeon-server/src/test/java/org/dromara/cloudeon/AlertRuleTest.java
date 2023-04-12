@@ -4,6 +4,7 @@ package org.dromara.cloudeon;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import lombok.extern.slf4j.Slf4j;
 import org.dromara.cloudeon.dao.AlertQuotaRepository;
 import org.dromara.cloudeon.dao.ClusterInfoRepository;
 import org.dromara.cloudeon.dto.PrometheusAlertRule;
@@ -23,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
+@Slf4j
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class AlertRuleTest {
@@ -35,7 +36,7 @@ public class AlertRuleTest {
     @Test
     public void dod() {
 
-        alertService.upgradeMonitorAlertRule(2);
+        alertService.upgradeMonitorAlertRule(1,log);
     }
 
 

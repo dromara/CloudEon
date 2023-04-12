@@ -14,6 +14,7 @@ dashboard:
 
 persistencePaths:
   - /opt/edp/${service.serviceName}/conf
+  - /opt/edp/${service.serviceName}/conf/rule
   - /opt/edp/${service.serviceName}/conf/discovery_configs
   - /opt/edp/${service.serviceName}/log
   - /opt/edp/${service.serviceName}/data

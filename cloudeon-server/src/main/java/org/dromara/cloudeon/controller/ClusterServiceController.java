@@ -42,7 +42,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static org.dromara.cloudeon.utils.Constant.AdminUserId;
+import static org.dromara.cloudeon.utils.Constant.*;
 
 /**
  * 集群服务相关接口
@@ -858,7 +858,7 @@ public class ClusterServiceController {
         StackServiceEntity stackServiceEntity = stackServiceRepository.findById(serviceInstanceEntity.getStackServiceId()).get();
 
         // 如果没安装monitor服务，则提示请先安装
-        ServiceInstanceEntity monitorServiceInstance = serviceInstanceRepository.findEntityByClusterIdAndStackServiceName(serviceInstanceEntity.getClusterId(), "MONITOR");
+        ServiceInstanceEntity monitorServiceInstance = serviceInstanceRepository.findEntityByClusterIdAndStackServiceName(serviceInstanceEntity.getClusterId(), MONITOR_SERVICE_NAME);
         if (monitorServiceInstance == null) {
             return ResultDTO.success("请先安装Monitor服务");
         }
@@ -866,7 +866,7 @@ public class ClusterServiceController {
         // 通过服务框架的dashboard和Grafana地址拼接完整url
         Integer monitorServiceInstanceId = monitorServiceInstance.getId();
         String grafanaHttpPort = serviceInstanceConfigRepository.findByServiceInstanceIdAndName(monitorServiceInstanceId, "grafana.http.port").getValue();
-        ServiceRoleInstanceEntity grafana = roleInstanceRepository.findByServiceInstanceIdAndServiceRoleName(monitorServiceInstanceId, "GRAFANA").get(0);
+        ServiceRoleInstanceEntity grafana = roleInstanceRepository.findByServiceInstanceIdAndServiceRoleName(monitorServiceInstanceId, MONITOR_ROLE_GRAFANA).get(0);
         Integer grafanaNodeId = grafana.getNodeId();
         ClusterNodeEntity grafanaNodeEntity = clusterNodeRepository.findById(grafanaNodeId).get();
         String dashboardUid = stackServiceEntity.getDashboardUid();

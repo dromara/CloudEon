@@ -8,10 +8,16 @@ export SPRING_PROFILES_ACTIVE=$DATABASE
 export SPRING_CACHE_TYPE=none
 export SPRING_JACKSON_TIME_ZONE=UTC
 export MASTER_FETCH_COMMAND_NUM=10
-
+<#--handle dependent.zookeeper-->
+<#if dependencies.ZOOKEEPER??>
+    <#assign zookeeper=dependencies.ZOOKEEPER quorum=[]>
+    <#list zookeeper.serviceRoles['ZOOKEEPER_SERVER'] as role>
+        <#assign quorum += [role.hostname + ":" + zookeeper.conf["zookeeper.client.port"]]>
+    </#list>
+</#if>
 # Registry center configuration, determines the type and link of the registry center
 export REGISTRY_TYPE="zookeeper"
-export REGISTRY_ZOOKEEPER_CONNECT_STRING="localhost:2181"
+export REGISTRY_ZOOKEEPER_CONNECT_STRING="${quorum?join(",")}"
 
 # Tasks related configurations, need to change the configuration if you use the related tasks.
 export HADOOP_HOME=/opt/soft/hadoop

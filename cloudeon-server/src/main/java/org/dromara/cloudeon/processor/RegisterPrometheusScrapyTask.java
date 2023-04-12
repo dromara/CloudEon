@@ -26,6 +26,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static org.dromara.cloudeon.utils.Constant.MONITOR_SERVICE_NAME;
+
 @NoArgsConstructor
 public class RegisterPrometheusScrapyTask extends BaseCloudeonTask {
     private static final String PROMETHEUS_DIR = "prometheus";
@@ -53,7 +55,7 @@ public class RegisterPrometheusScrapyTask extends BaseCloudeonTask {
         File renderDirFile = new File(renderDir);
 
         // 查出当前集群已安装的Monitor服务
-        ServiceInstanceEntity monitorServiceInstance = serviceInstanceRepository.findEntityByClusterIdAndStackServiceName(serviceInstanceEntity.getClusterId(), "MONITOR");
+        ServiceInstanceEntity monitorServiceInstance = serviceInstanceRepository.findEntityByClusterIdAndStackServiceName(serviceInstanceEntity.getClusterId(), MONITOR_SERVICE_NAME);
 
         // 如果不存在prometheus目录则跳过
         // todo monitor服务没安装则跳过
