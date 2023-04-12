@@ -27,6 +27,7 @@ public enum TaskGroupType {
     INIT_HIVE(15, "初始化HIVE", Lists.newArrayList(TaskType.INIT_HIVE_METASTORE,TaskType.INIT_HIVE_WAREHOUSE), false),
     INIT_SPARK(16, "初始化SPARK", Lists.newArrayList(TaskType.SPARK_HDFS_MKDIR), false),
     INIT_MONITOR(17, "初始化MONITOR", Lists.newArrayList(TaskType.SPARK_HDFS_MKDIR), false),
+    INIT_DS(18, "初始化DS", Lists.newArrayList(TaskType.INIT_DS_DB), false),
 
     ;
 

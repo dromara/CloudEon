@@ -86,7 +86,7 @@ registry:
     digest: ~
 
 master:
-  listen-port: ${conf['master.server.listern.port']}
+  listen-port: ${conf['master.server.listen.port']}
   # master fetch command num
   fetch-command-num: 10
   # master prepare execute thread number to limit handle commands in parallel

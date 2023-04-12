@@ -10,6 +10,15 @@ RUN wget https://archive.apache.org/dist/dolphinscheduler/3.0.5/apache-dolphinsc
 
 ENV DOLPHINSCHEDULER_HOME=/home/root/apache-dolphinscheduler
 
+RUN   wget https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.28/mysql-connector-java-8.0.28.jar \
+    && ln -s /home/root/mysql-connector-java-8.0.28.jar $DOLPHINSCHEDULER_HOME/alert-server/libs/mysql-connector-java-8.0.28.jar \
+    && ln -s /home/root/mysql-connector-java-8.0.28.jar $DOLPHINSCHEDULER_HOME/api-server/libs/mysql-connector-java-8.0.28.jar \
+    && ln -s /home/root/mysql-connector-java-8.0.28.jar $DOLPHINSCHEDULER_HOME/master-server/libs/mysql-connector-java-8.0.28.jar \
+    && ln -s /home/root/mysql-connector-java-8.0.28.jar $DOLPHINSCHEDULER_HOME/tools/libs/mysql-connector-java-8.0.28.jar \
+    && ln -s /home/root/mysql-connector-java-8.0.28.jar $DOLPHINSCHEDULER_HOME/worker-server/libs/mysql-connector-java-8.0.28.jar
+
+
+
 
 
 
