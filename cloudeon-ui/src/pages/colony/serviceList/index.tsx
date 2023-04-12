@@ -36,7 +36,7 @@ const serviceList: React.FC = () => {
     setLoading(false)
     if(result?.success){
       getServiceListData(true)
-      message.success('删除成功！', 3)
+      message.success('操作成功！', 3)
     }
   }
 

@@ -401,7 +401,7 @@ const serviceAdd: React.FC = () => {
                     serviceInfos && checkAllRolesRules(serviceInfos)
                     setCurrent(current + 1);
                     
-                  } else if(current == 2){ // 安装
+                  } else if(current == 2){ // 配置服务
                     const resultParams = await setPresetConfListToParams()
                     // console.log('---resultParams: ', resultParams);
                     
@@ -434,7 +434,7 @@ const serviceAdd: React.FC = () => {
                     setCurrent(current + 1);
                   }
                 }}
-              >下一步</Button>
+              >{ current == 2 ? '安装':'下一步'}</Button>
             </div>
           </div>
         </div>
