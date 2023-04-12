@@ -29,12 +29,12 @@
     </appender>
 
     <appender name="APILOGFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${log.base}/dolphinscheduler-api.log</file>
+        <file>${r"${log.base}"}/dolphinscheduler-api.log</file>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>INFO</level>
         </filter>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>${log.base}/dolphinscheduler-api.%d{yyyy-MM-dd_HH}.%i.log</fileNamePattern>
+            <fileNamePattern>${r"${log.base}"}/dolphinscheduler-api.%d{yyyy-MM-dd_HH}.%i.log</fileNamePattern>
             <maxHistory>168</maxHistory>
             <maxFileSize>64MB</maxFileSize>
             <totalSizeCap>50GB</totalSizeCap>
@@ -53,7 +53,7 @@
     <logger name="org.apache.hadoop" level="WARN"/>
 
     <root level="INFO">
-        <if condition="${DOCKER:-false}">
+        <if condition="true">
             <then>
                 <appender-ref ref="STDOUT"/>
             </then>

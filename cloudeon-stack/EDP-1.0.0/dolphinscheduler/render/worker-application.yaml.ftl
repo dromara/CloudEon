@@ -78,7 +78,7 @@ worker:
   groups:
     - default
   # alert server listen host
-  alert-listen-host: localhost
+  alert-listen-host: ${serviceRoles['DS_ALERT_SEVER'][0].hostname}
   alert-listen-port: ${conf['alert.rpc.port']}
 
 server:

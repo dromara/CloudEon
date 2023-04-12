@@ -149,29 +149,31 @@ public class StackLoadService implements ApplicationRunner {
                     }
 
                     // 读取alert-rule.yaml文件
-                    InputStream alertInputStream = new FileInputStream(serviceAlertRuleYaml);
-                    StackServiceAlertRuleInfo stackServiceAlertRuleInfo = yaml.loadAs(alertInputStream, StackServiceAlertRuleInfo.class);
-                    // 保存告警规则
-                    stackServiceAlertRuleInfo.getRules().forEach(stackServiceAlertRule -> {
-                        String ruleName = stackServiceAlertRule.getAlert();
-                        String serviceRoleName = stackServiceAlertRule.getServiceRoleName();
+                    if(FileUtil.exist(serviceAlertRuleYaml)){
+                        InputStream alertInputStream = new FileInputStream(serviceAlertRuleYaml);
+                        StackServiceAlertRuleInfo stackServiceAlertRuleInfo = yaml.loadAs(alertInputStream, StackServiceAlertRuleInfo.class);
+                        // 保存告警规则
+                        stackServiceAlertRuleInfo.getRules().forEach(stackServiceAlertRule -> {
+                            String ruleName = stackServiceAlertRule.getAlert();
+                            String serviceRoleName = stackServiceAlertRule.getServiceRoleName();
 
-                        // 查找是否已存在该告警规则
-                        StackAlertRuleEntity stackAlertRuleEntity = alertRuleRepository.findByRuleNameAndStackRoleName(ruleName, serviceRoleName);
-                        if (stackAlertRuleEntity == null) {
-                            stackAlertRuleEntity = new StackAlertRuleEntity();
-                        }
+                            // 查找是否已存在该告警规则
+                            StackAlertRuleEntity stackAlertRuleEntity = alertRuleRepository.findByRuleNameAndStackRoleName(ruleName, serviceRoleName);
+                            if (stackAlertRuleEntity == null) {
+                                stackAlertRuleEntity = new StackAlertRuleEntity();
+                            }
 
-                        stackAlertRuleEntity.setStackId(stackInfoEntityId);
-                        stackAlertRuleEntity.setAlertAdvice(stackServiceAlertRule.getAlertAdvice());
-                        stackAlertRuleEntity.setAlertInfo(stackServiceAlertRule.getAlertInfo());
-                        stackAlertRuleEntity.setAlertLevel(AlertLevel.valueOf(stackServiceAlertRule.getAlertLevel().toUpperCase()));
-                        stackAlertRuleEntity.setRuleName(ruleName);
-                        stackAlertRuleEntity.setStackServiceName(serviceInfo.getName());
-                        stackAlertRuleEntity.setStackRoleName(serviceRoleName);
-                        stackAlertRuleEntity.setPromql(stackServiceAlertRule.getPromql());
-                        alertRuleRepository.save(stackAlertRuleEntity);
-                    });
+                            stackAlertRuleEntity.setStackId(stackInfoEntityId);
+                            stackAlertRuleEntity.setAlertAdvice(stackServiceAlertRule.getAlertAdvice());
+                            stackAlertRuleEntity.setAlertInfo(stackServiceAlertRule.getAlertInfo());
+                            stackAlertRuleEntity.setAlertLevel(AlertLevel.valueOf(stackServiceAlertRule.getAlertLevel().toUpperCase()));
+                            stackAlertRuleEntity.setRuleName(ruleName);
+                            stackAlertRuleEntity.setStackServiceName(serviceInfo.getName());
+                            stackAlertRuleEntity.setStackRoleName(serviceRoleName);
+                            stackAlertRuleEntity.setPromql(stackServiceAlertRule.getPromql());
+                            alertRuleRepository.save(stackAlertRuleEntity);
+                        });
+                    }
 
 
                     // close file stream

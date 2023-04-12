@@ -33,11 +33,11 @@
         <filter class="org.apache.dolphinscheduler.server.log.TaskLogFilter"/>
         <Discriminator class="org.apache.dolphinscheduler.server.log.TaskLogDiscriminator">
             <key>taskAppId</key>
-            <logBase>${log.base}</logBase>
+            <logBase>${r"${log.base}"}</logBase>
         </Discriminator>
         <sift>
-            <appender name="FILE-${taskAppId}" class="ch.qos.logback.core.FileAppender">
-                <file>${log.base}/${taskAppId}.log</file>
+            <appender name="FILE-${r"${taskAppId}"}" class="ch.qos.logback.core.FileAppender">
+                <file>${r"${log.base}"}/${r"${taskAppId}"}.log</file>
                 <encoder>
                     <pattern>
                         [%level] %date{yyyy-MM-dd HH:mm:ss.SSS Z} - %messsage%n
@@ -49,9 +49,9 @@
         </sift>
     </appender>
     <appender name="MASTERLOGFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${log.base}/dolphinscheduler-master.log</file>
+        <file>${r"${log.base}"}/dolphinscheduler-master.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>${log.base}/dolphinscheduler-master.%d{yyyy-MM-dd_HH}.%i.log</fileNamePattern>
+            <fileNamePattern>${r"${log.base}"}/dolphinscheduler-master.%d{yyyy-MM-dd_HH}.%i.log</fileNamePattern>
             <maxHistory>168</maxHistory>
             <maxFileSize>200MB</maxFileSize>
             <totalSizeCap>50GB</totalSizeCap>
@@ -66,7 +66,7 @@
     </appender>
 
     <root level="INFO">
-        <if condition="${DOCKER:-false}">
+        <if condition="true">
             <then>
                 <appender-ref ref="STDOUT"/>
             </then>

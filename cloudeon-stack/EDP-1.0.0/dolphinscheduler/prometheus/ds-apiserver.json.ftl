@@ -1,5 +1,5 @@
 [
 {
-"targets":[<#list serviceRoles['HIVE_SERVER2'] as item>"${item.hostname}:5550"<#sep>,</#list>]
+"targets":[<#list serviceRoles['DS_API_SERVER'] as item>"${item.hostname}:${conf['api.server.port']}/actuator/prometheus"<#sep>,</#list>]
 }
 ]

@@ -29,9 +29,9 @@
     </appender>
 
     <appender name="ALERTLOGFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${log.base}/dolphinscheduler-alert.log</file>
+        <file>${r"${log.base}"}/dolphinscheduler-alert.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>${log.base}/dolphinscheduler-alert.%d{yyyy-MM-dd_HH}.%i.log</fileNamePattern>
+            <fileNamePattern>${r"${log.base}"}/dolphinscheduler-alert.%d{yyyy-MM-dd_HH}.%i.log</fileNamePattern>
             <maxHistory>20</maxHistory>
             <maxFileSize>64MB</maxFileSize>
             <totalSizeCap>50GB</totalSizeCap>
@@ -46,7 +46,7 @@
     </appender>
 
     <root level="INFO">
-        <if condition="${DOCKER:-false}">
+        <if condition="true">
             <then>
                 <appender-ref ref="STDOUT"/>
             </then>

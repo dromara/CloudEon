@@ -90,3 +90,15 @@ scrape_configs:
   - job_name: 'sparkhistoryserver'
     file_sd_configs:
     - files: ['discovery_configs/sparkhistoryserver.json']
+  - job_name: 'apiserver'
+    file_sd_configs:
+    - files: ['configs/ds-apiserver.json']
+  - job_name: 'masterserver'
+    file_sd_configs:
+    - files: ['configs/ds-masterserver.json']
+  - job_name: 'workerserver'
+    file_sd_configs:
+    - files: ['configs/ds-workerserver.json']
+  - job_name: 'alertserver'
+    file_sd_configs:
+    - files: ['configs/ds-alertserver.json']

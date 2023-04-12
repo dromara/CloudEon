@@ -62,7 +62,7 @@ management:
       application: ${r"${spring.application.name}"}
 
 alert:
-  port: 50052
+  port: ${conf['alert.rpc.port']}
   # Mark each alert of alert server if late after x milliseconds as failed.
   # Define value is (0 = infinite), and alert server would be waiting alert result.
   wait-timeout: 0
