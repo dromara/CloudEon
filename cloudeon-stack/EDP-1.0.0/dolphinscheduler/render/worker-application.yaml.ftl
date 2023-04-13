@@ -55,7 +55,7 @@ registry:
 
 worker:
   # worker listener port
-  listen-port: ${conf['worker.server.listern.port']}
+  listen-port: ${conf['worker.server.listener.port']}
   # worker execute thread number to limit task instances in parallel
   exec-threads: 100
   # worker heartbeat interval
@@ -78,7 +78,7 @@ worker:
   groups:
     - default
   # alert server listen host
-  alert-listen-host: ${serviceRoles['DS_ALERT_SEVER'][0].hostname}
+  alert-listen-host: ${serviceRoles['DS_ALERT_SERVER'][0].hostname}
   alert-listen-port: ${conf['alert.rpc.port']}
 
 server:

@@ -28,6 +28,7 @@ public enum TaskType {
     INIT_HIVE_METASTORE(18, "初始化hive Metastore", "org.dromara.cloudeon.processor.InitHiveMetastoreTask", false),
     SPARK_HDFS_MKDIR(19, "HDFS上创建Spark History目录", "org.dromara.cloudeon.processor.InitSparkHistoryDirOnHDFSTask", false),
     INIT_PROMETHEUS_ALERT(20, "导入PROMETHEUS告警规则", "org.dromara.cloudeon.processor.ImportAlertRuleTask", false),
+    INIT_DS_DB(21, "初始化DS数据库", "org.dromara.cloudeon.processor.InitDSTablesTask", false),
 
 
 

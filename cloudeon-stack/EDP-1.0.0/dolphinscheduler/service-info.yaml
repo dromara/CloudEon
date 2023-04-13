@@ -74,7 +74,7 @@ configurations:
     description: "MasterServer端口"
     tag: "端口"
     configurableInWizard: true
-  - name: master.server.listern.port
+  - name: master.server.listen.port
     recommendExpression: 5678
     valueType: InputNumber
     description: "MasterServer 监听端口"
@@ -86,7 +86,7 @@ configurations:
     description: "WorkerServer端口"
     tag: "端口"
     configurableInWizard: true
-  - name: worker.server.listen.port
+  - name: worker.server.listener.port
     recommendExpression: 1234
     valueType: InputNumber
     description: "WorkerServer 监听端口"
@@ -118,7 +118,7 @@ configurations:
     tag: "常用参数"
     configurableInWizard: true
   - name: jdbc.mysql.address
-    recommendExpression: "jdbc:mysql://127.0.0.1:3306/dolphinscheduler"
+    recommendExpression: "jdbc:mysql://192.168.197.149:3306/dolphinscheduler"
     valueType: InputString
     description: "MySQL数据库地址"
     tag: "常用参数"
@@ -130,7 +130,7 @@ configurations:
     tag: "常用参数"
     configurableInWizard: true
   - name: jdbc.mysql.password
-    recommendExpression: "root"
+    recommendExpression: "eWJmP7yvpccHCtmVb61Gxl2XLzIrRgmT"
     valueType: InputString
     description: "MySQL数据库密码"
     tag: "常用参数"

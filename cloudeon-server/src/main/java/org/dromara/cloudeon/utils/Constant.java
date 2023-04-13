@@ -24,6 +24,7 @@ public class Constant {
     public static final String HIVE_SERVICE_NAME = "HIVE";
     public static final String ZOOKEEPER_SERVICE_NAME = "ZOOKEEPER";
     public static final String MONITOR_SERVICE_NAME = "MONITOR";
+    public static final String DS_SERVICE_NAME = "DOLPHINSCHEDULER";
     public static final String MONITOR_ROLE_GRAFANA = "GRAFANA";
     public static final String MONITOR_ROLE_PROMETHEUS = "PROMETHEUS";
 
