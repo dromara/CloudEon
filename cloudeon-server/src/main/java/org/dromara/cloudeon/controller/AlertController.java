@@ -72,7 +72,7 @@ public class AlertController {
                     // 根据节点hostname查询节点id
                     ClusterNodeEntity roleClusterNode = clusterNodeRepository.findByHostname(hostname);
                     String severity = labels.getAlertLevel();
-                    AlertLevel alertLevel = AlertLevel.valueOf(severity.toUpperCase());
+                    AlertLevel alertLevel = AlertLevel.fromDesc(severity);
                     Annotations annotations = alert.getAnnotations();
                     String alertAdvice = annotations.getAlertAdvice();
                     String alertInfo = annotations.getAlertInfo();

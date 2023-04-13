@@ -23,6 +23,15 @@ public enum AlertLevel {
         this.value = value;
     }
 
+    public static AlertLevel fromDesc(String desc) {
+        for (AlertLevel alertLevel : values()) {
+            if (alertLevel.desc.equals(desc)) {
+                return alertLevel;
+            }
+        }
+        return null;
+    }
+
     @JsonValue
     public String getDesc() {
         return desc;
