@@ -95,7 +95,7 @@ public class AlertService {
         // 查找promethus服务所在节点，将本地目录里该集群的告警规则文件全部上传
         ServiceInstanceEntity monitorServiceInstance = serviceInstanceRepository.findEntityByClusterIdAndStackServiceName(clusterId, MONITOR_SERVICE_NAME);
         ServiceRoleInstanceEntity prometheus = roleInstanceRepository.findByServiceInstanceIdAndServiceRoleName(monitorServiceInstance.getId(), MONITOR_ROLE_PROMETHEUS).get(0);
-        ClusterNodeEntity prometheusNode = clusterNodeRepository.findById(prometheus.getId()).get();
+        ClusterNodeEntity prometheusNode = clusterNodeRepository.findById(prometheus.getNodeId()).get();
         // 建立ssh连接
         ClientSession clientSession = SshUtils.openConnectionByPassword(prometheusNode.getIp(), prometheusNode.getSshPort(), prometheusNode.getSshUser(), prometheusNode.getSshPassword());
         SftpFileSystem sftp;
