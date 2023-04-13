@@ -16,7 +16,7 @@ public enum TaskType {
     YARN_HDFS_MKDIR(7, "HDFS上创建目录", "org.dromara.cloudeon.processor.InitYARNDirOnHDFSTask", false),
     CANCEL_TAG_HOST(8, "移除节点上的标签", "org.dromara.cloudeon.processor.CancelHostTagTask", true),
     STOP_K8S_SERVICE(9, "停止K8s服务", "org.dromara.cloudeon.processor.StopRoleK8sDeploymentTask", false),
-    REGISTER_BE(10, "注册be节点", "org.dromara.cloudeon.processor.RegisterBeTask", false),
+    REGISTER_BE(10, "注册be节点", "org.dromara.cloudeon.processor.RegisterDorisBeTask", false),
     REGISTER_PROMETHEUS(11, "注册prometheus采集配置", "org.dromara.cloudeon.processor.RegisterPrometheusScrapyTask", false),
     DELETE_DATA_DIR(12, "删除服务数据目录", "org.dromara.cloudeon.processor.DeleteServiceDataDirTask", true),
     DELETE_SERVICE_DB_DATA(13, "删除服务相关db数据库", "org.dromara.cloudeon.processor.DeleteServiceDBDataTask", false),
@@ -29,6 +29,7 @@ public enum TaskType {
     SPARK_HDFS_MKDIR(19, "HDFS上创建Spark History目录", "org.dromara.cloudeon.processor.InitSparkHistoryDirOnHDFSTask", false),
     INIT_PROMETHEUS_ALERT(20, "导入PROMETHEUS告警规则", "org.dromara.cloudeon.processor.ImportAlertRuleTask", false),
     INIT_DS_DB(21, "初始化DS数据库", "org.dromara.cloudeon.processor.InitDSTablesTask", false),
+    REGISTER_FE(22, "注册fe Follwer节点", "org.dromara.cloudeon.processor.RegisterDorisFeTask", false),
 
 
 

@@ -20,7 +20,7 @@ roles:
     sortNum: 1
     type: MASTER
     jmxPort: 9232
-    fixedNum : 1
+    minNum : 1
     logFile: "fe.log"
 
   - name: DORIS_BE
