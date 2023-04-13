@@ -26,6 +26,6 @@ mysql_service_nio_enabled = true
 audit_log_dir = /opt/edp/${service.serviceName}/log
 sys_log_dir = /opt/edp/${service.serviceName}/log
 
-priority_networks = ${localhostip}
+priority_networks = ${localhostip}/24
 
 
