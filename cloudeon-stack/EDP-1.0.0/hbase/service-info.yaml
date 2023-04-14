@@ -2,7 +2,7 @@ name: HBASE
 label: "Hbase"
 description: "分布式、可扩展、面向列的NoSQL数据库"
 version: 2.14.16
-dockerImage: "registry.cn-hangzhou.aliyuncs.com/udh/2.14.16"
+dockerImage: "registry.cn-hangzhou.aliyuncs.com/udh/hbase/2.14.16"
 dependencies:
     - "HDFS"
     - "ZOOKEEPER"
