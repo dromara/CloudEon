@@ -49,7 +49,7 @@ spec:
             command:
             - "/bin/bash"
             - "-c"
-            - "curl --fail --connect-timeout 15 --max-time 15 \"http://`hostname`:${conf['alert.server.port']}/dolphinscheduler/actuator/health/liveness\"\
+            - "curl --fail --connect-timeout 15 --max-time 15 \"http://`hostname`:${conf['alert.server.port']}/actuator/health/liveness\"\
             \n"
           failureThreshold: 3
           initialDelaySeconds: 10
