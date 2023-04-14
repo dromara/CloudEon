@@ -15,7 +15,7 @@ JAVA_OPTS="-server -Duser.timezone=$SPRING_JACKSON_TIME_ZONE -Xms1g -Xmx1g -Xmn5
 
 nohup java $JAVA_OPTS \
   -cp "$DS_CONF/common.properties":"$DOLPHINSCHEDULER_ALERT_HOME/libs/*" \
- -Dlogging.config=$DS_CONF/alert-logback.xml  org.apache.dolphinscheduler.alert.AlertServer    --spring.config.location=$DS_CONF/alert-application.yaml  > $log 2>&1 &
+ -Dlogging.config=$DS_CONF/alert-logback.xml -Dspring.config.location=$DS_CONF/alert-application.yaml  org.apache.dolphinscheduler.alert.AlertServer      > $log 2>&1 &
 
 echo $! > $pid
 tail -f /dev/null

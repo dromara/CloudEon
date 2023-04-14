@@ -91,14 +91,18 @@ scrape_configs:
     file_sd_configs:
     - files: ['discovery_configs/sparkhistoryserver.json']
   - job_name: 'apiserver'
+    metrics_path: '/dolphinscheduler/actuator/prometheus'
     file_sd_configs:
-    - files: ['configs/ds-apiserver.json']
+    - files: ['discovery_configs/ds-apiserver.json']
   - job_name: 'masterserver'
+    metrics_path: '/actuator/prometheus'
     file_sd_configs:
-    - files: ['configs/ds-masterserver.json']
+    - files: ['discovery_configs/ds-masterserver.json']
   - job_name: 'workerserver'
+    metrics_path: '/actuator/prometheus'
     file_sd_configs:
-    - files: ['configs/ds-workerserver.json']
+    - files: ['discovery_configs/ds-workerserver.json']
   - job_name: 'alertserver'
+    metrics_path: '/actuator/prometheus'
     file_sd_configs:
-    - files: ['configs/ds-alertserver.json']
+    - files: ['discovery_configs/ds-alertserver.json']

@@ -17,6 +17,6 @@ JAVA_OPTS="-server -Duser.timezone=$SPRING_JACKSON_TIME_ZONE -Xms1g -Xmx1g -Xmn5
 java $JAVA_OPTS \
         -cp "$DS_CONF/common.properties":"$DOLPHINSCHEDULER_TOOLS_HOME/libs/*":"$DOLPHINSCHEDULER_TOOLS_HOME/sql" \
         -Dspring.profiles.active=upgrade,mysql   \
-        org.apache.dolphinscheduler.tools.datasource.UpgradeDolphinScheduler   --spring.config.location=$DS_CONF/tool-application.yaml
+        -Dspring.config.location=$DS_CONF/tool-application.yaml   org.apache.dolphinscheduler.tools.datasource.UpgradeDolphinScheduler
 
 

@@ -16,7 +16,7 @@ JAVA_OPTS="-server -Duser.timezone=$SPRING_JACKSON_TIME_ZONE -Xms1g -Xmx1g -Xmn5
 
 nohup java $JAVA_OPTS \
   -cp "$DS_CONF/common.properties":"$DOLPHINSCHEDULER_MASTER_HOME/libs/*" \
--Dlogging.config=$DS_CONF/master-logback.xml   org.apache.dolphinscheduler.server.master.MasterServer   --spring.config.location=$DS_CONF/master-application.yaml  > $log 2>&1 &
+-Dlogging.config=$DS_CONF/master-logback.xml  -Dspring.config.location=$DS_CONF/master-application.yaml  org.apache.dolphinscheduler.server.master.MasterServer    > $log 2>&1 &
 
 echo $! > $pid
 tail -f /dev/null
