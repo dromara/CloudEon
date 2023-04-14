@@ -18,7 +18,7 @@ roles:
   - name: DS_API_SERVER
     label: "DolphinScheduler ApiServer"
     roleFullName: "ds-api-server"
-    linkExpression: "http://${localhostname}:${conf['api.server.port']}/"
+    linkExpression: "http://${localhostname}:${conf['api.server.port']}/dolphinscheduler/ui/login"
     sortNum: 1
     type: MASTER
     jmxPort: 9232
@@ -28,7 +28,7 @@ roles:
   - name: DS_MASTER_SERVER
     label: "DolphinScheduler MasterServer"
     roleFullName: "ds-master-server"
-    linkExpression: "http://${localhostname}:${conf['master.server.port']}/"
+    linkExpression: "http://${localhostname}:${conf['master.server.port']}/dolphinscheduler/doc.html"
     sortNum: 2
     type: MASTER
     minNum: 1
@@ -37,7 +37,7 @@ roles:
   - name: DS_WORKER_SERVER
     label: "DolphinScheduler WorkerServer"
     roleFullName: "ds-worker-server"
-    linkExpression: "http://${localhostname}:${conf['worker.server.port']}/"
+    linkExpression: "http://${localhostname}:${conf['worker.server.port']}/dolphinscheduler/doc.html"
     sortNum: 3
     type: SLAVE
     minNum: 1
@@ -46,7 +46,7 @@ roles:
   - name: DS_ALERT_SERVER
     label: "DolphinScheduler AlertServer"
     roleFullName: "ds-alert-server"
-    linkExpression: "http://${localhostname}:${conf['alert.server.port']}/"
+    linkExpression: "http://${localhostname}:${conf['alert.server.port']}/dolphinscheduler/doc.html"
     sortNum: 4
     type: SLAVE
     minNum: 1
