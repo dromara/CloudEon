@@ -12,7 +12,7 @@ runAs: root
 supportKerberos: false
 
 dashboard:
-  uid: ""
+  uid: "gBTriNc7zfasdf"
 
 roles:
   - name: DS_API_SERVER
