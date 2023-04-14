@@ -23,7 +23,7 @@ roles:
     type: MASTER
     jmxPort: 9232
     fixedNum : 1
-    logFile: "fe.log"
+    logFile: "dolphinscheduler-api.log"
 
   - name: DS_MASTER_SERVER
     label: "DolphinScheduler MasterServer"
@@ -32,7 +32,7 @@ roles:
     sortNum: 2
     type: MASTER
     minNum: 1
-    logFile: "be.INFO"
+    logFile: "dolphinscheduler-master.log"
 
   - name: DS_WORKER_SERVER
     label: "DolphinScheduler WorkerServer"
@@ -41,7 +41,7 @@ roles:
     sortNum: 3
     type: SLAVE
     minNum: 1
-    logFile: "be.INFO"
+    logFile: "dolphinscheduler-worker.log"
 
   - name: DS_ALERT_SERVER
     label: "DolphinScheduler AlertServer"
@@ -50,7 +50,7 @@ roles:
     sortNum: 4
     type: SLAVE
     minNum: 1
-    logFile: "be.INFO"
+    logFile: "dolphinscheduler-alert.log"
 
 persistencePaths:
   - /opt/edp/${service.serviceName}/conf
