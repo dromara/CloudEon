@@ -47,7 +47,7 @@ spec:
         name: "${roleServiceFullName}"
         env:
           - name: GF_SECURITY_ADMIN_PASSWORD
-            value: "password"
+            value: "${conf['grafana.admin.password']}"
           - name: GF_USERS_ALLOW_SIGN_UP
             value: "false"
         readinessProbe:

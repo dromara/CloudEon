@@ -94,6 +94,11 @@ configurations:
     valueType: InputNumber
     configurableInWizard: true
     tag: "端口"
+  - name: grafana.admin.password
+    recommendExpression: admin
+    valueType: InputString
+    configurableInWizard: true
+    tag: "常用参数"
 
 
 
