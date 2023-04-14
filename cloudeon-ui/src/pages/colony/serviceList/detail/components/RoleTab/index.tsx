@@ -37,7 +37,7 @@ const roleTab:React.FC<{ serviceId: any}> = ({serviceId}) => {
 
     const getLog = (id: any) => {
         try {
-            let url = `ws://${process.env.API_HOST}/log`  // 'ws://bsvksx.natappfree.cc/log' 
+            let url = `ws://${process.env.UMI_ENV == 'dev' ? process.env.API_HOST : window.location.host}/log`  // 'ws://bsvksx.natappfree.cc/log' 
             let socket = new window.WebSocket(url)
             setSocketRef(socket)
             socket.onopen = function(){ // socket已连接
