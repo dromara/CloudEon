@@ -34,12 +34,7 @@ public class InstallTask extends BaseCloudeonTask {
         ClusterNodeEntity nodeEntity = clusterNodeRepository.findByHostname(taskParam.getHostName());
         ClientSession clientSession = sshPoolService.openSession(nodeEntity.getIp(), nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getSshPassword());
         SftpFileSystem sftp;
-        try {
-            sftp = SftpClientFactory.instance().createSftpFileSystem(clientSession);
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException("打开sftp失败："+e);
-        }
+        sftp =sshPoolService.openSftpFileSystem(nodeEntity.getIp());
         // 查询节点
         Arrays.stream(paths).forEach(new Consumer<String>() {
             @Override
@@ -59,6 +54,7 @@ public class InstallTask extends BaseCloudeonTask {
             }
         });
         sshPoolService.returnSession(clientSession,nodeEntity.getIp());
+        sshPoolService.returnSftp(sftp,nodeEntity.getIp());
 
 
         // todo 服务日志采集的相关执行

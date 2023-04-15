@@ -95,11 +95,12 @@ public class NodeController {
     public void checkSSH(String sshHost, Integer sshPort, String sshUser, String password) throws IOException {
 
         ClientSession session = sshPoolService.openSession(sshHost, sshPort, sshUser, password);
-        SftpFileSystem sftp = SftpClientFactory.instance().createSftpFileSystem(session);
+        SftpFileSystem sftp = sshPoolService.openSftpFileSystem(sshHost);
         SshUtils.uploadFile("/tmp/", cloudeonConfigProp.getRemoteScriptPath() + FileUtil.FILE_SEPARATOR + "check.sh",sftp);
         String result = SshUtils.execCmdWithResult(session, "sh /tmp/check.sh");
         Assert.equals(result,"ok!!!");
         sshPoolService.returnSession(session,sshHost);
+        sshPoolService.returnSftp(sftp,sshHost);
     }
 
 
