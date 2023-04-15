@@ -10,7 +10,7 @@ import defaultSettings from '../config/defaultSettings';
 import { currentUser as queryCurrentUser } from './services/ant-design-pro/api';
 import logoImg from '../src/assets/images/logo2.png';
 import userImg from '../src/assets/images/user.png'
-import React from 'react';
+import React, { useEffect } from 'react';
 import * as Icon from '@ant-design/icons';
 import {
   RobotOutlined,
@@ -230,17 +230,23 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     menuFooterRender:()=><></>,
     menuItemRender: (itemProps: any, defaultDom: any, props: any) => {
       // console.log('--menuItemRender: ');
-      
       const getData = JSON.parse(sessionStorage.getItem('colonyData') || '{}')
       const { actionCount, setActionCount } = useModel('colonyModel', model => ({ actionCount: model.actionCount, setActionCount: model.setActionCountModel }));
-      const getCount = async()=>{
-        const result = await getCountActiveAPI({clusterId:getData.clusterId})
-          setActionCount(result?.data || 0)
-      }
-      if(getData && getData.clusterId && !timer && !location.href.includes('user/login') && !location.href.includes('colony/colonyMg')){
-        getCount()
-        timer = setInterval(getCount,3000)
-      }   
+      
+      useEffect(()=>{
+        const getCount = async()=>{
+          const result = await getCountActiveAPI({clusterId:getData.clusterId})
+            setActionCount(result?.data || 0)
+        }
+        if(getData && getData.clusterId && !timer && !location.href.includes('user/login') && !location.href.includes('colony/colonyMg')){
+          getCount()
+          timer = setInterval(getCount,3000)
+        } 
+        return ()=>{
+          clearInterval(timer)
+          timer = null
+        }        
+      },[])  
 
      return <div style={{height:'100%',display:'flex',justifyContent: 'center',flexDirection:'column', alignItems:'center',width:'100%'}} 
         onClick={() => {
