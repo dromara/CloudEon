@@ -56,7 +56,6 @@ public abstract class BaseCloudeonTask implements Runnable {
         } catch (Exception e) {
             doWhenError(e);
         }
-        doSleep(5000);
         after();
 
     }
