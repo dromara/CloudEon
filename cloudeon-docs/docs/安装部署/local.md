@@ -39,7 +39,7 @@ cloudeon 目前支持配置 MySQL 作为应用数据库；**需要 MySQL 5.7 及
 mysql> CREATE DATABASE `cloudeon` CHARACTER SET 'utf8' COLLATE 'utf8_general_ci';
 ```
 **注意：在初次连接时会自动初始化数据库**
-**首次连接数据库(或者版本升级)时,建议使用一个权限较高的数据库账号登录(建议 root 账号)。因为首次连接会执行数据库初始化脚本，如果使用的数据库账号权限太低，会导致数据库初始化失败**
+**首次连接数据库时,建议使用一个权限较高的数据库账号登录(建议 root 账号)。因为首次连接会执行数据库初始化脚本，如果使用的数据库账号权限太低，会导致数据库初始化失败**
 编辑 conf/application.properties 文件，将数据库信息配置修改
 ```properties
        

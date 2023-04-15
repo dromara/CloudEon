@@ -1,6 +1,6 @@
 create table ce_stack_alert_rule
 (
-    id                int          null,
+    id                int        auto_increment  primary key,
     rule_name         varchar(255) null,
     alert_level       int          null,
     promql            text         null,
@@ -13,7 +13,7 @@ create table ce_stack_alert_rule
 
 create table ce_alert_rule_define
 (
-    id                int          null,
+    id                int           auto_increment  primary key,
     cluster_id                int          null,
     rule_name         varchar(255) null,
     alert_level       int          null,

@@ -57,12 +57,11 @@ nav:
       - 安装部署/docker.md
       - 安装部署/local.md
   - quickstart.md
-  - FAQ.md
-  - Roadmap.md
+  - 支持组件:
+      - 支持组件/supportservice.md
   - 社区贡献:
       - 社区贡献/communicate.md
       - 社区贡献/contribute.md
       - 社区贡献/develop.md
-  - 支持组件:
-      - 支持组件/supportservice.md
-
+  - FAQ.md
+  - Roadmap.md
