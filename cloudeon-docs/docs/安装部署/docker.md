@@ -43,7 +43,7 @@ spring.servlet.multipart.max-request-size=209715200
 # temporary skip circular references check
 spring.main.allow-circular-references=true
 
-####### udh properties #######
+####### cloudeon properties #######
 cloudeon.stack.load.path=${cloudeon.home.path}/stack
 cloudeon.remote.script.path=${cloudeon.home.path}/script
 cloudeon.task.log=${cloudeon.home.path}/log
