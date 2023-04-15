@@ -5,6 +5,7 @@ import org.dromara.cloudeon.dao.ClusterNodeRepository;
 import org.dromara.cloudeon.dao.StackServiceRepository;
 import org.dromara.cloudeon.entity.ClusterNodeEntity;
 import org.dromara.cloudeon.entity.StackServiceEntity;
+import org.dromara.cloudeon.service.SshPoolService;
 import org.dromara.cloudeon.utils.SshUtils;
 import lombok.NoArgsConstructor;
 import org.apache.sshd.client.session.ClientSession;
@@ -19,6 +20,7 @@ public class PullImageTask extends BaseCloudeonTask {
     public void internalExecute() {
         StackServiceRepository stackServiceRepository = SpringUtil.getBean(StackServiceRepository.class);
         ClusterNodeRepository clusterNodeRepository = SpringUtil.getBean(ClusterNodeRepository.class);
+        SshPoolService sshPoolService = SpringUtil.getBean(SshPoolService.class);
 
         // 查询安装服务的镜像
         StackServiceEntity stackServiceEntity = stackServiceRepository.findById(taskParam.getStackServiceId()).get();
@@ -34,7 +36,7 @@ public class PullImageTask extends BaseCloudeonTask {
             command=  "ctr image pull " + dockerImage;
         }
         // ssh执行拉镜像
-        ClientSession clientSession = SshUtils.openConnectionByPassword(nodeEntity.getIp(), nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getSshPassword());
+        ClientSession clientSession = sshPoolService.openSession(nodeEntity.getIp(), nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getSshPassword());
         try {
             log.info("节点：" + taskParam.getHostName() + " 上执行命令：" + command);
             String result = SshUtils.execCmdWithResult(clientSession, command);
@@ -43,7 +45,7 @@ public class PullImageTask extends BaseCloudeonTask {
             throw new RuntimeException(e);
         }
         log.info("成功在节点：" + taskParam.getHostName() + " 上拉取镜像：" + dockerImage);
-        SshUtils.closeConnection(clientSession);
+        sshPoolService.returnSession(clientSession,(nodeEntity.getIp()));
 
 
 

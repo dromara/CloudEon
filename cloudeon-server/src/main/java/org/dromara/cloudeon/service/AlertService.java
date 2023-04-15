@@ -57,6 +57,9 @@ public class AlertService {
     @Resource
     private ClusterNodeRepository clusterNodeRepository;
 
+    @Resource
+    private SshPoolService sshPoolService;
+
     public void upgradeMonitorAlertRule(Integer clusterId, Logger log) {
         String workHome = cloudeonConfigProp.getWorkHome();
         // 创建本地告警规则资源工作目录  ${workHome}/alert-rule/1/
@@ -97,7 +100,7 @@ public class AlertService {
         ServiceRoleInstanceEntity prometheus = roleInstanceRepository.findByServiceInstanceIdAndServiceRoleName(monitorServiceInstance.getId(), MONITOR_ROLE_PROMETHEUS).get(0);
         ClusterNodeEntity prometheusNode = clusterNodeRepository.findById(prometheus.getNodeId()).get();
         // 建立ssh连接
-        ClientSession clientSession = SshUtils.openConnectionByPassword(prometheusNode.getIp(), prometheusNode.getSshPort(), prometheusNode.getSshUser(), prometheusNode.getSshPassword());
+        ClientSession clientSession = sshPoolService.openSession(prometheusNode.getIp(), prometheusNode.getSshPort(), prometheusNode.getSshUser(), prometheusNode.getSshPassword());
         SftpFileSystem sftp;
         try {
             sftp = SftpClientFactory.instance().createSftpFileSystem(clientSession);
@@ -113,6 +116,7 @@ public class AlertService {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+        sshPoolService.returnSession(clientSession,prometheusNode.getIp());
 
     }
 }

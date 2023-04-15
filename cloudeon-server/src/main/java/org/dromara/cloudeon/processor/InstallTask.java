@@ -5,6 +5,7 @@ import org.dromara.cloudeon.dao.ClusterNodeRepository;
 import org.dromara.cloudeon.dao.ServiceInstanceRepository;
 import org.dromara.cloudeon.entity.ClusterNodeEntity;
 import org.dromara.cloudeon.entity.ServiceInstanceEntity;
+import org.dromara.cloudeon.service.SshPoolService;
 import org.dromara.cloudeon.utils.SshUtils;
 import lombok.NoArgsConstructor;
 import org.apache.sshd.client.session.ClientSession;
@@ -24,12 +25,14 @@ public class InstallTask extends BaseCloudeonTask {
         // 查询服务实例需要创建的目录
         ServiceInstanceRepository serviceInstanceRepository = SpringUtil.getBean(ServiceInstanceRepository.class);
         ClusterNodeRepository clusterNodeRepository = SpringUtil.getBean(ClusterNodeRepository.class);
+        SshPoolService sshPoolService = SpringUtil.getBean(SshPoolService.class);
+
         ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(taskParam.getServiceInstanceId()).get();
         String persistencePaths = serviceInstanceEntity.getPersistencePaths();
         String[] paths = persistencePaths.split(",");
 
         ClusterNodeEntity nodeEntity = clusterNodeRepository.findByHostname(taskParam.getHostName());
-        ClientSession clientSession = SshUtils.openConnectionByPassword(nodeEntity.getIp(), nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getSshPassword());
+        ClientSession clientSession = sshPoolService.openSession(nodeEntity.getIp(), nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getSshPassword());
         SftpFileSystem sftp;
         try {
             sftp = SftpClientFactory.instance().createSftpFileSystem(clientSession);
@@ -55,7 +58,7 @@ public class InstallTask extends BaseCloudeonTask {
 
             }
         });
-        SshUtils.closeConnection(clientSession);
+        sshPoolService.returnSession(clientSession,nodeEntity.getIp());
 
 
         // todo 服务日志采集的相关执行

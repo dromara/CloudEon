@@ -10,6 +10,7 @@ import org.dromara.cloudeon.dao.ClusterNodeRepository;
 import org.dromara.cloudeon.dto.ResultDTO;
 import org.dromara.cloudeon.entity.ClusterNodeEntity;
 import org.dromara.cloudeon.service.KubeService;
+import org.dromara.cloudeon.service.SshPoolService;
 import org.dromara.cloudeon.utils.ByteConverter;
 import org.dromara.cloudeon.utils.SshUtils;
 import io.fabric8.kubernetes.api.model.Node;
@@ -43,6 +44,9 @@ public class NodeController {
 
     @Resource
     private KubeService kubeService;
+
+    @Resource
+    private SshPoolService sshPoolService;
 
     @PostMapping("/add")
     public ResultDTO<Void> addNode(@RequestBody SaveNodeRequest req) throws IOException {
@@ -90,12 +94,12 @@ public class NodeController {
      */
     public void checkSSH(String sshHost, Integer sshPort, String sshUser, String password) throws IOException {
 
-        ClientSession session = SshUtils.openConnectionByPassword(sshHost, sshPort, sshUser, password);
+        ClientSession session = sshPoolService.openSession(sshHost, sshPort, sshUser, password);
         SftpFileSystem sftp = SftpClientFactory.instance().createSftpFileSystem(session);
         SshUtils.uploadFile("/tmp/", cloudeonConfigProp.getRemoteScriptPath() + FileUtil.FILE_SEPARATOR + "check.sh",sftp);
         String result = SshUtils.execCmdWithResult(session, "sh /tmp/check.sh");
         Assert.equals(result,"ok!!!");
-        session.close();
+        sshPoolService.returnSession(session,sshHost);
     }
 
 
