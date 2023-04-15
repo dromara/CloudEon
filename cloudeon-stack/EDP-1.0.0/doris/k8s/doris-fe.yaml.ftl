@@ -46,9 +46,11 @@ spec:
         imagePullPolicy: "Always"
         name: "${roleServiceFullName}"
         readinessProbe:
-          httpGet:
-            path: /api/health
-            port: ${conf['http_port']}
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - ps aux | grep PaloFe | grep -v grep > /dev/null
           failureThreshold: 3
           initialDelaySeconds: 3
           periodSeconds: 30

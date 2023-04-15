@@ -28,9 +28,6 @@ public class RegisterDorisFeTask extends BaseCloudeonTask {
 
         // 查询服务角色实例中的所有be
         Integer serviceInstanceId = taskParam.getServiceInstanceId();
-        List<ServiceRoleInstanceEntity> beInstanceList = roleInstanceRepository
-                .findByServiceInstanceIdAndServiceRoleName(serviceInstanceId, "DORIS_BE");
-
         List<ServiceRoleInstanceEntity> feInstanceList = roleInstanceRepository
                 .findByServiceInstanceIdAndServiceRoleName(serviceInstanceId, "DORIS_FE");
 
@@ -48,21 +45,22 @@ public class RegisterDorisFeTask extends BaseCloudeonTask {
         String url = "jdbc:mysql://" + masterFeIp + ":" + masterFeMysqlPort;
         log.info("jdbc连接为：{}", url);
         DataSource ds = new SimpleDataSource(url, "root", null);
-        for (ServiceRoleInstanceEntity beRoleEntity : beInstanceList) {
+        for (ServiceRoleInstanceEntity feRoleEntity : feInstanceList) {
             try (Connection conn = ds.getConnection();) {
                 // 执行非查询语句，返回影响的行数
-                String beIp = clusterNodeRepository.findById(beRoleEntity.getNodeId()).get().getIp();
-                String sql = String.format("ALTER SYSTEM ADD FOLLOWER  \"%s:%s\" ", beIp, feEditLogPort);
+                String feIp = clusterNodeRepository.findById(feRoleEntity.getNodeId()).get().getIp();
+                String sql = String.format("ALTER SYSTEM ADD FOLLOWER  \"%s:%s\" ", feIp, feEditLogPort);
                 log.info("执行sql：{}", sql);
                 SqlExecutor.execute(conn, sql);
 
             } catch (SQLException e) {
                 e.printStackTrace();
                 String message = e.getMessage();
-                if (!message.contains("Same backend already exists")) {
+                if (!message.contains("frontend already exists name")) {
                     throw new RuntimeException(e);
                 }else {
-                    log.error(message);
+                    log.info(message);
+                    log.info("该fe:{}已经注册过了，忽略....");
                 }
 
             }
