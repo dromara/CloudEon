@@ -427,7 +427,7 @@ const serviceAdd: React.FC = () => {
                         }
                       })
                     }
-                    console.log('--initParams: ', initParams);
+                    // console.log('--initParams: ', initParams);
                     installService(initParams)
 
                   }else{

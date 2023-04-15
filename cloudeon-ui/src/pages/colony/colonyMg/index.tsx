@@ -16,7 +16,7 @@ import "ace-builds/src-noconflict/ext-language_tools";
 const { Option } = Select;
 
 const Colony: React.FC = () => {
-  const intl = useIntl();
+  // const intl = useIntl();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -134,11 +134,11 @@ const Colony: React.FC = () => {
   //   history.push('/colony/nodeList');
   // }
 
-  type formItem = {
-    clusterName?: string,
-    stackId?: number,
-    kubeConfig?: string | null
-  }
+  // type formItem = {
+  //   clusterName?: string,
+  //   stackId?: number,
+  //   kubeConfig?: string | null
+  // }
 
   const handleUpdate = (item: API.ColonyItem) => {
     setEditColony(item)

@@ -39,6 +39,7 @@ const ConfigService:React.FC<{checkConfNext: any}> = ( {checkConfNext} )=>{
     })|| []
 
     const updateConfig = (value:any) => {
+        // console.log('---updateConfig: ', value);
         sessionStorage.setItem('allConfData', JSON.stringify(cloneDeep(value)))
         setConfData(value)
     }
@@ -240,10 +241,14 @@ const ConfigService:React.FC<{checkConfNext: any}> = ( {checkConfNext} )=>{
 
     // 修改某个值
     const actionOnChange = (e:any, record: Item) => {
-        console.log('--e: ', e);        
+        // console.log('--e: ', e);        
         record.value = e
         let cdata = cloneDeep(filterTableList || [])
+        // console.log('--cdata: ', cdata); 
         cdata && setFilterTableList(cdata)
+        const newData = cloneDeep(currentConfList||[]);
+        const index = newData.findIndex(item => record.name === item.name); // name是唯一值，所以用name做主键
+        dealItemData(index,newData,record) // 处理保存编辑的逻辑
     }
 
     interface Item {
@@ -507,6 +512,7 @@ const ConfigService:React.FC<{checkConfNext: any}> = ( {checkConfNext} )=>{
         setInitConfList(cloneDeep(currentConfList))
         if(serviceId){
             let confResult = {...(confData||{}),[serviceId]:cloneDeep(currentConfList)}
+            // console.log('---confResult:', confResult);
             updateConfig(confResult)
         }
     }
@@ -549,7 +555,7 @@ const ConfigService:React.FC<{checkConfNext: any}> = ( {checkConfNext} )=>{
                                 type="primary"
                                 disabled={!serviceId || loading}
                                 onClick={() => {
-                                    console.log('--currentConfList: ', currentConfList, form.getFieldsValue(true));
+                                    // console.log('--currentConfList: ', currentConfList, form.getFieldsValue(true));
                                     submitEdit()
                                 }}
                             >
