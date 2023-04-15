@@ -59,6 +59,7 @@ spec:
           limits: {}
         securityContext:
           privileged: true
+          runAsUser: 0
         volumeMounts:
         - mountPath: "/opt/edp/${service.serviceName}/data"
           name: "data"
