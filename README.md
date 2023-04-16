@@ -25,8 +25,8 @@
 
 - [官网地址](https://cloudeon.top//)
 - [项目介绍](https://docs.cloudeon.top/en/latest/)
-- [安装部署](https://docs.cloudeon.top/en/latest/instal/)
-- [支持组件](https://docs.cloudeon.top/en/latest/supportservice/)
+- [安装部署](https://docs.cloudeon.top/en/latest/%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/docker)
+- [支持组件](https://docs.cloudeon.top/en/latest/%E6%94%AF%E6%8C%81%E7%BB%84%E4%BB%B6/supportservice/)
 - [Roadmap](https://docs.cloudeon.top/en/latest/Roadmap/)
 
 
