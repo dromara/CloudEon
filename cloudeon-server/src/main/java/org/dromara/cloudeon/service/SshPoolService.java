@@ -34,12 +34,13 @@ public class SshPoolService {
     public SftpFileSystem openSftpFileSystem(String server) {
         SftpFilesystemPool sftpPool = sftpPools.get(server);
         SftpFileSystem fileSystem = null;
+        if (sftpPool == null) {
+            // 获取该服务器地址的ssh池
+            SshConnectionPool sshConnectionPool = pools.get(server);
+            sftpPools.put(server, new SftpFilesystemPool(sshConnectionPool));
+            sftpPool = sftpPools.get(server);
+        }
         try {
-            if (sftpPool == null) {
-                ClientSession clientSession = pools.get(server).borrowObject();
-                sftpPools.put(server, new SftpFilesystemPool(clientSession));
-                sftpPool = sftpPools.get(server);
-            }
             fileSystem = sftpPool.borrowObject();
         } catch (Exception e) {
             e.printStackTrace();

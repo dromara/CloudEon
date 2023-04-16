@@ -10,12 +10,13 @@ import org.apache.sshd.client.session.ClientSession;
 import org.apache.sshd.sftp.client.SftpClientFactory;
 import org.apache.sshd.sftp.client.fs.SftpFileSystem;
 
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 @Slf4j
 public class SftpFilesystemPool {
     private final GenericObjectPool<SftpFileSystem> pool;
 
-    public SftpFilesystemPool(ClientSession clientSession) {
+    public SftpFilesystemPool(SshConnectionPool sshConnectionPool) {
         GenericObjectPoolConfig<SftpFileSystem> config = new GenericObjectPoolConfig<>();
         config.setMaxTotal(5);
         config.setMaxIdle(3);
@@ -23,18 +24,18 @@ public class SftpFilesystemPool {
         config.setTestOnBorrow(true);
         config.setTestOnReturn(true);
         config.setTestWhileIdle(true);
-        config.setTimeBetweenEvictionRunsMillis(TimeUnit.MINUTES.toMillis(1));
-        config.setMinEvictableIdleTimeMillis(TimeUnit.MINUTES.toMillis(5));
+        config.setTimeBetweenEvictionRuns(Duration.ofMinutes(30));
+        config.setMinEvictableIdleTime(Duration.ofMinutes(5));
 
-        pool = new GenericObjectPool<>(new SftpConnectionPool(clientSession), config);
+        pool = new GenericObjectPool<>(new SftpConnectionPool(sshConnectionPool), config);
     }
 
     public SftpFileSystem borrowObject() throws Exception {
         return pool.borrowObject();
     }
 
-    public void returnObject(SftpFileSystem session) {
-        pool.returnObject(session);
+    public void returnObject(SftpFileSystem filesystem) {
+        pool.returnObject(filesystem);
     }
 
     public void close() {
@@ -42,22 +43,22 @@ public class SftpFilesystemPool {
     }
 
     private static class SftpConnectionPool extends BasePooledObjectFactory<SftpFileSystem> {
-        private final ClientSession clientSession;
+        private final SshConnectionPool sshConnectionPool;
 
-        public SftpConnectionPool(ClientSession clientSession) {
-            this.clientSession = clientSession;
+        public SftpConnectionPool( SshConnectionPool sshConnectionPool) {
+            this.sshConnectionPool = sshConnectionPool;
         }
 
         @Override
         public SftpFileSystem create() throws Exception {
-            log.info("创建SftpFileSystem：{}",clientSession.getConnectAddress());
+            ClientSession clientSession = sshConnectionPool.borrowObject();
             SftpFileSystem SftpFileSystem = SftpClientFactory.instance().createSftpFileSystem(clientSession);
             return SftpFileSystem;
         }
 
         @Override
-        public PooledObject<SftpFileSystem> wrap(SftpFileSystem session) {
-            return new DefaultPooledObject<>(session);
+        public PooledObject<SftpFileSystem> wrap(SftpFileSystem filesystem) {
+            return new DefaultPooledObject<>(filesystem);
         }
 
         @Override

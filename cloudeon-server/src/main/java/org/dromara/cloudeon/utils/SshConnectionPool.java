@@ -7,6 +7,7 @@ import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.apache.sshd.client.session.ClientSession;
 
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 public class SshConnectionPool {
@@ -14,14 +15,14 @@ public class SshConnectionPool {
 
     public SshConnectionPool(String host, int port, String username, String password) {
         GenericObjectPoolConfig<ClientSession> config = new GenericObjectPoolConfig<>();
-        config.setMaxTotal(10);
-        config.setMaxIdle(5);
+        config.setMaxTotal(5);
+        config.setMaxIdle(3);
         config.setMinIdle(1);
         config.setTestOnBorrow(true);
         config.setTestOnReturn(true);
         config.setTestWhileIdle(true);
-        config.setTimeBetweenEvictionRunsMillis(TimeUnit.MINUTES.toMillis(1));
-        config.setMinEvictableIdleTimeMillis(TimeUnit.MINUTES.toMillis(5));
+        config.setTimeBetweenEvictionRuns(Duration.ofMinutes(30));
+        config.setMinEvictableIdleTime(Duration.ofMinutes(5));
 
         pool = new GenericObjectPool<>(new SshConnectionFactory(host, port, username, password), config);
     }
