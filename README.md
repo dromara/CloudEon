@@ -24,10 +24,10 @@
 项目相关介绍，使用，最佳实践等相关内容，都会在官方文档呈现，如有疑问，请先阅读官方文档，以下列举以下常用快链。
 
 - [官网地址](https://cloudeon.top//)
-- [项目介绍](https://cloudeon.readthedocs.io/en/latest/)
-- [安装部署](https://cloudeon.readthedocs.io/en/latest/instal/)
-- [支持组件](https://cloudeon.readthedocs.io/en/latest/supportservice/)
-- [Roadmap](https://cloudeon.readthedocs.io/en/latest/Roadmap/)
+- [项目介绍](https://docs.cloudeon.top/en/latest/)
+- [安装部署](https://docs.cloudeon.top/en/latest/instal/)
+- [支持组件](https://docs.cloudeon.top/en/latest/supportservice/)
+- [Roadmap](https://docs.cloudeon.top/en/latest/Roadmap/)
 
 
 ## 🔍 功能特点
