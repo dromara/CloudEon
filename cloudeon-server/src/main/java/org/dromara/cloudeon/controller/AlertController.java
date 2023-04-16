@@ -59,11 +59,18 @@ public class AlertController {
                     String startsAt = alert.getStartsAt();
                     AlertLabels labels = alert.getLabels();
                     String alertname = labels.getAlertname();
+
                     int clusterId = labels.getClusterId();
                     String instance = labels.getInstance();
                     String hostname = instance.split(":")[0];
                     String serviceRoleName = labels.getServiceRoleName();
-                    log.info("根据告警信息查找服务角色：{} , hostname: {}", serviceRoleName, hostname);
+                    log.info("接收到firing告警，根据告警信息查找活跃告警, alertName:{} , startsAt: {} ,hostname:{} , serviceRoleName:{}", alertname, startsAt,hostname,serviceRoleName);
+                    // 判断是否已经保存过了
+                    AlertMessageEntity messageEntity = alertMessageRepository.findByFireTimeAndAlertNameAndHostname(startsAt, alertname,hostname);
+                    if (messageEntity != null) {
+                        // 之前已经保存过的就不需要了
+                        return null;
+                    }
                     // 查询服务角色实例
                     ServiceRoleInstanceEntity serviceRoleInstanceEntity = roleInstanceRepository.findByServiceRoleNameAndClusterIdAndHostname(clusterId, serviceRoleName, hostname);
                     if (serviceRoleInstanceEntity == null) {
@@ -102,11 +109,13 @@ public class AlertController {
                 String startsAt = alert.getStartsAt();
                 AlertLabels labels = alert.getLabels();
                 String alertname = labels.getAlertname();
-                log.info("根据告警信息查找活跃告警, alertName:{} , startsAt: {}", alertname, startsAt);
-
-                AlertMessageEntity alertMessageEntity = alertMessageRepository.findByFireTimeAndAlertName(startsAt, alertname);
+                String instance = labels.getInstance();
+                String hostname = instance.split(":")[0];
+                log.info("接收到已处理的告警，根据告警信息查找活跃告警, alertName:{} , startsAt: {} ,hostname:{}", alertname, startsAt,hostname);
+                AlertMessageEntity alertMessageEntity =alertMessageRepository.findByFireTimeAndAlertNameAndHostname(startsAt, alertname,hostname);
                 if (alertMessageEntity != null) {
                     String endsAt = alert.getEndsAt();
+                    alertMessageEntity.setResolved(true);
                     alertMessageEntity.setSolveTime(endsAt);
                     alertMessageEntity.setUpdateTime(new Date());
                     alertMessageRepository.save(alertMessageEntity);

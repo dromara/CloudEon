@@ -17,6 +17,7 @@ import org.dromara.cloudeon.config.CloudeonConfigProp;
 import org.dromara.cloudeon.dao.*;
 import org.dromara.cloudeon.dto.RoleNodeInfo;
 import org.dromara.cloudeon.entity.*;
+import org.dromara.cloudeon.service.SshPoolService;
 import org.dromara.cloudeon.utils.Constant;
 import org.dromara.cloudeon.utils.SshUtils;
 import org.dromara.cloudeon.utils.UnixConverUtil;
@@ -46,6 +47,7 @@ public class ConfigTask extends BaseCloudeonTask {
         ClusterNodeRepository clusterNodeRepository = SpringUtil.getBean(ClusterNodeRepository.class);
         ServiceRoleInstanceRepository roleInstanceRepository = SpringUtil.getBean(ServiceRoleInstanceRepository.class);
         ServiceInstanceConfigRepository configRepository = SpringUtil.getBean(ServiceInstanceConfigRepository.class);
+        SshPoolService sshPoolService = SpringUtil.getBean(SshPoolService.class);
 
         CloudeonConfigProp cloudeonConfigProp = SpringUtil.getBean(CloudeonConfigProp.class);
         Environment environment = SpringUtil.getBean(Environment.class);
@@ -129,14 +131,9 @@ public class ConfigTask extends BaseCloudeonTask {
 
         // ssh上传所有配置文件到指定目录
         ClusterNodeEntity nodeEntity = clusterNodeRepository.findByHostname(taskParam.getHostName());
-        ClientSession clientSession = SshUtils.openConnectionByPassword(nodeEntity.getIp(), nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getSshPassword());
+        ClientSession clientSession = sshPoolService.openSession(nodeEntity.getIp(), nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getSshPassword());
         SftpFileSystem sftp;
-        try {
-            sftp = SftpClientFactory.instance().createSftpFileSystem(clientSession);
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException("打开sftp失败："+e);
-        }
+        sftp = sshPoolService.openSftpFileSystem(nodeEntity.getIp());
         String remoteConfDirPath = "/opt/edp/" + serviceInstanceEntity.getServiceName() +"/conf/";
         log.info("拷贝本地配置目录：" + outputConfPath + " 到节点" + taskParam.getHostName() + "的：" + remoteConfDirPath);
         try {
@@ -171,7 +168,8 @@ public class ConfigTask extends BaseCloudeonTask {
             }
         }
 
-        SshUtils.closeConnection(clientSession);
+        sshPoolService.returnSession(clientSession,nodeEntity.getIp());
+        sshPoolService.returnSftp(sftp,nodeEntity.getIp());
     }
 
     /**

@@ -11,6 +11,7 @@ import org.dromara.cloudeon.entity.ClusterNodeEntity;
 import org.dromara.cloudeon.entity.ServiceInstanceEntity;
 import org.dromara.cloudeon.entity.ServiceRoleInstanceEntity;
 import org.dromara.cloudeon.entity.StackServiceEntity;
+import org.dromara.cloudeon.service.SshPoolService;
 import org.dromara.cloudeon.utils.SshUtils;
 
 import java.io.IOException;
@@ -28,6 +29,7 @@ public class InitSparkHistoryDirOnHDFSTask extends BaseCloudeonTask {
         StackServiceRepository stackServiceRepository = SpringUtil.getBean(StackServiceRepository.class);
         ServiceRoleInstanceRepository roleInstanceRepository = SpringUtil.getBean(ServiceRoleInstanceRepository.class);
         ClusterNodeRepository clusterNodeRepository = SpringUtil.getBean(ClusterNodeRepository.class);
+        SshPoolService sshPoolService = SpringUtil.getBean(SshPoolService.class);
 
         TaskParam taskParam = getTaskParam();
         Integer serviceInstanceId = taskParam.getServiceInstanceId();
@@ -48,7 +50,7 @@ public class InitSparkHistoryDirOnHDFSTask extends BaseCloudeonTask {
         ClusterNodeEntity nodeEntity = clusterNodeRepository.findById(nodeId).get();
         String ip = nodeEntity.getIp();
         log.info("在节点" + ip + "上执行命令:" + cmd);
-        ClientSession clientSession = SshUtils.openConnectionByPassword(ip, nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getSshPassword());
+        ClientSession clientSession = sshPoolService.openSession(ip, nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getSshPassword());
         try {
             String result = SshUtils.execCmdWithResult(clientSession, cmd);
             log.info(result);
@@ -56,7 +58,7 @@ public class InitSparkHistoryDirOnHDFSTask extends BaseCloudeonTask {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
-        SshUtils.closeConnection(clientSession);
+        sshPoolService.returnSession(clientSession,ip);
 
 
     }

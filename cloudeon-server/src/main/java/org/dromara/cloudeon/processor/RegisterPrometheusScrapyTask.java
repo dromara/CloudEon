@@ -14,6 +14,7 @@ import org.dromara.cloudeon.config.CloudeonConfigProp;
 import org.dromara.cloudeon.dao.*;
 import org.dromara.cloudeon.dto.RoleNodeInfo;
 import org.dromara.cloudeon.entity.*;
+import org.dromara.cloudeon.service.SshPoolService;
 import org.dromara.cloudeon.utils.SshUtils;
 
 import java.io.File;
@@ -40,6 +41,7 @@ public class RegisterPrometheusScrapyTask extends BaseCloudeonTask {
         ServiceRoleInstanceRepository roleInstanceRepository = SpringUtil.getBean(ServiceRoleInstanceRepository.class);
         ServiceInstanceRepository serviceInstanceRepository = SpringUtil.getBean(ServiceInstanceRepository.class);
         ClusterNodeRepository clusterNodeRepository = SpringUtil.getBean(ClusterNodeRepository.class);
+        SshPoolService sshPoolService = SpringUtil.getBean(SshPoolService.class);
 
         CloudeonConfigProp cloudeonConfigProp = SpringUtil.getBean(CloudeonConfigProp.class);
         TaskParam taskParam = getTaskParam();
@@ -108,14 +110,9 @@ public class RegisterPrometheusScrapyTask extends BaseCloudeonTask {
         ServiceRoleInstanceEntity monitorPrometheus = roleInstanceRepository.findByServiceInstanceIdAndServiceRoleName(monitorServiceInstance.getId(), "PROMETHEUS").get(0);
         Integer monitorPrometheusNodeId = monitorPrometheus.getNodeId();
         ClusterNodeEntity prometheusNodeEntity = clusterNodeRepository.findById(monitorPrometheusNodeId).get();
-        ClientSession clientSession = SshUtils.openConnectionByPassword(prometheusNodeEntity.getIp(), prometheusNodeEntity.getSshPort(), prometheusNodeEntity.getSshUser(), prometheusNodeEntity.getSshPassword());
+        ClientSession clientSession =sshPoolService.openSession(prometheusNodeEntity.getIp(), prometheusNodeEntity.getSshPort(), prometheusNodeEntity.getSshUser(), prometheusNodeEntity.getSshPassword());
         SftpFileSystem sftp;
-        try {
-            sftp = SftpClientFactory.instance().createSftpFileSystem(clientSession);
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException("打开sftp失败：" + e);
-        }
+        sftp = sshPoolService.openSftpFileSystem(prometheusNodeEntity.getIp());
         String remoteConfDirPath = "/opt/edp/" + monitorServiceInstance.getServiceName() +"/conf/discovery_configs/";
         log.info("拷贝本地配置目录：" + outputConfPath + " 到节点" + prometheusNodeEntity.getHostname() + "的：" + remoteConfDirPath);
         try {
@@ -125,7 +122,8 @@ public class RegisterPrometheusScrapyTask extends BaseCloudeonTask {
             throw new RuntimeException("拷贝文件上远程服务器失败：" + e);
         }
         log.info("成功拷贝本地配置目录：" + outputConfPath + " 到节点" + prometheusNodeEntity.getHostname() + "的：" + remoteConfDirPath);
-
+        sshPoolService.returnSession(clientSession,prometheusNodeEntity.getIp());
+        sshPoolService.returnSftp(sftp,prometheusNodeEntity.getIp());
     }
 
     private Map<String, List<RoleNodeInfo>> getServiceRoles(List<ServiceRoleInstanceEntity> roleInstanceEntities, ClusterNodeRepository clusterNodeRepository) {
