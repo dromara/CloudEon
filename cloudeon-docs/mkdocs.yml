@@ -1,9 +1,9 @@
 site_name: CloudEon Documentation
 site_description: 构建于kubernetes集群之上的大数据集群管理平台
-site_url: https://github.com/Pandas886/CloudEon
+site_url: https://github.com/dromara/CloudEon
 site_author: Pandas886
-repo_name: Pandas886/CloudEon
-repo_url: https://github.com/Pandas886/CloudEon
+repo_name: dromara/CloudEon
+repo_url: https://github.com/dromara/CloudEon
 edit_uri: ""
 extra:
   generator: false

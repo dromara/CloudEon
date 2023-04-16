@@ -1,12 +1,12 @@
 <div align="center">
 <h1>CloudEon云原生大数据平台</h1>
 
-[![GitHub Pull Requests](https://img.shields.io/github/stars/Pandas886/e-mapreduce)](https://github.com/Pandas886/e-mapreduce/stargazers)
-[![HitCount](https://views.whatilearened.today/views/github/Pandas886/e-mapreduce.svg)](https://github.com/Pandas886/e-mapreduce)
-[![Commits](https://img.shields.io/github/commit-activity/m/Pandas886/e-mapreduce?color=ffff00)](https://github.com/Pandas886/e-mapreduce/commits/main)
+[![GitHub Pull Requests](https://img.shields.io/github/stars/dromara/CloudEon)](https://github.com/dromara/CloudEon/stargazers)
+[![HitCount](https://views.whatilearened.today/views/github/dromara/CloudEon.svg)](https://github.com/dromara/CloudEon)
+[![Commits](https://img.shields.io/github/commit-activity/m/dromara/CloudEon?color=ffff00)](https://github.com/dromara/CloudEon/commits/main)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 [![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
-[![GitHub license](https://img.shields.io/github/license/Pandas886/e-mapreduce)](https://github.com/Pandas886/e-mapreduce/LICENSE)
+[![GitHub license](https://img.shields.io/github/license/dromara/CloudEon)](https://github.com/dromara/CloudEon/LICENSE)
 
 <p> 🌉 构建于kubernetes集群之上的大数据集群管理平台 🌉</p>
 
@@ -62,8 +62,8 @@
 
 | 分类 |                        GitHub                        |                        Gitee                        |
 | :--: | :--------------------------------------------------: | :-------------------------------------------------: |
-| 后端 |  https://github.com/Pandas886/CloudEon   | https://gitee.com/Pandas886/CloudEon  |
-| 前端 | https://github.com/Pandas886/CloudEon/tree/master/cloudeon-ui | https://gitee.com/Pandas886/CloudEon/tree/master/cloudeon-ui  |
+| 后端 |  https://github.com/dromara/CloudEon   | https://gitee.com/dromara/CloudEon  |
+| 前端 | https://github.com/dromara/CloudEon/tree/master/cloudeon-ui | https://gitee.com/dromara/CloudEon/tree/master/cloudeon-ui  |
 
 
 
@@ -93,7 +93,7 @@
 
 ## 📝 使用登记
 
-如果你所在公司使用了该项目，烦请在这里留下脚印，感谢支持🥳 [点我](https://github.com/Pandas886/CloudEon/issues/8)
+如果你所在公司使用了该项目，烦请在这里留下脚印，感谢支持🥳 [点我](https://github.com/dromara/CloudEon/issues/8)
 
 
 ## 💎 优秀软件推荐
@@ -113,10 +113,10 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <table>
   <tbody>
     <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Pandas886"><img src="https://avatars.githubusercontent.com/u/123344357?v=4?s=100" width="100px;" alt="Pandas886"/><br /><sub><b>Pandas886</b></sub></a><br /><a href="https://github.com/Pandas886/CloudEon/commits?author=Pandas886" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Mericol"><img src="https://avatars.githubusercontent.com/u/39690226?v=4?s=100" width="100px;" alt="Mericol"/><br /><sub><b>Mericol</b></sub></a><br /><a href="https://github.com/Pandas886/CloudEon/commits?author=Mericol" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Pandas886"><img src="https://avatars.githubusercontent.com/u/123344357?v=4?s=100" width="100px;" alt="Pandas886"/><br /><sub><b>Pandas886</b></sub></a><br /><a href="https://github.com/dromara/CloudEon/commits?author=Pandas886" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Mericol"><img src="https://avatars.githubusercontent.com/u/39690226?v=4?s=100" width="100px;" alt="Mericol"/><br /><sub><b>Mericol</b></sub></a><br /><a href="https://github.com/dromara/CloudEon/commits?author=Mericol" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Kyofin"><img src="https://avatars.githubusercontent.com/u/18548053?v=4?s=100" width="100px;" alt="Kyofin"/><br /><sub><b>Kyofin</b></sub></a><br /><a href="#infra-Kyofin" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> </td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/mechaelyoung"><img src="https://avatars.githubusercontent.com/u/44049993?v=4?s=100" width="100px;" alt="mechaelyoung"/><br /><sub><b>mechaelyoung</b></sub></a><br /><a href="https://github.com/Pandas886/CloudEon/commits?author=mechaelyoung" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/mechaelyoung"><img src="https://avatars.githubusercontent.com/u/44049993?v=4?s=100" width="100px;" alt="mechaelyoung"/><br /><sub><b>mechaelyoung</b></sub></a><br /><a href="https://github.com/dromara/CloudEon/commits?author=mechaelyoung" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

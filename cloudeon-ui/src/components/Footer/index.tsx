@@ -19,13 +19,13 @@ const Footer: React.FC = () => {
     //     {
     //       key: 'CloudEon',
     //       title: 'CloudEon',
-    //       href: 'https://github.com/Pandas886/CloudEon',
+    //       href: 'https://github.com/dromara/CloudEon',
     //       blankTarget: true,
     //     },
     //     {
     //       key: 'github',
     //       title: <GithubOutlined />,
-    //       href: 'https://github.com/Pandas886/CloudEon',
+    //       href: 'https://github.com/dromara/CloudEon',
     //       blankTarget: true,
     //     },
     //     // {
