@@ -18,6 +18,7 @@ extra:
 
 copyright: Copyright &copy; 2023 CloudEon
 theme:
+  custom_dir: overrides
   name: material
   language: zh
   logo: images/logo.png
