@@ -10,8 +10,12 @@ CloudEon是一款基于kubernetes的开源大数据平台，旨在为用户提�
 - 自动化运维
 - 可视化管理界面
 - 灵活的扩展性
-## 💎架构
+## 💎功能架构
 ![图片.png](images/architecture.png)
+
+##  🍓 实现思路
+![图片.png](images/silu.png)
+
 ## 🥰 感谢
 感谢如下优秀的项目，没有这些项目，不可能会有CloudEon：
 
