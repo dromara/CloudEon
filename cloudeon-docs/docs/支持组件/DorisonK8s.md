@@ -14,5 +14,8 @@
 安装成功后，可以进入服务详情，进行Doris服务的管理。
 ![图片.png](../images/doris-5.png)
 
+
+![图片.png](../images/doris-7.png)
+
 可以用kubectl看到对应的pod
 ![图片.png](../images/doris-6.png)
