@@ -20,6 +20,7 @@ roles:
     sortNum: 1
     type: MASTER
     jmxPort: 9232
+    needOdd: true
     minNum : 1
     logFile: "fe.log"
 
