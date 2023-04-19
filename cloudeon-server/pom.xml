@@ -29,6 +29,7 @@
         <maven.resource.version>3.1.0</maven.resource.version>
         <start-class>org.dromara.cloudeon.CloudEonApplication</start-class>
         <bouncycastle.version>1.68</bouncycastle.version>
+        <vertx.version>4.2.3</vertx.version>
 
     </properties>
 
@@ -57,11 +58,11 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql.version}</version>
         </dependency>
-        <!-- akka -->
+
         <dependency>
-            <groupId>com.typesafe.akka</groupId>
-            <artifactId>akka-slf4j_2.13</artifactId>
-            <version>${akka.version}</version>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-core</artifactId>
+            <version>${vertx.version}</version>
         </dependency>
         <!-- 自定义依赖 -->
 

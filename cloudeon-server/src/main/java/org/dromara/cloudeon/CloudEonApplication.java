@@ -1,10 +1,13 @@
 package org.dromara.cloudeon;
 
-import akka.actor.ActorSystem;
+import io.vertx.core.DeploymentOptions;
+import io.vertx.core.Vertx;
+import lombok.extern.slf4j.Slf4j;
+import org.dromara.cloudeon.verticle.CommandExecuteVerticle;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-
+@Slf4j
 @SpringBootApplication
 public class CloudEonApplication {
 
@@ -13,9 +16,21 @@ public class CloudEonApplication {
 		SpringApplication.run(CloudEonApplication.class, args);
 	}
 
-    @Bean("cloudeonActorSystem")
-    public ActorSystem cloudeonActorSystem() {
-        return ActorSystem.create("cloudeonActorSystem");
+
+    @Bean("cloudeonVertx")
+    public Vertx cloudeonVertx() {
+        Vertx vertx = Vertx.vertx();
+        vertx.deployVerticle(new CommandExecuteVerticle(), new DeploymentOptions()
+                        .setWorker(true)
+                        .setWorkerPoolName("dedicated-pool")
+                        .setMaxWorkerExecuteTime(2000)
+                        .setWorkerPoolSize(5)
+                )
+                .onSuccess(id -> {
+                    log.info("Deployed CommandExecuteVerticle verticle " + id);
+                });
+
+        return vertx;
     }
 
 

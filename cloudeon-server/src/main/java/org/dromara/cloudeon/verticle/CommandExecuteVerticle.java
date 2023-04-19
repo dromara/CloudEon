@@ -1,20 +1,20 @@
-package org.dromara.cloudeon.actor;
+package org.dromara.cloudeon.verticle;
 
-import akka.actor.AbstractActor;
-import akka.actor.Props;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import com.alibaba.fastjson.JSONObject;
+import io.vertx.core.AbstractVerticle;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.dromara.cloudeon.dao.CommandRepository;
 import org.dromara.cloudeon.dao.CommandTaskRepository;
 import org.dromara.cloudeon.entity.CommandEntity;
 import org.dromara.cloudeon.entity.CommandTaskEntity;
+import org.dromara.cloudeon.enums.CommandState;
 import org.dromara.cloudeon.processor.BaseCloudeonTask;
 import org.dromara.cloudeon.processor.TaskParam;
-import org.dromara.cloudeon.enums.CommandState;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.dromara.cloudeon.utils.Constant;
 
 import java.util.Date;
 import java.util.List;
@@ -25,19 +25,20 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @AllArgsConstructor
-public class CommandExecuteActor extends AbstractActor {
+public class CommandExecuteVerticle extends AbstractVerticle {
 
-
-    public static Props props() {
-        return Props.create(CommandExecuteActor.class, () -> new CommandExecuteActor());
-    }
 
     @Override
-    public Receive createReceive() {
-        return receiveBuilder()
-                .match(Integer.class, this::onReceiveCommandId)
-                .matchAny(obj -> log.warn("[ProcessorTrackerActor] receive unknown request: {}.", obj))
-                .build();
+    public void start() throws Exception {
+        vertx.eventBus().consumer(Constant.VERTX_COMMAND_ADDRESS, message -> {
+            Integer commandId = (Integer) message.body();
+            // 1. 从message中获取command
+            vertx.executeBlocking(future -> {
+                onReceiveCommandId(commandId);
+            }, false, res -> {
+                log.info("CommandExecuteVerticle commandId:{} 执行完毕", commandId);
+            });
+        });
     }
 
 
