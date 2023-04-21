@@ -1,6 +1,8 @@
 package org.dromara.cloudeon.utils;
 
 public class Constant {
+    public static final String VERTX_COMMAND_ADDRESS = "command.adrress";
+
     public static final String SALT = "ioAs7orSYY2fd0PeOgKf907A1l9MwycE";
     public static final String StackPackageInfoYAML="service-info.yaml";
     public static final String StackPackageAlertRuleYAML="alert-rule.yaml";

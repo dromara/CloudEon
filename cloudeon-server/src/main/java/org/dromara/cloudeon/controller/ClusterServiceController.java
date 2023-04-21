@@ -1,7 +1,5 @@
 package org.dromara.cloudeon.controller;
 
-import akka.actor.ActorRef;
-import akka.actor.ActorSystem;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Dict;
@@ -13,8 +11,8 @@ import freemarker.cache.StringTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import io.vertx.core.Vertx;
 import lombok.extern.slf4j.Slf4j;
-import org.dromara.cloudeon.actor.CommandExecuteActor;
 import org.dromara.cloudeon.config.CloudeonConfigProp;
 import org.dromara.cloudeon.controller.request.InitServiceRequest;
 import org.dromara.cloudeon.controller.request.ServiceConfUpgradeRequest;
@@ -57,6 +55,8 @@ public class ClusterServiceController {
     @Resource
     private CloudeonConfigProp cloudeonConfigProp;
 
+    @Resource(name = "cloudeonVertx")
+    private Vertx cloudeonVertx;
 
     @Resource
     private AlertMessageRepository alertMessageRepository;
@@ -89,9 +89,6 @@ public class ClusterServiceController {
 
     @Resource
     private CommandHandler commandHandler;
-
-    @Resource(name = "cloudeonActorSystem")
-    private ActorSystem cloudeonActorSystem;
 
     @Resource
     private ClusterNodeRepository clusterNodeRepository;
@@ -255,7 +252,7 @@ public class ClusterServiceController {
         Integer commandId = buildServiceCommand(serviceInstanceEntities, clusterId, CommandType.INSTALL_SERVICE);
 
         //  调用workflow
-        cloudeonActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
+        cloudeonVertx.eventBus().request(VERTX_COMMAND_ADDRESS, commandId);
 
 
         return ResultDTO.success(null);
@@ -408,7 +405,8 @@ public class ClusterServiceController {
         Integer commandId = buildServiceCommand(serviceInstanceEntities, serviceInstanceEntity.getClusterId(), CommandType.STOP_SERVICE);
 
         //  调用workflow
-        cloudeonActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
+        cloudeonVertx.eventBus().request(VERTX_COMMAND_ADDRESS, commandId);
+
         // 更新服务实例状态
         serviceInstanceEntity.setServiceState(ServiceState.STOPPING_SERVICE);
         serviceInstanceRepository.save(serviceInstanceEntity);
@@ -425,7 +423,7 @@ public class ClusterServiceController {
         Integer commandId = buildServiceCommand(serviceInstanceEntities, serviceInstanceEntity.getClusterId(), CommandType.UPGRADE_SERVICE_CONFIG);
 
         //  调用workflow
-        cloudeonActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
+        cloudeonVertx.eventBus().request(VERTX_COMMAND_ADDRESS, commandId);
 
 
         return ResultDTO.success(null);
@@ -439,7 +437,7 @@ public class ClusterServiceController {
         Integer commandId = buildServiceCommand(serviceInstanceEntities, serviceInstanceEntity.getClusterId(), CommandType.RESTART_SERVICE);
 
         //  调用workflow
-        cloudeonActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
+        cloudeonVertx.eventBus().request(VERTX_COMMAND_ADDRESS, commandId);
         // 更新服务实例状态
         serviceInstanceEntity.setServiceState(ServiceState.RESTARTING_SERVICE);
         serviceInstanceRepository.save(serviceInstanceEntity);
@@ -455,7 +453,7 @@ public class ClusterServiceController {
         Integer commandId = buildServiceCommand(serviceInstanceEntities, serviceInstanceEntity.getClusterId(), CommandType.START_SERVICE);
 
         //  调用workflow
-        cloudeonActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
+        cloudeonVertx.eventBus().request(VERTX_COMMAND_ADDRESS, commandId);
 
         // 更新服务实例状态
         serviceInstanceEntity.setServiceState(ServiceState.STARTING_SERVICE);
@@ -630,7 +628,7 @@ public class ClusterServiceController {
         Integer commandId = buildRoleCommand(serviceInstanceEntities, Lists.newArrayList(roleInstanceEntity),
                 serviceInstanceEntity.getClusterId(), CommandType.STOP_ROLE);
         //  调用workflow
-        cloudeonActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
+        cloudeonVertx.eventBus().request(VERTX_COMMAND_ADDRESS, commandId);
 
         return ResultDTO.success(null);
     }
@@ -648,7 +646,7 @@ public class ClusterServiceController {
         Integer commandId = buildRoleCommand(serviceInstanceEntities, Lists.newArrayList(roleInstanceEntity),
                 serviceInstanceEntity.getClusterId(), CommandType.START_ROLE);
         //  调用workflow
-        cloudeonActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
+        cloudeonVertx.eventBus().request(VERTX_COMMAND_ADDRESS, commandId);
 
         return ResultDTO.success(null);
     }
@@ -839,7 +837,7 @@ public class ClusterServiceController {
         List<ServiceInstanceEntity> serviceInstanceEntities = Lists.newArrayList(serviceInstanceEntity);
         Integer commandId = buildServiceCommand(serviceInstanceEntities, serviceInstanceEntity.getClusterId(), CommandType.DELETE_SERVICE);
         //  调用workflow
-        cloudeonActorSystem.actorOf(CommandExecuteActor.props()).tell(commandId, ActorRef.noSender());
+        cloudeonVertx.eventBus().request(VERTX_COMMAND_ADDRESS, commandId);
 
         // 更新服务实例状态
         serviceInstanceEntity.setServiceState(ServiceState.DELETING_SERVICE);
