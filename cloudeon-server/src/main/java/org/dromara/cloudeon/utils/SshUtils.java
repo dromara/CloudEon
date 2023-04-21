@@ -131,7 +131,11 @@ public class SshUtils {
         Integer exitStatus = channelExec.getExitStatus();
         LOG.info("mina result {}", exitStatus);
         if (exitStatus != 0) {
-            throw new RuntimeException("ssh 执行命令失败：" + err.toString());
+            String errorMsg = err.toString();
+            if (!StrUtil.isNotBlank(errorMsg)) {
+                errorMsg = out.toString();
+            }
+            throw new RuntimeException("ssh 执行命令失败：" + errorMsg);
         }
         LOG.info("exe cmd return : {}", out);
         return out.toString().trim();

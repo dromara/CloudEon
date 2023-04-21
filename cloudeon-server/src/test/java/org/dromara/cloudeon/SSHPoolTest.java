@@ -17,11 +17,11 @@ import java.util.concurrent.TimeUnit;
 public class SSHPoolTest {
     private static final Map<String, SshConnectionPool> pools = new HashMap<>();
     public static final int TIMES =500;
-    public static final String command = " sh /tmp/check.sh";
-    public static final ArrayList<String> serverList = Lists.newArrayList("192.168.197.149", "192.168.197.150", "192.168.197.151");
+    public static final String command = " sudo docker  run --net=host -v /opt/edp/dolphinscheduler1/conf:/opt/edp/dolphinscheduler1/conf -v /opt/edp/dolphinscheduler1/log:/opt/edp/dolphinscheduler1/log   -v /opt/edp/dolphinscheduler1/data:/opt/edp/dolphinscheduler1/data  registry.mufankong.top/udh/dolphinscheduler:3.0.5 sh -c \"  /opt/edp/dolphinscheduler1/conf/init-dolphinscheduler-db.sh \"   \n";
+    public static final ArrayList<String> serverList = Lists.newArrayList("fl002");
     public static final int PORT = 22;
     public static final String USERNAME = "root";
-    public static final String PASSWORD = "123456";
+    public static final String PASSWORD = "Ltcyhlwylym@admin2021zi!";
 
     @Test
     public void executeCommandUsingPool() throws Exception {
@@ -30,6 +30,15 @@ public class SSHPoolTest {
             int randomInt = RandomUtil.randomInt(serverList.size());
             sayHelloUsingPoll(serverList.get(randomInt), command);
         }
+    }
+
+    @Test
+    public void error() throws Exception {
+        String server = "fl002";
+        pools.put(server, new SshConnectionPool(server, PORT, USERNAME, PASSWORD));
+        ClientSession clientSession = pools.get(server).borrowObject();
+        SshUtils.execCmdWithResult(clientSession, command);
+
     }
 
 
