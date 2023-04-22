@@ -1,9 +1,6 @@
 package org.dromara.cloudeon.service;
 
-import org.dromara.cloudeon.dao.ServiceInstanceConfigRepository;
-import org.dromara.cloudeon.dao.ServiceInstanceRepository;
-import org.dromara.cloudeon.dao.ServiceRoleInstanceRepository;
-import org.dromara.cloudeon.dao.ServiceRoleInstanceWebuisRepository;
+import org.dromara.cloudeon.dao.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +16,8 @@ public class DeleteClusterService {
     ServiceRoleInstanceRepository roleInstanceRepository ;
     @Resource
     ServiceRoleInstanceWebuisRepository roleInstanceWebuisRepository;
+    @Resource
+    private AlertMessageRepository alertMessageRepository;
 
     @Transactional(rollbackFor = Exception.class)
     public void deleteOneService(Integer serviceInstanceId) {
@@ -30,5 +29,8 @@ public class DeleteClusterService {
         serviceInstanceConfigRepository.deleteByServiceInstanceId(serviceInstanceId);
         // 删除服务ui表
         roleInstanceWebuisRepository.deleteByServiceInstanceId(serviceInstanceId);
+        // 删除告警信息表
+        alertMessageRepository.deleteByServiceInstanceId(serviceInstanceId);
+
     }
 }

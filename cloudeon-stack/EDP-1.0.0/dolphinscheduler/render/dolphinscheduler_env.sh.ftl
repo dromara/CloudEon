@@ -6,7 +6,7 @@ export SPRING_PROFILES_ACTIVE=$DATABASE
 
 # DolphinScheduler server related configuration
 export SPRING_CACHE_TYPE=none
-export SPRING_JACKSON_TIME_ZONE=UTC
+export SPRING_JACKSON_TIME_ZONE=GMT+8
 <#--handle dependent.zookeeper-->
 <#if dependencies.ZOOKEEPER??>
     <#assign zookeeper=dependencies.ZOOKEEPER quorum=[]>

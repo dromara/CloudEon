@@ -15,7 +15,7 @@ cd $DOLPHINSCHEDULER_API_HOME
 # 启动后访问地址  http://localhost:12345/dolphinscheduler/doc.html
 #               http://localhost:12345/dolphinscheduler/ui
 nohup java $JAVA_OPTS \
-  -cp "$DS_CONF/common.properties":"$DOLPHINSCHEDULER_API_HOME/libs/*" \
+  -cp "$DS_CONF":"$DOLPHINSCHEDULER_API_HOME/libs/*" \
  -Dlogging.config=$DS_CONF/api-logback.xml  -Dspring.config.location=$DS_CONF/api-application.yaml org.apache.dolphinscheduler.api.ApiApplicationServer     > $log 2>&1 &
 
 echo $! > $pid

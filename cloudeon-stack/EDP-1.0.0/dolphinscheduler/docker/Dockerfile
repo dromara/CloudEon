@@ -17,7 +17,7 @@ RUN   wget https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.28/mysq
     && ln -s /home/root/mysql-connector-java-8.0.28.jar $DOLPHINSCHEDULER_HOME/tools/libs/mysql-connector-java-8.0.28.jar \
     && ln -s /home/root/mysql-connector-java-8.0.28.jar $DOLPHINSCHEDULER_HOME/worker-server/libs/mysql-connector-java-8.0.28.jar
 
-
+RUN yum install -y sudo && yum clean all && rm -rf /var/lib/yum/history/*.sqlite  && rm -rf /var/cache/yum
 
 
 

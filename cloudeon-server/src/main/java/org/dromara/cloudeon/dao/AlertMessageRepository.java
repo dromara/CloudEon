@@ -15,4 +15,6 @@ public interface AlertMessageRepository extends JpaRepository<AlertMessageEntity
 
     List<AlertMessageEntity> findByServiceInstanceIdAndResolved(Integer serviceInstanceId, boolean resolved);
     List<AlertMessageEntity> findByServiceRoleInstanceIdAndResolved(Integer roleInstanceId, boolean resolved);
+
+    int deleteByServiceInstanceId(Integer serviceInstanceId);
 }

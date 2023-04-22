@@ -7,10 +7,7 @@ import org.dromara.cloudeon.controller.response.ActiveAlertVO;
 import org.dromara.cloudeon.controller.response.HistoryAlertVO;
 import org.dromara.cloudeon.dao.*;
 import org.dromara.cloudeon.dto.*;
-import org.dromara.cloudeon.entity.AlertMessageEntity;
-import org.dromara.cloudeon.entity.ClusterAlertRuleEntity;
-import org.dromara.cloudeon.entity.ClusterNodeEntity;
-import org.dromara.cloudeon.entity.ServiceRoleInstanceEntity;
+import org.dromara.cloudeon.entity.*;
 import org.dromara.cloudeon.enums.AlertLevel;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +15,7 @@ import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -135,24 +133,32 @@ public class AlertController {
                 Integer serviceInstanceId = alertMessageEntity.getServiceInstanceId();
                 Integer roleInstanceId = alertMessageEntity.getServiceRoleInstanceId();
 
-                String serviceLabel = serviceInstanceRepository.findById(serviceInstanceId).get().getLabel();
-                String roleInstanceLabel = roleInstanceRepository.getRoleInstanceLabel(roleInstanceId);
+                Optional<ServiceInstanceEntity> optionalServiceInstance = serviceInstanceRepository.findById(serviceInstanceId);
+                boolean present = optionalServiceInstance.isPresent();
+                if (present) {
+                    ServiceInstanceEntity serviceInstanceEntity = optionalServiceInstance.get();
+                    String serviceLabel = serviceInstanceEntity.getLabel();
+                    String roleInstanceLabel = roleInstanceRepository.getRoleInstanceLabel(roleInstanceId);
 
-                return ActiveAlertVO.builder()
-                        .alertId(alertMessageEntity.getId())
-                        .advice(alertMessageEntity.getAlertAdvice())
-                        .alertLevelMsg(alertMessageEntity.getAlertLevel().getDesc())
-                        .alertName(alertMessageEntity.getAlertName())
-                        .createTime(alertMessageEntity.getCreateTime())
-                        .info(alertMessageEntity.getAlertInfo())
-                        .serviceInstanceName(serviceLabel)
-                        .serviceRoleLabel(roleInstanceLabel)
-                        .serviceInstanceId(serviceInstanceId)
-                        .hostname(alertMessageEntity.getHostname())
-                        .serviceRoleInstanceId(roleInstanceId)
-                        .build();
+                    return ActiveAlertVO.builder()
+                            .alertId(alertMessageEntity.getId())
+                            .advice(alertMessageEntity.getAlertAdvice())
+                            .alertLevelMsg(alertMessageEntity.getAlertLevel().getDesc())
+                            .alertName(alertMessageEntity.getAlertName())
+                            .createTime(alertMessageEntity.getCreateTime())
+                            .info(alertMessageEntity.getAlertInfo())
+                            .serviceInstanceName(serviceInstanceEntity.getServiceName())
+                            .serviceRoleLabel(roleInstanceLabel)
+                            .serviceInstanceId(serviceInstanceId)
+                            .hostname(alertMessageEntity.getHostname())
+                            .serviceRoleInstanceId(roleInstanceId)
+                            .build();
+                }else {
+                    return null;
+                }
+
             }
-        }).collect(Collectors.toList());
+        }).filter(Objects::nonNull).collect(Collectors.toList());
 
         return ResultDTO.success(activeAlertVOS);
     }
@@ -165,23 +171,30 @@ public class AlertController {
                 Integer serviceInstanceId = alertMessageEntity.getServiceInstanceId();
                 Integer roleInstanceId = alertMessageEntity.getServiceRoleInstanceId();
 
-                String serviceLabel = serviceInstanceRepository.findById(serviceInstanceId).get().getLabel();
-                String roleInstanceLabel = roleInstanceRepository.getRoleInstanceLabel(roleInstanceId);
+                Optional<ServiceInstanceEntity> optionalServiceInstance = serviceInstanceRepository.findById(serviceInstanceId);
+                boolean present = optionalServiceInstance.isPresent();
+                if (present) {
+                    ServiceInstanceEntity serviceInstanceEntity =optionalServiceInstance.get();
+                    String serviceLabel = serviceInstanceEntity.getLabel();
+                    String roleInstanceLabel = roleInstanceRepository.getRoleInstanceLabel(roleInstanceId);
+                    return HistoryAlertVO.builder()
+                            .alertId(alertMessageEntity.getId())
+                            .alertLevelMsg(alertMessageEntity.getAlertLevel().getDesc())
+                            .alertName(alertMessageEntity.getAlertName())
+                            .createTime(alertMessageEntity.getCreateTime())
+                            .updateTime(alertMessageEntity.getUpdateTime())
+                            .serviceInstanceName(serviceInstanceEntity.getServiceName())
+                            .serviceRoleLabel(roleInstanceLabel)
+                            .serviceInstanceId(serviceInstanceId)
+                            .hostname(alertMessageEntity.getHostname())
+                            .serviceRoleInstanceId(roleInstanceId)
+                            .build();
+                }else {
+                    return null;
+                }
 
-                return HistoryAlertVO.builder()
-                        .alertId(alertMessageEntity.getId())
-                        .alertLevelMsg(alertMessageEntity.getAlertLevel().getDesc())
-                        .alertName(alertMessageEntity.getAlertName())
-                        .createTime(alertMessageEntity.getCreateTime())
-                        .updateTime(alertMessageEntity.getUpdateTime())
-                        .serviceInstanceName(serviceLabel)
-                        .serviceRoleLabel(roleInstanceLabel)
-                        .serviceInstanceId(serviceInstanceId)
-                        .hostname(alertMessageEntity.getHostname())
-                        .serviceRoleInstanceId(roleInstanceId)
-                        .build();
             }
-        }).collect(Collectors.toList());
+        }).filter(Objects::nonNull).collect(Collectors.toList());
 
         return ResultDTO.success(historyAlertVOS);
     }

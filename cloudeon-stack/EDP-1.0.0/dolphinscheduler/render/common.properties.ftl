@@ -16,7 +16,7 @@
 #
 
 # user data local directory path, please make sure the directory exists and have read write permissions
-data.basedir.path=/opt/edp/${service.serviceName}/
+data.basedir.path=/opt/edp/${service.serviceName}/data
 
 # resource view suffixs
 #resource.view.suffixs=txt,log,sh,bat,conf,cfg,py,java,sql,xml,hql,properties,json,yml,yaml,ini,js
