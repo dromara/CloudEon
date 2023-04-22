@@ -23,7 +23,7 @@
 
 项目相关介绍，使用，最佳实践等相关内容，都会在官方文档呈现，如有疑问，请先阅读官方文档，以下列举以下常用快链。
 
-- [官网地址](https://cloudeon.top//)
+- [官网地址](https://cloudeon.top/)
 - [项目介绍](https://docs.cloudeon.top/en/latest/)
 - [安装部署](https://docs.cloudeon.top/en/latest/%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/docker)
 - [支持组件](https://docs.cloudeon.top/en/latest/%E6%94%AF%E6%8C%81%E7%BB%84%E4%BB%B6/supportservice/)
