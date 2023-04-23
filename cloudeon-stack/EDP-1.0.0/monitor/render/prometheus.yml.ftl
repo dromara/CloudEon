@@ -106,3 +106,6 @@ scrape_configs:
     metrics_path: '/actuator/prometheus'
     file_sd_configs:
     - files: ['discovery_configs/ds-alertserver.json']
+  - job_name: 'flinkhistoryserver'
+    file_sd_configs:
+    - files: ['discovery_configs/flinkhistoryserver.json']
