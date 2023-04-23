@@ -1,0 +1,172 @@
+name: Flink
+label: "Flink"
+description: "实时计算引擎"
+version: 1.15.4
+dockerImage: "registry.mufankong.top/udh/flink:1.15.4"
+dependencies:
+    - "HDFS"
+    - "YARN"
+
+runAs: flink
+
+supportKerberos: true
+
+dashboard:
+  uid: ""
+
+roles:
+
+  - name: FLINK_HISTORY_SERVER
+    label: "Flink History Server"
+    roleFullName: "flink-historyserver"
+    sortNum: 1
+    type: MASTER
+    fixedNum: 1
+    linkExpression: "http://${localhostname}:${conf['flink.history.ui.port']}"
+    logFile: "spark-spark-org.apache.spark.deploy.history.HistoryServer-1-${localhostname}.out"
+
+persistencePaths:
+  - /opt/edp/${service.serviceName}/conf
+  - /opt/edp/${service.serviceName}/log
+  - /opt/edp/${service.serviceName}/data
+  - /opt/edp/${service.serviceName}/data/tmp
+
+
+customConfigFiles:
+  - flink-conf.yaml
+
+
+configurations:
+
+  - name: "flink.history.ui.port"
+    recommendExpression: "8082"
+    valueType: InputNumber
+    configurableInWizard: true
+    description: "flink history server web ui端口"
+    confFile:  "flink-conf.yaml"
+    tag: "端口"
+
+
+
+
+
+
+
+
+  - name: "spark.history.retainedApplications"
+    recommendExpression: "300"
+    valueType: InputNumber
+    configurableInWizard: false
+    description: "spark history server保留的应用数量"
+    confFile:  "spark-defaults.conf"
+    tag: "常用参数"
+
+  - name: "spark.history.fs.cleaner.enabled"
+    recommendExpression: "true"
+    valueType: Switch
+    configurableInWizard: false
+    description: "是否启用spark history server的清理功能"
+    confFile:  "spark-defaults.conf"
+    tag: "常用参数"
+
+  - name: "spark.ui.showConsoleProgress"
+    recommendExpression: "true"
+    valueType: Switch
+    configurableInWizard: false
+    description: "是否在spark web ui上显示进度条"
+    confFile:  "spark-defaults.conf"
+    tag: "常用参数"
+
+  - name: "spark.history.fs.logDirectory"
+    recommendExpression: "hdfs:///app/spark/history"
+    valueType: InputString
+    configurableInWizard: true
+    description: "spark history server的日志目录"
+    confFile:  "spark-defaults.conf"
+    tag: "常用参数"
+
+  - name: "spark.eventLog.compress"
+    recommendExpression: "false"
+    valueType: Switch
+    configurableInWizard: false
+    description: "是否压缩spark event log"
+    confFile:  "spark-defaults.conf"
+    tag: "常用参数"
+
+  - name: "spark.eventLog.enabled"
+    recommendExpression: "true"
+    valueType: Switch
+    configurableInWizard: true
+    description: "是否启用spark event log"
+    confFile:  "spark-defaults.conf"
+    tag: "常用参数"
+
+  - name: "spark.eventLog.dir"
+    recommendExpression: "hdfs:///app/spark/history"
+    valueType: InputString
+    configurableInWizard: true
+    description: "spark event log的目录"
+    confFile:  "spark-defaults.conf"
+    tag: "常用参数"
+
+  - name: "spark.serializer"
+    recommendExpression: "org.apache.spark.serializer.KryoSerializer"
+    configurableInWizard: false
+    description: "spark序列化方式"
+    tag: "性能"
+    confFile:  "spark-defaults.conf"
+    valueType: Select
+    options: ["org.apache.spark.serializer.KryoSerializer","org.apache.spark.serializer.JavaSerializer"]
+
+  - name: "spark.executor.extraJavaOptions"
+    recommendExpression: "-Dio.netty.tryReflectionSetAccessible=true -XX:+UseG1GC -XX:ReservedCodeCacheSize=1024M"
+    valueType: InputString
+    configurableInWizard: false
+    description: "spark executor的jvm参数"
+    tag: "性能"
+    confFile:  "spark-defaults.conf"
+
+  - name: "spark.sql.shuffle.partitions"
+    recommendExpression: 64
+    valueType: InputNumber
+    description: "spark sql shuffle分区数"
+    configurableInWizard: true
+    confFile:  "spark-defaults.conf"
+    tag: "性能"
+
+  - name: "spark.sql.shuffle.partitions"
+    recommendExpression: 64
+    valueType: InputNumber
+    description: "spark sql shuffle分区数"
+    configurableInWizard: true
+    confFile:  "spark-defaults.conf"
+    tag: "性能"
+  - name: "spark.sql.adaptive.enabled"
+    recommendExpression: true
+    valueType: Switch
+    description: "是否启用spark sql adaptive"
+    configurableInWizard: false
+    confFile:  "spark-defaults.conf"
+    tag: "高级参数"
+  - name: "hive.server2.enable.doAs"
+    recommendExpression: false
+    valueType: Switch
+    description: "是否启用hive server2的doAs功能"
+    configurableInWizard: false
+    confFile:  "hive-site.xml"
+    tag: "安全"
+  - name: "hive.metastore.client.connect.retry.delay"
+    recommendExpression: 5
+    valueType: InputNumber
+    description: "hive metastore client重试延迟时间"
+    configurableInWizard: true
+    confFile:  "hive-site.xml"
+    tag: "高级参数"
+  - name: "hive.metastore.client.socket.timeout"
+    recommendExpression: 120000
+    valueType: InputNumber
+    description: "hive metastore client socket超时时间"
+    configurableInWizard: true
+    confFile:  "hive-site.xml"
+    tag: "高级参数"
+    unit: Ms
