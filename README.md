@@ -17,7 +17,7 @@
 
 ## ℹ️ 项目简介
 
-`CloudEon`是一款基于`kubernetes`的开源大数据平台，旨在为用户提供一种简单、高效、可扩展的大数据解决方案。该平台支持多种大数据服务的部署和管理，如hadoop、doris、Spark、Flink、Hive等，能够满足不同规模和业务需求下的大数据处理和分析需求。
+CloudEon是一款基于kubernetes的开源大数据平台，旨在为用户提供一种简单、高效、可扩展的大数据解决方案。该平台致力于简化多种大数据服务在kubernetes上的部署和管理，如Hadoop、Doris、Spark、Flink、Hive、Kafka等，能够满足不同规模和业务需求下的大数据处理和分析需求。
 
 ## 🔗 文档快链
 
