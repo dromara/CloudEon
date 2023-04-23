@@ -4,8 +4,10 @@
 DOLPHINSCHEDULER_WORKER_HOME=$DOLPHINSCHEDULER_HOME/worker-server
 
 pid=/opt/edp/${service.serviceName}/data/worker-server-pid
-log=/opt/edp/${service.serviceName}/log/worker-server-$HOSTNAME.out
+log=$DOLPHINSCHEDULER_WORKER_HOME/logs/worker-server-$HOSTNAME.out
 DS_CONF=/opt/edp/${service.serviceName}/conf
+
+cd $DOLPHINSCHEDULER_WORKER_HOME
 
 source "$DS_CONF/dolphinscheduler_env.sh"
 

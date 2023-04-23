@@ -65,7 +65,7 @@ spec:
         volumeMounts:
         - mountPath: "/opt/edp/${service.serviceName}/data"
           name: "data"
-        - mountPath: "/opt/edp/${service.serviceName}/log"
+        - mountPath: "/home/root/apache-dolphinscheduler/worker-server/logs"
           name: "log"
         - mountPath: "/etc/localtime"
           name: "timezone"

@@ -17,7 +17,7 @@
   -->
 
 <configuration scan="true" scanPeriod="120 seconds">
-    <property name="log.base" value="/opt/edp/${service.serviceName}/log"/>
+    <property name="log.base" value="logs"/>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
