@@ -8,5 +8,8 @@
 修改初始化配置，一般不用调整
 ![图片.png](../images/yarn-3.png)
 
-等待安装成功
-![图片.png](../images/yarn-4.png)
+安装成功
+![图片.png](../images/yarn-5.png)
+
+可以用kubectl看到对应的pod
+![图片.png](../images/yarn-6.png)

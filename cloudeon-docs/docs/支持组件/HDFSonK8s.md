@@ -14,3 +14,6 @@
 安装成功后，可以进入服务详情，进行HDFS服务的管理。
 ![图片.png](../images/hdfs-5.png)
 
+可以用kubectl看到对应的pod
+![图片.png](../images/hdfs-6.png)
+
