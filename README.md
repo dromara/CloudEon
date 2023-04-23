@@ -58,12 +58,13 @@
 
 
 
-## 👨‍💻 项目地址
+## 👨‍💻 开源地址
 
 | 分类 |                        GitHub                        |                        Gitee                        |
 | :--: | :--------------------------------------------------: | :-------------------------------------------------: |
 | 后端 |  https://github.com/dromara/CloudEon   | https://gitee.com/dromara/CloudEon  |
 | 前端 | https://github.com/dromara/CloudEon/tree/master/cloudeon-ui | https://gitee.com/dromara/CloudEon/tree/master/cloudeon-ui  |
+| 大数据组件 | https://github.com/dromara/CloudEon/tree/master/cloudeon-stack | https://gitee.com/dromara/CloudEon/tree/master/cloudeon-stack  |
 
 
 ## 🏖开源初衷
