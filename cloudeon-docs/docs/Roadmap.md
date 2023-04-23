@@ -10,7 +10,7 @@
 * 指令记录详情
 * 服务角色实时日志
 * 告警规则，活跃告警，历史告警
-* 支持hdfs、yarn、zookeeper、doris、hive、spark、dolphinscheduler、hbase、kafka、prometheus、grafana、alertmanager等服务在Kubernetes上运行
+* 支持hdfs、yarn、zookeeper、doris、hive、spark、flink、dolphinscheduler、hbase、kafka、prometheus、grafana、alertmanager等服务在Kubernetes上运行
 
 ## 1.1.0
 * 服务角色实例新增，删除
@@ -21,12 +21,13 @@
 * RSS支持
 
 ## 1.3.0
-* 集群健康分析(罗盘compass)
+* 集群健康分析
 * 集群巡检功能
+* 集成compass
 
 
 ## 1.4.0
-* 构建kerberos、openldap、ranger安全体系
+* 构建kerberos、openldap、ranger、knox安全体系
 
 
 ## 1.5.0
