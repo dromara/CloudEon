@@ -7,6 +7,13 @@
 - MySql5.7+ (可选，内置H2)
 - Cloudeon 安装包（cloudeon-assembly-*-release.zip)
 - Kubernetes 1.21 +
+
+## 部署包准备
+
+https://www.aliyundrive.com/s/3DR5yo6uvVn
+
+提取码: n5v8
+
 ## 文件结构
 首先下载安装包，并且解压安装包。
 ```
