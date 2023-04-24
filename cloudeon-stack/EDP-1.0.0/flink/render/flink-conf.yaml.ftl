@@ -40,7 +40,6 @@ historyserver.web.port: ${conf['flink.history.ui.port']}
 
 historyserver.archive.fs.dir: ${conf['flink.history.fs.logDirectory']}
 
-historyserver.archive.fs.refresh-interval: ${conf['historyserver.archive.fs.refresh-interval']}
 historyserver.web.tmpdir: /opt/edp/${service.serviceName}/data/tmp
 
 
@@ -49,7 +48,6 @@ env.pid.dir: /opt/edp/${service.serviceName}/data
 env.log.dir: /opt/edp/${service.serviceName}/log
 env.yarn.conf.dir: /opt/edp/${service.serviceName}/conf
 env.hadoop.conf.dir: /opt/edp/${service.serviceName}/conf
-
 <#list confFiles['flink-conf.yaml']?keys as key>
 ${key}: ${confFiles['flink-conf.yaml'][key]}
 </#list>

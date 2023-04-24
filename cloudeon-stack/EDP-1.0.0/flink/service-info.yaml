@@ -1,8 +1,8 @@
-name: Flink
+name: FLINK
 label: "Flink"
 description: "实时计算引擎"
 version: 1.15.4
-dockerImage: "registry.mufankong.top/udh/flink:1.15.4"
+dockerImage: "registry.cn-hangzhou.aliyuncs.com/udh/flink:1.15.4"
 dependencies:
     - "HDFS"
     - "YARN"
@@ -23,7 +23,8 @@ roles:
     type: MASTER
     fixedNum: 1
     linkExpression: "http://${localhostname}:${conf['flink.history.ui.port']}"
-    logFile: "spark-spark-org.apache.spark.deploy.history.HistoryServer-1-${localhostname}.out"
+    logFile: "flink-flink-historyserver-0-${localhostname}.log"
+
 
 persistencePaths:
   - /opt/edp/${service.serviceName}/conf
@@ -43,14 +44,12 @@ configurations:
     valueType: InputNumber
     configurableInWizard: true
     description: "flink history server web ui端口"
-    confFile:  "flink-conf.yaml"
     tag: "端口"
   - name: "flink.history.fs.logDirectory"
     recommendExpression: "hdfs:///flink/completed-jobs/"
     valueType: InputString
     configurableInWizard: true
     description: "flink history server的日志目录"
-    confFile:  "flink-conf.yaml"
     tag: "常用参数"
 
 

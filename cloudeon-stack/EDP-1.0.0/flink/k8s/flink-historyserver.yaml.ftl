@@ -45,6 +45,8 @@ spec:
         env:
           - name: "FLINK_CONF_DIR"
             value: "/opt/edp/${service.serviceName}/conf"
+          - name: "HADOOP_CONF_DIR"
+            value: "/opt/edp/${service.serviceName}/conf"
           - name: "USER"
             value: "flink"
         image: "${dockerImage}"
