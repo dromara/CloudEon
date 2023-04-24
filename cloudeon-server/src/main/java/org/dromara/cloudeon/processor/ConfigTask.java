@@ -220,6 +220,7 @@ public class ConfigTask extends BaseCloudeonTask {
         if (stackServiceName.equalsIgnoreCase(Constant.YARN_SERVICE_NAME)
                 ||stackServiceName.equalsIgnoreCase(Constant.HBASE_SERVICE_NAME)
                 ||stackServiceName.equalsIgnoreCase(Constant.DOLPHINSCHEDULER_SERVICE_NAME)
+                ||stackServiceName.equalsIgnoreCase(Constant.FLINK_SERVICE_NAME)
                 ||stackServiceName.equalsIgnoreCase(Constant.SPARK_SERVICE_NAME)
                 ||stackServiceName.equalsIgnoreCase(Constant.HIVE_SERVICE_NAME)) {
             List<Integer> instanceIds = Arrays.stream(depServiceInstanceIds).map(new Function<String, Integer>() {
@@ -264,7 +265,9 @@ public class ConfigTask extends BaseCloudeonTask {
 
         }
 
-        if (stackServiceName.equalsIgnoreCase(Constant.HIVE_SERVICE_NAME) || stackServiceName.equalsIgnoreCase(Constant.SPARK_SERVICE_NAME)) {
+        if (stackServiceName.equalsIgnoreCase(Constant.HIVE_SERVICE_NAME)
+                || stackServiceName.equalsIgnoreCase(Constant.SPARK_SERVICE_NAME )
+                || stackServiceName.equalsIgnoreCase(Constant.FLINK_SERVICE_NAME )) {
             List<Integer> instanceIds = Arrays.stream(depServiceInstanceIds).map(new Function<String, Integer>() {
                 @Override
                 public Integer apply(String s) {
