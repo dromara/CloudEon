@@ -104,7 +104,7 @@ CloudEon致力于将大数据服务迁移到云上，并帮助大数据生态组
 
 ## 📝 使用登记
 
-如果你所在公司使用了该项目，烦请在这里留下脚印，感谢支持🥳 [点我](https://github.com/dromara/CloudEon/issues/8)
+如果你所在公司使用了该项目，烦请在这里留下脚印，感谢支持🥳 [点我](https://github.com/dromara/CloudEon/issues/20)
 
 
 ## 💎 优秀软件推荐
