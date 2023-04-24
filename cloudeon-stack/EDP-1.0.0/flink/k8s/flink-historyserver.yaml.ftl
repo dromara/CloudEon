@@ -43,7 +43,7 @@ spec:
       - args:
           - "/opt/edp/${service.serviceName}/conf/bootstrap-historyserver.sh"
         env:
-          - name: "HADOOP_CONF_DIR"
+          - name: "FLINK_CONF_DIR"
             value: "/opt/edp/${service.serviceName}/conf"
           - name: "USER"
             value: "flink"
@@ -54,7 +54,7 @@ spec:
             command:
             - "/bin/bash"
             - "-c"
-            - "curl --fail --connect-timeout 15 --max-time 15 \"http://`hostname`:${conf['spark.history.ui.port']}/\"\
+            - "curl --fail --connect-timeout 15 --max-time 15 \"http://`hostname`:${conf['flink.history.ui.port']}/\"\
             \n"
           failureThreshold: 3
           initialDelaySeconds: 10

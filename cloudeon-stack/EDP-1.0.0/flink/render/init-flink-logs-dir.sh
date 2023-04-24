@@ -4,7 +4,7 @@
 
 HDFS_HOME="$HADOOP_HOME"
 HDFS_CONF_DIR="/opt/edp/${service.serviceName}/conf"
-FLINK_HISTORY_LOGS_DIR="${conf['spark.history.fs.logDirectory']}"
+FLINK_HISTORY_LOGS_DIR="${conf['flink.history.fs.logDirectory']}"
 
 
 
