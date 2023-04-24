@@ -51,6 +51,9 @@ public class CommandHandler {
                 if (stackServiceName.equals(SPARK_SERVICE_NAME)) {
                     taskGroupTypes.add(TaskGroupType.INIT_SPARK);
                 }
+                if (stackServiceName.equals(FLINK_SERVICE_NAME)) {
+                    taskGroupTypes.add(TaskGroupType.INIT_FLINK);
+                }
                 if (stackServiceName.equals(MONITOR_SERVICE_NAME)) {
                     taskGroupTypes.add(TaskGroupType.INIT_MONITOR);
                 }
