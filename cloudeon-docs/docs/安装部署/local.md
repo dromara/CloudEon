@@ -10,9 +10,9 @@
 
 ## 部署包准备
 
-https://www.aliyundrive.com/s/3DR5yo6uvVn
+https://pan.baidu.com/s/13Gv_3sAayy8vsvUWEQZ3cQ
 
-提取码: n5v8
+提取码: ikue
 
 ## 文件结构
 首先下载安装包，并且解压安装包。
