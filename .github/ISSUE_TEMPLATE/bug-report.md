@@ -19,6 +19,7 @@ A clear and concise description of what you expected to happen.
  - CloudEon Version: [e.g. 1.0.0]
  - Java Version: [e.g. OpenJDK 8]
  - OS: [e.g. CentOS 8.1]
+ - Kubernetes: [e.g. 1.21.10]
 
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
