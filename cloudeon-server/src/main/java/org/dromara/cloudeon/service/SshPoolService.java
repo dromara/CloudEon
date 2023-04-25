@@ -1,12 +1,15 @@
 package org.dromara.cloudeon.service;
 
+import com.google.common.collect.Lists;
 import org.apache.sshd.client.session.ClientSession;
 import org.apache.sshd.sftp.client.SftpClientFactory;
 import org.apache.sshd.sftp.client.fs.SftpFileSystem;
+import org.dromara.cloudeon.dto.HostSshPoolMetrics;
 import org.dromara.cloudeon.utils.SftpFilesystemPool;
 import org.dromara.cloudeon.utils.SshConnectionPool;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -29,6 +32,20 @@ public class SshPoolService {
             throw new RuntimeException(e);
         }
         return session;
+    }
+
+    public List<HostSshPoolMetrics> metrics() {
+        List<HostSshPoolMetrics> hostSshPoolMetricsList = Lists.newArrayList();
+        HostSshPoolMetrics hostSshPoolMetrics = new HostSshPoolMetrics();
+        // 根据pool获取所有HostSshPoolMetrics列表
+        for (Map.Entry<String, SshConnectionPool> entry : pools.entrySet()) {
+            String host = entry.getKey();
+            SshConnectionPool pool = entry.getValue();
+            hostSshPoolMetrics.setHostname(host);
+            hostSshPoolMetrics.setSshPoolMetrics(pool.poolMetrics());
+            hostSshPoolMetricsList.add(hostSshPoolMetrics);
+        }
+        return hostSshPoolMetricsList;
     }
 
     public SftpFileSystem openSftpFileSystem(String server) {

@@ -6,6 +6,7 @@ import org.apache.commons.pool2.impl.DefaultPooledObject;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.apache.sshd.client.session.ClientSession;
+import org.dromara.cloudeon.dto.SshPoolMetrics;
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
@@ -25,6 +26,14 @@ public class SshConnectionPool {
         config.setMinEvictableIdleTime(Duration.ofMinutes(5));
 
         pool = new GenericObjectPool<>(new SshConnectionFactory(host, port, username, password), config);
+    }
+
+    public SshPoolMetrics poolMetrics() {
+        pool.getNumActive();
+        pool.getNumIdle();
+        pool.getNumWaiters();
+        SshPoolMetrics sshPoolMetrics = new SshPoolMetrics(pool.getNumActive(), pool.getNumIdle(), pool.getNumWaiters());
+        return sshPoolMetrics;
     }
 
     public ClientSession borrowObject() throws Exception {
