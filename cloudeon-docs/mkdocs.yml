@@ -17,6 +17,9 @@ extra:
       link: https://github.com/Pandas886
 
 copyright: Copyright &copy; 2023 CloudEon
+markdown_extensions:
+  - pymdownx.superfences
+  - pymdownx.tasklist
 theme:
   custom_dir: overrides
   name: material
