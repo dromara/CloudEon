@@ -1,4 +1,7 @@
 # HDFS on  K8s
+## 介绍
+支持HDFS HA模式在k8s上运行
+## 操作
 安装HDFS服务
 ![图片.png](../images/hdfs-1.png)
 

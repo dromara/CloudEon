@@ -1,4 +1,7 @@
 # Doris on  K8s
+## 介绍
+支持Doris 多Fe多Be模式在k8s上运行
+## 操作
 安装Doris服务
 ![图片.png](../images/doris-1.png)
 
