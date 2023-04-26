@@ -18,8 +18,8 @@ extra:
 
 copyright: Copyright &copy; 2023 CloudEon
 markdown_extensions:
-  - pymdownx.superfences
-  - pymdownx.tasklist
+  - pymdownx.tasklist:
+      custom_checkbox: true
 theme:
   custom_dir: overrides
   name: material
