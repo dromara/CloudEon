@@ -28,6 +28,7 @@ public class StackConfiguration {
     private String recommendExpression;
     private String valueType;
     private boolean configurableInWizard;
+    private boolean needChangeInWizard;
     private String confFile;
     private Integer min;
     private Integer max;

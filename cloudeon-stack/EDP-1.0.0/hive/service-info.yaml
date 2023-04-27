@@ -56,6 +56,7 @@ configurations:
     valueType: InputString
     configurableInWizard: true
     description: "metastore依赖数据库的登录账户"
+    needChangeInWizard: true
     confFile:  "hive-site.xml"
     tag: "常用参数"
 
@@ -64,15 +65,17 @@ configurations:
     valueType: InputString
     configurableInWizard: true
     description: "metastore依赖数据库的登录密码"
+    needChangeInWizard: true
     confFile:  "hive-site.xml"
     tag: "常用参数"
 
   - name: "javax.jdo.option.ConnectionURL"
-    recommendExpression: "jdbc:mysql://localhost:33066/hive_db_ce?createDatabaseIfNotExist=true&amp;useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"
+    recommendExpression: "jdbc:mysql://xxx:3306/hive_db_ce?createDatabaseIfNotExist=true&amp;useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false"
     valueType: InputString
     configurableInWizard: true
     description: "metastore依赖数据库的jdbc访问地址"
     confFile:  "hive-site.xml"
+    needChangeInWizard: true
     tag: "常用参数"
 
   - name: "hive.server2.enable.doAs"

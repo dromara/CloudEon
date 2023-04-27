@@ -33,6 +33,8 @@ public class ServiceConfVO {
     private String recommendExpression;
     private String valueType;
     private Boolean configurableInWizard;
+    private Boolean     needChangeInWizard;
+
     private String confFile;
     private Integer min;
     private Integer max;

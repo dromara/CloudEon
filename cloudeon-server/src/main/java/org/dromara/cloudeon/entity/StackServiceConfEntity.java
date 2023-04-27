@@ -67,6 +67,7 @@ public class StackServiceConfEntity implements Serializable {
 	private String confFile;
 
 	private Boolean configurableInWizard;
+	private Boolean     needChangeInWizard;
 	@Enumerated(EnumType.STRING)
 	private ConfValueType valueType;
 
