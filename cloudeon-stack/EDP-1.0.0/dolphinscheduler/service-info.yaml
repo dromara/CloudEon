@@ -21,7 +21,7 @@ roles:
     linkExpression: "http://${localhostname}:${conf['api.server.port']}/dolphinscheduler/ui/login"
     sortNum: 1
     type: MASTER
-    jmxPort: 9232
+
     fixedNum : 1
     logFile: "dolphinscheduler-api.log"
 

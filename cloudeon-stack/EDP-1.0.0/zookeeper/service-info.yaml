@@ -19,7 +19,7 @@ roles:
     linkExpression: ""
     sortNum: 1
     type: MASTER
-    jmxPort: 9232
+
     needOdd: true
     minNum: 3
     logFile: "zookeeper-zookeeper-server-${localhostname}.log"

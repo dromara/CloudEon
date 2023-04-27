@@ -27,7 +27,6 @@ public class StackServiceRole {
     private String linkExpression;
     private String type;
     private Integer sortNum;
-    private Integer jmxPort;
     private Integer minNum;
     private Integer fixedNum;
     private boolean needOdd;
