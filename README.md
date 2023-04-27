@@ -72,7 +72,7 @@ CloudEon是一款基于kubernetes的开源大数据平台，旨在为用户提�
 
 在研究Hadoop on Kubernetes时，我们采用了helm完成了服务依赖顺序、配置关联影响和容器编排等工作。我们还整合了Doris（多Fe多Be）、DolphinScheduler、Kyuubi和Spark等服务，并实现了使用一句helm install命令即可正确启动这些相互依赖的服务。
 
-在使用过程中，我们发现这种方法大大减少了部署时间，提高了部署大数据集群的成功率。然而，运维管理的体验不尽人意，因为使用通用型Kubernetes的管理工具来管理大数据服务是不容易的，这需要开发者掌握Pod、Service、Configmap等知识。因此，我们开发了CloudEon，并将其开源。
+在使用helm + Kubernetes来部署管理大数据集群过程中，我们发现这种方法大大减少了部署时间，提高了部署大数据集群的成功率。然而，运维管理的体验不尽人意，因为使用通用型Kubernetes的管理工具来管理大数据服务是不容易的，这需要开发者掌握Pod、Service、Configmap等知识。因此，我们开发了CloudEon，并将其开源。
 
 CloudEon致力于将大数据服务迁移到云上，并帮助大数据生态组件更好地与云原生相融合。
 

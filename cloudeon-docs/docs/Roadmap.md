@@ -1,38 +1,47 @@
 # Roadmap
-## 1.0.0
-* 多k8s集群管理
-* 实现k8s上管理部署大数据服务
-* 节点管理
-* 服务角色重启、启动、停止
-* 服务重启、启动、停止、配置、删除
-* 服务告警提示、服务dashboard
-* 服务配置
-* 指令记录详情
-* 服务角色实时日志
-* 告警规则，活跃告警，历史告警
-* 支持hdfs、yarn、zookeeper、doris、hive、spark、flink、dolphinscheduler、hbase、kafka、prometheus、grafana、alertmanager等服务在Kubernetes上运行
-
-## 1.1.0
-* 服务角色实例新增，删除
-* 支持kyuubi、Arctic、streampark、dinky、trino、alluxiio、iotdb、iceberg、kylin、seatunnel等服务在Kubernetes上运行
-* 更聪明的安装服务分配节点机制
-## 1.2.0
-* 服务日志分析模块
-* RSS支持
-
-## 1.3.0
-* 集群健康分析
-* 集群巡检功能
-* 集成compass
-
-
-## 1.4.0
-* 构建kerberos、openldap、ranger、knox安全体系
-
-
-## 1.5.0
-* 大数据服务客户端一键下载
-* 可视化在线sql编辑器
-
-## 1.6.0
-ARM支持
+- [x] 多k8s集群管理
+- [x] 实现k8s上管理部署大数据服务
+- [x] 节点管理
+- [x] 服务角色重启、启动、停止
+- [x] 服务重启、启动、停止、配置、删除
+- [x] 服务告警提示、服务dashboard
+- [x] 服务配置
+- [x] 指令记录详情
+- [x] 服务角色实时日志
+- [x] 告警规则，活跃告警，历史告警
+- [x] 支持hdfs服务在Kubernetes上运行
+- [x] 支持yarn服务在Kubernetes上运行
+- [x] 支持zookeeper服务在Kubernetes上运行
+- [x] 支持doris服务在Kubernetes上运行
+- [x] 支持hive服务在Kubernetes上运行
+- [x] 支持spark服务在Kubernetes上运行
+- [x] 支持flink服务在Kubernetes上运行
+- [x] 支持dolphinscheduler服务在Kubernetes上运行
+- [x] 支持hbase服务在Kubernetes上运行
+- [x] 支持kafka服务在Kubernetes上运行
+- [x] 支持prometheus服务在Kubernetes上运行
+- [x] 支持grafana服务在Kubernetes上运行
+- [x] 支持alertmanager服务在Kubernetes上运行
+- [x] 服务角色实例新增，删除
+- [ ] 支持kyuubi服务在Kubernetes上运行
+- [ ] 支持EFAK服务在Kubernetes上运行
+- [ ] 支持Arctic服务在Kubernetes上运行
+- [ ] 支持streampark服务在Kubernetes上运行
+- [ ] 支持dinky服务在Kubernetes上运行
+- [ ] 支持trino服务在Kubernetes上运行
+- [ ] 支持prestodb服务在Kubernetes上运行
+- [ ] 支持alluxiio服务在Kubernetes上运行
+- [ ] 支持iotdb服务在Kubernetes上运行
+- [ ] 支持iceberg服务在Kubernetes上运行
+- [ ] 支持kylin服务在Kubernetes上运行
+- [ ] 支持seatunnel等服务在Kubernetes上运行
+- [ ] 更聪明的安装服务分配节点机制
+- [ ] 服务日志分析模块
+- [ ] Spark/Flink RSS支持
+- [ ] 集群健康分析
+- [ ] 集群巡检功能
+- [ ] 集成compass
+- [ ] 构建kerberos、openldap、ranger、knox安全体系
+- [ ] 大数据服务客户端配置下载
+- [ ] 可视化在线分析工具
+- [ ] ARM支持

@@ -17,6 +17,9 @@ extra:
       link: https://github.com/Pandas886
 
 copyright: Copyright &copy; 2023 CloudEon
+markdown_extensions:
+  - pymdownx.tasklist:
+      custom_checkbox: true
 theme:
   custom_dir: overrides
   name: material
@@ -66,9 +69,14 @@ nav:
       - 支持组件/ZookeeperOnK8s.md
       - 支持组件/KafkaOnK8s.md
       - 支持组件/HbaseOnK8s.md
+      - 支持组件/FlinkOnK8s.md
+      - 支持组件/SparkOnK8s.md
+      - 支持组件/HiveOnK8s.md
+      - 支持组件/DolphinschedulerOnK8s.md
   - 社区贡献:
       - 社区贡献/communicate.md
       - 社区贡献/contribute.md
       - 社区贡献/develop.md
+      - 社区贡献/windows-develop.md
   - FAQ.md
   - Roadmap.md
