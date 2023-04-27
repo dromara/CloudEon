@@ -105,8 +105,6 @@ public class StackLoadService implements ApplicationRunner {
 
                     // 读取图标
                     String iconAppStr = ImageUtil.GetImageStr(iconAppFilePath);
-                    String iconDefaultStr = ImageUtil.GetImageStr(iconDefaultFilePath);
-                    String iconDangerStr = ImageUtil.GetImageStr(iconDangerFilePath);
 
                     // 查找数据库中是否含有该service
                     StackServiceEntity stackServiceEntity = null;
@@ -127,8 +125,6 @@ public class StackLoadService implements ApplicationRunner {
                     stackServiceEntity.setServiceConfigurationYaml(yaml.dump(serviceInfo.getConfigurations()));
                     stackServiceEntity.setPersistencePaths(StrUtil.join(",", serviceInfo.getPersistencePaths()));
                     // 持久化图标base64
-                    stackServiceEntity.setIconDanger(iconDangerStr);
-                    stackServiceEntity.setIconDefault(iconDefaultStr);
                     stackServiceEntity.setIconApp(iconAppStr);
                     stackServiceRepository.save(stackServiceEntity);
                     Integer stackServiceEntityId = stackServiceEntity.getId();
