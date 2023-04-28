@@ -337,7 +337,7 @@ const serviceAdd: React.FC = () => {
 
   return (
     <PageContainer header={{ title: '' }}>
-      <Spin tip="Loading" size="small" spinning={loading}>
+      <Spin tip="Loading" size="small" spinning={loading} style={{display:'flex'}}>
         <div className={styles.stepsLayout}>
           <div className={styles.stepsWrap}>
             <Steps

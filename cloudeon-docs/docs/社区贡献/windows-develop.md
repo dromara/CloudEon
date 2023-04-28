@@ -44,13 +44,10 @@ npm install yarn tyarn -g
 ```
 tyarn
 ```
-3. 修改接口地址，修改/cloudeon-ui/config/proxy.ts文件如下:
-```
- '/apiPre/': {
-   target: 'http://xxx.xxx.xxx.xxx:7700', // 要代理的地址改成后端接口实际的地址,本地的话即127.0.0.1:7700
-   changeOrigin: true,
-   pathRewrite: { '^/apiPre' : '' },
- }
+3. 在cloudeon-ui/config/apiConfig.ts文件修改：
+   ```bash
+    devHost = "XX.XX.XX.XX:7700" // 修改成要代理的地址
+   ```
 ```
 4. 回到cmd，启动项目
 ```
