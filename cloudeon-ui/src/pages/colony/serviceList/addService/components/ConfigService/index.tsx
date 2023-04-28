@@ -5,7 +5,7 @@ import { Menu, Form, Table, Button, Typography, Popconfirm, InputNumber, Input, 
 import { QuestionCircleFilled } from '@ant-design/icons';
 import { getServiceConfAPI } from '@/services/ant-design-pro/colony';
 import {cloneDeep} from 'lodash'
-const { TextArea } = Input;
+// const { TextArea } = Input;
 
 const ConfigService:React.FC<{checkConfNext: any}> = ( {checkConfNext} )=>{
 
@@ -13,7 +13,7 @@ const ConfigService:React.FC<{checkConfNext: any}> = ( {checkConfNext} )=>{
     const [currentConfList, setCurrentConfList] = useState<any[]>();
     const [loading, setLoading] = useState(false);
     const [serviceId, setServiceId] = useState(null);
-    const [editingKey, setEditingKey] = useState('');
+    // const [editingKey, setEditingKey] = useState('');
     const [confData, setConfData] = useState({});
     const [addConfigForm] = Form.useForm()
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -158,17 +158,17 @@ const ConfigService:React.FC<{checkConfNext: any}> = ( {checkConfNext} )=>{
         // dealItemData(index,newData,row)// 处理保存编辑的逻辑
         // dealFilterData(record.name,row) // 处理过滤表格的数据
     }
-    const save = async (key: string) => {        
-        try {
-            const row = (await form.validateFields()) as Item;
-            const newData = cloneDeep(currentConfList||[])
-            const index = newData.findIndex(item => key === item.name); // name是唯一值，所以用name做主键
-            dealItemData(index,newData,row) // 处理保存编辑的逻辑
-            dealFilterData(key,row) // 处理过滤表格的数据
-        } catch (errInfo) {
-            console.log('Validate Failed:', errInfo);
-        }
-    }
+    // const save = async (key: string) => {        
+    //     try {
+    //         const row = (await form.validateFields()) as Item;
+    //         const newData = cloneDeep(currentConfList||[])
+    //         const index = newData.findIndex(item => key === item.name); // name是唯一值，所以用name做主键
+    //         dealItemData(index,newData,row) // 处理保存编辑的逻辑
+    //         dealFilterData(key,row) // 处理过滤表格的数据
+    //     } catch (errInfo) {
+    //         console.log('Validate Failed:', errInfo);
+    //     }
+    // }
     // 处理总数据的编辑逻辑
     const dealItemData = (index:number,newData:any[],row:any) =>{
         if (index > -1) {
@@ -178,11 +178,11 @@ const ConfigService:React.FC<{checkConfNext: any}> = ( {checkConfNext} )=>{
                 ...row,
             });
             setCurrentConfList(newData);
-            setEditingKey('');
+            // setEditingKey('');
         }else{
             newData.push(row);
             setCurrentConfList(newData);
-            setEditingKey('');
+            // setEditingKey('');
         }
         let confResult = serviceId ? {...confData,[serviceId]:newData} : {...confData}
         updateConfig(confResult)
@@ -266,74 +266,6 @@ const ConfigService:React.FC<{checkConfNext: any}> = ( {checkConfNext} )=>{
         description: string
     }
 
-    interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
-        editing: boolean;
-        dataIndex: string;
-        title: any;
-        inputType: 'InputNumber' | 'InputString' | 'Slider' | 'Switch' | 'Select';
-        record: Item;
-        index: number;
-        children: React.ReactNode;
-      }
-
-    // const EditableCell: React.FC<EditableCellProps> = ({
-    //     editing,
-    //     dataIndex,
-    //     title,
-    //     inputType,
-    //     record,
-    //     index,
-    //     children,
-    //     ...restProps
-    //   }) => {
-    //     let inputNode = <Input addonAfter={record?.unit || ''} />
-    //     // const inputNode = inputType === 'number' ? <InputNumber /> : <Input />;
-    //     switch(inputType){
-    //         case 'InputNumber':
-    //             inputNode = <InputNumber max={record.max || Number.MAX_SAFE_INTEGER} min={record.min || Number.MIN_SAFE_INTEGER} addonAfter={record.unit || ''} />
-    //             ;break;
-    //         case 'InputString':;break;
-    //         case 'Slider':
-    //             inputNode = <Slider max={record.max || 100} min={record.min || 0} />
-    //             ;break;
-    //         case 'Switch':
-    //             inputNode = <Switch />
-    //             ;break;
-    //         case 'Select':
-    //             inputNode = 
-    //                     <Select
-    //                             // style={{ width: 120 }}
-    //                             options={
-    //                                 record.options.map((opItem: any)=>{
-    //                                     return { value: opItem, label: opItem }
-    //                                 })}
-    //                         />
-                        
-    //             ;break;
-    //     }
-      
-    //     return (
-    //       <td {...restProps} className={(record?.sourceValue != record?.recommendExpression && !editing && !record.isCustomConf) ? styles.hasEdited:''}>
-    //         {editing ? (
-    //           <Form.Item
-    //             name={dataIndex}
-    //             style={{ margin: 0 }}
-    //             rules={[
-    //               {
-    //                 required: true,
-    //                 message: `请输入 ${title}!`,
-    //               },
-    //             ]}
-    //           >
-    //             {inputNode}
-    //           </Form.Item>
-    //         ) : (
-    //           children
-    //         )}
-    //       </td>
-    //     );
-    //   };
-
     const configColumns = [
         {
             title: '配置项',
@@ -412,14 +344,6 @@ const ConfigService:React.FC<{checkConfNext: any}> = ( {checkConfNext} )=>{
             width: 200,
             editable: false,
         },
-        // {
-        //     title: '描述',
-        //     dataIndex: 'description',
-        //     editable: false,
-        //     render: (_: any, record: Item)=>{
-        //         return (record.description||'-')
-        //     }
-        // },
         {
             title: '操作',
             width: 150,
@@ -477,13 +401,6 @@ const ConfigService:React.FC<{checkConfNext: any}> = ( {checkConfNext} )=>{
             dealItemData(index,newData,row)
             dealFilterData(values.name,row)
             setIsModalOpen(false)
-            // const result: API.normalResult = await createNodeAPI({...values, clusterId: getData.clusterId})
-            // if(result && result.success){
-            //   message.success('新增成功');
-            //   getNodeData({ clusterId: getData.clusterId });
-            //   setIsModalOpen(false);
-            //   form.resetFields()
-            // }
           })
           .catch((err) => {
             console.log('err: ', err);
@@ -591,17 +508,6 @@ const ConfigService:React.FC<{checkConfNext: any}> = ( {checkConfNext} )=>{
                             </Button>
                         </>)
                     }
-                    {/* <Button 
-                        key="addconfig"
-                        type="primary"
-                        disabled={!serviceId}
-                        onClick={() => {
-                            setIsModalOpen(true)
-                            addConfigForm.resetFields()
-                        }}
-                    >
-                        添加自定义配置
-                    </Button> */}
                 </div>
                 <div className={styles.fileTabLayout}>
                     <div className={styles.fileTabBar}>

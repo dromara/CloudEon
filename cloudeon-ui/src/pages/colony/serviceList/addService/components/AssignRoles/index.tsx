@@ -25,7 +25,6 @@ const AssignRoles : React.FC<{
     
     const getData = JSON.parse(sessionStorage.getItem('colonyData') || '{}')
 
-    type NotificationType = 'success' | 'info' | 'warning' | 'error';
 
     type selectRoleItem = {
         validRule: any;
@@ -33,8 +32,6 @@ const AssignRoles : React.FC<{
         stackRoleName: any,
         nodeIds: any[]
     }
-
-    // type nodeJsonItem = {}
 
     const getNodeData = async (params: any) => {
         setLoading(true)
@@ -57,32 +54,7 @@ const AssignRoles : React.FC<{
         if(!sourceServiceInfos) return
         setServiceInfos(sourceServiceInfos)
         setServiceInfosToParams(sourceServiceInfos)
-        // const roleData = {
-        //     stackServiceId: sourceServiceInfos[0].stackServiceId || 0,
-        //     stackRoleName: sourceServiceInfos[0] && sourceServiceInfos[0].roles && sourceServiceInfos[0].roles[0].stackRoleName || '',
-        //     nodeIds: sourceServiceInfos[0] && sourceServiceInfos[0].roles && sourceServiceInfos[0].roles[0].nodeIds || [],
-        //     validRule: sourceServiceInfos[0] && sourceServiceInfos[0].roles && sourceServiceInfos[0].roles[0].validRule || {},
-        // }
-        // setCurrentSelectRoles(roleData)
-        // const newSelectedRowKeys = getNodeIds(sourceServiceInfos[0].stackServiceId, serviceList[0].roles[0])
-        // setSelectedRowKeys(newSelectedRowKeys);
     }
-
-    // const treeData = serviceList.map(item=>{
-    //     let itemData = {
-    //         title: item.label,
-    //         key: item.id,
-    //         selectable: false,
-    //         children: item.roles? (item.roles.map((r: any)=>{
-    //             return {
-    //                 title: r,
-    //                 key: r,
-    //                 stackServiceId: item.id
-    //             }
-    //         })):[]
-    //     }
-    //     return itemData
-    // })
 
     const getNodeIds:any = (stackServiceId:number, stackRoleName:any) => {
         for (let sItem of (serviceInfos||sourceServiceInfos)) {
@@ -106,19 +78,6 @@ const AssignRoles : React.FC<{
         }      
     }
 
-    // const onSelectTree: TreeProps['onSelect'] = (selectedKeys, info) => {
-    //     console.log('selected', selectedKeys, info);
-    //     const newSelectedRowKeys = getNodeIds(info.selectedNodes[0].stackServiceId, selectedKeys[0])
-    //     setSelectedRowKeys(newSelectedRowKeys);
-    //     const roleData = {
-    //         stackServiceId: info.selectedNodes[0].stackServiceId,
-    //         stackRoleName: selectedKeys[0],
-    //         nodeIds: newSelectedRowKeys,
-    //         validRule: getRoleRule(info.selectedNodes[0].stackServiceId, selectedKeys[0]),
-    //     }
-    //     setCurrentSelectRoles(roleData)
-    //     // console.log('--currentSelectRoles:', currentSelectRoles);
-    // };
 
     const columns = [
         {
@@ -150,43 +109,9 @@ const AssignRoles : React.FC<{
 
     const [api, contextHolder] = notification.useNotification();
 
-    // const openNotificationWithIcon = (errList:string[]) =>{
-    //     if(!errList || errList.length == 0) return
-    //     const errDom = errList.map(item=>{
-    //         return (<Alert type="error" message={item} banner />)
-    //     })
-    //     notification.open({
-    //         message: '温馨提示',
-    //         description:<>{errDom}</>,
-    //         duration:null,
-    //         style: {
-    //             width: 500
-    //         }
-    //         // onClick: () => {
-    //         //   console.log('Notification Clicked!');
-    //         // },
-    //       });
-    // }
-
-    
-
     const onSelectChange = (newSelectedRowKeys: number[]) => { // 主机名勾选触发的函数
-        console.log('---onSelectChange:', newSelectedRowKeys, currentSelectRoles);
+        // console.log('---onSelectChange:', newSelectedRowKeys, currentSelectRoles);
         setSelectedRowKeys(newSelectedRowKeys);
-        // let roles = {...currentSelectRoles}
-        // const newServiceInfos = [...(serviceInfos||[])]
-        // roles.nodeIds = newSelectedRowKeys
-        // for (let sItem of newServiceInfos||[]) {
-        //     if (sItem.stackServiceId == roles.stackServiceId) {
-        //         for (let role of sItem.roles||[]) {
-        //             if(role.stackRoleName == roles.stackRoleName)
-        //             role.nodeIds = newSelectedRowKeys
-        //         }
-        //     }
-        // } 
-        // setServiceInfos(newServiceInfos)
-        // checkAllRolesRules(newServiceInfos)
-        // setServiceInfosToParams(newServiceInfos)
     };
 
     const rowSelection = {

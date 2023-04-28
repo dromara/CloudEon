@@ -105,6 +105,7 @@ const serviceList: React.FC = () => {
             serviceList.map(sItem=>{
               return (
                 <div 
+                  key={sItem.serviceName+'card'}
                   className={styles.cardBox}
                 >
                   <Spin tip="Loading" key={sItem.serviceName+'spin'} size="small" spinning={btnLoadingStatus(sItem.id)}>
