@@ -36,7 +36,7 @@
 - [ ] 支持kylin服务在Kubernetes上运行
 - [ ] 支持seatunnel等服务在Kubernetes上运行
 - [ ] 更聪明的安装服务分配节点机制
-- [ ] 服务日志分析模块
+- [ ] 基于PLG实现服务日志分析监控模块
 - [ ] Spark/Flink RSS支持
 - [ ] 集群健康分析
 - [ ] 集群巡检功能

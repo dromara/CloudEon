@@ -21,7 +21,7 @@ roles:
     linkExpression: "http://${localhostname}:${conf['api.server.port']}/dolphinscheduler/ui/login"
     sortNum: 1
     type: MASTER
-    jmxPort: 9232
+
     fixedNum : 1
     logFile: "dolphinscheduler-api.log"
 
@@ -116,6 +116,7 @@ configurations:
     configurableInWizard: true
   - name: jdbc.mysql.address
     recommendExpression: "jdbc:mysql://192.168.197.149:3306/dolphinscheduler"
+    needChangeInWizard: true
     valueType: InputString
     description: "MySQL数据库地址"
     tag: "常用参数"
@@ -125,10 +126,12 @@ configurations:
     valueType: InputString
     description: "MySQL数据库用户名"
     tag: "常用参数"
+    needChangeInWizard: true
     configurableInWizard: true
   - name: jdbc.mysql.password
     recommendExpression: "eWJmP7yvpccHCtmVb61Gxl2XLzIrRgmT"
     valueType: InputString
     description: "MySQL数据库密码"
+    needChangeInWizard: true
     tag: "常用参数"
     configurableInWizard: true

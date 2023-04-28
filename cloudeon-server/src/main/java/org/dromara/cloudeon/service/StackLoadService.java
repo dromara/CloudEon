@@ -1,3 +1,19 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ *  contributor license agreements.  See the NOTICE file distributed with
+ *  this work for additional information regarding copyright ownership.
+ *  The ASF licenses this file to You under the Apache License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance with
+ *  the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 package org.dromara.cloudeon.service;
 
 import cn.hutool.core.bean.BeanUtil;
@@ -89,8 +105,6 @@ public class StackLoadService implements ApplicationRunner {
 
                     // 读取图标
                     String iconAppStr = ImageUtil.GetImageStr(iconAppFilePath);
-                    String iconDefaultStr = ImageUtil.GetImageStr(iconDefaultFilePath);
-                    String iconDangerStr = ImageUtil.GetImageStr(iconDangerFilePath);
 
                     // 查找数据库中是否含有该service
                     StackServiceEntity stackServiceEntity = null;
@@ -111,8 +125,6 @@ public class StackLoadService implements ApplicationRunner {
                     stackServiceEntity.setServiceConfigurationYaml(yaml.dump(serviceInfo.getConfigurations()));
                     stackServiceEntity.setPersistencePaths(StrUtil.join(",", serviceInfo.getPersistencePaths()));
                     // 持久化图标base64
-                    stackServiceEntity.setIconDanger(iconDangerStr);
-                    stackServiceEntity.setIconDefault(iconDefaultStr);
                     stackServiceEntity.setIconApp(iconAppStr);
                     stackServiceRepository.save(stackServiceEntity);
                     Integer stackServiceEntityId = stackServiceEntity.getId();

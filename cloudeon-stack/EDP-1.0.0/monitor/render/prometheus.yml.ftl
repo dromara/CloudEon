@@ -1,4 +1,6 @@
-# my global config
+#
+#  Thx for datasophon community open source contribute.This Part is Copied from datasophon.  Link to: https://github.com/datasophon/datasophon"
+#
 global:
   scrape_interval:     15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
   evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.

@@ -1,3 +1,5 @@
+# Thx for datasophon community open source contribute.This Part is Copied from datasophon.  Link to: https://github.com/datasophon/datasophon",
+
 rules:
         - alert: 主机内存使用率
           promql: (1-(node_memory_MemAvailable_bytes/(node_memory_MemTotal_bytes)))*100 > 95

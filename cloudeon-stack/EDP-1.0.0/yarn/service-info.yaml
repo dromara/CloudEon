@@ -27,7 +27,7 @@ roles:
     linkExpression: "http://${localhostname}:${conf['resourcemanager.webapp.port']}/?user.name=yarn"
     sortNum: 1
     type: MASTER
-    jmxPort: 9232
+
     minNum: 2
     logFile: "hadoop-hadoop-resourcemanager-${localhostname}.log"
 
@@ -37,7 +37,7 @@ roles:
     linkExpression: "http://${localhostname}:${conf['nodemanager.webapp.port']}/node/allApplications/?user.name=yarn"
     sortNum: 2
     type: SLAVE
-    jmxPort: 9232
+
     minNum: 1
     logFile: "hadoop-hadoop-nodemanager-${localhostname}.log"
 
@@ -47,7 +47,7 @@ roles:
     linkExpression: "http://${localhostname}:${conf['historyserver.http-port']}"
     sortNum: 3
     type: MASTER
-    jmxPort: 9232
+
     minNum: 1
     logFile: "hadoop-yarn-historyserver-${localhostname}.log"
 
@@ -57,7 +57,7 @@ roles:
     linkExpression: "http://${localhostname}:${conf['timelineserver.http.port']}"
     sortNum: 4
     type: MASTER
-    jmxPort: 9232
+
     minNum: 1
     logFile: "hadoop-hadoop-timelineserver-${localhostname}.log"
 

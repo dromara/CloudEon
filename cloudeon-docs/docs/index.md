@@ -28,6 +28,7 @@ CloudEon是一款基于kubernetes的开源大数据平台，旨在为用户提�
 - 前端技术栈
    - [react](https://github.com/facebook/react)
    - [ant-design](https://github.com/ant-design/ant-design)
-- 另外感谢
-   - [Ambari](https://github.com/apache/ambari)
-   - [datasophon](https://github.com/datasophon/datasophon)
+- 另外特别感谢
+  - [Ambari](https://github.com/apache/ambari)  ：参考其对大数据组件的安全管理、可拓展大数据组件包管理
+  - [datasophon](https://github.com/datasophon/datasophon) ：参考其优秀的监控告警体系
+
