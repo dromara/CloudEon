@@ -1,11 +1,13 @@
 
-# Windows搭建Cloudeon开发环境
+# Windows开发指南
 在搭建 `Cloudeon` 开发环境之前请确保你已经安装以下软件:
+
 - Git
 - JDK 1.8.x
 - Mysql 5.7.x
 - Maven
 - nvm
+
 # 克隆代码库
 通过你git管理工具下载git代码，以git cmd为例。
 ```
@@ -45,9 +47,8 @@ npm install yarn tyarn -g
 tyarn
 ```
 3. 在cloudeon-ui/config/apiConfig.ts文件修改：
-   ```bash
-    devHost = "XX.XX.XX.XX:7700" // 修改成要代理的地址
-   ```
+```bash
+devHost = "XX.XX.XX.XX:7700" // 修改成要代理的地址
 ```
 4. 回到cmd，启动项目
 ```
