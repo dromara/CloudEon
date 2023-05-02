@@ -172,6 +172,7 @@ public class StackController {
         List<ServiceConfVO> stackConfigurations = stackServiceConfEntities.stream().map(stackServiceConfEntity -> {
             ServiceConfVO serviceConfVO = new ServiceConfVO();
             BeanUtil.copyProperties(stackServiceConfEntity, serviceConfVO);
+            serviceConfVO.setStackServiceName(stackServiceEntity.getName());
             serviceConfVO.setConfFile(stackServiceConfEntity.getConfFile());
             if (StrUtil.isNotBlank(stackServiceConfEntity.getOptions())) {
                 serviceConfVO.setOptions(JSONObject.parseArray(stackServiceConfEntity.getOptions()).toJavaList(String.class));

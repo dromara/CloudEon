@@ -52,7 +52,7 @@ configurations:
     tag: "常用参数"
 
   - name: "javax.jdo.option.ConnectionUserName"
-    recommendExpression: "root"
+    recommendExpression: "xxx"
     valueType: InputString
     configurableInWizard: true
     description: "metastore依赖数据库的登录账户"
@@ -61,7 +61,7 @@ configurations:
     tag: "常用参数"
 
   - name: "javax.jdo.option.ConnectionPassword"
-    recommendExpression: "root"
+    recommendExpression: "xxx"
     valueType: InputString
     configurableInWizard: true
     description: "metastore依赖数据库的登录密码"

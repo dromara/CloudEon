@@ -28,6 +28,7 @@ public class ServiceConfVO {
      */
     private Boolean isCustomConf;
     private String name;
+    private String stackServiceName;
     private String description;
     private String label;
     private String recommendExpression;
