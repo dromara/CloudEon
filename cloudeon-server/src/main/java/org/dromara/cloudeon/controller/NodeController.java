@@ -35,6 +35,7 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 import org.apache.sshd.client.session.ClientSession;
 import org.apache.sshd.sftp.client.SftpClientFactory;
 import org.apache.sshd.sftp.client.fs.SftpFileSystem;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -65,8 +66,9 @@ public class NodeController {
     private SshPoolService sshPoolService;
 
     @PostMapping("/add")
+    @Transactional(rollbackFor = Exception.class)
     public ResultDTO<Void> addNode(@RequestBody SaveNodeRequest req) throws IOException {
-        String ip = req.getIp();
+        String ip = req.getIp().trim();
         Integer sshPort = req.getSshPort();
         String sshUser = req.getSshUser();
         String sshPassword = req.getSshPassword();
