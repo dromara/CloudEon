@@ -1,11 +1,8 @@
 # Docker部署
-Cloudeon 在 dockerhub 中的公共镜像地址为 [peterpoker/cloudeon](https://hub.docker.com/repository/docker/peterpoker/cloudeon)。如果你本地已经安装了 docker，执行以下命令可以一键安装：
-```
-docker run -p 7700:7700 peterpoker/cloudeon
-```
-如果国内访问比较慢，也可以用
+如果你本地已经安装了 docker，执行以下命令可以一键安装：
+
 ```shell
- docker run  -p 7700:7700  --name cloudeon --rm registry.cn-hangzhou.aliyuncs.com/udh/cloudeon:1.0.0
+ docker run  -p 7700:7700  --name cloudeon --rm registry.cn-hangzhou.aliyuncs.com/udh/cloudeon:v1.0.0
 ```
 镜像启动成功后，在浏览器中访问 http://docker_ip:7700 进入登录页。镜像中提供初始账户，用户名 admin 密码 admin
 
