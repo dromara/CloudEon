@@ -2,7 +2,8 @@ name: Experiment
 
 on:
   push:
-
+    tags:
+      - 'v*.*.*'
 
 jobs:
   my-job:
@@ -15,4 +16,8 @@ jobs:
       - name: Step 2
         run: |
           # Use the TAG_NAME environment variable
-          echo "The tag name is: ${{ env.GITHUB_REF }}"
+          echo "The tag name is: ${{ env.GITHUB_REF }}   ${TAG} "
+      - name: Step 3
+        run: |
+          # Use the TAG_NAME environment variable
+          echo "The tag name is: ${{ env.TAG }}"
