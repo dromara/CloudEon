@@ -37,7 +37,7 @@
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>cloudeon-ui</artifactId>
-            <version>1.0.0</version>
+            <version>v1.0.0</version>
         </dependency>
         <!-- lombok -->
         <dependency>
