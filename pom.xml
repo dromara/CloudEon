@@ -6,7 +6,7 @@
 
     <groupId>org.dromara</groupId>
     <artifactId>cloudeon</artifactId>
-    <version>1.0.0</version>
+    <version>v1.0.0</version>
     <packaging>pom</packaging>
     <name>cloudeon</name>
 

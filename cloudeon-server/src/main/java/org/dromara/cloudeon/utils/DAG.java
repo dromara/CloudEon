@@ -1,6 +1,4 @@
 /*
-Thx for datasophon community open source contribute.This Part is Copied from datasophon.  Link to: https://github.com/datasophon/datasophon
-
  * Licensed to the Apache Software Foundation (ASF) under one or more
  *  contributor license agreements.  See the NOTICE file distributed with
  *  this work for additional information regarding copyright ownership.
@@ -16,6 +14,11 @@ Thx for datasophon community open source contribute.This Part is Copied from dat
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+
+//Thx for datasophon community open source contribute.This Part is Copied from datasophon.  Link to: https://github.com/datasophon/datasophon
+
+
+
 package org.dromara.cloudeon.utils;
 
 import cn.hutool.core.collection.CollUtil;
