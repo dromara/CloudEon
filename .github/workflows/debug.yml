@@ -16,8 +16,4 @@ jobs:
       - name: Step 2
         run: |
           # Use the TAG_NAME environment variable
-          echo "The tag name is: ${{ env.GITHUB_REF }}   ${TAG} "
-      - name: Step 3
-        run: |
-          # Use the TAG_NAME environment variable
-          echo "The tag name is: ${{ env.TAG }}"
+          echo "The tag name is: ${{steps.tag.outputs.tag}} "
