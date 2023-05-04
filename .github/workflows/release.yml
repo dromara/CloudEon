@@ -54,7 +54,7 @@ jobs:
           asset_name: cloudeon-assembly-${{steps.tag.outputs.tag}}-release.tar.gz
           asset_content_type: application/gzip
       - name: Build the Docker image
-          run: cp -r cloudeon-assembly/target/cloudeon-assembly-${{steps.tag.outputs.tag}}-release ./docker
+        run: cp -r cloudeon-assembly/target/cloudeon-assembly-${{steps.tag.outputs.tag}}-release ./docker
       - uses: docker/build-push-action@v1
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
