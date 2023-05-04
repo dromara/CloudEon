@@ -1,0 +1,12 @@
+name: Experiment
+
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Debug
+      run: echo "Works. Tag is ${GITHUB_REF##*/}"
