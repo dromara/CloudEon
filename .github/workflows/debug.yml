@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      TAG_NAME: ${{ github.ref##*/ }}
+      TAG_NAME: ${GITHUB_REF##*/}
 
     steps:
 
