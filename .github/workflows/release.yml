@@ -9,8 +9,12 @@ jobs:
   build-and-release:
     runs-on: ubuntu-latest
     steps:
-      - name: Get current git tag
-        uses: devops-actions/action-get-tag@v1.0.2
+      - name: Get tag
+        id: tag
+        uses: devops-actions/action-get-tag@v1.0.1
+        with:
+          strip_v: false # Optional: Remove 'v' character from version
+          default: v0.0.0 # Optional: Default version when tag not found
 
       - uses: actions/checkout@v2
       - name: Set up JDK 1.8
@@ -25,10 +29,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PERSON_TOKEN }}
         with:
-          tag_name: ${{ env.GITHUB_REF }}
-          release_name: Release ${{ env.GITHUB_REF }}
+          tag_name: ${{steps.tag.outputs.tag}}
+          release_name: Release ${{steps.tag.outputs.tag}}
           body: |
-            This is a release for version  ${{ env.GITHUB_REF }}
+            This is a release for version  ${{steps.tag.outputs.tag}}
           draft: false
           prerelease: false
       - name: Upload Release Asset
@@ -36,7 +40,7 @@ jobs:
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.PERSON_TOKEN }}
-          TAG_NAME: ${{ env.GITHUB_REF }}
+          TAG_NAME: ${{steps.tag.outputs.tag}}
 
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
