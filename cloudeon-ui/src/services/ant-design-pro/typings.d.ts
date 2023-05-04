@@ -172,6 +172,8 @@ declare namespace API {
   };
 
   type ConfItem = {
+    stackServiceName: any;
+    needChangeInWizard: boolean;
     value: string;
     isCustomConf: any;
     name?: string,

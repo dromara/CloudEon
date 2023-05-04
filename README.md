@@ -92,9 +92,10 @@ CloudEon致力于将大数据服务迁移到云上，并帮助大数据生态组
   - [react](https://github.com/facebook/react)
   - [ant-design](https://github.com/ant-design/ant-design)
 
-- 另外感谢
-  - [datasophon](https://github.com/datasophon/datasophon)
-  - [Ambari](https://github.com/apache/ambari)
+- 另外特别感谢
+  - [Ambari](https://github.com/apache/ambari)  ：参考其对大数据组件的安全管理、可拓展大数据组件包管理
+  - [datasophon](https://github.com/datasophon/datasophon) ：参考其优秀的监控告警体系
+
 
 ## 🤗 另外
 

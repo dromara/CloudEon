@@ -128,17 +128,21 @@ const serviceAdd: React.FC = () => {
   }
 
   interface anyKey{
-    [key:number]:any,
+    [key:number|string]:any[],
   }
   
   const setPresetConfListToParams = async() => {
     const allConfData = JSON.parse(sessionStorage.getItem('allConfData') || '{}')
     let presetConfData:anyKey = {}
     let customConfData:anyKey = {}
+    let needChangeData:anyKey = {}
     for(let key in allConfData){
       presetConfData[key] = []
       customConfData[key] = []
-      allConfData[key].forEach((item: { isCustomConf: any; name: any; value: any; confFile: any; sourceValue: any; recommendExpression: any; })=>{
+      allConfData[key].forEach((item: {
+        stackServiceName: any;
+        needChangeInWizard: boolean; isCustomConf: any; name: any; value: any; confFile: any; sourceValue: any; recommendExpression: any; 
+      })=>{
         if(item.isCustomConf){
           customConfData[key].push({
             name: item.name,
@@ -146,6 +150,12 @@ const serviceAdd: React.FC = () => {
             confFile: item.confFile
           })
         }else{
+          if(item.needChangeInWizard && item.value == item.recommendExpression){
+            if(!needChangeData[item.stackServiceName]){
+              needChangeData[item.stackServiceName] = []
+            } 
+            needChangeData[item.stackServiceName].push(item.name)
+          }
           presetConfData[key].push({
             name: item.name,
             recommendedValue: item.sourceValue,
@@ -153,13 +163,6 @@ const serviceAdd: React.FC = () => {
           })
         }
       })
-      // allConfData[key] = allConfData[key].map((item: { name: any; sourceValue: any; recommendExpression: any; })=>{
-      //   return {
-      //     name: item.name,
-      //     recommendedValue: item.sourceValue,
-      //     value: item.recommendExpression
-      //   }
-      // })
     }
     let params = cloneDeep(allParams)
     if(params?.serviceInfos?.length){
@@ -171,19 +174,27 @@ const serviceAdd: React.FC = () => {
             psItem.customConfList = customConfData[psItem.stackServiceId]
           } else {
               setLoading(true)
-              const params = {
+              const paramsData = {
                   serviceId: psItem.stackServiceId,
                   inWizard: true
               }
-              const result =  await getServiceConfAPI(params);
+              const result =  await getServiceConfAPI(paramsData);
               const confsList = result?.data?.confs || []
-              const confsdata = confsList.map((cItem)=>{
-                return {
+              let confsdata = []
+              for(let j = 0; j < confsList.length; j++){
+                let cItem = confsList[j]
+                confsdata.push({
                   name: cItem.name,
                   recommendedValue: cItem.recommendExpression,
                   value: cItem.recommendExpression
+                })
+                if(cItem.needChangeInWizard && cItem.recommendExpression){
+                  if(!needChangeData[cItem.stackServiceName]){
+                    needChangeData[cItem.stackServiceName] = []
+                  } 
+                  needChangeData[cItem.stackServiceName].push(cItem.name)
                 }
-              })
+              }
               setLoading(false)
               psItem.presetConfList = confsdata
               psItem.customConfList = []
@@ -192,8 +203,10 @@ const serviceAdd: React.FC = () => {
         }
       }
     }
+    // console.log('--needChangeData: ', needChangeData);
+    // console.log('--params: ', params);
     setSubmitallParams(params)
-    return params
+    return {params, needChangeData}
   }
 
   // const checkRoleNext = (value:boolean) =>{
@@ -280,12 +293,13 @@ const serviceAdd: React.FC = () => {
   // 弹框角色分配校验结果
   const [api, contextHolder] = notification.useNotification();
   const openNotificationWithIcon = (errList:string[]) =>{
-      notification.destroy()
+    notification.close("openNotificationWithIcon")
       if(!errList || errList.length == 0) return
       const errDom = errList.map(item=>{
           return (<Alert type="error" key={item} message={item} banner />)
       })
       notification.open({
+          key:"openNotificationWithIcon",
           message: '温馨提示',
           description:<>{errDom}</>,
           duration:null,
@@ -294,6 +308,26 @@ const serviceAdd: React.FC = () => {
           }
         });
   }
+
+  const openNotificationNeedChange = (needChangeList: any) =>{
+    // console.log("-NeedChangeList:", needChangeList);
+    notification.close("openNotificationNeedChange")
+    if(!needChangeList) return
+    const errDom: JSX.Element[] = []
+    for(let key in needChangeList){
+      const des = needChangeList[key].map((item: any)=>{return (<div key={item}>{item}</div>)})
+      errDom.push(<Alert type="error" key={key}  message={key} description={<>{des}</>} banner />)
+    }
+    notification.open({
+        key:"openNotificationNeedChange",
+        message: '如下配置项需要修改默认值',
+        description:<>{errDom}</>,
+        duration:null,
+        style: {
+            width: 500
+        }
+    });
+}
 
   // 角色分配校验：检验是否符合节点选择规则
   const checkAllRolesRules = (serviceInfos:API.ServiceInfosItem[]) => {
@@ -337,7 +371,7 @@ const serviceAdd: React.FC = () => {
 
   return (
     <PageContainer header={{ title: '' }}>
-      <Spin tip="Loading" size="small" spinning={loading}>
+      <Spin tip="Loading" size="small" spinning={loading} style={{display:'flex'}}>
         <div className={styles.stepsLayout}>
           <div className={styles.stepsWrap}>
             <Steps
@@ -402,8 +436,15 @@ const serviceAdd: React.FC = () => {
                     setCurrent(current + 1);
                     
                   } else if(current == 2){ // 配置服务
-                    const resultParams = await setPresetConfListToParams()
-                    // console.log('---resultParams: ', resultParams);
+                    const {params, needChangeData} = await setPresetConfListToParams()
+                    const resultParams = params
+                    
+                    if(needChangeData && JSON.stringify(needChangeData) != "{}"){ // 对需要修改默认值的项进行判断
+                      openNotificationNeedChange(needChangeData)
+                      return false
+                    }else{
+                      notification.close("openNotificationNeedChange")
+                    }
                     
                     let initParams = {
                       ...resultParams, 
@@ -428,6 +469,7 @@ const serviceAdd: React.FC = () => {
                       })
                     }
                     // console.log('--initParams: ', initParams);
+
                     installService(initParams)
 
                   }else{

@@ -99,106 +99,109 @@ const serviceList: React.FC = () => {
       }}
     >
       <Spin tip="Loading" size="small" spinning={loading}>
-      <Space className={styles.serviceList}>
+      <div className={styles.serviceList}>
         {
           (serviceList && serviceList.length > 0) ? (
             serviceList.map(sItem=>{
               return (
-                <Spin tip="Loading" key={sItem.serviceName+'spin'} size="small" spinning={btnLoadingStatus(sItem.id)}>
-                  <Card
-                    hoverable
-                    key={sItem.serviceName}
-                    style={{ width: 300 }}
-                    actions={[                      
-                      <Popconfirm
-                            key='startPop'
-                            title="确定要启动吗?"
-                            onConfirm={()=>{ handleACT('start',sItem.id) }}
-                            okText="确定"
-                            cancelText="取消"
-                      >
-                        <Popover content="启动" title="">
-                          <PlayCircleOutlined/>
-                        </Popover>
-                      </Popconfirm>,
-                      <Popconfirm
-                            key='stopPop'
-                            title="确定要停止吗?"
-                            onConfirm={()=>{ handleACT('stop',sItem.id) }}
-                            okText="确定"
-                            cancelText="取消"
-                      >
-                      <Popover content="停止" title="">
-                        <PoweroffOutlined />
-                      </Popover>
-                      </Popconfirm>,
-                      <Popconfirm
-                            key='restartPop'
-                            title="确定要重启吗?"
-                            onConfirm={()=>{ handleACT('restart',sItem.id) }}
-                            okText="确定"
-                            cancelText="取消"
-                      >
-                      <Popover content="重启" title="">
-                        <ReloadOutlined />
-                      </Popover>
-                      </Popconfirm>,
-                      <Popover content="删除" title="">
+                <div 
+                  key={sItem.serviceName+'card'}
+                  className={styles.cardBox}
+                >
+                  <Spin tip="Loading" key={sItem.serviceName+'spin'} size="small" spinning={btnLoadingStatus(sItem.id)}>
+                    <Card
+                      hoverable
+                      key={sItem.serviceName}
+                      actions={[                      
                         <Popconfirm
-                          title="确定删除该服务吗？"
-                          onConfirm={()=>{
-                            handleDeleteService({serviceInstanceId: sItem.id })
-                          }}
-                          onCancel={()=>{}}
-                          okText="确定"
-                          cancelText="取消"
+                              key='startPop'
+                              title="确定要启动吗?"
+                              onConfirm={()=>{ handleACT('start',sItem.id) }}
+                              okText="确定"
+                              cancelText="取消"
                         >
-                          <DeleteOutlined key="setting"/>
-                        </Popconfirm>
-                      </Popover>,
-                      // <SettingOutlined />,
-                      // <EditOutlined key="edit" />,
-                      // <EllipsisOutlined key="ellipsis" />,
-                    ]}
-                  >
-                    {
-                      sItem.alertMsgCnt ? 
-                      <div className={styles.alertWrap}>
-                        <Tooltip 
-                          placement="top" 
-                          color="#fff"
-                          title={
-                            <div className={styles.alertText}>
-                              {`该服务当前有${sItem.alertMsgCnt}个告警：`}
-                              {sItem.alertMsgName.map((msg:any,index:any)=>{
-                                return <div key={index}>{`${index+1}. ${msg}`}</div>
-                              })}
-                            </div>
-                          }
+                          <Popover content="启动" title="">
+                            <PlayCircleOutlined/>
+                          </Popover>
+                        </Popconfirm>,
+                        <Popconfirm
+                              key='stopPop'
+                              title="确定要停止吗?"
+                              onConfirm={()=>{ handleACT('stop',sItem.id) }}
+                              okText="确定"
+                              cancelText="取消"
                         >
-                          <AlertFilled style={{fontSize:'18px'}} />
-                        </Tooltip>                      
-                      </div> :''
-                    }
-                    <div 
-                      style={{cursor:'pointer'}}
-                      onClick={() => {
-                        history.push(`/colony/serviceList/detail?serviceName=${sItem.serviceName}&id=${sItem.id}`);
-                      }}>
-                        <Meta
-                          avatar={<Avatar style={{width:'40px', height:'40px'}} src={'data:image/jpeg;base64,'+sItem.icon} />}
-                          title={<div style={{paddingLeft:'2px'}}>{sItem.serviceName}</div>}
-                          description={<div style={{paddingLeft:'2px'}}>
-                          <span style={{backgroundColor: serviceStatusColor[sItem.serviceStateValue || 0]}} 
-                                className={`${styles.statusCircel} ${[1,2,3,4,5,8].includes(sItem.serviceStateValue) && styles.statusProcessing}`}>
-                            </span>
-                          {sItem.serviceState}
-                          </div>}
-                        />
-                    </div>
-                  </Card>
-                </Spin>
-                
+                        <Popover content="停止" title="">
+                          <PoweroffOutlined />
+                        </Popover>
+                        </Popconfirm>,
+                        <Popconfirm
+                              key='restartPop'
+                              title="确定要重启吗?"
+                              onConfirm={()=>{ handleACT('restart',sItem.id) }}
+                              okText="确定"
+                              cancelText="取消"
+                        >
+                        <Popover content="重启" title="">
+                          <ReloadOutlined />
+                        </Popover>
+                        </Popconfirm>,
+                        <Popover content="删除" title="">
+                          <Popconfirm
+                            title="确定删除该服务吗？"
+                            onConfirm={()=>{
+                              handleDeleteService({serviceInstanceId: sItem.id })
+                            }}
+                            onCancel={()=>{}}
+                            okText="确定"
+                            cancelText="取消"
+                          >
+                            <DeleteOutlined key="setting"/>
+                          </Popconfirm>
+                        </Popover>,
+                        // <SettingOutlined />,
+                        // <EditOutlined key="edit" />,
+                        // <EllipsisOutlined key="ellipsis" />,
+                      ]}
+                    >
+                      {
+                        sItem.alertMsgCnt ? 
+                        <div className={styles.alertWrap}>
+                          <Tooltip 
+                            placement="top" 
+                            color="#fff"
+                            title={
+                              <div className={styles.alertText}>
+                                {`该服务当前有${sItem.alertMsgCnt}个告警：`}
+                                {sItem.alertMsgName.map((msg:any,index:any)=>{
+                                  return <div key={index}>{`${index+1}. ${msg}`}</div>
+                                })}
+                              </div>
+                            }
+                          >
+                            <AlertFilled style={{fontSize:'18px'}} />
+                          </Tooltip>                      
+                        </div> :''
+                      }
+                      <div 
+                        style={{cursor:'pointer'}}
+                        onClick={() => {
+                          history.push(`/colony/serviceList/detail?serviceName=${sItem.serviceName}&id=${sItem.id}`);
+                        }}>
+                          <Meta
+                            avatar={<Avatar style={{width:'40px', height:'40px'}} src={'data:image/jpeg;base64,'+sItem.icon} />}
+                            title={<div style={{paddingLeft:'2px'}}>{sItem.serviceName}</div>}
+                            description={<div style={{paddingLeft:'2px'}}>
+                            <span style={{backgroundColor: serviceStatusColor[sItem.serviceStateValue || 0]}} 
+                                  className={`${styles.statusCircel} ${[1,2,3,4,5,8].includes(sItem.serviceStateValue) && styles.statusProcessing}`}>
+                              </span>
+                            {sItem.serviceState}
+                            </div>}
+                          />
+                      </div>
+                    </Card>
+                  </Spin>
+                </div>
               )
 
             })
@@ -229,7 +232,7 @@ const serviceList: React.FC = () => {
             // </Card>
           )
         }
-      </Space>
+      </div>
       </Spin>
     </PageContainer>
   );

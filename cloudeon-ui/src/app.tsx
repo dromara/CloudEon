@@ -243,7 +243,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
           timer = setInterval(getCount,3000)
         } 
         return ()=>{
-          clearInterval(timer)
+          timer && clearInterval(timer)
           timer = null
         }        
       },[])  
