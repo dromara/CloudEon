@@ -9,4 +9,4 @@ jobs:
 
     steps:
     - name: Debug
-      run: echo "Works. Tag is ${GITHUB_REF##*/}"
+      run: echo "Works. Tag is ${GITHUB_REF}"
