@@ -33,8 +33,9 @@ jobs:
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.PERSON_TOKEN }}
+          TAG_NAME:  ${{ github.ref#refs/tags/ }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./cloudeon-assembly/target/cloudeon-assembly-${{ github.ref }}-release.tar.gz
-          asset_name: cloudeon-assembly-${{ github.ref }}-release.tar.gz
+          asset_path: ./cloudeon-assembly/target/cloudeon-assembly-${TAG_NAME}-release.tar.gz
+          asset_name: cloudeon-assembly-${TAG_NAME}-release.tar.gz
           asset_content_type: application/gzip
