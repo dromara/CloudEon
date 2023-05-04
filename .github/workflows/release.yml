@@ -22,10 +22,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PERSON_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag_name: ${{ GITHUB_REF##/ }}
+          release_name: Release ${{ GITHUB_REF##/ }}
           body: |
-            This is a release for version ${{ github.ref }}
+            This is a release for version  ${{ GITHUB_REF##/ }}
           draft: false
           prerelease: false
       - name: Upload Release Asset
@@ -33,7 +33,7 @@ jobs:
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.PERSON_TOKEN }}
-          TAG_NAME: ${{ github.ref##*/ }}
+          TAG_NAME: ${{ GITHUB_REF##/ }}
 
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
