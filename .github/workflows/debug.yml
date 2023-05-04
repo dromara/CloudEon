@@ -3,10 +3,19 @@ name: Experiment
 on:
   push:
 
+
 jobs:
-  build:
+  my-job:
     runs-on: ubuntu-latest
 
+    env:
+      TAG_NAME: ${{ github.ref##*/ }}
+
     steps:
-    - name: Debug
-      run: echo "Works. Tag is ${GITHUB_REF}"
+      - name: Step 1
+        run: echo "The tag name is: ${{ env.TAG_NAME }}"
+
+      - name: Step 2
+        run: |
+          # Use the TAG_NAME environment variable
+          echo "The tag name is: ${TAG_NAME}"
