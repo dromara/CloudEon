@@ -73,6 +73,7 @@ nav:
       - 支持组件/SparkOnK8s.md
       - 支持组件/HiveOnK8s.md
       - 支持组件/DolphinschedulerOnK8s.md
+      - 支持组件/SeatunnelOnK8s.md
   - 社区贡献:
       - 社区贡献/communicate.md
       - 社区贡献/contribute.md
