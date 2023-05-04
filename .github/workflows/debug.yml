@@ -8,12 +8,11 @@ jobs:
   my-job:
     runs-on: ubuntu-latest
 
-    env:
-      TAG_NAME: ${GITHUB_REF##*/}
 
     steps:
-
+      - name: Get current git tag
+        uses: devops-actions/action-get-tag@v1.0.2
       - name: Step 2
         run: |
           # Use the TAG_NAME environment variable
-          echo "The tag name is: ${TAG_NAME}"
+          echo "The tag name is: ${{ GITHUB_REF }}"
