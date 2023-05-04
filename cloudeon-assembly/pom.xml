@@ -20,7 +20,7 @@
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>cloudeon-server</artifactId>
-            <version>1.0.0</version>
+            <version>${cloudeon.version}</version>
         </dependency>
     </dependencies>
 <build>
