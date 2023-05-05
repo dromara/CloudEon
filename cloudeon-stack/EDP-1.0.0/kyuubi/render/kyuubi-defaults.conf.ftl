@@ -8,7 +8,7 @@ kyuubi.frontend.protocols                     	THRIFT_BINARY,REST
 kyuubi.engine.type                       SPARK_SQL
 
 
-
+# 开启ha后，beeline访问方式 =>  beeline -u 'jdbc:hive2://test-1:2181/;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=kyuubi7' -n hive
 <#if dependencies.ZOOKEEPER??>
     <#assign zookeeper=dependencies.ZOOKEEPER quorum=[]>
     <#list zookeeper.serviceRoles['ZOOKEEPER_SERVER'] as role>
@@ -24,6 +24,8 @@ kyuubi.metrics.reporters                   PROMETHEUS
 
 ## Spark Configurations
 # 这里可以输入spark原生的配置，优先级会比spark-default.conf高
+spark.master                       yarn
+
 <#if dependencies.SPARK??>
     <#assign spark=dependencies.SPARK >
 # spark history

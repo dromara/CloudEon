@@ -5,6 +5,7 @@ version: 1.7.0
 dockerImage: "registry.cn-hangzhou.aliyuncs.com/udh/kyuubi:1.7.0"
 dependencies:
     - "HDFS"
+    - "ZOOKEEPER"
     - "YARN"
     - "HIVE"
     - "SPARK"
@@ -23,9 +24,9 @@ roles:
     roleFullName: "kyuubi-server"
     sortNum: 1
     type: MASTER
-    fixedNum: 1
+    minNum: 1
     linkExpression: "http://${localhostname}:${conf['kyuubi.frontend.rest.bind.port']}"
-    logFile: "flink-flink-historyserver-0-${localhostname}.log"
+    logFile: "kyuubi-kyuubi-org.apache.kyuubi.server.KyuubiServer-${localhostname}.out"
 
 
 persistencePaths:
@@ -35,7 +36,7 @@ persistencePaths:
 
 
 customConfigFiles:
-  - kyuubi-defaults.conf.ftl
+  - kyuubi-defaults.conf
 
 
 configurations:
@@ -67,10 +68,7 @@ configurations:
     valueType: Select
     options: ["CONNECTION","USER","GROUP","SERVER"]
     description: | 
-    CONNECTION：引擎不会被共享，仅由当前客户端连接使用。这意味着每个连接都将启动一个新的查询引擎。
-    USER：引擎将由所有由唯一用户名创建的会话共享。这意味着，具有相同用户名的所有会话都将共享同一个查询引擎。如果指定了kyuubi.engine.share.level.subdomain配置项，则可以将共享级别细分为更小的子域。
-    GROUP：引擎将由所有属于同一主组名称的用户创建的会话共享。这意味着，具有相同主组名称的所有用户的会话都将共享同一个查询引擎。引擎将以组名作为有效用户名启动，因此组名是能够访问团队计算资源/数据的特殊用户的值。如果未找到主组，则回退到USER级别。
-    SERVER：引擎将由所有Kyuubi服务器共享。这意味着，具有相同配置的所有Kyuubi服务器将共享同一个查询引擎。这种级别通常用于在大规模集群中共享资源。
+      CONNECTION：引擎不会被共享，仅由当前客户端连接使用。这意味着每个连接都将启动一个新的查询引擎。USER：引擎将由所有由唯一用户名创建的会话共享。GROUP：引擎将由所有属于同一主组名称的用户创建的会话共享。SERVER：引擎将由所有Kyuubi服务器共享。
     confFile:  "kyuubi-defaults.conf"
     tag: "高级参数"
 

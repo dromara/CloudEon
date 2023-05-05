@@ -42,6 +42,11 @@ spec:
       containers:
       - args:
           - "/opt/edp/${service.serviceName}/conf/bootstrap-kyuubi.sh"
+        env:
+          - name: "USER"
+            value: "kyuubi"
+          - name: "KYUUBI_CONF_DIR"
+            value: "/opt/edp/${service.serviceName}/conf"
         image: "${dockerImage}"
         imagePullPolicy: "Always"
         readinessProbe:
@@ -49,7 +54,7 @@ spec:
             command:
             - "/bin/bash"
             - "-c"
-            - "curl --fail --connect-timeout 15 --max-time 15 \"http://`hostname`:${conf['flink.history.ui.port']}/\"\
+            - "curl --fail --connect-timeout 15 --max-time 15 \"http://`hostname`:${conf['kyuubi.frontend.rest.bind.port']}/\"\
             \n"
           failureThreshold: 3
           initialDelaySeconds: 10

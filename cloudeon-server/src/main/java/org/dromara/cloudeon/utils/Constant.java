@@ -37,6 +37,7 @@ public class Constant {
     public static final String ALERT_RULE_RESOURCE_DIR = "alert-rule";
     public static final String YARN_SERVICE_NAME = "YARN";
     public static final String HBASE_SERVICE_NAME = "HBASE";
+    public static final String KYUUBI_SERVICE_NAME = "KYUUBI";
     public static final String DOLPHINSCHEDULER_SERVICE_NAME = "DOLPHINSCHEDULER";
     public static final String FLINK_SERVICE_NAME = "FLINK";
     public static final String SPARK_SERVICE_NAME = "SPARK";
