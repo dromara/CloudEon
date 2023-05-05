@@ -111,3 +111,6 @@ scrape_configs:
   - job_name: 'flinkhistoryserver'
     file_sd_configs:
     - files: ['discovery_configs/flinkhistoryserver.json']
+  - job_name: 'kyuubiserver'
+    file_sd_configs:
+    - files: ['discovery_configs/kyuubiserver.json']
