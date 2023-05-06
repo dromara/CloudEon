@@ -15,7 +15,7 @@ runAs: kyuubi
 supportKerberos: true
 
 dashboard:
-  uid: ""
+  uid: "S43WG_yVk"
 
 roles:
 

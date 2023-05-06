@@ -25,7 +25,6 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 23,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -133,6 +132,10 @@
               {
                 "color": "green",
                 "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
               }
             ]
           },
@@ -175,7 +178,7 @@
           },
           "editorMode": "code",
           "expr": "kyuubi_memory_usage_heap_max{job=\"kyuubiserver\"}",
-          "legendFormat": "__auto",
+          "legendFormat": "{{instance}}",
           "range": true,
           "refId": "A"
         }
@@ -876,6 +879,6 @@
   "timezone": "",
   "title": "Kyuubi",
   "uid": "S43WG_yVk",
-  "version": 4,
+  "version": 1,
   "weekStart": ""
 }
