@@ -65,6 +65,7 @@ nav:
   - 支持组件:
       - 支持组件/supportservice.md
       - 支持组件/HDFSonK8s.md
+      - 支持组件/YarnonK8s.md
       - 支持组件/DorisonK8s.md
       - 支持组件/ZookeeperOnK8s.md
       - 支持组件/KafkaOnK8s.md
