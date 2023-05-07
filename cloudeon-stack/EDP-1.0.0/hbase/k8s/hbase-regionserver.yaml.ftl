@@ -45,6 +45,8 @@ spec:
         env:
           - name: "USER"
             value: "${runAs}"
+          - name: "HBASE_CONF_DIR"
+            value: "/opt/edp/${service.serviceName}/conf"
         image: "${dockerImage}"
         imagePullPolicy: "Always"
         readinessProbe:
