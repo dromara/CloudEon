@@ -23,6 +23,7 @@ import cn.hutool.core.lang.Console;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.extra.ssh.JschSessionPool;
 import cn.hutool.extra.ssh.JschUtil;
+import cn.hutool.extra.ssh.Sftp;
 import com.google.common.collect.Lists;
 import com.jcraft.jsch.Session;
 import org.apache.sshd.client.session.ClientSession;
@@ -31,6 +32,7 @@ import org.dromara.cloudeon.utils.SshConnectionPool;
 import org.dromara.cloudeon.utils.SshUtils;
 import org.junit.Test;
 
+import java.io.File;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,6 +53,18 @@ public class JschTest {
             JschUtils.execCallbackLine(session, Charset.defaultCharset(), 10000,command2 , null,consoleLineHandler,consoleLineHandler2 );
 
         }
+    }
+
+    @Test
+    public void sftpTest() {
+        Session session = jschSessionPool.getSession("192.168.197.173", 22, "root", "123456");
+        Sftp sftp = new Sftp(session, Charset.defaultCharset(), 10000);
+        // 单文件上传指定目录中
+//        sftp.put("E:\\workspace\\CloudEon\\cloudeon-docs\\mkdocs.yml","/tmp");
+
+        // 整个文件夹上传到服务器上
+        sftp.mkDirs("/tmp/cloudeon-docs");
+        sftp.syncUpload(new File("E:\\workspace\\CloudEon\\cloudeon-docs\\"),"/tmp/cloudeon-docs");
     }
 
     public static class MyLineHandler implements LineHandler {
