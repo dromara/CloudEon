@@ -43,25 +43,33 @@
 fork
 
 然后 用git命令 将代码下载到本地：
+```
 
-git clone git@github.com:${YOUR_USERNAME}/${TARGET_REPO}.git #推荐使用# 也可以 git clone https://github.com/${YOUR_USERNAME}/${TARGET_REPO}.git
+git clone git@github.com:${YOUR_USERNAME}/${TARGET_REPO}.git #推荐使用# 
+```
+也可以 
+```
+git clone https://github.com/${YOUR_USERNAME}/${TARGET_REPO}.git
+```
 
 下载完成后，请参考目标仓库的入门指南或者 README 文件对项目进行初始化。
 
 接着，您可以参考如下命令进行代码的提交：
 
 切换新的分支，进行开发
-
+```
 git checkout -b a-dev-branch
-
+```
 提交 commit
-
-git add <modified file/path> #add后跟着改动的文件或目录git commit -m 'necessary instructions'
+```
+git add <modified file/path> #add后跟着改动的文件或目录
+git commit -m 'necessary instructions'
+```
 
 推送到远程仓库
-
+```
 git push origin a-dev-branch
-
+```
 然后您就可以在 GitHub 上发起新的 PR (Pull Request)。
 
 请注意 PR 的标题需要符合我们的规范，并且在 PR 中写上必要的说明，来方便 Committer 和其他贡献者进行代码审查。
