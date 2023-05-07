@@ -60,7 +60,7 @@ public class PullImageTask extends BaseCloudeonTask {
         Session clientSession = sshPoolService.openSession(nodeEntity.getIp(), nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getSshPassword());
         try {
             log.info("节点：" + taskParam.getHostName() + " 上执行命令：" + command);
-            JschUtils.execCallbackLine(clientSession, Charset.defaultCharset(), DEFAULT_JSCH_TIMEOUT,command ,null,remoteSshTaskLineHandler,remoteSshTaskLineHandler );
+            JschUtils.execCallbackLine(clientSession, Charset.defaultCharset(), DEFAULT_JSCH_TIMEOUT,command ,null,remoteSshTaskLineHandler,remoteSshTaskErrorLineHandler );
 
         } catch (IOException e) {
             throw new RuntimeException(e);

@@ -69,7 +69,7 @@ public class InitYARNDirOnHDFSTask extends BaseCloudeonTask {
         log.info("在节点"+ip+"上执行命令:" + cmd);
         Session clientSession = sshPoolService.openSession(ip, nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getSshPassword());
         try {
-            JschUtils.execCallbackLine(clientSession, Charset.defaultCharset(), DEFAULT_JSCH_TIMEOUT,cmd ,null,remoteSshTaskLineHandler,remoteSshTaskLineHandler );
+            JschUtils.execCallbackLine(clientSession, Charset.defaultCharset(), DEFAULT_JSCH_TIMEOUT,cmd ,null,remoteSshTaskLineHandler,remoteSshTaskErrorLineHandler );
 
         } catch (IOException e) {
             e.printStackTrace();

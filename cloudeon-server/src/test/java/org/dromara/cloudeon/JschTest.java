@@ -25,19 +25,28 @@ import cn.hutool.extra.ssh.JschSessionPool;
 import cn.hutool.extra.ssh.JschUtil;
 import cn.hutool.extra.ssh.Sftp;
 import com.google.common.collect.Lists;
+import com.jcraft.jsch.ChannelExec;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.sshd.client.session.ClientSession;
-import org.dromara.cloudeon.utils.JschUtils;
-import org.dromara.cloudeon.utils.SshConnectionPool;
-import org.dromara.cloudeon.utils.SshUtils;
+import org.dromara.cloudeon.utils.*;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-import java.io.File;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.dromara.cloudeon.utils.Constant.DEFAULT_JSCH_TIMEOUT;
+@Slf4j
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class JschTest {
     private JschSessionPool jschSessionPool = JschSessionPool.INSTANCE;
 
@@ -55,6 +64,57 @@ public class JschTest {
         }
     }
 
+    @Test
+    public void execError() throws IOException {
+        RemoteSshTaskLineHandler remoteSshTaskLineHandler = new RemoteSshTaskLineHandler(log);
+        RemoteSshTaskErrorLineHandler remoteSshTaskErrorLineHandler = new RemoteSshTaskErrorLineHandler(log);
+        Session session = jschSessionPool.getSession("192.168.197.173", 22, "root", "123456");
+        JschUtils.execCallbackLine(session, Charset.defaultCharset(), DEFAULT_JSCH_TIMEOUT,"ls /nonexistent-directory" ,null,remoteSshTaskLineHandler,remoteSshTaskErrorLineHandler );
+
+    }
+
+    @Test
+    public void jschError() {
+        String host = "192.168.197.175";
+        String user = "root";
+        String password = "123456";
+        String command = "ls /nonexistent-directory";
+
+        try {
+            JSch jsch = new JSch();
+            Session session = jsch.getSession(user, host, 22);
+            session.setPassword(password);
+            session.setConfig("StrictHostKeyChecking", "no");
+            session.connect();
+
+            ChannelExec channel = (ChannelExec) session.openChannel("exec");
+            channel.setCommand(command);
+
+            ByteArrayOutputStream errStream = new ByteArrayOutputStream();
+            channel.setErrStream(errStream);
+
+            channel.connect();
+
+            InputStream in = channel.getInputStream();
+            byte[] buffer = new byte[1024];
+            int len;
+            while ((len = in.read(buffer)) > 0) {
+                System.out.println(new String(buffer, 0, len));
+            }
+
+            channel.disconnect();
+            session.disconnect();
+
+            String errOutput = new String(errStream.toByteArray());
+            if (!errOutput.isEmpty()) {
+                // 处理错误输出
+                System.err.println("发生错误：" + errOutput);
+            }
+        } catch (JSchException | IOException e) {
+            // 处理异常
+            e.printStackTrace();
+        }
+    }
     @Test
     public void sftpTest() {
         Session session = jschSessionPool.getSession("192.168.197.173", 22, "root", "123456");

@@ -26,6 +26,7 @@ import org.dromara.cloudeon.enums.CommandState;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.dromara.cloudeon.utils.RemoteSshTaskErrorLineHandler;
 import org.dromara.cloudeon.utils.RemoteSshTaskLineHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,11 +49,13 @@ public abstract class BaseCloudeonTask implements Runnable {
     protected TaskParam taskParam;
 
     protected RemoteSshTaskLineHandler remoteSshTaskLineHandler;
+    protected RemoteSshTaskErrorLineHandler remoteSshTaskErrorLineHandler;
 
 
 
     private void init() {
         remoteSshTaskLineHandler = new RemoteSshTaskLineHandler(log);
+        remoteSshTaskErrorLineHandler = new RemoteSshTaskErrorLineHandler(log);
         // 填充数据库操作类
         commandTaskRepository = SpringUtil.getBean(CommandTaskRepository.class);
         commandRepository = SpringUtil.getBean(CommandRepository.class);
