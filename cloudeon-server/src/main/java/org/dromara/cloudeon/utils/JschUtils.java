@@ -29,12 +29,14 @@ import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.extra.ssh.ChannelType;
 import cn.hutool.extra.ssh.JschUtil;
 import cn.hutool.extra.ssh.Sftp;
 import com.jcraft.jsch.*;
 import lombok.Lombok;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.cloudeon.config.CloudeonConfigProp;
 
 import java.io.*;
 import java.lang.reflect.Method;
@@ -230,12 +232,14 @@ public class JschUtils {
             String tempId = IdUtil.fastSimpleUUID();
             File tmpDir = FileUtil.getTmpDir();
             File buildSsh = FileUtil.file(tmpDir, "ssh_temp", tempId + ".sh");
-            try (InputStream sshExecTemplateInputStream = new FileInputStream("E:\\workspace\\CloudEon\\remote-script\\template.sh")) {
+            CloudeonConfigProp cloudeonConfigProp = SpringUtil.getBean(CloudeonConfigProp.class);
+            String templateScriptPath = cloudeonConfigProp.getRemoteScriptPath() + FileUtil.FILE_SEPARATOR + "template.sh";
+            try (InputStream sshExecTemplateInputStream = new FileInputStream(templateScriptPath)) {
                 String sshExecTemplate = IoUtil.readUtf8(sshExecTemplateInputStream);
                 FileUtil.writeString(sshExecTemplate + command + StrUtil.LF, buildSsh, charset);
             }
             // 上传文件
-            String path = StrUtil.format("{}/.jpom/", sftp.home());
+            String path = StrUtil.format("{}/.cloudeon/", sftp.home());
             String destFile = StrUtil.format("{}{}.sh", path, tempId);
             sftp.mkDirs(path);
             sftp.upload(destFile, buildSsh);

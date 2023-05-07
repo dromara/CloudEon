@@ -16,7 +16,11 @@
  */
 package org.dromara.cloudeon.processor;
 
+import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.extra.spring.SpringUtil;
+import cn.hutool.extra.ssh.JschUtil;
+import cn.hutool.extra.ssh.Sftp;
+import com.jcraft.jsch.Session;
 import org.dromara.cloudeon.dao.ClusterNodeRepository;
 import org.dromara.cloudeon.dao.ServiceInstanceRepository;
 import org.dromara.cloudeon.entity.ClusterNodeEntity;
@@ -48,29 +52,23 @@ public class InstallTask extends BaseCloudeonTask {
         String[] paths = persistencePaths.split(",");
 
         ClusterNodeEntity nodeEntity = clusterNodeRepository.findByHostname(taskParam.getHostName());
-        ClientSession clientSession = sshPoolService.openSession(nodeEntity.getIp(), nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getSshPassword());
-        SftpFileSystem sftp;
-        sftp =sshPoolService.openSftpFileSystem(nodeEntity.getIp());
+        Session clientSession = sshPoolService.openSession(nodeEntity.getIp(), nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getSshPassword());
+        Sftp sftp = JschUtil.createSftp(clientSession);
         // 查询节点
         Arrays.stream(paths).forEach(new Consumer<String>() {
             @Override
             public void accept(String path) {
                 log.info("节点：" + taskParam.getHostName() + " 上创建目录：" + path);
                 // ssh执行创建目录
-                SshUtils.createDir(clientSession, path, sftp);
-                try {
-                    String command = "chmod 777 -R " + path;
-                    log.info("执行远程命令：" + command);
-                    SshUtils.execCmdWithResult(clientSession, command);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                sftp.mkDirs(path);
+                String command = "chmod 777 -R " + path;
+                log.info("执行远程命令：" + command);
+                JschUtil.exec(clientSession, command, CharsetUtil.CHARSET_UTF_8);
                 log.info("成功在节点：" + taskParam.getHostName() + " 上创建目录：" + path);
 
             }
         });
-        sshPoolService.returnSession(clientSession,nodeEntity.getIp());
-        sshPoolService.returnSftp(sftp,nodeEntity.getIp());
+        JschUtil.close(sftp.getClient());
 
 
         // todo 服务日志采集的相关执行

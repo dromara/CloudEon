@@ -17,6 +17,7 @@
 package org.dromara.cloudeon.processor;
 
 import cn.hutool.extra.spring.SpringUtil;
+import com.jcraft.jsch.Session;
 import lombok.NoArgsConstructor;
 import org.apache.sshd.client.session.ClientSession;
 import org.dromara.cloudeon.dao.ClusterNodeRepository;
@@ -28,11 +29,14 @@ import org.dromara.cloudeon.entity.ServiceInstanceEntity;
 import org.dromara.cloudeon.entity.ServiceRoleInstanceEntity;
 import org.dromara.cloudeon.entity.StackServiceEntity;
 import org.dromara.cloudeon.service.SshPoolService;
+import org.dromara.cloudeon.utils.JschUtils;
 import org.dromara.cloudeon.utils.SshUtils;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.List;
 
+import static org.dromara.cloudeon.utils.Constant.DEFAULT_JSCH_TIMEOUT;
 import static org.dromara.cloudeon.utils.Constant.HDFS_SERVICE_NAME;
 
 @NoArgsConstructor
@@ -66,15 +70,14 @@ public class InitFlinkHistoryDirOnHDFSTask extends BaseCloudeonTask {
         ClusterNodeEntity nodeEntity = clusterNodeRepository.findById(nodeId).get();
         String ip = nodeEntity.getIp();
         log.info("在节点" + ip + "上执行命令:" + cmd);
-        ClientSession clientSession = sshPoolService.openSession(ip, nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getSshPassword());
+        Session clientSession = sshPoolService.openSession(ip, nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getSshPassword());
         try {
-            String result = SshUtils.execCmdWithResult(clientSession, cmd);
-            log.info(result);
+            JschUtils.execCallbackLine(clientSession, Charset.defaultCharset(), DEFAULT_JSCH_TIMEOUT,cmd ,null,remoteSshTaskLineHandler,remoteSshTaskLineHandler );
+
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
-        sshPoolService.returnSession(clientSession,ip);
 
 
     }

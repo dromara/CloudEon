@@ -17,9 +17,13 @@
 package org.dromara.cloudeon.processor;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
+import cn.hutool.extra.ssh.JschUtil;
+import cn.hutool.extra.ssh.Sftp;
 import com.google.common.collect.ImmutableMap;
+import com.jcraft.jsch.Session;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -147,45 +151,28 @@ public class ConfigTask extends BaseCloudeonTask {
 
         // ssh上传所有配置文件到指定目录
         ClusterNodeEntity nodeEntity = clusterNodeRepository.findByHostname(taskParam.getHostName());
-        ClientSession clientSession = sshPoolService.openSession(nodeEntity.getIp(), nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getSshPassword());
-        SftpFileSystem sftp;
-        sftp = sshPoolService.openSftpFileSystem(nodeEntity.getIp());
+        Session clientSession = sshPoolService.openSession(nodeEntity.getIp(), nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getSshPassword());
+        Sftp sftp = JschUtil.createSftp(clientSession);
         String remoteConfDirPath = "/opt/edp/" + serviceInstanceEntity.getServiceName() +"/conf/";
         log.info("拷贝本地配置目录：" + outputConfPath + " 到节点" + taskParam.getHostName() + "的：" + remoteConfDirPath);
-        try {
-            SshUtils.uploadDirectory(sftp,new File(outputConfPath),remoteConfDirPath);
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException("拷贝文件上远程服务器失败："+e);
-        }
+        sftp.syncUpload(new File(outputConfPath),remoteConfDirPath);
         log.info("成功拷贝本地配置目录：" + outputConfPath + " 到节点" + taskParam.getHostName() + "的：" + remoteConfDirPath);
 
-        try {
-            String premissionCommand = "chmod +x " + remoteConfDirPath + "/*.sh";
-            log.info("赋予conf目录下sh脚本执行权限：{}", premissionCommand);
-            SshUtils.execCmdWithResult(clientSession, premissionCommand);
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
+        String premissionCommand = "chmod +x " + remoteConfDirPath + "/*.sh";
+        log.info("赋予conf目录下sh脚本执行权限：{}", premissionCommand);
+        JschUtil.exec(clientSession, premissionCommand, CharsetUtil.CHARSET_UTF_8);
 
 
         // 特殊处理
         if (stackServiceEntity.getName().equals(Constant.ZOOKEEPER_SERVICE_NAME)) {
-            try {
-                String remoteDataDirPath = "/opt/edp/" + serviceInstanceEntity.getServiceName()  +"/data";
-                String command = "mv " + remoteConfDirPath + File.separator + "myid " + remoteDataDirPath;
-                log.info("移动myid文件到data目录 {}", remoteDataDirPath);
-                log.info("ssh执行命令： {}", command);
-                SshUtils.execCmdWithResult(clientSession, command);
-            } catch (IOException e) {
-                e.printStackTrace();
-                throw new RuntimeException(e);
-            }
+            String remoteDataDirPath = "/opt/edp/" + serviceInstanceEntity.getServiceName()  +"/data";
+            String command = "mv " + remoteConfDirPath + File.separator + "myid " + remoteDataDirPath;
+            log.info("移动myid文件到data目录 {}", remoteDataDirPath);
+            log.info("ssh执行命令： {}", command);
+            JschUtil.exec(clientSession, command,CharsetUtil.CHARSET_UTF_8);
         }
 
-        sshPoolService.returnSession(clientSession,nodeEntity.getIp());
-        sshPoolService.returnSftp(sftp,nodeEntity.getIp());
+        JschUtil.close(sftp.getClient());
     }
 
     /**

@@ -17,16 +17,21 @@
 package org.dromara.cloudeon.processor;
 
 import cn.hutool.extra.spring.SpringUtil;
+import com.jcraft.jsch.Session;
 import org.dromara.cloudeon.dao.ClusterNodeRepository;
 import org.dromara.cloudeon.dao.StackServiceRepository;
 import org.dromara.cloudeon.entity.ClusterNodeEntity;
 import org.dromara.cloudeon.entity.StackServiceEntity;
 import org.dromara.cloudeon.service.SshPoolService;
+import org.dromara.cloudeon.utils.JschUtils;
 import org.dromara.cloudeon.utils.SshUtils;
 import lombok.NoArgsConstructor;
 import org.apache.sshd.client.session.ClientSession;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+
+import static org.dromara.cloudeon.utils.Constant.DEFAULT_JSCH_TIMEOUT;
 
 @NoArgsConstructor
 public class PullImageTask extends BaseCloudeonTask {
@@ -52,16 +57,15 @@ public class PullImageTask extends BaseCloudeonTask {
             command=  "ctr image pull " + dockerImage;
         }
         // ssh执行拉镜像
-        ClientSession clientSession = sshPoolService.openSession(nodeEntity.getIp(), nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getSshPassword());
+        Session clientSession = sshPoolService.openSession(nodeEntity.getIp(), nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getSshPassword());
         try {
             log.info("节点：" + taskParam.getHostName() + " 上执行命令：" + command);
-            String result = SshUtils.execCmdWithResult(clientSession, command);
-            log.info(result);
+            JschUtils.execCallbackLine(clientSession, Charset.defaultCharset(), DEFAULT_JSCH_TIMEOUT,command ,null,remoteSshTaskLineHandler,remoteSshTaskLineHandler );
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         log.info("成功在节点：" + taskParam.getHostName() + " 上拉取镜像：" + dockerImage);
-        sshPoolService.returnSession(clientSession,(nodeEntity.getIp()));
 
 
 

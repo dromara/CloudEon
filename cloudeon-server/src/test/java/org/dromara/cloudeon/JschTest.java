@@ -62,9 +62,12 @@ public class JschTest {
         // 单文件上传指定目录中
 //        sftp.put("E:\\workspace\\CloudEon\\cloudeon-docs\\mkdocs.yml","/tmp");
 
-        // 整个文件夹上传到服务器上
-        sftp.mkDirs("/tmp/cloudeon-docs");
-        sftp.syncUpload(new File("E:\\workspace\\CloudEon\\cloudeon-docs\\"),"/tmp/cloudeon-docs");
+        // 多个符合后缀的文件上传到指定目录
+        sftp.put("E:\\workspace\\CloudEon\\cloudeon-docs\\docs\\安装部署\\*.md","/tmp");
+
+        // 整个文件夹同步到服务器上
+//        sftp.mkDirs("/tmp/cloudeon-docs");
+//        sftp.syncUpload(new File("E:\\workspace\\CloudEon\\cloudeon-docs\\"),"/tmp/cloudeon-docs");
     }
 
     public static class MyLineHandler implements LineHandler {

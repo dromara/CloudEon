@@ -16,7 +16,10 @@
  */
 package org.dromara.cloudeon.processor;
 
+import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.extra.spring.SpringUtil;
+import cn.hutool.extra.ssh.JschUtil;
+import com.jcraft.jsch.Session;
 import org.dromara.cloudeon.dao.ClusterNodeRepository;
 import org.dromara.cloudeon.entity.ClusterNodeEntity;
 import org.dromara.cloudeon.service.SshPoolService;
@@ -36,17 +39,11 @@ public class DeleteServiceDataDirTask extends BaseCloudeonTask {
         ClusterNodeEntity nodeEntity = clusterNodeRepository.findByHostname(taskParam.getHostName());
         SshPoolService sshPoolService = SpringUtil.getBean(SshPoolService.class);
 
-        try  {
-            ClientSession clientSession = sshPoolService.openSession(nodeEntity.getIp(), nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getSshPassword());
-            String remoteDataDirPath = "/opt/edp/" + serviceInstanceName;
-            String command = "rm -rf " + remoteDataDirPath;
-            log.info("执行远程命令：" + command);
-            SshUtils.execCmdWithResult(clientSession, command);
-            sshPoolService.returnSession(clientSession,nodeEntity.getIp());
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException("打开sftp失败：" + e);
-        }
+        Session clientSession = sshPoolService.openSession(nodeEntity.getIp(), nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getSshPassword());
+        String remoteDataDirPath = "/opt/edp/" + serviceInstanceName;
+        String command = "rm -rf " + remoteDataDirPath;
+        log.info("执行远程命令：" + command);
+        JschUtil.exec(clientSession, command, CharsetUtil.CHARSET_UTF_8);
 
     }
 }

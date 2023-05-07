@@ -19,6 +19,11 @@ package org.dromara.cloudeon.controller;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.CharsetUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.ssh.JschUtil;
+import cn.hutool.extra.ssh.Sftp;
+import com.jcraft.jsch.Session;
 import org.dromara.cloudeon.config.CloudeonConfigProp;
 import org.dromara.cloudeon.controller.request.SaveNodeRequest;
 import org.dromara.cloudeon.controller.response.NodeInfoVO;
@@ -28,6 +33,7 @@ import org.dromara.cloudeon.entity.ClusterNodeEntity;
 import org.dromara.cloudeon.service.KubeService;
 import org.dromara.cloudeon.service.SshPoolService;
 import org.dromara.cloudeon.utils.ByteConverter;
+import org.dromara.cloudeon.utils.JschUtils;
 import org.dromara.cloudeon.utils.SshUtils;
 import io.fabric8.kubernetes.api.model.Node;
 import io.fabric8.kubernetes.api.model.NodeList;
@@ -39,7 +45,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -112,13 +120,16 @@ public class NodeController {
      */
     public void checkSSH(String sshHost, Integer sshPort, String sshUser, String password) throws IOException {
 
-        ClientSession session = sshPoolService.openSession(sshHost, sshPort, sshUser, password);
-        SftpFileSystem sftp = sshPoolService.openSftpFileSystem(sshHost);
-        SshUtils.uploadFile("/tmp/", cloudeonConfigProp.getRemoteScriptPath() + FileUtil.FILE_SEPARATOR + "check.sh",sftp);
-        String result = SshUtils.execCmdWithResult(session, "sh /tmp/check.sh");
-        Assert.equals(result,"ok!!!");
-        sshPoolService.returnSession(session,sshHost);
-        sshPoolService.returnSftp(sftp,sshHost);
+        Session session = sshPoolService.openSession(sshHost, sshPort, sshUser, password);
+        Sftp sftp = JschUtil.createSftp(session);
+        String sftpHome = sftp.home();
+        boolean connected = session.isConnected();
+        if (connected && StrUtil.isNotBlank(sftpHome)) {
+            JschUtil.close(sftp.getClient());
+            return;
+        }else {
+            throw new RuntimeException("ssh连接异常");
+        }
     }
 
 

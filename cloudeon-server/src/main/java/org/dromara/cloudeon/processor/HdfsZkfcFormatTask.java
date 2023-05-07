@@ -16,7 +16,10 @@
  */
 package org.dromara.cloudeon.processor;
 
+import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.extra.spring.SpringUtil;
+import cn.hutool.extra.ssh.JschUtil;
+import com.jcraft.jsch.Session;
 import org.dromara.cloudeon.dao.ClusterNodeRepository;
 import org.dromara.cloudeon.dao.ServiceInstanceRepository;
 import org.dromara.cloudeon.dao.ServiceRoleInstanceRepository;
@@ -26,12 +29,15 @@ import org.dromara.cloudeon.entity.ServiceInstanceEntity;
 import org.dromara.cloudeon.entity.ServiceRoleInstanceEntity;
 import org.dromara.cloudeon.entity.StackServiceEntity;
 import org.dromara.cloudeon.service.SshPoolService;
-import org.dromara.cloudeon.utils.SshUtils;
+import org.dromara.cloudeon.utils.JschUtils;
+import org.dromara.cloudeon.utils.RemoteSshTaskLineHandler;
 import lombok.NoArgsConstructor;
-import org.apache.sshd.client.session.ClientSession;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.List;
+
+import static org.dromara.cloudeon.utils.Constant.DEFAULT_JSCH_TIMEOUT;
 
 @NoArgsConstructor
 public class HdfsZkfcFormatTask extends BaseCloudeonTask {
@@ -64,14 +70,14 @@ public class HdfsZkfcFormatTask extends BaseCloudeonTask {
         ClusterNodeEntity nodeEntity = clusterNodeRepository.findById(nodeId).get();
         String ip = nodeEntity.getIp();
         log.info("在节点"+ip+"上执行命令:" + cmd);
-        ClientSession clientSession = sshPoolService.openSession(ip, nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getSshPassword());
+        Session clientSession = sshPoolService.openSession(ip, nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getSshPassword());
+
         try {
-            SshUtils.execCmdWithResult(clientSession, cmd);
+            JschUtils.execCallbackLine(clientSession, Charset.defaultCharset(), DEFAULT_JSCH_TIMEOUT,cmd ,null,remoteSshTaskLineHandler,remoteSshTaskLineHandler );
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
-        sshPoolService.returnSession(clientSession,ip);
 
 
     }

@@ -18,6 +18,9 @@ package org.dromara.cloudeon.service;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.extra.spring.SpringUtil;
+import cn.hutool.extra.ssh.JschUtil;
+import cn.hutool.extra.ssh.Sftp;
+import com.jcraft.jsch.Session;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
@@ -116,19 +119,12 @@ public class AlertService {
         ServiceRoleInstanceEntity prometheus = roleInstanceRepository.findByServiceInstanceIdAndServiceRoleName(monitorServiceInstance.getId(), MONITOR_ROLE_PROMETHEUS).get(0);
         ClusterNodeEntity prometheusNode = clusterNodeRepository.findById(prometheus.getNodeId()).get();
         // 建立ssh连接
-        ClientSession clientSession = sshPoolService.openSession(prometheusNode.getIp(), prometheusNode.getSshPort(), prometheusNode.getSshUser(), prometheusNode.getSshPassword());
-        SftpFileSystem sftp;
-        sftp = sshPoolService.openSftpFileSystem(prometheusNode.getIp());
+        Session clientSession = sshPoolService.openSession(prometheusNode.getIp(), prometheusNode.getSshPort(), prometheusNode.getSshUser(), prometheusNode.getSshPassword());
+        Sftp sftp = JschUtil.createSftp(clientSession);
         String remoteConfDirPath = "/opt/edp/" + monitorServiceInstance.getServiceName() + "/conf/rule/";
         log.info("拷贝本地配置目录：" + alertRuleOutputPath + " 到节点" + prometheusNode.getIp() + "的：" + remoteConfDirPath);
-        try {
-            SshUtils.uploadLocalDirToRemote(remoteConfDirPath, alertRuleOutputPath, sftp);
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-        sshPoolService.returnSession(clientSession,prometheusNode.getIp());
-        sshPoolService.returnSftp(sftp,prometheusNode.getIp());
+        sftp.syncUpload(new File(alertRuleOutputPath), remoteConfDirPath);
+        JschUtil.close(sftp.getClient());
 
     }
 }

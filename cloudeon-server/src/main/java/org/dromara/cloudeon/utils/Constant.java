@@ -48,5 +48,6 @@ public class Constant {
     public static final String DS_SERVICE_NAME = "DOLPHINSCHEDULER";
     public static final String MONITOR_ROLE_GRAFANA = "GRAFANA";
     public static final String MONITOR_ROLE_PROMETHEUS = "PROMETHEUS";
+    public static final int DEFAULT_JSCH_TIMEOUT = 300_000;
 
 }

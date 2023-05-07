@@ -18,6 +18,9 @@ package org.dromara.cloudeon.processor;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.extra.spring.SpringUtil;
+import cn.hutool.extra.ssh.JschUtil;
+import cn.hutool.extra.ssh.Sftp;
+import com.jcraft.jsch.Session;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -126,20 +129,13 @@ public class RegisterPrometheusScrapyTask extends BaseCloudeonTask {
         ServiceRoleInstanceEntity monitorPrometheus = roleInstanceRepository.findByServiceInstanceIdAndServiceRoleName(monitorServiceInstance.getId(), "PROMETHEUS").get(0);
         Integer monitorPrometheusNodeId = monitorPrometheus.getNodeId();
         ClusterNodeEntity prometheusNodeEntity = clusterNodeRepository.findById(monitorPrometheusNodeId).get();
-        ClientSession clientSession =sshPoolService.openSession(prometheusNodeEntity.getIp(), prometheusNodeEntity.getSshPort(), prometheusNodeEntity.getSshUser(), prometheusNodeEntity.getSshPassword());
-        SftpFileSystem sftp;
-        sftp = sshPoolService.openSftpFileSystem(prometheusNodeEntity.getIp());
+        Session clientSession =sshPoolService.openSession(prometheusNodeEntity.getIp(), prometheusNodeEntity.getSshPort(), prometheusNodeEntity.getSshUser(), prometheusNodeEntity.getSshPassword());
+        Sftp sftp = JschUtil.createSftp(clientSession);
         String remoteConfDirPath = "/opt/edp/" + monitorServiceInstance.getServiceName() +"/conf/discovery_configs/";
         log.info("拷贝本地配置目录：" + outputConfPath + " 到节点" + prometheusNodeEntity.getHostname() + "的：" + remoteConfDirPath);
-        try {
-            SshUtils.uploadDirectory(sftp,new File(outputConfPath),remoteConfDirPath );
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException("拷贝文件上远程服务器失败：" + e);
-        }
+        sftp.put(outputConfPath + File.separator +"*.json",remoteConfDirPath);
         log.info("成功拷贝本地配置目录：" + outputConfPath + " 到节点" + prometheusNodeEntity.getHostname() + "的：" + remoteConfDirPath);
-        sshPoolService.returnSession(clientSession,prometheusNodeEntity.getIp());
-        sshPoolService.returnSftp(sftp,prometheusNodeEntity.getIp());
+        JschUtil.close(sftp.getClient());
     }
 
     private Map<String, List<RoleNodeInfo>> getServiceRoles(List<ServiceRoleInstanceEntity> roleInstanceEntities, ClusterNodeRepository clusterNodeRepository) {
