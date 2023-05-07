@@ -22,7 +22,7 @@
 - [x] 支持prometheus服务在Kubernetes上运行
 - [x] 支持grafana服务在Kubernetes上运行
 - [x] 支持alertmanager服务在Kubernetes上运行
-- [x] 服务角色实例新增，删除
+- [ ] 服务角色实例新增，删除
 - [ ] 支持kyuubi服务在Kubernetes上运行
 - [ ] 支持EFAK服务在Kubernetes上运行
 - [ ] 支持Arctic服务在Kubernetes上运行
@@ -45,3 +45,4 @@
 - [ ] 大数据服务客户端配置下载
 - [ ] 可视化在线分析工具
 - [ ] ARM支持
+- [ ] 全离线部署支持

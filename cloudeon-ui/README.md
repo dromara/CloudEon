@@ -20,7 +20,7 @@ tyarn
 4. 问后端接口地址，本地环境启动修改接口地址
    在config/apiConfig.ts文件修改：
    ```bash
-    devHost = "XX.XX.XX.XX:7700" // 修改成要代理的地址
+    devHost = "http://XX.XX.XX.XX:7700" // 修改成要代理的地址
    ```
 5. 启动项目的命令
 ```bash

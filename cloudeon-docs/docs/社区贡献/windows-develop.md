@@ -53,7 +53,7 @@ udh.work.home=F:\\JavaProjects\\CloudEon\\work
 3. 在cloudeon-ui/config/apiConfig.ts文件修改：
    
     ```bash
-    devHost = "XX.XX.XX.XX:7700" // 修改成要代理的地址
+    devHost = "http://XX.XX.XX.XX:7700" // 修改成要代理的地址
     ```
 
 4. 回到cmd，启动项目
