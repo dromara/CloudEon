@@ -16,8 +16,10 @@
  */
 package org.dromara.cloudeon;
 
+import cn.hutool.core.io.LineHandler;
 import cn.hutool.core.io.file.Tailer;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.lang.Console;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.extra.ssh.JschSessionPool;
 import cn.hutool.extra.ssh.JschUtil;
@@ -42,14 +44,26 @@ public class JschTest {
         for (int i = 0; i < 10; i++) {
             Session session = jschSessionPool.getSession("192.168.197.173", 22, "root", "123456");
             System.out.println(session);
-            Tailer.ConsoleLineHandler consoleLineHandler = new Tailer.ConsoleLineHandler();
-            Tailer.ConsoleLineHandler consoleLineHandler2 = new Tailer.ConsoleLineHandler();
+            MyLineHandler consoleLineHandler = new MyLineHandler();
+            MyLineHandler2 consoleLineHandler2 = new MyLineHandler2();
             String command1 = "for i in $(seq 1 10); do echo $i; sleep 1; done";
             String command2 = " sudo docker  run --net=host -v /opt/edp/dolphinscheduler1/conf:/opt/edp/dolphinscheduler1/conf -v /opt/edp/dolphinscheduler1/log:/opt/edp/dolphinscheduler1/log   -v /opt/edp/dolphinscheduler1/data:/opt/edp/dolphinscheduler1/data  registry.mufankong.top/udh/dolphinscheduler:3.0.5 sh -c \"  /opt/edp/dolphinscheduler1/conf/init-dolphinscheduler-db.sh \" ";
-            JschUtils.execCallbackLine(session, Charset.defaultCharset(), 10000,command1 , null,consoleLineHandler,consoleLineHandler2 );
+            JschUtils.execCallbackLine(session, Charset.defaultCharset(), 10000,command2 , null,consoleLineHandler,consoleLineHandler2 );
 
         }
     }
 
+    public static class MyLineHandler implements LineHandler {
+        @Override
+        public void handle(String line) {
+            System.out.println(line);
+        }
+    }
 
+    public static class MyLineHandler2 implements LineHandler {
+        @Override
+        public void handle(String line) {
+            System.err.println(line);
+        }
+    }
 }
