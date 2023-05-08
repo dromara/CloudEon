@@ -31,7 +31,7 @@
 在运行起来之后，可以阅读我们官网收录的源码分析文章，来对 Cloudeon 有更深入的理解。
 ## 寻找任务
 
-寻找您感兴趣的Issue！在我们的GitHub仓库和邮件列表中，我们经常会发布一些带有` good first issue `或者` status: volunteer wanted` 标签的issue，这些issue都欢迎贡献者的帮助。其中`good first issue`往往门槛较低、适合新手，您可以点击 链接 查看这些issue。
+寻找您感兴趣的[Issue](https://github.com/dromara/CloudEon/issues) ！在我们的GitHub仓库和邮件列表中，我们经常会发布一些带有` good first issue `或者` status: volunteer wanted` 标签的issue，这些issue都欢迎贡献者的帮助。其中`good first issue`往往门槛较低、适合新手，您可以点击 链接 查看这些issue。
 
 当然，如果您有好的想法，也可以直接在 issue 中提出，经过充分讨论后就可以开始行动。
 
