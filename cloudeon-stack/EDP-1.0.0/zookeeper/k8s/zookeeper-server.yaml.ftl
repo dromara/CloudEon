@@ -52,7 +52,7 @@ spec:
             command:
             - "/bin/bash"
             - "-c"
-            - " echo 'stat' | nc localhost 2181 > /tmp/stat_zk; cat /tmp/stat_zk; grep -qE 'Mode: (follower|leader|standalone)' /tmp/stat_zk "
+            - " echo 'stat' | nc localhost ${conf['zookeeper.client.port']} > /tmp/stat_zk; cat /tmp/stat_zk; grep -qE 'Mode: (follower|leader|standalone)' /tmp/stat_zk "
           failureThreshold: 3
           initialDelaySeconds: 3
           periodSeconds: 30
