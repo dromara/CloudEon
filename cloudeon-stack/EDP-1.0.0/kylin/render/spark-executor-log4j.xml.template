@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<Configuration name="Log4j1">
+    <Appenders>
+        <Console name="stderr" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{ISO8601} %-5p %X{request.project}[%t] %c{2} : %m%n"/>
+        </Console>
+        <ExecutorHdfsAppender name="hdfs"
+                              workingDir="${sys:kylin.hdfs.working.dir:-}"
+                              metadataId="${sys:kap.metadata.identifier:-}"
+                              category="${sys:kap.spark.category:-}"
+                              identifier="${sys:kap.spark.identifier:-}"
+                              jobName="${sys:kap.spark.jobName:-}"
+                              project="${sys:kap.spark.project:-}"
+                              rollingPeriod="5"
+                              logQueueCapacity="5000"
+                              flushInterval="5000">
+            <PatternLayout pattern="%d{ISO8601} %-5p %X{request.project}[%t] %c{2} : %m%n"/>
+        </ExecutorHdfsAppender>
+    </Appenders>
+    <Loggers>
+        <Root level="INFO">
+            <AppenderRef ref="hdfs"/>
+            <AppenderRef ref="stderr"/>
+        </Root>
+        <Logger name="org.apache.spark" level="INFO"/>
+
+        <!-- CAUTION !!! Switch hadoop log level to DEBUG may cause large log output. -->
+        <Logger name="org.apache.hadoop" level="INFO"/>
+        <!-- CAUTION !!! Switch parquet log level to DEBUG may cause extremely large log output. -->
+        <Logger name="org.apache.parquet" level="INFO"/>
+    </Loggers>
+</Configuration>

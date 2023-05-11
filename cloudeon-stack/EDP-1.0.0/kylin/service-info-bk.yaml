@@ -1,0 +1,69 @@
+name: FLINK
+label: "Flink"
+description: "实时计算引擎"
+version: 1.15.4
+dockerImage: "registry.cn-hangzhou.aliyuncs.com/udh/flink:1.15.4"
+dependencies:
+    - "HDFS"
+    - "YARN"
+
+runAs: flink
+
+supportKerberos: true
+
+dashboard:
+  uid: ""
+
+roles:
+
+  - name: FLINK_HISTORY_SERVER
+    label: "Flink History Server"
+    roleFullName: "flink-historyserver"
+    sortNum: 1
+    type: MASTER
+    fixedNum: 1
+    linkExpression: "http://${localhostname}:${conf['flink.history.ui.port']}"
+    logFile: "flink-flink-historyserver-0-${localhostname}.log"
+
+
+persistencePaths:
+  - /opt/edp/${service.serviceName}/conf
+  - /opt/edp/${service.serviceName}/log
+  - /opt/edp/${service.serviceName}/data
+  - /opt/edp/${service.serviceName}/data/tmp
+
+
+customConfigFiles:
+  - flink-conf.yaml
+
+
+configurations:
+
+  - name: "flink.history.ui.port"
+    recommendExpression: "8082"
+    valueType: InputNumber
+    configurableInWizard: true
+    description: "flink history server web ui端口"
+    tag: "端口"
+  - name: "flink.history.fs.logDirectory"
+    recommendExpression: "hdfs:///flink/completed-jobs/"
+    valueType: InputString
+    configurableInWizard: true
+    description: "flink history server的日志目录"
+    tag: "常用参数"
+
+
+  - name: "historyserver.archive.fs.refresh-interval"
+    recommendExpression: 10000
+    valueType: InputNumber
+    description: "historyserver定时刷新的时间间隔"
+    configurableInWizard: true
+    confFile:  "flink-conf.yaml"
+    tag: "高级参数"
+    unit: Ms
+
+
+
+
+
+
