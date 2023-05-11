@@ -15,5 +15,8 @@ ENV HIVE_HOME=/home/hive/apache-hive
 
 ENV PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin:$HIVE_HOME/bin
 
-
-
+ENV MYSQL_CONN_VERSION=8.0.20
+ENV MYSQL_CONN_URL=https://downloads.mysql.com/archives/get/p/3/file/mysql-connector-java-${MYSQL_CONN_VERSION}.tar.gz
+RUN  curl -fSL $MYSQL_CONN_URL -o /home/hive/mysql-connector-java.tar.gz     && tar -xzvf /home/hive/mysql-connector-java.tar.gz -C /home/hive/   \
+  && cp /home/hive/mysql-connector-java-${MYSQL_CONN_VERSION}/mysql-connector-java-${MYSQL_CONN_VERSION}.jar $HIVE_HOME/lib/mysql-connector-java.jar  \
+  && rm /home/hive/mysql-connector-java.tar.gz     && rm -rf /home/hive/mysql-connector-java-${MYSQL_CONN_VERSION}
