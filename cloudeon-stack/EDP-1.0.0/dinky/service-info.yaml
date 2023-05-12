@@ -1,0 +1,90 @@
+name: DINKY
+label: "DINKY"
+description: "实时计算平台"
+version: 0.7.3
+dockerImage: "registry.cn-hangzhou.aliyuncs.com/udh/dinky:0.7.3"
+dependencies:
+  - "HDFS"
+  - "YARN"
+
+runAs: root
+
+supportKerberos: false
+
+dashboard:
+  uid: "kGFhlowrt"
+
+roles:
+  - name: DINKY_SERVER
+    label: "DINKY"
+    roleFullName: "dinky-server"
+    linkExpression: "http://${localhostname}:${conf['dinky.server.port']}"
+    sortNum: 1
+    type: MASTER
+
+    fixedNum : 1
+    logFile: "dinky.log"
+
+persistencePaths:
+  - /opt/edp/${service.serviceName}/conf
+  - /opt/edp/${service.serviceName}/log
+  - /opt/edp/${service.serviceName}/data
+
+customConfigFiles: []
+
+configurations:
+  - name: resources.requests.cpu
+    recommendExpression: "100m"
+    needChangeInWizard: false
+    valueType: InputString
+    description: "容器请求CPU"
+    tag: "常用参数"
+    configurableInWizard: true
+  - name: resources.limits.cpu
+    recommendExpression: "200m"
+    needChangeInWizard: false
+    valueType: InputString
+    description: "容器限制CPU"
+    tag: "常用参数"
+    configurableInWizard: true
+  - name: resources.requests.memory
+    recommendExpression: "256Mi"
+    needChangeInWizard: false
+    valueType: InputString
+    description: "容器请求内存"
+    tag: "常用参数"
+    configurableInWizard: true
+  - name: resources.limits.memory
+    recommendExpression: "2048Mi"
+    needChangeInWizard: false
+    valueType: InputString
+    description: "容器限制内存"
+    tag: "常用参数"
+    configurableInWizard: true
+  - name: dinky.server.port
+    recommendExpression: 8888
+    valueType: InputNumber
+    description: "Dinky端口"
+    tag: "端口"
+    configurableInWizard: true
+  - name: jdbc.mysql.address
+    recommendExpression: "jdbc:mysql://xxx:3306/dinky?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false&zeroDateTimeBehavior=convertToNull&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true"
+    needChangeInWizard: true
+    valueType: InputString
+    description: "MySQL数据库地址"
+    tag: "常用参数"
+    configurableInWizard: true
+  - name: jdbc.mysql.username
+    recommendExpression: "xxx"
+    valueType: InputString
+    description: "MySQL数据库用户名"
+    tag: "常用参数"
+    needChangeInWizard: true
+    configurableInWizard: true
+  - name: jdbc.mysql.password
+    recommendExpression: "xxx"
+    valueType: InputString
+    description: "MySQL数据库密码"
+    needChangeInWizard: true
+    tag: "常用参数"
+    configurableInWizard: true
