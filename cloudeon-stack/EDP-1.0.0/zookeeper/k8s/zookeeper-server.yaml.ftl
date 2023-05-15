@@ -45,6 +45,10 @@ spec:
           value: "/opt/edp/${service.serviceName}/conf"
         - name: USER
           value: ${runAs}
+        - name: MEM_LIMIT
+          valueFrom:
+            resourceFieldRef:
+              resource: limits.memory
         image: "${dockerImage}"
         imagePullPolicy: "Always"
         readinessProbe:
@@ -60,8 +64,12 @@ spec:
           timeoutSeconds: 15
         name: "${roleServiceFullName}"
         resources:
-          requests: {}
-          limits: {}
+          requests:
+            memory: "${conf['zookeeper.container.request.memory']}Mi"
+            cpu: "${conf['zookeeper.container.request.cpu']}"
+          limits:
+            memory: "${conf['zookeeper.container.limit.memory']}Mi"
+            cpu: "${conf['zookeeper.container.limit.cpu']}"
         securityContext:
           privileged: true
         volumeMounts:

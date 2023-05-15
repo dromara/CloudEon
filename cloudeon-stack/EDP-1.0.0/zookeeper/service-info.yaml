@@ -35,6 +35,44 @@ customConfigFiles:
 
 configurations:
 
+  - name: zookeeper.container.limit.cpu
+    description: "Zookeeper Server容器的CPU使用限额"
+    recommendExpression: 1.0
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: zookeeper.container.limit.memory
+    description: "Zookeeper Server容器的内存使用限额，单位MB"
+    recommendExpression: 2048
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: zookeeper.container.request.cpu
+    description: "Zookeeper Server容器的CPU请求量"
+    recommendExpression: 0.2
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: zookeeper.container.request.memory
+    description: "Zookeeper Server容器的内存请求量，单位MB"
+    recommendExpression: 1024
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: zookeeper.jvm.memory.percentage
+    description: "Zookeeper Server JVM占容器内存限额的百分比"
+    recommendExpression: 75
+    valueType: InputNumber
+    unit: ".0"
+    configurableInWizard: true
+    tag: "资源管理"
+
   - name: zookeeper.peer.communicate.port
     recommendExpression: 2888
     valueType: InputNumber
@@ -59,6 +97,7 @@ configurations:
   - name: zookeeper.jmxremote.port
     recommendExpression: 9911
     valueType: InputNumber
+    configurableInWizard: true
     tag: "端口"
 
 
@@ -93,16 +132,6 @@ configurations:
     valueType: InputNumber
     confFile: "zoo.cfg"
     tag: "常用参数"
-
-
-  - name: zookeeper.server.memory
-    recommendExpression: 1024
-    valueType: InputNumber
-    unit: MB
-    configurableInWizard: true
-    tag: "资源管理"
-
-
 
   - name: sasl.oauth2.enabled
     recommendExpression: true
