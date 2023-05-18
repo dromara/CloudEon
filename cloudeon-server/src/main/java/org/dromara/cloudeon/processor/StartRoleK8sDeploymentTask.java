@@ -131,7 +131,7 @@ public class StartRoleK8sDeploymentTask extends BaseCloudeonTask {
             deploymentName = metadata.get(0).getMetadata().getName();
             final Deployment deployment = client.apps().deployments().inNamespace("default").withName(deploymentName).get();
             Resource<Deployment> resource = client.resource(deployment).inNamespace("default");
-            int amount = 10;
+            int amount = 20;
             log.info("在k8s上启动deployment: {} ,使用本地资源文件: {} ,持续等待 {} 分钟", deploymentName, outPutFile, amount);
             resource.waitUntilReady(amount, TimeUnit.MINUTES);
 

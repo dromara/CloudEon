@@ -1,0 +1,88 @@
+name: KYLIN
+label: "Kylin"
+description: "OLAP引擎"
+version: 5.0.0-alpha
+dockerImage: "registry.cn-hangzhou.aliyuncs.com/udh/kylin:5.0.0-alpha"
+dependencies:
+    - "HDFS"
+    - "ZOOKEEPER"
+    - "YARN"
+    - "HIVE"
+
+runAs: hadoop
+
+supportKerberos: true
+
+dashboard:
+  uid: ""
+
+roles:
+
+  - name: KYLIN_SERVER
+    label: "Kylin Server"
+    roleFullName: "kylin-server"
+    sortNum: 1
+    type: MASTER
+    minNum: 1
+    linkExpression: "http://${localhostname}:${conf['kylin.ui.port']}/kylin/index.html"
+    logFile: "kylin.log"
+
+
+persistencePaths:
+  - /opt/edp/${service.serviceName}/conf
+  - /opt/edp/${service.serviceName}/log
+  - /opt/edp/${service.serviceName}/data
+
+
+customConfigFiles: []
+
+configurations:
+
+  - name: "kylin.ui.port"
+    recommendExpression: "7070"
+    valueType: InputNumber
+    configurableInWizard: true
+    description: "kylin = server web ui端口"
+    tag: "端口"
+  - name: "kylin.hdfs.work.dir"
+    recommendExpression: "/kylin"
+    valueType: InputString
+    configurableInWizard: true
+    description: "kylin hdfs 工作目录"
+    tag: "常用参数"
+
+  - name: "ConnectionDriverName"
+    recommendExpression: "com.mysql.jdbc.Driver"
+    valueType: InputString
+    configurableInWizard: true
+    description: "依赖数据库的jdbc驱动类"
+    tag: "常用参数"
+
+  - name: "ConnectionUserName"
+    recommendExpression: "xxx"
+    valueType: InputString
+    configurableInWizard: true
+    description: "依赖数据库的登录账户"
+    needChangeInWizard: true
+    tag: "常用参数"
+
+  - name: "ConnectionPassword"
+    recommendExpression: "xxx"
+    valueType: InputString
+    configurableInWizard: true
+    description: "依赖数据库的登录密码"
+    needChangeInWizard: true
+    tag: "常用参数"
+
+  - name: "ConnectionURL"
+    recommendExpression: "jdbc:mysql://xxx:3306/kylin?useUnicode=true&characterEncoding=utf8"
+    valueType: InputString
+    configurableInWizard: true
+    description: "依赖数据库的jdbc访问地址"
+    needChangeInWizard: true
+    tag: "常用参数"
+
+
+
+
+
