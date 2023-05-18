@@ -52,7 +52,7 @@ spec:
             command:
             - "/bin/bash"
             - "-c"
-            - "curl --fail --connect-timeout 15 --max-time 15 \"http://`hostname`:${conf['kylin.ui.port']}/\"\
+            - "curl --fail --connect-timeout 15 --max-time 15 \"http://`hostname`:${conf['kylin.ui.port']}/kylin/index.html\"\
             \n"
           failureThreshold: 3
           initialDelaySeconds: 10

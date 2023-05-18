@@ -47,6 +47,7 @@ public enum TaskType {
     INIT_DS_DB(21, "初始化DS数据库", "org.dromara.cloudeon.processor.InitDSTablesTask", false),
     REGISTER_FE(22, "注册fe Follwer节点", "org.dromara.cloudeon.processor.RegisterDorisFeTask", false),
     FLINK_HDFS_MKDIR(23, "HDFS上创建Flink History目录", "org.dromara.cloudeon.processor.InitFlinkHistoryDirOnHDFSTask", false),
+    KYLIN_HDFS_MKDIR(24, "HDFS上创建Kylin 工作目录", "org.dromara.cloudeon.processor.InitKylinWorkDirTask", false),
 
 
 

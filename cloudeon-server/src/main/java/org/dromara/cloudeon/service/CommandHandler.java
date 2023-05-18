@@ -58,6 +58,9 @@ public class CommandHandler {
                 if (stackServiceName.equals(HDFS_SERVICE_NAME)) {
                     taskGroupTypes.add(TaskGroupType.INIT_HDFS);
                 }
+                if (stackServiceName.equals(KYLIN_SERVICE_NAME)) {
+                    taskGroupTypes.add(TaskGroupType.INIT_KYLIN);
+                }
                 if (stackServiceName.equals(YARN_SERVICE_NAME)) {
                     taskGroupTypes.add(TaskGroupType.INIT_YARN);
                 }

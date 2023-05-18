@@ -463,6 +463,13 @@
 <#--#kylin.streaming.spark-conf.spark.driver.extraJavaOptions=-Dfile.encoding=UTF-8 -Dhdp.version=current -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=${KYLIN_HOME}/logs-->
 <#--#kylin.streaming.spark-conf.spark.executor.extraJavaOptions=-Dfile.encoding=UTF-8 -Dhdp.version=current -Dkylin.hdfs.working.dir=${kylin.env.hdfs-working-dir} -Dkap.metadata.identifier=${kylin.metadata.url.identifier} -Dkap.spark.category=streaming_job-->
 
+<#if dependencies.ZOOKEEPER??>
+    <#assign zookeeper=dependencies.ZOOKEEPER quorum=[]>
+    <#list zookeeper.serviceRoles['ZOOKEEPER_SERVER'] as role>
+        <#assign quorum += [role.hostname + ":" + zookeeper.conf["zookeeper.client.port"]]>
+    </#list>
+
+</#if>
 
 server.port=${conf['kylin.ui.port']}
 kylin.query.init-sparder-async=false
@@ -470,8 +477,8 @@ kylin.query.init-sparder-async=false
 kylin.env.apache-hadoop-conf-dir=/home/hadoop/apache-kylin/conf
 kylin.env.apache-hive-conf-dir=/home/hadoop/apache-kylin/conf
 kylin.metadata.url=kylin@jdbc,driverClassName=${conf['ConnectionDriverName']},url=${conf['ConnectionURL']},username=${conf['ConnectionUserName']},password=${conf['ConnectionPassword']},maxTotal=50,maxIdle=8
-kylin.env.zookeeper-connect-string=localhost:2181
-kylin.env.hdfs-working-dir=/kylin
+kylin.env.zookeeper-connect-string=${quorum?join(",")}
+kylin.env.hdfs-working-dir=${conf['kylin.hdfs.work.dir']}
 
 # Query
 kylin.storage.columnar.spark-conf.spark.driver.memory=512M
