@@ -14,24 +14,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+  <#assign servers=[]>
+  <#list serviceRoles['SEATUNNEL_SERVER'] as role>
+    <#assign servers += [role.hostname  ]>
+  </#list>
 
-seatunnel:
-  engine:
-    backup-count: 1
-    queue-type: blockingqueue
-    print-execution-info-interval: 60
-    print-job-metrics-info-interval: 60
-    slot-service:
-      dynamic-slot: true
-    checkpoint:
-      interval: 10000
-      timeout: 60000
-      max-concurrent: 5
-      tolerable-failure: 2
-      storage:
-        type: hdfs
-        max-retained: 3
-        plugin-config:
-          namespace: /tmp/seatunnel/checkpoint_snapshot
-          storage.type: hdfs
-          fs.defaultFS: file:///tmp/ # Ensure that the directory has written permission
+hazelcast:
+  cluster-name:  ${conf['seatunnel.cluster.name']}
+  network:
+    rest-api:
+      enabled: true
+      endpoint-groups:
+        CLUSTER_WRITE:
+          enabled: true
+        DATA:
+          enabled: true
+    join:
+      tcp-ip:
+        enabled: true
+        member-list: [${servers?join(",")}]
+    port:
+      auto-increment: false
+      port: ${conf['seatunnel.server.join.port']}
+  properties:
+    hazelcast.invocation.max.retry.count: 20
+    hazelcast.tcp.join.port.try.count: 30
+    hazelcast.logging.type: log4j2
+    hazelcast.operation.generic.thread.count: 100
+

@@ -41,30 +41,17 @@ spec:
       hostNetwork: true
       containers:
       - args:
-          - "/opt/edp/${service.serviceName}/conf/bootstrap-historyserver.sh"
+          - "/home/hadoop/apache-seatunnel/config/bootstrap-seatunnelserver.sh"
         env:
-          - name: "FLINK_CONF_DIR"
-            value: "/opt/edp/${service.serviceName}/conf"
-          - name: HADOOP_CLASSPATH
-            value: "/home/flink/apache-hadoop/share/hadoop/common/lib/*:/home/flink/apache-hadoop/share/hadoop/common/*:/home/flink/apache-hadoop/share/hadoop/hdfs:/home/flink/apache-hadoop/share/hadoop/hdfs/lib/*:/home/flink/apache-hadoop/share/hadoop/hdfs/*:/home/flink/apache-hadoop/share/hadoop/mapreduce/*:/home/flink/apache-hadoop/share/hadoop/yarn:/home/flink/apache-hadoop/share/hadoop/yarn/lib/*:/home/flink/apache-hadoop/share/hadoop/yarn/*:/opt/edp/flink14/conf/hadoop-client-api-3.3.4.jar:/opt/edp/flink14/conf/hadoop-client-runtime-3.3.4.jar"
-          - name: "HADOOP_CONF_DIR"
-            value: "/opt/edp/${service.serviceName}/conf"
           - name: "USER"
-            value: "flink"
+            value: "${runAs}"
         image: "${dockerImage}"
         imagePullPolicy: "Always"
         readinessProbe:
-          exec:
-            command:
-            - "/bin/bash"
-            - "-c"
-            - "curl --fail --connect-timeout 15 --max-time 15 \"http://`hostname`:${conf['flink.history.ui.port']}/\"\
-            \n"
-          failureThreshold: 3
+          tcpSocket:
+            port: ${conf['seatunnel.server.join.port']}
           initialDelaySeconds: 10
-          periodSeconds: 10
-          successThreshold: 1
-          timeoutSeconds: 1
+          timeoutSeconds: 2
         name: "${roleServiceFullName}"
         resources:
           requests: {}
@@ -74,11 +61,11 @@ spec:
         volumeMounts:
         - mountPath: "/opt/edp/${service.serviceName}/data"
           name: "data"
-        - mountPath: "/opt/edp/${service.serviceName}/log"
+        - mountPath: "/home/hadoop/apache-seatunnel/logs"
           name: "log"
         - mountPath: "/etc/localtime"
           name: "timezone"
-        - mountPath: "/opt/edp/${service.serviceName}/conf"
+        - mountPath: "/home/hadoop/apache-seatunnel/config"
           name: "conf"
 
       nodeSelector:

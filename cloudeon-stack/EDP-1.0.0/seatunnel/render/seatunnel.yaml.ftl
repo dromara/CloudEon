@@ -15,27 +15,23 @@
 # limitations under the License.
 #
 
-hazelcast:
-  cluster-name: seatunnel
-  network:
-    rest-api:
-      enabled: true
-      endpoint-groups:
-        CLUSTER_WRITE:
-          enabled: true
-        DATA:
-          enabled: true
-    join:
-      tcp-ip:
-        enabled: true
-        member-list:
-          - localhost
-    port:
-      auto-increment: false
-      port: 5801
-  properties:
-    hazelcast.invocation.max.retry.count: 20
-    hazelcast.tcp.join.port.try.count: 30
-    hazelcast.logging.type: log4j2
-    hazelcast.operation.generic.thread.count: 100
-
+seatunnel:
+  engine:
+    backup-count: 1
+    queue-type: blockingqueue
+    print-execution-info-interval: 60
+    print-job-metrics-info-interval: 60
+    slot-service:
+      dynamic-slot: true
+    checkpoint:
+      interval: 10000
+      timeout: 60000
+      max-concurrent: 5
+      tolerable-failure: 2
+      storage:
+        type: hdfs
+        max-retained: 3
+        plugin-config:
+          namespace: ${conf['seatunnel.fs.storage']}
+          storage.type: hdfs
+          fs.defaultFS: file:///tmp/ # Ensure that the directory has written permission
