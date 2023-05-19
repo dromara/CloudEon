@@ -114,3 +114,6 @@ scrape_configs:
   - job_name: 'kyuubiserver'
     file_sd_configs:
     - files: ['discovery_configs/kyuubiserver.json']
+  - job_name: 'kylinserver'
+    file_sd_configs:
+    - files: ['discovery_configs/kylinserver.json']

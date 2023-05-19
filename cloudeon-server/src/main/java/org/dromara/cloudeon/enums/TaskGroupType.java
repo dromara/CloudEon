@@ -45,6 +45,7 @@ public enum TaskGroupType {
     INIT_MONITOR(17, "初始化MONITOR", Lists.newArrayList(TaskType.INIT_PROMETHEUS_ALERT), false),
     INIT_DS(18, "初始化DS", Lists.newArrayList(TaskType.INIT_DS_DB), false),
     INIT_FLINK(19, "初始化FLINK", Lists.newArrayList(TaskType.FLINK_HDFS_MKDIR), false),
+    INIT_KYLIN(20, "初始化KYLIN", Lists.newArrayList(TaskType.KYLIN_HDFS_MKDIR), false),
 
     ;
 

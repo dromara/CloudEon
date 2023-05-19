@@ -1,0 +1,7 @@
+rules:
+  -   alert: KylinSever进程存活
+      promql: up{job="kylinserver"} != 1
+      alertLevel: exception
+      serviceRoleName: KYLIN_SERVER
+      alertAdvice: 请联系管理员
+      alertInfo: "{{ $labels.job }}的{{ $labels.instance }}实例产生告警"
