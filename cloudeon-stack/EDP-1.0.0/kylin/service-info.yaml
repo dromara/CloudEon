@@ -1,6 +1,6 @@
 name: KYLIN
 label: "Kylin"
-description: "OLAP引擎"
+description: "大数据开源OLAP 引擎，支持在数万亿条记录上实现亚秒级查询延迟"
 version: 5.0.0-alpha
 dockerImage: "registry.cn-hangzhou.aliyuncs.com/udh/kylin:5.0.0-alpha"
 dependencies:
