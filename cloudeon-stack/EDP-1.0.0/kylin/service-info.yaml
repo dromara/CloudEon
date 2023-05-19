@@ -14,7 +14,7 @@ runAs: hadoop
 supportKerberos: true
 
 dashboard:
-  uid: ""
+  uid: "ngFLn9U4k"
 
 roles:
 
