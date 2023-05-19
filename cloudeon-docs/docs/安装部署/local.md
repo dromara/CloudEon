@@ -9,10 +9,7 @@
 - Kubernetes 1.21 +
 
 ## 部署包准备
-
-https://pan.baidu.com/s/13Gv_3sAayy8vsvUWEQZ3cQ
-
-提取码: ikue
+https://github.com/dromara/CloudEon/releases
 
 ## 文件结构
 首先下载安装包，并且解压安装包。
