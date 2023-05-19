@@ -76,6 +76,7 @@ nav:
       - 支持组件/KyuubiOnK8s.md
       - 支持组件/MonitorOnK8s.md
       - 支持组件/KylinOnK8s.md
+      - 支持组件/DinkyOnK8s.md
       - 支持组件/DolphinschedulerOnK8s.md
   - 社区贡献:
       - 社区贡献/communicate.md
