@@ -23,18 +23,18 @@
 - [x] 支持grafana服务在Kubernetes上运行
 - [x] 支持alertmanager服务在Kubernetes上运行
 - [ ] 服务角色实例新增，删除
-- [ ] 支持kyuubi服务在Kubernetes上运行
+- [x] 支持kyuubi服务在Kubernetes上运行
 - [ ] 支持EFAK服务在Kubernetes上运行
 - [ ] 支持Arctic服务在Kubernetes上运行
 - [ ] 支持streampark服务在Kubernetes上运行
-- [ ] 支持dinky服务在Kubernetes上运行
+- [x] 支持dinky服务在Kubernetes上运行
 - [ ] 支持trino服务在Kubernetes上运行
 - [ ] 支持prestodb服务在Kubernetes上运行
 - [ ] 支持alluxiio服务在Kubernetes上运行
 - [ ] 支持iotdb服务在Kubernetes上运行
 - [ ] 支持iceberg服务在Kubernetes上运行
-- [ ] 支持kylin服务在Kubernetes上运行
-- [ ] 支持seatunnel等服务在Kubernetes上运行
+- [x] 支持kylin服务在Kubernetes上运行
+- [x] 支持seatunnel等服务在Kubernetes上运行
 - [ ] 更聪明的安装服务分配节点机制
 - [ ] 基于PLG实现服务日志分析监控模块
 - [ ] Spark/Flink RSS支持
