@@ -45,6 +45,10 @@ spec:
         env:
           - name: "USER"
             value: "${runAs}"
+          - name: "HIVE_CONF_DIR"
+            value: "/home/hadoop/apache-kylin/conf"
+          - name: "HADOOP_CONF_DIR"
+            value: "/home/hadoop/apache-kylin/conf"
         image: "${dockerImage}"
         imagePullPolicy: "Always"
         readinessProbe:
