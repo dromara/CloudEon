@@ -15,4 +15,4 @@ RUN wget   https://github.com/DataLinkDC/dinky/releases/download/v${DINKY_VERSIO
 ENV DINKY_HOME=/opt/dlink-release-${DINKY_VERSION}
 ENV FLINK_HOME=/opt/flink-${FLINK_VERSION}
 
-RUN yum install -y sudo && yum clean all && rm -rf /var/lib/yum/history/*.sqlite  && rm -rf /var/cache/yum
+RUN yum install -y sudo mysql && yum clean all && rm -rf /var/lib/yum/history/*.sqlite  && rm -rf /var/cache/yum
