@@ -61,7 +61,7 @@ public class StopRolePodTask extends BaseCloudeonTask {
                     // do something with the pod
                     String podName = pod.getMetadata().getName();
                     log.info("删除节点 {} 上的pod: {}", hostName, podName);
-                    client.pods().withName(podName).delete();
+                    client.pods().delete(pod);
                 }
             }
         }
