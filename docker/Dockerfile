@@ -14,7 +14,7 @@ RUN ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezo
 
 RUN mkdir -p ${CLOUDEON_HOME}
 
-COPY cloudeon-assembly-${CLOUDEON_VERSION}-release .
+COPY cloudeon-assembly-*-release .
 # 健康检查
 HEALTHCHECK CMD curl -X POST -f http://localhost:7700 || exit 1
 

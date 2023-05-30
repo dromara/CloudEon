@@ -29,3 +29,9 @@ jobs:
             ${{ runner.os }}-maven-
       - name: Build with Maven
         run: mvn  clean install  -DskipTests
+      - name: Build the Docker image
+        run: cp -r cloudeon-assembly/target/cloudeon-assembly-*-release ./docker
+
+      - name: build docker image for aliyun
+        run:  docker login --username=${{ secrets.ALIYUN_DOCKER_USERNAME }} --password  ${{ secrets.ALIYUN_DOCKER_PASSWORD }} registry.cn-hangzhou.aliyuncs.com  && docker build -f docker/Dockerfile  --build-arg CLOUDEON_VERSION=dev -t cloudeon:dev ./docker  && docker tag cloudeon:dev registry.cn-hangzhou.aliyuncs.com/udh/cloudeon:dev  && docker push registry.cn-hangzhou.aliyuncs.com/udh/cloudeon:dev
+
