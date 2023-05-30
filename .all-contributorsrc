@@ -43,6 +43,24 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "linshenkx",
+      "name": "且炼时光",
+      "avatar_url": "https://avatars.githubusercontent.com/u/32978552?v=4",
+      "profile": "https://linshenkx.cn",
+       "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "tgluon",
+      "name": "XiuhongTang",
+      "avatar_url": "https://avatars.githubusercontent.com/u/26194129?v=4",
+      "profile": "https://github.com/tgluon",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
@@ -50,5 +68,6 @@
   "repoType": "github",
   "repoHost": "https://github.com",
   "projectName": "CloudEon",
-  "projectOwner": "Pandas886"
+  "projectOwner": "dromara",
+  "commitType": "docs"
 }
