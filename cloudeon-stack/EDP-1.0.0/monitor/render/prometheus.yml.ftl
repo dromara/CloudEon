@@ -117,3 +117,7 @@ scrape_configs:
   - job_name: 'kylinserver'
     file_sd_configs:
     - files: ['discovery_configs/kylinserver.json']
+  - job_name: 'elasticsearch'
+    metrics_path: '/metrics'
+    file_sd_configs:
+    - files: ['discovery_configs/elasticsearch-node.json']
