@@ -1,7 +1,7 @@
 // 集群管理页面
 import { PageContainer, ProCard } from '@ant-design/pro-components';
-import { Space, Select, Table, Button, Modal, Form, Input, message, Spin } from 'antd';
-import React, { useState, useEffect, useRef } from 'react';
+import { Space, Select, Table, Button, Modal, Form, Input, message, Spin, Radio } from 'antd';
+import React, { useState, useEffect, useRef, createRef } from 'react';
 import type { FormInstance } from 'antd/es/form';
 import { FormattedMessage, useIntl, history } from 'umi';
 import { getNodeListAPI, createNodeAPI, getListK8sNodeAPI } from '@/services/ant-design-pro/colony';
@@ -14,6 +14,7 @@ const nodeList: React.FC = () => {
   const [k8sListloading, setK8sListLoading] = useState(false);
   const [createLoading, setCreateLoading] = useState(false);
   const [form] = Form.useForm();
+  const sshAuthType = Form.useWatch('sshAuthType', form);
   const [ipList, setIpList] = useState<any[]>()
 
   const getData = JSON.parse(sessionStorage.getItem('colonyData') || '{}')
@@ -63,12 +64,20 @@ const nodeList: React.FC = () => {
         console.log('values: ', values);
         const arr = values?.ip?.replace('(',' ').replace(')','').split(' ')        
         
-        const params = {
+        let params = {
           ip :  arr && arr[1],
           hostname: arr && arr[0],
+          sshAuthType: values.sshAuthType,
           sshPassword: values.sshPassword,
+          privateKeyPath: values.privateKeyPath,
           sshPort: values.sshPort,
           sshUser: values.sshUser,
+        }
+
+        if(sshAuthType === "PASSWORD"){
+          delete params.privateKeyPath
+        }else{
+          delete params.sshPassword
         }
         setCreateLoading(true)
         const result: API.normalResult = await createNodeAPI({...params, clusterId: getData.clusterId})
@@ -194,20 +203,29 @@ const nodeList: React.FC = () => {
             preserve={false}
             labelCol={{ span: 6 }}
             wrapperCol={{ span: 16 }}
-            initialValues={{ remember: true }}
+            // initialValues={{ }}
             // onFinish={onFinish}
             autoComplete="off"
           >
             <Form.Item
               label="选择k8s节点"
               name="ip"
+              initialValue="111"
               rules={[{ required: true, message: '请选择k8s节点!' }]}
             >
                <Select
-                  defaultValue=""
                   onChange={handleChange}
                   options={ipList}
                 />
+            </Form.Item>
+
+            <Form.Item
+              label="ssh端口"
+              name="sshPort"
+              initialValue={22}
+              rules={[{ required: true, message: 'ssh端口!' }]}
+            >
+              <Input />
             </Form.Item>
 
             <Form.Item
@@ -219,21 +237,37 @@ const nodeList: React.FC = () => {
             </Form.Item>
 
             <Form.Item
-              label="ssh密码"
-              name="sshPassword"
-              rules={[{ required: true, message: '请输入ssh密码!' }]}
+              label="认证方式"
+              name="sshAuthType"
+              initialValue={"PASSWORD"}
+              rules={[{ required: true, message: '请选择认证方式!' }]}
             >
-              <Input.Password />
+              <Radio.Group name="sshAuthType" >
+                <Radio value="PASSWORD">PASSWORD</Radio>
+                <Radio value="PRIVATEKEY">PRIVATEKEY</Radio>
+              </Radio.Group>
             </Form.Item>
 
-            <Form.Item
-              label="ssh端口"
-              name="sshPort"
-              initialValue={22}
-              rules={[{ required: true, message: 'ssh端口!' }]}
-            >
-              <Input />
-            </Form.Item>
+            {
+              // form.getFieldsValue(['sshAuthType'])
+              sshAuthType === "PASSWORD"?(
+                <Form.Item
+                  label="ssh密码"
+                  name="sshPassword"
+                  rules={[{ required: true, message: '请输入ssh密码!' }]}
+                >
+                  <Input.Password />
+                </Form.Item>
+              ):(
+                <Form.Item
+                  label="私钥路径"
+                  name="privateKeyPath"
+                  rules={[{ required: true, message: '请输入私钥路径!' }]}
+                >
+                  <Input />
+                </Form.Item>
+              )
+            }
 
             {/* <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
               <Button key='addnodebtn' type="primary" htmlType="submit">
