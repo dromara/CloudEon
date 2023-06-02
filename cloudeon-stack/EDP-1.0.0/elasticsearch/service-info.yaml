@@ -54,7 +54,7 @@ configurations:
     tag: "端口"
 
   - name: elasticsearch.exporter.port
-    recommendExpression: 5556
+    recommendExpression: 5557
     valueType: InputNumber
     configurableInWizard: true
     description: "Elasticsearch exporter metrics端口"

@@ -3,23 +3,36 @@
     "list": [
       {
         "builtIn": 1,
-        "datasource": "-- Grafana --",
+        "datasource": {
+          "type": "datasource",
+          "uid": "grafana"
+        },
         "enable": true,
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
         "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
         "type": "dashboard"
       }
     ]
   },
   "editable": true,
-  "gnetId": null,
+  "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
-  "id": null,
-  "iteration": 1549021227642,
+  "id": 24,
   "links": [],
+  "liveNow": false,
   "panels": [
     {
+      "datasource": {
+        "type": "datasource",
+        "uid": "grafana"
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -27,27 +40,73 @@
         "y": 0
       },
       "id": 90,
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "grafana"
+          },
+          "refId": "A"
+        }
+      ],
       "title": "Cluster",
       "type": "row"
     },
     {
-      "cacheTimeout": null,
-      "colorBackground": true,
-      "colorPostfix": false,
-      "colorPrefix": false,
-      "colorValue": false,
-      "colors": [
-        "#299c46",
-        "rgba(237, 129, 40, 0.89)",
-        "#d44a3a"
-      ],
-      "format": "none",
-      "gauge": {
-        "maxValue": 100,
-        "minValue": 0,
-        "show": false,
-        "thresholdLabels": false,
-        "thresholdMarkers": true
+      "datasource": {
+        "type": "datasource",
+        "uid": "grafana"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "options": {
+                "1": {
+                  "text": "green"
+                },
+                "2": {
+                  "text": "yellow"
+                },
+                "3": {
+                  "text": "red"
+                }
+              },
+              "type": "value"
+            },
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#299c46",
+                "value": null
+              },
+              {
+                "color": "rgba(237, 129, 40, 0.89)",
+                "value": 2
+              },
+              {
+                "color": "#d44a3a",
+                "value": 3
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
       },
       "gridPos": {
         "h": 3,
@@ -56,43 +115,30 @@
         "y": 1
       },
       "id": 92,
-      "interval": null,
       "links": [],
-      "mappingType": 1,
-      "mappingTypes": [
-        {
-          "name": "value to text",
-          "value": 1
-        },
-        {
-          "name": "range to text",
-          "value": 2
-        }
-      ],
       "maxDataPoints": 100,
-      "nullPointMode": "connected",
-      "nullText": null,
-      "postfix": "",
-      "postfixFontSize": "50%",
-      "prefix": "",
-      "prefixFontSize": "50%",
-      "rangeMaps": [
-        {
-          "from": "null",
-          "text": "N/A",
-          "to": "null"
-        }
-      ],
-      "sparkline": {
-        "fillColor": "rgba(31, 118, 189, 0.18)",
-        "full": false,
-        "lineColor": "rgb(31, 120, 193)",
-        "show": false
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^Value$/",
+          "values": false
+        },
+        "textMode": "auto"
       },
-      "tableColumn": "Value",
+      "pluginVersion": "9.1.6",
       "targets": [
         {
-          "expr": "scalar(elasticsearch_cluster_health_status{color="green",cluster=~"$cluster"}) + scalar(elasticsearch_cluster_health_status{color="yellow",cluster=~"$cluster"}) * 2 + scalar(elasticsearch_cluster_health_status{color="red",cluster=~"$cluster"}) * 3",
+          "datasource": {
+            "type": "datasource",
+            "uid": "grafana"
+          },
+          "expr": "scalar(elasticsearch_cluster_health_status{color=\"green\",cluster=~\"$cluster\"}) + scalar(elasticsearch_cluster_health_status{color=\"yellow\",cluster=~\"$cluster\"}) * 2 + scalar(elasticsearch_cluster_health_status{color=\"red\",cluster=~\"$cluster\"}) * 3",
           "format": "time_series",
           "instant": false,
           "intervalFactor": 1,
@@ -100,53 +146,46 @@
           "refId": "A"
         }
       ],
-      "thresholds": "2,3",
-      "title": "集群状态",
-      "type": "singlestat",
-      "valueFontSize": "120%",
-      "valueMaps": [
-        {
-          "op": "=",
-          "text": "N/A",
-          "value": "null"
-        },
-        {
-          "op": "=",
-          "text": "健康",
-          "value": "1"
-        },
-        {
-          "op": "=",
-          "text": "亚健康",
-          "value": "2"
-        },
-        {
-          "op": "=",
-          "text": "异常",
-          "value": "3"
-        }
-      ],
-      "valueName": "current"
+      "title": "Cluster Status",
+      "type": "stat"
     },
     {
-      "cacheTimeout": null,
-      "colorBackground": false,
-      "colorValue": false,
-      "colors": [
-        "rgba(245, 54, 54, 0.9)",
-        "rgba(237, 129, 40, 0.89)",
-        "rgba(50, 172, 45, 0.97)"
-      ],
-      "datasource": "$server",
-      "editable": true,
-      "error": false,
-      "format": "none",
-      "gauge": {
-        "maxValue": 100,
-        "minValue": 0,
-        "show": false,
-        "thresholdLabels": false,
-        "thresholdMarkers": true
+      "datasource": {
+        "uid": "$server"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "rgb(31, 120, 193)",
+            "mode": "fixed"
+          },
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
       },
       "gridPos": {
         "h": 3,
@@ -155,43 +194,29 @@
         "y": 1
       },
       "id": 8,
-      "interval": null,
       "links": [],
-      "mappingType": 1,
-      "mappingTypes": [
-        {
-          "name": "value to text",
-          "value": 1
-        },
-        {
-          "name": "range to text",
-          "value": 2
-        }
-      ],
       "maxDataPoints": 100,
-      "nullPointMode": "connected",
-      "nullText": null,
-      "postfix": "",
-      "postfixFontSize": "50%",
-      "prefix": "",
-      "prefixFontSize": "50%",
-      "rangeMaps": [
-        {
-          "from": "null",
-          "text": "N/A",
-          "to": "null"
-        }
-      ],
-      "sparkline": {
-        "fillColor": "rgba(31, 118, 189, 0.18)",
-        "full": false,
-        "lineColor": "rgb(31, 120, 193)",
-        "show": true
+      "options": {
+        "colorMode": "none",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
       },
-      "tableColumn": "",
+      "pluginVersion": "9.1.6",
       "targets": [
         {
-          "expr": "sum(elasticsearch_cluster_health_number_of_nodes{cluster=~"$cluster"})/count(elasticsearch_cluster_health_number_of_nodes{cluster=~"$cluster"})",
+          "datasource": {
+            "uid": "$server"
+          },
+          "expr": "sum(elasticsearch_cluster_health_number_of_nodes{cluster=~\"$cluster\"})/count(elasticsearch_cluster_health_number_of_nodes{cluster=~\"$cluster\"})",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -201,37 +226,47 @@
           "step": 1800
         }
       ],
-      "thresholds": "",
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "运行节点数",
-      "type": "singlestat",
-      "valueFontSize": "120%",
-      "valueMaps": [
-        {
-          "op": "=",
-          "text": "N/A",
-          "value": "null"
-        }
-      ],
-      "valueName": "current"
+      "title": "Running Nodes",
+      "type": "stat"
     },
     {
-      "cacheTimeout": null,
-      "colorBackground": false,
-      "colorValue": false,
-      "colors": [
-        "#299c46",
-        "rgba(237, 129, 40, 0.89)",
-        "#d44a3a"
-      ],
-      "format": "none",
-      "gauge": {
-        "maxValue": 100,
-        "minValue": 0,
-        "show": false,
-        "thresholdLabels": false,
-        "thresholdMarkers": true
+      "datasource": {
+        "type": "datasource",
+        "uid": "grafana"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "rgb(31, 120, 193)",
+            "mode": "fixed"
+          },
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
       },
       "gridPos": {
         "h": 3,
@@ -240,77 +275,79 @@
         "y": 1
       },
       "id": 94,
-      "interval": null,
       "links": [],
-      "mappingType": 1,
-      "mappingTypes": [
-        {
-          "name": "value to text",
-          "value": 1
-        },
-        {
-          "name": "range to text",
-          "value": 2
-        }
-      ],
       "maxDataPoints": 100,
-      "nullPointMode": "connected",
-      "nullText": null,
-      "postfix": "",
-      "postfixFontSize": "50%",
-      "prefix": "",
-      "prefixFontSize": "50%",
-      "rangeMaps": [
-        {
-          "from": "null",
-          "text": "N/A",
-          "to": "null"
-        }
-      ],
-      "sparkline": {
-        "fillColor": "rgba(31, 118, 189, 0.18)",
-        "full": false,
-        "lineColor": "rgb(31, 120, 193)",
-        "show": true
+      "options": {
+        "colorMode": "none",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
       },
-      "tableColumn": "",
+      "pluginVersion": "9.1.6",
       "targets": [
         {
-          "expr": "elasticsearch_cluster_health_number_of_data_nodes{cluster=~"$cluster"}",
+          "datasource": {
+            "type": "datasource",
+            "uid": "grafana"
+          },
+          "expr": "elasticsearch_cluster_health_number_of_data_nodes{cluster=~\"$cluster\"}",
           "format": "time_series",
           "intervalFactor": 1,
           "refId": "A"
         }
       ],
-      "thresholds": "",
-      "title": "活跃的数据节点数",
-      "type": "singlestat",
-      "valueFontSize": "120%",
-      "valueMaps": [
-        {
-          "op": "=",
-          "text": "N/A",
-          "value": "null"
-        }
-      ],
-      "valueName": "current"
+      "title": "Active Data Nodes",
+      "type": "stat"
     },
     {
-      "cacheTimeout": null,
-      "colorBackground": false,
-      "colorValue": true,
-      "colors": [
-        "#299c46",
-        "rgba(237, 129, 40, 0.89)",
-        "#d44a3a"
-      ],
-      "format": "none",
-      "gauge": {
-        "maxValue": 100,
-        "minValue": 0,
-        "show": false,
-        "thresholdLabels": false,
-        "thresholdMarkers": true
+      "datasource": {
+        "type": "datasource",
+        "uid": "grafana"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#299c46",
+                "value": null
+              },
+              {
+                "color": "rgba(237, 129, 40, 0.89)",
+                "value": 0.5
+              },
+              {
+                "color": "#d44a3a",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
       },
       "gridPos": {
         "h": 3,
@@ -319,63 +356,44 @@
         "y": 1
       },
       "id": 96,
-      "interval": null,
       "links": [],
-      "mappingType": 1,
-      "mappingTypes": [
-        {
-          "name": "value to text",
-          "value": 1
-        },
-        {
-          "name": "range to text",
-          "value": 2
-        }
-      ],
       "maxDataPoints": 100,
-      "nullPointMode": "connected",
-      "nullText": null,
-      "postfix": "",
-      "postfixFontSize": "50%",
-      "prefix": "",
-      "prefixFontSize": "50%",
-      "rangeMaps": [
-        {
-          "from": "null",
-          "text": "N/A",
-          "to": "null"
-        }
-      ],
-      "sparkline": {
-        "fillColor": "rgba(31, 118, 189, 0.18)",
-        "full": false,
-        "lineColor": "rgb(31, 120, 193)",
-        "show": true
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
       },
-      "tableColumn": "",
+      "pluginVersion": "9.1.6",
       "targets": [
         {
-          "expr": "elasticsearch_cluster_health_number_of_pending_tasks{cluster=~"$cluster"}",
+          "datasource": {
+            "type": "datasource",
+            "uid": "grafana"
+          },
+          "expr": "elasticsearch_cluster_health_number_of_pending_tasks{cluster=~\"$cluster\"}",
           "format": "time_series",
           "intervalFactor": 1,
           "refId": "A"
         }
       ],
-      "thresholds": "0.5,1",
-      "title": "等待的任务数",
-      "type": "singlestat",
-      "valueFontSize": "120%",
-      "valueMaps": [
-        {
-          "op": "=",
-          "text": "N/A",
-          "value": "null"
-        }
-      ],
-      "valueName": "current"
+      "title": "Pending Tasks",
+      "type": "stat"
     },
     {
       "collapsed": false,
+      "datasource": {
+        "type": "datasource",
+        "uid": "grafana"
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -384,25 +402,56 @@
       },
       "id": 76,
       "panels": [],
-      "title": "分片",
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "grafana"
+          },
+          "refId": "A"
+        }
+      ],
+      "title": "Shards",
       "type": "row"
     },
     {
-      "cacheTimeout": null,
-      "colorBackground": false,
-      "colorValue": false,
-      "colors": [
-        "#299c46",
-        "rgba(237, 129, 40, 0.89)",
-        "#d44a3a"
-      ],
-      "format": "none",
-      "gauge": {
-        "maxValue": 100,
-        "minValue": 0,
-        "show": false,
-        "thresholdLabels": false,
-        "thresholdMarkers": true
+      "datasource": {
+        "type": "datasource",
+        "uid": "grafana"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "rgb(31, 120, 193)",
+            "mode": "fixed"
+          },
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
       },
       "gridPos": {
         "h": 3,
@@ -411,78 +460,76 @@
         "y": 5
       },
       "id": 78,
-      "interval": null,
       "links": [],
-      "mappingType": 1,
-      "mappingTypes": [
-        {
-          "name": "value to text",
-          "value": 1
-        },
-        {
-          "name": "range to text",
-          "value": 2
-        }
-      ],
       "maxDataPoints": 100,
-      "nullPointMode": "connected",
-      "nullText": null,
-      "postfix": "",
-      "postfixFontSize": "50%",
-      "prefix": "",
-      "prefixFontSize": "50%",
-      "rangeMaps": [
-        {
-          "from": "null",
-          "text": "N/A",
-          "to": "null"
-        }
-      ],
-      "sparkline": {
-        "fillColor": "rgba(31, 118, 189, 0.18)",
-        "full": false,
-        "lineColor": "rgb(31, 120, 193)",
-        "show": true
+      "options": {
+        "colorMode": "none",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
       },
-      "tableColumn": "",
+      "pluginVersion": "9.1.6",
       "targets": [
         {
-          "expr": "elasticsearch_cluster_health_active_shards{cluster=~"$cluster"}",
+          "datasource": {
+            "type": "datasource",
+            "uid": "grafana"
+          },
+          "expr": "elasticsearch_cluster_health_active_shards{cluster=~\"$cluster\"}",
           "format": "time_series",
           "intervalFactor": 1,
           "refId": "A"
         }
       ],
-      "thresholds": "",
-      "title": "活跃的分片数",
-      "transparent": false,
-      "type": "singlestat",
-      "valueFontSize": "120%",
-      "valueMaps": [
-        {
-          "op": "=",
-          "text": "N/A",
-          "value": "null"
-        }
-      ],
-      "valueName": "current"
+      "title": "Active Shards",
+      "type": "stat"
     },
     {
-      "cacheTimeout": null,
-      "colorBackground": false,
-      "colorValue": false,
-      "colors": [
-        "#299c46",
-        "rgba(237, 129, 40, 0.89)",
-        "#d44a3a"
-      ],
-      "format": "none",
-      "gauge": {
-        "maxValue": 100,
-        "minValue": 0,
-        "show": false,
-        "thresholdLabels": false,
-        "thresholdMarkers": true
+      "datasource": {
+        "type": "datasource",
+        "uid": "grafana"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "rgb(31, 120, 193)",
+            "mode": "fixed"
+          },
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
       },
       "gridPos": {
         "h": 3,
@@ -491,77 +538,79 @@
         "y": 5
       },
       "id": 80,
-      "interval": null,
       "links": [],
-      "mappingType": 1,
-      "mappingTypes": [
-        {
-          "name": "value to text",
-          "value": 1
-        },
-        {
-          "name": "range to text",
-          "value": 2
-        }
-      ],
       "maxDataPoints": 100,
-      "nullPointMode": "connected",
-      "nullText": null,
-      "postfix": "",
-      "postfixFontSize": "50%",
-      "prefix": "",
-      "prefixFontSize": "50%",
-      "rangeMaps": [
-        {
-          "from": "null",
-          "text": "N/A",
-          "to": "null"
-        }
-      ],
-      "sparkline": {
-        "fillColor": "rgba(31, 118, 189, 0.18)",
-        "full": false,
-        "lineColor": "rgb(31, 120, 193)",
-        "show": true
+      "options": {
+        "colorMode": "none",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
       },
-      "tableColumn": "",
+      "pluginVersion": "9.1.6",
       "targets": [
         {
-          "expr": "elasticsearch_cluster_health_active_primary_shards{cluster=~"$cluster"}",
+          "datasource": {
+            "type": "datasource",
+            "uid": "grafana"
+          },
+          "expr": "elasticsearch_cluster_health_active_primary_shards{cluster=~\"$cluster\"}",
           "format": "time_series",
           "intervalFactor": 1,
           "refId": "A"
         }
       ],
-      "thresholds": "",
-      "title": "活跃的主分片数",
-      "type": "singlestat",
-      "valueFontSize": "120%",
-      "valueMaps": [
-        {
-          "op": "=",
-          "text": "N/A",
-          "value": "null"
-        }
-      ],
-      "valueName": "current"
+      "title": "Active Primary Shards",
+      "type": "stat"
     },
     {
-      "cacheTimeout": null,
-      "colorBackground": false,
-      "colorValue": true,
-      "colors": [
-        "#299c46",
-        "rgba(237, 129, 40, 0.89)",
-        "#d44a3a"
-      ],
-      "format": "none",
-      "gauge": {
-        "maxValue": 100,
-        "minValue": 0,
-        "show": false,
-        "thresholdLabels": false,
-        "thresholdMarkers": true
+      "datasource": {
+        "type": "datasource",
+        "uid": "grafana"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#299c46",
+                "value": null
+              },
+              {
+                "color": "rgba(237, 129, 40, 0.89)",
+                "value": 0.5
+              },
+              {
+                "color": "#d44a3a",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
       },
       "gridPos": {
         "h": 3,
@@ -570,77 +619,79 @@
         "y": 5
       },
       "id": 82,
-      "interval": null,
       "links": [],
-      "mappingType": 1,
-      "mappingTypes": [
-        {
-          "name": "value to text",
-          "value": 1
-        },
-        {
-          "name": "range to text",
-          "value": 2
-        }
-      ],
       "maxDataPoints": 100,
-      "nullPointMode": "connected",
-      "nullText": null,
-      "postfix": "",
-      "postfixFontSize": "50%",
-      "prefix": "",
-      "prefixFontSize": "50%",
-      "rangeMaps": [
-        {
-          "from": "null",
-          "text": "N/A",
-          "to": "null"
-        }
-      ],
-      "sparkline": {
-        "fillColor": "rgba(31, 118, 189, 0.18)",
-        "full": false,
-        "lineColor": "rgb(31, 120, 193)",
-        "show": true
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
       },
-      "tableColumn": "",
+      "pluginVersion": "9.1.6",
       "targets": [
         {
-          "expr": "elasticsearch_cluster_health_initializing_shards{cluster=~"$cluster"}",
+          "datasource": {
+            "type": "datasource",
+            "uid": "grafana"
+          },
+          "expr": "elasticsearch_cluster_health_initializing_shards{cluster=~\"$cluster\"}",
           "format": "time_series",
           "intervalFactor": 1,
           "refId": "A"
         }
       ],
-      "thresholds": "0.5,1",
-      "title": "正在初始化的分片数",
-      "type": "singlestat",
-      "valueFontSize": "120%",
-      "valueMaps": [
-        {
-          "op": "=",
-          "text": "N/A",
-          "value": "null"
-        }
-      ],
-      "valueName": "current"
+      "title": "Initializing Shards",
+      "type": "stat"
     },
     {
-      "cacheTimeout": null,
-      "colorBackground": false,
-      "colorValue": true,
-      "colors": [
-        "#299c46",
-        "rgba(237, 129, 40, 0.89)",
-        "#d44a3a"
-      ],
-      "format": "none",
-      "gauge": {
-        "maxValue": 100,
-        "minValue": 0,
-        "show": false,
-        "thresholdLabels": false,
-        "thresholdMarkers": true
+      "datasource": {
+        "type": "datasource",
+        "uid": "grafana"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#299c46",
+                "value": null
+              },
+              {
+                "color": "rgba(237, 129, 40, 0.89)",
+                "value": 0.5
+              },
+              {
+                "color": "#d44a3a",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
       },
       "gridPos": {
         "h": 3,
@@ -649,77 +700,79 @@
         "y": 5
       },
       "id": 84,
-      "interval": null,
       "links": [],
-      "mappingType": 1,
-      "mappingTypes": [
-        {
-          "name": "value to text",
-          "value": 1
-        },
-        {
-          "name": "range to text",
-          "value": 2
-        }
-      ],
       "maxDataPoints": 100,
-      "nullPointMode": "connected",
-      "nullText": null,
-      "postfix": "",
-      "postfixFontSize": "50%",
-      "prefix": "",
-      "prefixFontSize": "50%",
-      "rangeMaps": [
-        {
-          "from": "null",
-          "text": "N/A",
-          "to": "null"
-        }
-      ],
-      "sparkline": {
-        "fillColor": "rgba(31, 118, 189, 0.18)",
-        "full": false,
-        "lineColor": "rgb(31, 120, 193)",
-        "show": true
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
       },
-      "tableColumn": "",
+      "pluginVersion": "9.1.6",
       "targets": [
         {
-          "expr": "elasticsearch_cluster_health_relocating_shards{cluster=~"$cluster"}",
+          "datasource": {
+            "type": "datasource",
+            "uid": "grafana"
+          },
+          "expr": "elasticsearch_cluster_health_relocating_shards{cluster=~\"$cluster\"}",
           "format": "time_series",
           "intervalFactor": 1,
           "refId": "A"
         }
       ],
-      "thresholds": "0.5,1",
-      "title": "迁移的分片数",
-      "type": "singlestat",
-      "valueFontSize": "120%",
-      "valueMaps": [
-        {
-          "op": "=",
-          "text": "N/A",
-          "value": "null"
-        }
-      ],
-      "valueName": "current"
+      "title": "Relocating Shards",
+      "type": "stat"
     },
     {
-      "cacheTimeout": null,
-      "colorBackground": false,
-      "colorValue": true,
-      "colors": [
-        "#299c46",
-        "rgba(237, 129, 40, 0.89)",
-        "#d44a3a"
-      ],
-      "format": "none",
-      "gauge": {
-        "maxValue": 100,
-        "minValue": 0,
-        "show": false,
-        "thresholdLabels": false,
-        "thresholdMarkers": true
+      "datasource": {
+        "type": "datasource",
+        "uid": "grafana"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#299c46",
+                "value": null
+              },
+              {
+                "color": "rgba(237, 129, 40, 0.89)",
+                "value": 0.5
+              },
+              {
+                "color": "#d44a3a",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
       },
       "gridPos": {
         "h": 3,
@@ -728,77 +781,79 @@
         "y": 5
       },
       "id": 86,
-      "interval": null,
       "links": [],
-      "mappingType": 1,
-      "mappingTypes": [
-        {
-          "name": "value to text",
-          "value": 1
-        },
-        {
-          "name": "range to text",
-          "value": 2
-        }
-      ],
       "maxDataPoints": 100,
-      "nullPointMode": "connected",
-      "nullText": null,
-      "postfix": "",
-      "postfixFontSize": "50%",
-      "prefix": "",
-      "prefixFontSize": "50%",
-      "rangeMaps": [
-        {
-          "from": "null",
-          "text": "N/A",
-          "to": "null"
-        }
-      ],
-      "sparkline": {
-        "fillColor": "rgba(31, 118, 189, 0.18)",
-        "full": false,
-        "lineColor": "rgb(31, 120, 193)",
-        "show": true
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
       },
-      "tableColumn": "",
+      "pluginVersion": "9.1.6",
       "targets": [
         {
-          "expr": "elasticsearch_cluster_health_unassigned_shards{cluster=~"$cluster"}",
+          "datasource": {
+            "type": "datasource",
+            "uid": "grafana"
+          },
+          "expr": "elasticsearch_cluster_health_unassigned_shards{cluster=~\"$cluster\"}",
           "format": "time_series",
           "intervalFactor": 1,
           "refId": "A"
         }
       ],
-      "thresholds": "0.5,1",
-      "title": "未分配的分片数",
-      "type": "singlestat",
-      "valueFontSize": "120%",
-      "valueMaps": [
-        {
-          "op": "=",
-          "text": "N/A",
-          "value": "null"
-        }
-      ],
-      "valueName": "current"
+      "title": "Unassigned Shards",
+      "type": "stat"
     },
     {
-      "cacheTimeout": null,
-      "colorBackground": false,
-      "colorValue": true,
-      "colors": [
-        "#299c46",
-        "rgba(237, 129, 40, 0.89)",
-        "#d44a3a"
-      ],
-      "format": "none",
-      "gauge": {
-        "maxValue": 100,
-        "minValue": 0,
-        "show": false,
-        "thresholdLabels": false,
-        "thresholdMarkers": true
+      "datasource": {
+        "type": "datasource",
+        "uid": "grafana"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#299c46",
+                "value": null
+              },
+              {
+                "color": "rgba(237, 129, 40, 0.89)",
+                "value": 0.5
+              },
+              {
+                "color": "#d44a3a",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
       },
       "gridPos": {
         "h": 3,
@@ -807,63 +862,44 @@
         "y": 5
       },
       "id": 88,
-      "interval": null,
       "links": [],
-      "mappingType": 1,
-      "mappingTypes": [
-        {
-          "name": "value to text",
-          "value": 1
-        },
-        {
-          "name": "range to text",
-          "value": 2
-        }
-      ],
       "maxDataPoints": 100,
-      "nullPointMode": "connected",
-      "nullText": null,
-      "postfix": "",
-      "postfixFontSize": "50%",
-      "prefix": "",
-      "prefixFontSize": "50%",
-      "rangeMaps": [
-        {
-          "from": "null",
-          "text": "N/A",
-          "to": "null"
-        }
-      ],
-      "sparkline": {
-        "fillColor": "rgba(31, 118, 189, 0.18)",
-        "full": false,
-        "lineColor": "rgb(31, 120, 193)",
-        "show": true
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
       },
-      "tableColumn": "",
+      "pluginVersion": "9.1.6",
       "targets": [
         {
-          "expr": "elasticsearch_cluster_health_delayed_unassigned_shards{cluster=~"$cluster"}",
+          "datasource": {
+            "type": "datasource",
+            "uid": "grafana"
+          },
+          "expr": "elasticsearch_cluster_health_delayed_unassigned_shards{cluster=~\"$cluster\"}",
           "format": "time_series",
           "intervalFactor": 1,
           "refId": "A"
         }
       ],
-      "thresholds": "0.5,1",
-      "title": "延时未分配的分片数",
-      "type": "singlestat",
-      "valueFontSize": "120%",
-      "valueMaps": [
-        {
-          "op": "=",
-          "text": "N/A",
-          "value": "null"
-        }
-      ],
-      "valueName": "current"
+      "title": "Delayed Unassigned Shards",
+      "type": "stat"
     },
     {
       "collapsed": false,
+      "datasource": {
+        "type": "datasource",
+        "uid": "grafana"
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -872,7 +908,16 @@
       },
       "id": 70,
       "panels": [],
-      "title": "文档",
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "grafana"
+          },
+          "refId": "A"
+        }
+      ],
+      "title": "Documents",
       "type": "row"
     },
     {
@@ -880,10 +925,13 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "$server",
+      "datasource": {
+        "uid": "$server"
+      },
       "editable": true,
       "error": false,
       "fill": 1,
+      "fillGradient": 0,
       "grid": {},
       "gridPos": {
         "h": 9,
@@ -891,6 +939,7 @@
         "x": 0,
         "y": 9
       },
+      "hiddenSeries": false,
       "id": 3,
       "legend": {
         "alignAsTable": true,
@@ -906,7 +955,11 @@
       "linewidth": 2,
       "links": [],
       "nullPointMode": "connected",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
+      "pluginVersion": "9.1.6",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -916,7 +969,10 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(elasticsearch_indices_docs{cluster=~"$cluster"})",
+          "datasource": {
+            "uid": "$server"
+          },
+          "expr": "sum(elasticsearch_indices_docs{cluster=~\"$cluster\"})",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "Documents",
@@ -925,10 +981,8 @@
         }
       ],
       "thresholds": [],
-      "timeFrom": null,
       "timeRegions": [],
-      "timeShift": null,
-      "title": "索引文档数",
+      "title": "Documents indexed",
       "tooltip": {
         "msResolution": true,
         "shared": true,
@@ -937,9 +991,7 @@
       },
       "type": "graph",
       "xaxis": {
-        "buckets": null,
         "mode": "time",
-        "name": null,
         "show": true,
         "values": []
       },
@@ -947,21 +999,17 @@
         {
           "format": "short",
           "logBase": 1,
-          "max": null,
           "min": 0,
           "show": true
         },
         {
           "format": "short",
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         }
       ],
       "yaxis": {
-        "align": false,
-        "alignLevel": null
+        "align": false
       }
     },
     {
@@ -969,10 +1017,13 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "$server",
+      "datasource": {
+        "uid": "$server"
+      },
       "editable": true,
       "error": false,
       "fill": 1,
+      "fillGradient": 0,
       "grid": {},
       "gridPos": {
         "h": 9,
@@ -980,6 +1031,7 @@
         "x": 12,
         "y": 9
       },
+      "hiddenSeries": false,
       "id": 4,
       "legend": {
         "alignAsTable": true,
@@ -995,7 +1047,11 @@
       "linewidth": 2,
       "links": [],
       "nullPointMode": "connected",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
+      "pluginVersion": "9.1.6",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -1005,7 +1061,10 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(elasticsearch_indices_store_size_bytes{cluster=~"$cluster"})",
+          "datasource": {
+            "uid": "$server"
+          },
+          "expr": "sum(elasticsearch_indices_store_size_bytes{cluster=~\"$cluster\"})",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "Index Size",
@@ -1014,10 +1073,8 @@
         }
       ],
       "thresholds": [],
-      "timeFrom": null,
       "timeRegions": [],
-      "timeShift": null,
-      "title": "索引数据总存储容量",
+      "title": "Index Size",
       "tooltip": {
         "msResolution": true,
         "shared": true,
@@ -1026,9 +1083,7 @@
       },
       "type": "graph",
       "xaxis": {
-        "buckets": null,
         "mode": "time",
-        "name": null,
         "show": true,
         "values": []
       },
@@ -1036,21 +1091,17 @@
         {
           "format": "bytes",
           "logBase": 1,
-          "max": null,
           "min": 0,
           "show": true
         },
         {
           "format": "short",
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         }
       ],
       "yaxis": {
-        "align": false,
-        "alignLevel": null
+        "align": false
       }
     },
     {
@@ -1058,13 +1109,19 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
+      "datasource": {
+        "type": "datasource",
+        "uid": "grafana"
+      },
       "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 9,
         "w": 12,
         "x": 0,
         "y": 18
       },
+      "hiddenSeries": false,
       "id": 72,
       "legend": {
         "alignAsTable": true,
@@ -1080,7 +1137,11 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
+      "pluginVersion": "9.1.6",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -1090,7 +1151,11 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "rate(elasticsearch_indices_indexing_index_total{cluster=~"$cluster"}[1h])",
+          "datasource": {
+            "type": "datasource",
+            "uid": "grafana"
+          },
+          "expr": "rate(elasticsearch_indices_indexing_index_total{cluster=~\"$cluster\"}[1h])",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "{{name}}",
@@ -1098,9 +1163,7 @@
         }
       ],
       "thresholds": [],
-      "timeFrom": null,
       "timeRegions": [],
-      "timeShift": null,
       "title": "Documents Indexed Rate",
       "tooltip": {
         "shared": true,
@@ -1109,9 +1172,7 @@
       },
       "type": "graph",
       "xaxis": {
-        "buckets": null,
         "mode": "time",
-        "name": null,
         "show": true,
         "values": []
       },
@@ -1120,22 +1181,16 @@
           "format": "short",
           "label": "Documents/s",
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         },
         {
           "format": "short",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         }
       ],
       "yaxis": {
-        "align": false,
-        "alignLevel": null
+        "align": false
       }
     },
     {
@@ -1143,13 +1198,19 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
+      "datasource": {
+        "type": "datasource",
+        "uid": "grafana"
+      },
       "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 9,
         "w": 12,
         "x": 12,
         "y": 18
       },
+      "hiddenSeries": false,
       "id": 74,
       "legend": {
         "alignAsTable": true,
@@ -1165,7 +1226,11 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
+      "pluginVersion": "9.1.6",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -1175,7 +1240,11 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "rate(elasticsearch_indices_search_fetch_total{cluster=~"$cluster"}[1h])",
+          "datasource": {
+            "type": "datasource",
+            "uid": "grafana"
+          },
+          "expr": "rate(elasticsearch_indices_search_fetch_total{cluster=~\"$cluster\"}[1h])",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "{{name}}",
@@ -1183,9 +1252,7 @@
         }
       ],
       "thresholds": [],
-      "timeFrom": null,
       "timeRegions": [],
-      "timeShift": null,
       "title": "Query Rate",
       "tooltip": {
         "shared": true,
@@ -1194,9 +1261,7 @@
       },
       "type": "graph",
       "xaxis": {
-        "buckets": null,
         "mode": "time",
-        "name": null,
         "show": true,
         "values": []
       },
@@ -1205,22 +1270,16 @@
           "format": "short",
           "label": "Queris/s",
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         },
         {
           "format": "short",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         }
       ],
       "yaxis": {
-        "align": false,
-        "alignLevel": null
+        "align": false
       }
     },
     {
@@ -1228,10 +1287,13 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "$server",
+      "datasource": {
+        "uid": "$server"
+      },
       "editable": true,
       "error": false,
       "fill": 1,
+      "fillGradient": 0,
       "grid": {},
       "gridPos": {
         "h": 8,
@@ -1240,6 +1302,7 @@
         "y": 27
       },
       "height": "",
+      "hiddenSeries": false,
       "id": 64,
       "legend": {
         "avg": false,
@@ -1254,7 +1317,11 @@
       "linewidth": 2,
       "links": [],
       "nullPointMode": "connected",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
+      "pluginVersion": "9.1.6",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -1264,7 +1331,10 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(elasticsearch_thread_pool_queue_count{cluster=~"$cluster", type!="management"}) by (type)",
+          "datasource": {
+            "uid": "$server"
+          },
+          "expr": "sum(elasticsearch_thread_pool_queue_count{cluster=~\"$cluster\", type!=\"management\"}) by (type)",
           "interval": "",
           "intervalFactor": 2,
           "legendFormat": "Type: {{type}}",
@@ -1273,9 +1343,7 @@
         }
       ],
       "thresholds": [],
-      "timeFrom": null,
       "timeRegions": [],
-      "timeShift": null,
       "title": "Queue Count",
       "tooltip": {
         "msResolution": true,
@@ -1285,9 +1353,7 @@
       },
       "type": "graph",
       "xaxis": {
-        "buckets": null,
         "mode": "time",
-        "name": null,
         "show": true,
         "values": []
       },
@@ -1295,25 +1361,24 @@
         {
           "format": "short",
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         },
         {
           "format": "short",
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         }
       ],
       "yaxis": {
-        "align": false,
-        "alignLevel": null
+        "align": false
       }
     },
     {
       "collapsed": false,
+      "datasource": {
+        "type": "datasource",
+        "uid": "grafana"
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -1322,28 +1387,55 @@
       },
       "id": 68,
       "panels": [],
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "grafana"
+          },
+          "refId": "A"
+        }
+      ],
       "title": "System",
       "type": "row"
     },
     {
-      "cacheTimeout": null,
-      "colorBackground": false,
-      "colorValue": false,
-      "colors": [
-        "rgba(245, 54, 54, 0.9)",
-        "rgba(237, 129, 40, 0.89)",
-        "rgba(50, 172, 45, 0.97)"
-      ],
-      "datasource": "$server",
-      "editable": true,
-      "error": false,
-      "format": "bytes",
-      "gauge": {
-        "maxValue": 100,
-        "minValue": 0,
-        "show": false,
-        "thresholdLabels": false,
-        "thresholdMarkers": true
+      "datasource": {
+        "uid": "$server"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "rgb(31, 120, 193)",
+            "mode": "fixed"
+          },
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
       },
       "gridPos": {
         "h": 3,
@@ -1351,45 +1443,30 @@
         "x": 0,
         "y": 36
       },
-      "height": "",
       "id": 12,
-      "interval": null,
       "links": [],
-      "mappingType": 1,
-      "mappingTypes": [
-        {
-          "name": "value to text",
-          "value": 1
-        },
-        {
-          "name": "range to text",
-          "value": 2
-        }
-      ],
       "maxDataPoints": 100,
-      "nullPointMode": "connected",
-      "nullText": null,
-      "postfix": "",
-      "postfixFontSize": "50%",
-      "prefix": "",
-      "prefixFontSize": "50%",
-      "rangeMaps": [
-        {
-          "from": "null",
-          "text": "N/A",
-          "to": "null"
-        }
-      ],
-      "sparkline": {
-        "fillColor": "rgba(31, 118, 189, 0.18)",
-        "full": false,
-        "lineColor": "rgb(31, 120, 193)",
-        "show": true
+      "options": {
+        "colorMode": "none",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
       },
-      "tableColumn": "",
+      "pluginVersion": "9.1.6",
       "targets": [
         {
-          "expr": "sum(node_memory_MemTotal_bytes{cluster=~"$cluster"})",
+          "datasource": {
+            "uid": "$server"
+          },
+          "expr": "sum(node_memory_MemTotal_bytes{cluster=~\"$cluster\"})",
           "intervalFactor": 2,
           "legendFormat": "",
           "metric": "",
@@ -1397,38 +1474,46 @@
           "step": 1800
         }
       ],
-      "thresholds": "",
       "title": "Total Memory",
-      "type": "singlestat",
-      "valueFontSize": "80%",
-      "valueMaps": [
-        {
-          "op": "=",
-          "text": "N/A",
-          "value": "null"
-        }
-      ],
-      "valueName": "current"
+      "type": "stat"
     },
     {
-      "cacheTimeout": null,
-      "colorBackground": false,
-      "colorValue": false,
-      "colors": [
-        "rgba(245, 54, 54, 0.9)",
-        "rgba(237, 129, 40, 0.89)",
-        "rgba(50, 172, 45, 0.97)"
-      ],
-      "datasource": "$server",
-      "editable": true,
-      "error": false,
-      "format": "bytes",
-      "gauge": {
-        "maxValue": 100,
-        "minValue": 0,
-        "show": false,
-        "thresholdLabels": false,
-        "thresholdMarkers": true
+      "datasource": {
+        "uid": "$server"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "rgb(31, 120, 193)",
+            "mode": "fixed"
+          },
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
       },
       "gridPos": {
         "h": 3,
@@ -1436,83 +1521,76 @@
         "x": 8,
         "y": 36
       },
-      "height": "",
       "id": 13,
-      "interval": null,
       "links": [],
-      "mappingType": 1,
-      "mappingTypes": [
-        {
-          "name": "value to text",
-          "value": 1
-        },
-        {
-          "name": "range to text",
-          "value": 2
-        }
-      ],
       "maxDataPoints": 100,
-      "nullPointMode": "connected",
-      "nullText": null,
-      "postfix": "",
-      "postfixFontSize": "50%",
-      "prefix": "",
-      "prefixFontSize": "50%",
-      "rangeMaps": [
-        {
-          "from": "null",
-          "text": "N/A",
-          "to": "null"
-        }
-      ],
-      "sparkline": {
-        "fillColor": "rgba(31, 118, 189, 0.18)",
-        "full": false,
-        "lineColor": "rgb(31, 120, 193)",
-        "show": true
+      "options": {
+        "colorMode": "none",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
       },
-      "tableColumn": "",
+      "pluginVersion": "9.1.6",
       "targets": [
         {
-          "expr": "sum(node_memory_MemFree_bytes{cluster=~"$cluster"})",
+          "datasource": {
+            "uid": "$server"
+          },
+          "expr": "sum(node_memory_MemFree_bytes{cluster=~\"$cluster\"})",
           "intervalFactor": 2,
           "legendFormat": "",
           "refId": "A",
           "step": 1800
         }
       ],
-      "thresholds": "",
       "title": "Total Memory Free",
-      "type": "singlestat",
-      "valueFontSize": "80%",
-      "valueMaps": [
-        {
-          "op": "=",
-          "text": "N/A",
-          "value": "null"
-        }
-      ],
-      "valueName": "current"
+      "type": "stat"
     },
     {
-      "cacheTimeout": null,
-      "colorBackground": false,
-      "colorValue": false,
-      "colors": [
-        "rgba(245, 54, 54, 0.9)",
-        "rgba(237, 129, 40, 0.89)",
-        "rgba(50, 172, 45, 0.97)"
-      ],
-      "datasource": "$server",
-      "editable": true,
-      "error": false,
-      "format": "bytes",
-      "gauge": {
-        "maxValue": 100,
-        "minValue": 0,
-        "show": false,
-        "thresholdLabels": false,
-        "thresholdMarkers": true
+      "datasource": {
+        "uid": "$server"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "rgb(31, 120, 193)",
+            "mode": "fixed"
+          },
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
       },
       "gridPos": {
         "h": 3,
@@ -1520,73 +1598,51 @@
         "x": 16,
         "y": 36
       },
-      "height": "",
       "id": 14,
-      "interval": null,
       "links": [],
-      "mappingType": 1,
-      "mappingTypes": [
-        {
-          "name": "value to text",
-          "value": 1
-        },
-        {
-          "name": "range to text",
-          "value": 2
-        }
-      ],
       "maxDataPoints": 100,
-      "nullPointMode": "connected",
-      "nullText": null,
-      "postfix": "",
-      "postfixFontSize": "50%",
-      "prefix": "",
-      "prefixFontSize": "50%",
-      "rangeMaps": [
-        {
-          "from": "null",
-          "text": "N/A",
-          "to": "null"
-        }
-      ],
-      "sparkline": {
-        "fillColor": "rgba(31, 118, 189, 0.18)",
-        "full": false,
-        "lineColor": "rgb(31, 120, 193)",
-        "show": true
+      "options": {
+        "colorMode": "none",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
       },
-      "tableColumn": "",
+      "pluginVersion": "9.1.6",
       "targets": [
         {
-          "expr": "sum(node_memory_MemAvailable_bytes{cluster=~"$cluster"})",
+          "datasource": {
+            "uid": "$server"
+          },
+          "expr": "sum(node_memory_MemAvailable_bytes{cluster=~\"$cluster\"})",
           "intervalFactor": 2,
           "legendFormat": "",
           "refId": "A",
           "step": 1800
         }
       ],
-      "thresholds": "",
       "title": "Total Memory Available",
-      "type": "singlestat",
-      "valueFontSize": "80%",
-      "valueMaps": [
-        {
-          "op": "=",
-          "text": "N/A",
-          "value": "null"
-        }
-      ],
-      "valueName": "current"
+      "type": "stat"
     },
     {
       "aliasColors": {},
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "$server",
+      "datasource": {
+        "uid": "$server"
+      },
       "editable": true,
       "error": false,
       "fill": 1,
+      "fillGradient": 0,
       "grid": {},
       "gridPos": {
         "h": 8,
@@ -1594,6 +1650,7 @@
         "x": 0,
         "y": 39
       },
+      "hiddenSeries": false,
       "id": 1,
       "legend": {
         "avg": false,
@@ -1608,7 +1665,11 @@
       "linewidth": 2,
       "links": [],
       "nullPointMode": "connected",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
+      "pluginVersion": "9.1.6",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -1618,7 +1679,10 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(elasticsearch_thread_pool_active_count{cluster=~"$cluster", type!="management"}) by (type)",
+          "datasource": {
+            "uid": "$server"
+          },
+          "expr": "sum(elasticsearch_thread_pool_active_count{cluster=~\"$cluster\", type!=\"management\"}) by (type)",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -1628,9 +1692,7 @@
         }
       ],
       "thresholds": [],
-      "timeFrom": null,
       "timeRegions": [],
-      "timeShift": null,
       "title": "Thread Pools",
       "tooltip": {
         "msResolution": true,
@@ -1640,9 +1702,7 @@
       },
       "type": "graph",
       "xaxis": {
-        "buckets": null,
         "mode": "time",
-        "name": null,
         "show": true,
         "values": []
       },
@@ -1650,21 +1710,16 @@
         {
           "format": "short",
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         },
         {
           "format": "short",
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         }
       ],
       "yaxis": {
-        "align": false,
-        "alignLevel": null
+        "align": false
       }
     },
     {
@@ -1672,10 +1727,13 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "$server",
+      "datasource": {
+        "uid": "$server"
+      },
       "editable": true,
       "error": false,
       "fill": 1,
+      "fillGradient": 0,
       "grid": {},
       "gridPos": {
         "h": 8,
@@ -1683,6 +1741,7 @@
         "x": 12,
         "y": 39
       },
+      "hiddenSeries": false,
       "id": 66,
       "legend": {
         "avg": false,
@@ -1697,7 +1756,11 @@
       "linewidth": 2,
       "links": [],
       "nullPointMode": "connected",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
+      "pluginVersion": "9.1.6",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -1707,7 +1770,10 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "rate(elasticsearch_thread_pool_rejected_count{cluster=~"$cluster", type!="management"}[5m])",
+          "datasource": {
+            "uid": "$server"
+          },
+          "expr": "rate(elasticsearch_thread_pool_rejected_count{cluster=~\"$cluster\", type!=\"management\"}[5m])",
           "interval": "",
           "intervalFactor": 2,
           "legendFormat": "{{ name }} {{ type }}",
@@ -1716,9 +1782,7 @@
         }
       ],
       "thresholds": [],
-      "timeFrom": null,
       "timeRegions": [],
-      "timeShift": null,
       "title": "Thread pool rejections",
       "tooltip": {
         "msResolution": true,
@@ -1728,9 +1792,7 @@
       },
       "type": "graph",
       "xaxis": {
-        "buckets": null,
         "mode": "time",
-        "name": null,
         "show": true,
         "values": []
       },
@@ -1738,21 +1800,16 @@
         {
           "format": "short",
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         },
         {
           "format": "short",
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         }
       ],
       "yaxis": {
-        "align": false,
-        "alignLevel": null
+        "align": false
       }
     },
     {
@@ -1760,14 +1817,18 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "$server",
+      "datasource": {
+        "uid": "$server"
+      },
       "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 9,
         "w": 12,
         "x": 0,
         "y": 47
       },
+      "hiddenSeries": false,
       "id": 57,
       "legend": {
         "avg": false,
@@ -1782,7 +1843,11 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
+      "pluginVersion": "9.1.6",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -1801,8 +1866,11 @@
               "type": "date_histogram"
             }
           ],
+          "datasource": {
+            "uid": "$server"
+          },
           "dsType": "elasticsearch",
-          "expr": "avg(irate(node_cpu_seconds_total{cluster=~"$cluster"}[60s])) by(mode) *100",
+          "expr": "avg(irate(node_cpu_seconds_total{cluster=~\"$cluster\"}[60s])) by(mode) *100",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "{{ mode }}",
@@ -1819,9 +1887,7 @@
         }
       ],
       "thresholds": [],
-      "timeFrom": null,
       "timeRegions": [],
-      "timeShift": null,
       "title": "Avg. CPU Usage",
       "tooltip": {
         "shared": true,
@@ -1830,9 +1896,7 @@
       },
       "type": "graph",
       "xaxis": {
-        "buckets": null,
         "mode": "time",
-        "name": null,
         "show": true,
         "values": []
       },
@@ -1841,22 +1905,17 @@
           "format": "short",
           "label": "",
           "logBase": 1,
-          "max": null,
           "min": "0",
           "show": true
         },
         {
           "format": "short",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         }
       ],
       "yaxis": {
-        "align": false,
-        "alignLevel": null
+        "align": false
       }
     },
     {
@@ -1864,10 +1923,13 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "$server",
+      "datasource": {
+        "uid": "$server"
+      },
       "editable": true,
       "error": false,
       "fill": 1,
+      "fillGradient": 0,
       "grid": {},
       "gridPos": {
         "h": 9,
@@ -1875,6 +1937,7 @@
         "x": 12,
         "y": 47
       },
+      "hiddenSeries": false,
       "id": 28,
       "legend": {
         "alignAsTable": true,
@@ -1891,7 +1954,11 @@
       "linewidth": 2,
       "links": [],
       "nullPointMode": "connected",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
+      "pluginVersion": "9.1.6",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -1901,7 +1968,10 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "avg_over_time(elasticsearch_jvm_memory_used_bytes{area="heap",cluster=~"$cluster"}[15m]) / elasticsearch_jvm_memory_max_bytes{area="heap",cluster=~"$cluster"}",
+          "datasource": {
+            "uid": "$server"
+          },
+          "expr": "avg_over_time(elasticsearch_jvm_memory_used_bytes{area=\"heap\",cluster=~\"$cluster\"}[15m]) / elasticsearch_jvm_memory_max_bytes{area=\"heap\",cluster=~\"$cluster\"}",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -1911,9 +1981,7 @@
         }
       ],
       "thresholds": [],
-      "timeFrom": null,
       "timeRegions": [],
-      "timeShift": null,
       "title": "Avg Heap in 15min",
       "tooltip": {
         "msResolution": true,
@@ -1923,9 +1991,7 @@
       },
       "type": "graph",
       "xaxis": {
-        "buckets": null,
         "mode": "time",
-        "name": null,
         "show": true,
         "values": []
       },
@@ -1940,16 +2006,12 @@
         },
         {
           "format": "short",
-          "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": false
         }
       ],
       "yaxis": {
-        "align": false,
-        "alignLevel": null
+        "align": false
       }
     },
     {
@@ -1957,10 +2019,13 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "$server",
+      "datasource": {
+        "uid": "$server"
+      },
       "editable": true,
       "error": false,
       "fill": 1,
+      "fillGradient": 0,
       "grid": {},
       "gridPos": {
         "h": 8,
@@ -1968,6 +2033,7 @@
         "x": 0,
         "y": 56
       },
+      "hiddenSeries": false,
       "id": 5,
       "legend": {
         "alignAsTable": true,
@@ -1983,7 +2049,11 @@
       "linewidth": 2,
       "links": [],
       "nullPointMode": "connected",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
+      "pluginVersion": "9.1.6",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -1993,7 +2063,10 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(rate(elasticsearch_transport_rx_packets_total{cluster=~"$cluster"}[5m]))",
+          "datasource": {
+            "uid": "$server"
+          },
+          "expr": "sum(rate(elasticsearch_transport_rx_packets_total{cluster=~\"$cluster\"}[5m]))",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "RX",
@@ -2001,7 +2074,10 @@
           "step": 240
         },
         {
-          "expr": "sum(rate(elasticsearch_transport_tx_packets_total{cluster=~"$cluster"}[5m])) * -1",
+          "datasource": {
+            "uid": "$server"
+          },
+          "expr": "sum(rate(elasticsearch_transport_tx_packets_total{cluster=~\"$cluster\"}[5m])) * -1",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "TX",
@@ -2010,9 +2086,7 @@
         }
       ],
       "thresholds": [],
-      "timeFrom": null,
       "timeRegions": [],
-      "timeShift": null,
       "title": "RX/TX Rate 5m",
       "tooltip": {
         "msResolution": true,
@@ -2022,9 +2096,7 @@
       },
       "type": "graph",
       "xaxis": {
-        "buckets": null,
         "mode": "time",
-        "name": null,
         "show": true,
         "values": []
       },
@@ -2032,21 +2104,16 @@
         {
           "format": "short",
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         },
         {
           "format": "short",
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         }
       ],
       "yaxis": {
-        "align": false,
-        "alignLevel": null
+        "align": false
       }
     },
     {
@@ -2054,10 +2121,13 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "$server",
+      "datasource": {
+        "uid": "$server"
+      },
       "editable": true,
       "error": false,
       "fill": 1,
+      "fillGradient": 0,
       "grid": {},
       "gridPos": {
         "h": 8,
@@ -2065,6 +2135,7 @@
         "x": 12,
         "y": 56
       },
+      "hiddenSeries": false,
       "id": 65,
       "legend": {
         "avg": false,
@@ -2079,7 +2150,11 @@
       "linewidth": 2,
       "links": [],
       "nullPointMode": "connected",
+      "options": {
+        "alertThreshold": true
+      },
       "percentage": false,
+      "pluginVersion": "9.1.6",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -2089,7 +2164,10 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "irate(elasticsearch_jvm_gc_collection_seconds_sum{cluster=~"$cluster"}[1m])",
+          "datasource": {
+            "uid": "$server"
+          },
+          "expr": "irate(elasticsearch_jvm_gc_collection_seconds_sum{cluster=~\"$cluster\"}[1m])",
           "interval": "",
           "intervalFactor": 2,
           "legendFormat": "{{ name }} {{ gc }}",
@@ -2098,9 +2176,7 @@
         }
       ],
       "thresholds": [],
-      "timeFrom": null,
       "timeRegions": [],
-      "timeShift": null,
       "title": "GC seconds",
       "tooltip": {
         "msResolution": true,
@@ -2110,9 +2186,7 @@
       },
       "type": "graph",
       "xaxis": {
-        "buckets": null,
         "mode": "time",
-        "name": null,
         "show": true,
         "values": []
       },
@@ -2120,26 +2194,21 @@
         {
           "format": "short",
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         },
         {
           "format": "short",
           "logBase": 1,
-          "max": null,
-          "min": null,
           "show": true
         }
       ],
       "yaxis": {
-        "align": false,
-        "alignLevel": null
+        "align": false
       }
     }
   ],
   "refresh": "1m",
-  "schemaVersion": 16,
+  "schemaVersion": 37,
   "style": "dark",
   "tags": [
     "infra",
@@ -2150,11 +2219,14 @@
     "list": [
       {
         "current": {
+          "selected": false,
           "text": "Prometheus",
           "value": "Prometheus"
         },
         "hide": 0,
+        "includeAll": false,
         "label": "Server",
+        "multi": false,
         "name": "server",
         "options": [],
         "query": "prometheus",
@@ -2164,23 +2236,34 @@
         "type": "datasource"
       },
       {
-        "allValue": null,
-        "current": {},
-        "datasource": "$server",
+        "current": {
+          "selected": true,
+          "text": [
+            "elasticsearch"
+          ],
+          "value": [
+            "elasticsearch"
+          ]
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "$server"
+        },
         "definition": "",
         "hide": 0,
         "includeAll": true,
-        "label": null,
         "multi": true,
         "name": "cluster",
         "options": [],
-        "query": "label_values(elasticsearch_cluster_health_status,cluster)",
+        "query": {
+          "query": "label_values(elasticsearch_cluster_health_status,cluster)",
+          "refId": "Prometheus-cluster-Variable-Query"
+        },
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
         "sort": 0,
         "tagValuesQuery": "",
-        "tags": [],
         "tagsQuery": "",
         "type": "query",
         "useTags": false
@@ -2188,7 +2271,7 @@
     ]
   },
   "time": {
-    "from": "now-12h",
+    "from": "now-5m",
     "to": "now"
   },
   "timepicker": {
@@ -2219,5 +2302,6 @@
   "timezone": "utc",
   "title": "Elasticsearch",
   "uid": "n_nxrE_mk",
-  "version": 2
+  "version": 2,
+  "weekStart": ""
 }
