@@ -129,7 +129,7 @@ public class RegisterPrometheusScrapyTask extends BaseCloudeonTask {
         ServiceRoleInstanceEntity monitorPrometheus = roleInstanceRepository.findByServiceInstanceIdAndServiceRoleName(monitorServiceInstance.getId(), "PROMETHEUS").get(0);
         Integer monitorPrometheusNodeId = monitorPrometheus.getNodeId();
         ClusterNodeEntity prometheusNodeEntity = clusterNodeRepository.findById(monitorPrometheusNodeId).get();
-        Session clientSession =sshPoolService.openSession(prometheusNodeEntity.getIp(), prometheusNodeEntity.getSshPort(), prometheusNodeEntity.getSshUser(), prometheusNodeEntity.getSshPassword());
+        Session clientSession =sshPoolService.openSession(prometheusNodeEntity);
         Sftp sftp = JschUtil.createSftp(clientSession);
         String remoteConfDirPath = "/opt/edp/" + monitorServiceInstance.getServiceName() +"/conf/discovery_configs/";
         log.info("拷贝本地配置目录：" + outputConfPath + " 到节点" + prometheusNodeEntity.getHostname() + "的：" + remoteConfDirPath);

@@ -52,7 +52,7 @@ public class InstallTask extends BaseCloudeonTask {
         String[] paths = persistencePaths.split(",");
 
         ClusterNodeEntity nodeEntity = clusterNodeRepository.findByHostname(taskParam.getHostName());
-        Session clientSession = sshPoolService.openSession(nodeEntity.getIp(), nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getSshPassword());
+        Session clientSession = sshPoolService.openSession(nodeEntity);
         Sftp sftp = JschUtil.createSftp(clientSession);
         // 查询节点
         Arrays.stream(paths).forEach(new Consumer<String>() {

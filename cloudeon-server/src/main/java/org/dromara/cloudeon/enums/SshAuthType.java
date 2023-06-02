@@ -14,19 +14,9 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.dromara.cloudeon.controller.request;
+package org.dromara.cloudeon.enums;
 
-import lombok.Data;
-
-@Data
-public class SaveNodeRequest {
-    private String sshUser;
-    private String sshPassword;
-    private Integer sshPort;
-    private Integer clusterId;
-    private String ip;
-    private String hostname;
-    private String privateKeyPath;
-    private String sshAuthType;
+public enum SshAuthType {
+    PASSWORD,PRIVATEKEY
 
 }

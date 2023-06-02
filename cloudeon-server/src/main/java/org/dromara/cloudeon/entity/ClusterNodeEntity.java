@@ -17,6 +17,7 @@
 package org.dromara.cloudeon.entity;
 
 import lombok.Data;
+import org.dromara.cloudeon.enums.SshAuthType;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -73,6 +74,11 @@ public class ClusterNodeEntity implements Serializable {
     private String sshUser;
     private String sshPassword;
     private Integer sshPort;
+
+    @Enumerated(EnumType.STRING)
+    private SshAuthType sshAuthType;
+
+    private String privateKeyPath;
 
     /**
      * 集群id

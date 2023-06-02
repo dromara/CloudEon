@@ -23,6 +23,8 @@ import org.apache.sshd.client.session.ClientSession;
 import org.apache.sshd.sftp.client.SftpClientFactory;
 import org.apache.sshd.sftp.client.fs.SftpFileSystem;
 import org.dromara.cloudeon.dto.HostSshPoolMetrics;
+import org.dromara.cloudeon.entity.ClusterNodeEntity;
+import org.dromara.cloudeon.enums.SshAuthType;
 import org.dromara.cloudeon.utils.SftpFilesystemPool;
 import org.dromara.cloudeon.utils.SshConnectionPool;
 import org.springframework.stereotype.Service;
@@ -39,11 +41,19 @@ public class SshPoolService {
         Session session = jschSessionPool.getSession(server, port, username, password);
         return session;
     }
+    public Session openSessionByPrivateKey(String server, int port, String username, String privateKey) {
+        Session session = jschSessionPool.getSession(server, port, username, privateKey,null);
+        return session;
+    }
 
-
-
-
-
-
-
+    public Session openSession(ClusterNodeEntity nodeEntity) {
+        // 判断是用密码访问还是私钥
+        Session session = null;
+        if (nodeEntity.getSshAuthType().equals(SshAuthType.PASSWORD)) {
+            session=  jschSessionPool.getSession(nodeEntity.getIp(), nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getSshPassword());
+        } else if (nodeEntity.getSshAuthType().equals(SshAuthType.PRIVATEKEY)) {
+            session=  jschSessionPool.getSession(nodeEntity.getIp(), nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getPrivateKeyPath(), null);
+        }
+        return session;
+    }
 }

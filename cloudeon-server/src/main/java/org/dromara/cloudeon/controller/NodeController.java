@@ -17,9 +17,6 @@
 package org.dromara.cloudeon.controller;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.ssh.JschUtil;
 import cn.hutool.extra.ssh.Sftp;
@@ -30,24 +27,18 @@ import org.dromara.cloudeon.controller.response.NodeInfoVO;
 import org.dromara.cloudeon.dao.ClusterNodeRepository;
 import org.dromara.cloudeon.dto.ResultDTO;
 import org.dromara.cloudeon.entity.ClusterNodeEntity;
+import org.dromara.cloudeon.enums.SshAuthType;
 import org.dromara.cloudeon.service.KubeService;
 import org.dromara.cloudeon.service.SshPoolService;
 import org.dromara.cloudeon.utils.ByteConverter;
-import org.dromara.cloudeon.utils.JschUtils;
-import org.dromara.cloudeon.utils.SshUtils;
 import io.fabric8.kubernetes.api.model.Node;
 import io.fabric8.kubernetes.api.model.NodeList;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import org.apache.sshd.client.session.ClientSession;
-import org.apache.sshd.sftp.client.SftpClientFactory;
-import org.apache.sshd.sftp.client.fs.SftpFileSystem;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -86,7 +77,7 @@ public class NodeController {
            return ResultDTO.failed("已添加ip为：" + ip + " 的节点(服务器)");
         }
         // 校验ssh服务
-        checkSSH(ip, sshPort, sshUser, sshPassword);
+        checkSSH(ip, sshPort, sshUser, sshPassword,req.getPrivateKeyPath(),req.getSshAuthType());
         KubernetesClient kubeClient = kubeService.getKubeClient(clusterId);
         NodeList nodeList = kubeClient.nodes().list();
         List<Node> items = nodeList.getItems();
@@ -107,6 +98,12 @@ public class NodeController {
         // 保存到数据库
         ClusterNodeEntity newClusterNodeEntity = new ClusterNodeEntity();
         BeanUtil.copyProperties(req, newClusterNodeEntity);
+        if (req.getSshAuthType()!=null && req.getSshAuthType().toUpperCase().equals(SshAuthType.PRIVATEKEY.name())) {
+            newClusterNodeEntity.setPrivateKeyPath(req.getPrivateKeyPath());
+            newClusterNodeEntity.setSshAuthType(SshAuthType.PRIVATEKEY);
+        }else {
+            newClusterNodeEntity.setSshAuthType(SshAuthType.PASSWORD);
+        }
         newClusterNodeEntity.setCreateTime(new Date());
         newClusterNodeEntity.setRuntimeContainer(containerRuntimeVersion);
         clusterNodeRepository.save(newClusterNodeEntity);
@@ -118,9 +115,14 @@ public class NodeController {
     /**
      * 查询服务器基础信息
      */
-    public void checkSSH(String sshHost, Integer sshPort, String sshUser, String password) throws IOException {
+    public void checkSSH(String sshHost, Integer sshPort, String sshUser, String password,String privateKey ,String sshAuthType) throws IOException {
+        Session session = null;
+        if (sshAuthType==null ||sshAuthType.toUpperCase().equals(SshAuthType.PASSWORD.name())) {
+            session = sshPoolService.openSession(sshHost, sshPort, sshUser, password);
+        }else if(sshAuthType.toUpperCase().equals(SshAuthType.PRIVATEKEY.name())){
+            session= sshPoolService.openSessionByPrivateKey(sshHost, sshPort, sshUser, privateKey);
+        }
 
-        Session session = sshPoolService.openSession(sshHost, sshPort, sshUser, password);
         Sftp sftp = JschUtil.createSftp(session);
         String sftpHome = sftp.home();
         boolean connected = session.isConnected();

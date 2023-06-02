@@ -151,7 +151,7 @@ public class ConfigTask extends BaseCloudeonTask {
 
         // ssh上传所有配置文件到指定目录
         ClusterNodeEntity nodeEntity = clusterNodeRepository.findByHostname(taskParam.getHostName());
-        Session clientSession = sshPoolService.openSession(nodeEntity.getIp(), nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getSshPassword());
+        Session clientSession = sshPoolService.openSession(nodeEntity);
         Sftp sftp = JschUtil.createSftp(clientSession);
         String remoteConfDirPath = "/opt/edp/" + serviceInstanceEntity.getServiceName() +"/conf/";
         log.info("拷贝本地配置目录：" + outputConfPath + " 到节点" + taskParam.getHostName() + "的：" + remoteConfDirPath);

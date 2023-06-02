@@ -119,7 +119,7 @@ public class AlertService {
         ServiceRoleInstanceEntity prometheus = roleInstanceRepository.findByServiceInstanceIdAndServiceRoleName(monitorServiceInstance.getId(), MONITOR_ROLE_PROMETHEUS).get(0);
         ClusterNodeEntity prometheusNode = clusterNodeRepository.findById(prometheus.getNodeId()).get();
         // 建立ssh连接
-        Session clientSession = sshPoolService.openSession(prometheusNode.getIp(), prometheusNode.getSshPort(), prometheusNode.getSshUser(), prometheusNode.getSshPassword());
+        Session clientSession = sshPoolService.openSession(prometheusNode);
         Sftp sftp = JschUtil.createSftp(clientSession);
         String remoteConfDirPath = "/opt/edp/" + monitorServiceInstance.getServiceName() + "/conf/rule/";
         log.info("拷贝本地配置目录：" + alertRuleOutputPath + " 到节点" + prometheusNode.getIp() + "的：" + remoteConfDirPath);

@@ -66,7 +66,7 @@ public class InitDSTablesTask extends BaseCloudeonTask {
         ClusterNodeEntity nodeEntity = clusterNodeRepository.findById(nodeId).get();
         String ip = nodeEntity.getIp();
         log.info("在节点"+ip+"上执行命令:" + cmd);
-        Session clientSession = sshPoolService.openSession(ip, nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getSshPassword());
+        Session clientSession = sshPoolService.openSession( nodeEntity);
         try {
             JschUtils.execCallbackLine(clientSession, Charset.defaultCharset(), DEFAULT_JSCH_TIMEOUT,cmd ,null,remoteSshTaskLineHandler,remoteSshTaskErrorLineHandler );
         } catch (IOException e) {
