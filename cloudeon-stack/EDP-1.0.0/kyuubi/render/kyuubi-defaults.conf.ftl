@@ -36,6 +36,16 @@ spark.eventLog.dir               ${spark.conf['spark.eventLog.dir']}
 spark.yarn.historyServer.address   ${spark.serviceRoles['SPARK_HISTORY_SERVER'][0].hostname}:${spark.conf['spark.history.ui.port']}
 </#if>
 
+<#if conf['plugin.iceberg'] =='true'>
+spark.sql.extensions              org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions
+spark.sql.catalog.iceberg_catalog           org.apache.iceberg.spark.SparkCatalog
+spark.sql.catalog.iceberg_catalog.type        hadoop
+spark.sql.catalog.iceberg_catalog.warehouse     ${conf['plugin.iceberg.warehouse']}
+<#if conf['plugin.iceberg.as.defaultCatalog'] == 'true'>
+spark.sql.defaultCatalog             iceberg_catalog
+</#if>
+</#if>
+
 # Details in https://kyuubi.readthedocs.io/en/master/deployment/settings.html
 <#list confFiles['kyuubi-defaults.conf']?keys as key>
 ${key}                            ${confFiles['kyuubi-defaults.conf'][key]}

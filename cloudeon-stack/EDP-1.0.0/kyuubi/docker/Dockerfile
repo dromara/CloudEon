@@ -18,7 +18,8 @@ RUN wget https://archive.apache.org/dist/kyuubi/kyuubi-1.7.0/apache-kyuubi-1.7.0
 
 ENV PATH=$PATH:$KYUUBI_HOME/bin:$SPARK_HOME/bin
 
-
+# support iceberg
+RUN wget https://repo1.maven.org/maven2/org/apache/iceberg/iceberg-spark-runtime-3.2_2.12/1.2.1/iceberg-spark-runtime-3.2_2.12-1.2.1.jar
 
 
 
