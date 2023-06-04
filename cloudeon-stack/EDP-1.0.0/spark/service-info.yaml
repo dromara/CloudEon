@@ -177,3 +177,21 @@ configurations:
     confFile:  "hive-site.xml"
     tag: "高级参数"
     unit: Ms
+  - name: "plugin.iceberg"
+    recommendExpression: true
+    valueType: Switch
+    description: "是否启用iceberg"
+    configurableInWizard: false
+    tag: "数据湖"
+  - name: "plugin.iceberg.warehouse"
+    recommendExpression: "hdfs:///iceberg/warehouse"
+    valueType: InputString
+    configurableInWizard: true
+    description: "iceberg数据目录"
+    tag: "数据湖"
+  - name: "plugin.iceberg.as.defaultCatalog"
+    recommendExpression: "true"
+    valueType: Switch
+    configurableInWizard: true
+    description: "是否默认用iceberg catalog，如果是则不用 ` use iceberg_catalog; `语句进行切换catalog。开启后，如果要切换回默认的catalog查询hive上的数据，则需用语句`use spark_catalog; `"
+    tag: "数据湖"

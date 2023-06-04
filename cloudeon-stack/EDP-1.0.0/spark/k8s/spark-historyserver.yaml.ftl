@@ -43,6 +43,8 @@ spec:
       - args:
           - "/opt/edp/${service.serviceName}/conf/bootstrap-historyserver.sh"
         env:
+          - name: "SPARK_CONF_DIR"
+            value: "/opt/edp/${service.serviceName}/conf"
           - name: "HADOOP_CONF_DIR"
             value: "/opt/edp/${service.serviceName}/conf"
           - name: "USER"

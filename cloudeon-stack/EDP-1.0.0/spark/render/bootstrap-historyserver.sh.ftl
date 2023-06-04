@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source  /opt/edp/${service.serviceName}/conf/install-iceberg.sh
+
 export SPARK_PID_DIR=/opt/edp/${service.serviceName}/data
 export SPARK_LOG_DIR=/opt/edp/${service.serviceName}/log
 export SPARK_LOCAL_DIRS=/opt/edp/${service.serviceName}/data/local
