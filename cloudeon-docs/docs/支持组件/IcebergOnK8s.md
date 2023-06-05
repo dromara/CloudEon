@@ -19,7 +19,7 @@ iceberg是以插件模式集成到各个服务中，目前以支持spark、kyuub
 ![img.png](../images/iceberg3.png)
 
 使用kubectl进入pod中。启动standalone集群。
-![img.png](img.png)
+![img.png](../images/iceberg4.png)
 
 启动成功后，启动sql-client。
 ```shell
@@ -62,3 +62,8 @@ SET execution.checkpointing.interval = '30s';
 insert into `iceberg_catalog`.`default`.`taxi`  select * from datagen_v1;
 
 ```
+查询iceberg数据。
+```sql
+select * from `iceberg_catalog`.`default`.`taxi`;
+```
+![img_1.png](../images/iceberg5.png)
