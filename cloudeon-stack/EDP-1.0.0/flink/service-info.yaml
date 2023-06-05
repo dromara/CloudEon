@@ -12,7 +12,7 @@ runAs: flink
 supportKerberos: true
 
 dashboard:
-  uid: ""
+  uid: "qugC-I_Vk"
 
 roles:
 

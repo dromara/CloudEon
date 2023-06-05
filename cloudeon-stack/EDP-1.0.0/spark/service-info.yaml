@@ -13,7 +13,7 @@ runAs: spark
 supportKerberos: true
 
 dashboard:
-  uid: ""
+  uid: "ziOC-S_4z"
 
 roles:
   - name: SPAKR_THRIFT_SERVER
