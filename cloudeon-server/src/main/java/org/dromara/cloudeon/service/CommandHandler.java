@@ -73,6 +73,9 @@ public class CommandHandler {
                 if (stackServiceName.equals(FLINK_SERVICE_NAME)) {
                     taskGroupTypes.add(TaskGroupType.INIT_FLINK);
                 }
+                if (stackServiceName.equals(DINKY_SERVICE_NAME)) {
+                    taskGroupTypes.add(TaskGroupType.INIT_DINKY);
+                }
                 if (stackServiceName.equals(MONITOR_SERVICE_NAME)) {
                     taskGroupTypes.add(TaskGroupType.INIT_MONITOR);
                 }
@@ -81,7 +84,7 @@ public class CommandHandler {
                 }
                 taskGroupTypes.add(TaskGroupType.TAG_AND_START_K8S_SERVICE);
 
-                if (stackServiceName.equals("DORIS")) {
+                if (stackServiceName.equals(DORIS_SERVICE_NAME)) {
                     taskGroupTypes.add(TaskGroupType.INIT_DORIS);
                 }
                 taskGroupTypes.add(TaskGroupType.REGISTER_MONITOR);

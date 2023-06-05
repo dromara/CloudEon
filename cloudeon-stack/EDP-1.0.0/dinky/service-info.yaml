@@ -12,7 +12,7 @@ runAs: root
 supportKerberos: false
 
 dashboard:
-  uid: "kGFhlowrt"
+  uid: "cMEJaI_4z"
 
 roles:
   - name: DINKY_SERVER
