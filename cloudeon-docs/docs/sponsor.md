@@ -5,6 +5,9 @@ CloudEon 采用 Apache-2.0 开源协议，承诺项目本身与官网文档永�
 ## 赞赏码
 ![mm_reward_qrcode_1686114362835](https://github.com/dromara/CloudEon/assets/39690226/41a3de0d-3f80-4bb0-a86c-17fbad11b911)
 
+
+欢迎朋友们赞赏时留言，留下您的名字和一句话🤝
+
 ## 已捐赠列表
 
 | 赞助人 | 赞助金额 | 留言 | 时间 |
