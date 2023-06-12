@@ -52,3 +52,7 @@ cloudeon-ui/package-lock.json
 cloudeon-ui/pnpm-lock.yaml
 cloudeon-ui/dist
 web-ui
+app-logic-db/cloudeon/data/*
+cloudeon-server/src/main/resources/static/*
+cloudeon-ui/node/yarn/dist/*
+cloudeon-ui/node/*

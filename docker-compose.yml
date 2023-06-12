@@ -1,0 +1,68 @@
+version: '2.1'
+services:
+
+  eon-engine:
+    image: eon-engine:1.0
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      args:
+        ZIP_RELEASE_NAME: "cloudeon-assembly-v1.0.0-release"
+
+    container_name: eon-engine
+    ports:
+      - 7700:7700
+    mem_limit: 4096m
+    shm_size: 1gb
+    depends_on:
+      eon-db:
+        condition: service_healthy
+    env_file:
+      - .env
+    networks:
+      - eon-network
+
+  eon-db:
+
+    image: biarms/mysql:5.7
+    # image: mysql:5.7
+    build:
+      context: ./app-logic-db
+      dockerfile: Dockerfile
+
+    container_name: eon-db
+    hostname: eon-db
+    restart: always
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-u${EON_MYSQL_USER}", "-p${EON_MYSQL_PASSWORD}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    environment:
+      MYSQL_DATABASE: dev
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: password_
+
+    ports:
+      - ${EON_MYSQL_PORT}:3306
+    volumes:
+      - ./app-logic-db/initdb.d:/docker-entrypoint-initdb.d
+      - ./app-logic-db/conf.d:/etc/mysql/conf.d
+      - ./app-logic-db/log:/var/log/mysql
+      - ./app-logic-db/cloudeon/data/mysql:/var/lib/mysql
+
+    networks:
+      - eon-network
+
+
+
+networks:
+  eon-network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: ${EON_DOCKER_SUBNET}
+          gateway: ${EON_DOCKER_GATEWAY}
+

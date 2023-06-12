@@ -1,27 +1,28 @@
+FROM maven:3.8.6-jdk-8 AS build
 
-FROM maven:3.8.6-jdk-8
+WORKDIR usr/src/app
 
-ARG BUILD_DATE
-ARG CLOUDEON_VERSION=v0.0.0
-
-ENV CLOUDEON_HOME	/usr/local/cloudeon
-
-WORKDIR ${CLOUDEON_HOME}
-
-# 时区
 ENV TZ Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezone
 
-RUN mkdir -p ${CLOUDEON_HOME}
+COPY . ./
 
-COPY cloudeon-assembly-* .
+RUN mvn clean install -DskipTests -Dlicense.skip=true 
 
-RUN mv   cloudeon-assembly-*   cloudeon-assembly
+# Usage Stage...
 
-# 健康检查
-HEALTHCHECK CMD curl -X POST -f http://localhost:7700 || exit 1
+FROM openjdk:11-jre-slim
+
+RUN apt update && apt install unzip
+
+ARG ZIP_RELEASE_NAME="cloudeon-assembly-v1.0.0-release"
+
+WORKDIR /usr/src/app
 
 EXPOSE 7700
 
+COPY --from=build /usr/src/app/target/${ZIP_RELEASE_NAME}.zip .
 
-ENTRYPOINT ["/bin/bash", "/usr/local/cloudeon/cloudeon-assembly/bin/server.sh","start"]
+RUN unzip -v ${ZIP_RELEASE_NAME}.zip
+
+ENTRYPOINT ["/bin/bash", "/usr/src/app/cloudeon-assembly-v1.0.0/bin/server.sh","start"]
