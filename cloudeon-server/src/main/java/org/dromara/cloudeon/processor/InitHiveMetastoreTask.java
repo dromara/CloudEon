@@ -23,15 +23,17 @@ import cn.hutool.db.sql.SqlExecutor;
 import cn.hutool.extra.spring.SpringUtil;
 import com.jcraft.jsch.Session;
 import lombok.NoArgsConstructor;
-import org.apache.sshd.client.session.ClientSession;
-import org.dromara.cloudeon.dao.*;
+import org.dromara.cloudeon.dao.ClusterNodeRepository;
+import org.dromara.cloudeon.dao.ServiceInstanceConfigRepository;
+import org.dromara.cloudeon.dao.ServiceInstanceRepository;
+import org.dromara.cloudeon.dao.ServiceRoleInstanceRepository;
+import org.dromara.cloudeon.dao.StackServiceRepository;
 import org.dromara.cloudeon.entity.ClusterNodeEntity;
 import org.dromara.cloudeon.entity.ServiceInstanceEntity;
 import org.dromara.cloudeon.entity.ServiceRoleInstanceEntity;
 import org.dromara.cloudeon.entity.StackServiceEntity;
 import org.dromara.cloudeon.service.SshPoolService;
 import org.dromara.cloudeon.utils.JschUtils;
-import org.dromara.cloudeon.utils.SshUtils;
 
 import javax.sql.DataSource;
 import java.io.IOException;
@@ -86,20 +88,25 @@ public class InitHiveMetastoreTask extends BaseCloudeonTask {
         if (StrUtil.isNotBlank(qureyResult)) {
             log.info("检查到hive元数据库已经初始化过，无需执行初始化脚本...");
         } else {
-            // todo 能捕获到执行日志吗？
-            String cmd = String.format("sudo docker  run --net=host -v /opt/edp/%s/conf:/opt/edp/%s/conf  -v /opt/edp/%s/log:/opt/edp/%s/log  %s sh -c \"  /opt/edp/%s/conf/init-metastore-db.sh \"   ",
-                    serviceName, serviceName, serviceName, serviceName, stackServiceEntity.getDockerImage(), serviceName);
-
             // 选择metastore所在节点执行
             List<ServiceRoleInstanceEntity> roleInstanceEntities = roleInstanceRepository.findByServiceInstanceIdAndServiceRoleName(serviceInstanceId, "HIVE_SERVER2");
             ServiceRoleInstanceEntity firstNamenode = roleInstanceEntities.get(0);
             Integer nodeId = firstNamenode.getNodeId();
             ClusterNodeEntity nodeEntity = clusterNodeRepository.findById(nodeId).get();
+            String cmd = "";
+            String runtimeContainer = nodeEntity.getRuntimeContainer();
+            if (runtimeContainer.startsWith("docker")) {
+                cmd = String.format("docker run --net=host -v /opt/edp/%s/conf:/opt/edp/%s/conf  -v /opt/edp/%s/log:/opt/edp/%s/log  %s sh -c \"  /opt/edp/%s/conf/init-metastore-db.sh \"   ",
+                        serviceName, serviceName, serviceName, serviceName, stackServiceEntity.getDockerImage(), serviceName);
+            } else if (runtimeContainer.startsWith("containerd")) {
+                cmd = String.format("ctr run --rm --net-host --mount type=bind,src=/opt/edp/%s/conf,dst=/opt/edp/%s/conf,options=rbind:rw --mount type=bind,src=/opt/edp/%s/log,dst=/opt/edp/%s/log,options=rbind:rw  %s  init  sh -c \"  /opt/edp/%s/conf/init-metastore-db.sh \"   ",
+                        serviceName, serviceName, serviceName, serviceName, stackServiceEntity.getDockerImage(), serviceName);
+            }
             String ip = nodeEntity.getIp();
             log.info("在节点" + ip + "上执行命令:" + cmd);
             Session clientSession = sshPoolService.openSession(nodeEntity);
             try {
-                JschUtils.execCallbackLine(clientSession, Charset.defaultCharset(), DEFAULT_JSCH_TIMEOUT,cmd ,null,remoteSshTaskLineHandler,remoteSshTaskErrorLineHandler );
+                JschUtils.execCallbackLine(clientSession, Charset.defaultCharset(), DEFAULT_JSCH_TIMEOUT, cmd, null, remoteSshTaskLineHandler, remoteSshTaskErrorLineHandler);
 
             } catch (IOException e) {
                 e.printStackTrace();
