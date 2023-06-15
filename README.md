@@ -135,6 +135,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/pan3793"><img src="https://avatars.githubusercontent.com/u/26535726?v=4?s=100" width="100px;" alt="Cheng Pan"/><br /><sub><b>Cheng Pan</b></sub></a><br /><a href="https://github.com/dromara/CloudEon/commits?author=pan3793" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/limaiwang"><img src="https://avatars.githubusercontent.com/u/23052750?v=4?s=100" width="100px;" alt="maiwang li"/><br /><sub><b>maiwang li</b></sub></a><br /><a href="https://github.com/dromara/CloudEon/commits?author=limaiwang" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
