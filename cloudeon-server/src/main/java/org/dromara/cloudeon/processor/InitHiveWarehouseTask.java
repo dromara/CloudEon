@@ -18,6 +18,7 @@ package org.dromara.cloudeon.processor;
 
 import cn.hutool.extra.spring.SpringUtil;
 import com.jcraft.jsch.Session;
+import lombok.NoArgsConstructor;
 import org.dromara.cloudeon.dao.ClusterNodeRepository;
 import org.dromara.cloudeon.dao.ServiceInstanceRepository;
 import org.dromara.cloudeon.dao.ServiceRoleInstanceRepository;
@@ -28,9 +29,6 @@ import org.dromara.cloudeon.entity.ServiceRoleInstanceEntity;
 import org.dromara.cloudeon.entity.StackServiceEntity;
 import org.dromara.cloudeon.service.SshPoolService;
 import org.dromara.cloudeon.utils.JschUtils;
-import org.dromara.cloudeon.utils.SshUtils;
-import lombok.NoArgsConstructor;
-import org.apache.sshd.client.session.ClientSession;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -56,20 +54,25 @@ public class InitHiveWarehouseTask extends BaseCloudeonTask {
         ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(serviceInstanceId).get();
         StackServiceEntity stackServiceEntity = stackServiceRepository.findById(serviceInstanceEntity.getStackServiceId()).get();
         String serviceName = serviceInstanceEntity.getServiceName();
-        // todo 能捕获到执行日志吗？
-        String cmd = String.format("sudo docker  run --net=host -v /opt/edp/%s/conf:/opt/edp/%s/conf  %s sh -c \"  /opt/edp/%s/conf/init-warehouse-dir.sh \"   ",
-                serviceName,serviceName,stackServiceEntity.getDockerImage(),serviceName);
-
         // 选择metastore所在节点执行
-        List<ServiceRoleInstanceEntity> roleInstanceEntities = roleInstanceRepository.findByServiceInstanceIdAndServiceRoleName(serviceInstanceId,"HIVE_METASTORE");
+        List<ServiceRoleInstanceEntity> roleInstanceEntities = roleInstanceRepository.findByServiceInstanceIdAndServiceRoleName(serviceInstanceId, "HIVE_METASTORE");
         ServiceRoleInstanceEntity firstNamenode = roleInstanceEntities.get(0);
         Integer nodeId = firstNamenode.getNodeId();
         ClusterNodeEntity nodeEntity = clusterNodeRepository.findById(nodeId).get();
+        String cmd = "";
+        String runtimeContainer = nodeEntity.getRuntimeContainer();
+        if (runtimeContainer.startsWith("docker")) {
+            cmd = String.format("docker run --net=host -v /opt/edp/%s/conf:/opt/edp/%s/conf  %s sh -c \"  /opt/edp/%s/conf/init-warehouse-dir.sh \"   ",
+                    serviceName, serviceName, stackServiceEntity.getDockerImage(), serviceName);
+        } else if (runtimeContainer.startsWith("containerd")) {
+            cmd = String.format("ctr run --rm --net-host --mount type=bind,src=/opt/edp/%s/conf,dst=/opt/edp/%s/conf,options=rbind:rw  %s  init  sh -c \"  /opt/edp/%s/conf/init-warehouse-dir.sh \"   ",
+                    serviceName, serviceName, stackServiceEntity.getDockerImage(), serviceName);
+        }
         String ip = nodeEntity.getIp();
-        log.info("在节点"+ip+"上执行命令:" + cmd);
+        log.info("在节点" + ip + "上执行命令:" + cmd);
         Session clientSession = sshPoolService.openSession(nodeEntity);
         try {
-            JschUtils.execCallbackLine(clientSession, Charset.defaultCharset(), DEFAULT_JSCH_TIMEOUT,cmd ,null,remoteSshTaskLineHandler,remoteSshTaskErrorLineHandler );
+            JschUtils.execCallbackLine(clientSession, Charset.defaultCharset(), DEFAULT_JSCH_TIMEOUT, cmd, null, remoteSshTaskLineHandler, remoteSshTaskErrorLineHandler);
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
