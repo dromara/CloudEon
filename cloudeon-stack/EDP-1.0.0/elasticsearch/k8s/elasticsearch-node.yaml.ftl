@@ -51,8 +51,12 @@ spec:
           timeoutSeconds: 2
         name: "${roleServiceFullName}"
         resources:
-          requests: {}
-          limits: {}
+          requests:
+            memory: "${conf['elasticsearch.container.request.memory']}Mi"
+            cpu: "${conf['elasticsearch.container.request.cpu']}"
+          limits:
+            memory: "${conf['elasticsearch.container.limit.memory']}Mi"
+            cpu: "${conf['elasticsearch.container.limit.cpu']}"
         securityContext:
           privileged: true
         volumeMounts:

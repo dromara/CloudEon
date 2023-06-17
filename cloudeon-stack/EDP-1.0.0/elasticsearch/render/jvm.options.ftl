@@ -30,11 +30,6 @@
 ## directory containing these lines:
 ##
 
-<#assign esInitalMemory=conf['elasticsearch.node.inital.memory']?trim?number>
-<#assign esMaxMemory=conf['elasticsearch.node.max.memory']?trim?number>
-
--Xms${esInitalMemory?floor?c}g
--Xmx${esMaxMemory?floor?c}g
 ##
 ## See https://www.elastic.co/guide/en/elasticsearch/reference/8.5/heap-size.html
 ## for more information
