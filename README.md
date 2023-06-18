@@ -5,7 +5,7 @@
 [![HitCount](https://views.whatilearened.today/views/github/dromara/CloudEon.svg)](https://github.com/dromara/CloudEon)
 [![Commits](https://img.shields.io/github/commit-activity/m/dromara/CloudEon?color=ffff00)](https://github.com/dromara/CloudEon/commits/main)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
-[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/github/all-contributors/dromara/CloudEon)](#contributors-)
 [![GitHub license](https://img.shields.io/github/license/dromara/CloudEon)](https://github.com/dromara/CloudEon/LICENSE)
 
 <p> 🌉 构建于kubernetes集群之上的大数据集群管理平台 🌉</p>
