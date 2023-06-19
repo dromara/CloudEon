@@ -1,7 +1,7 @@
 import { PageContainer, ProCard } from '@ant-design/pro-components';
-import { Button, Popover, Popconfirm, Typography, Tabs, message, Spin } from 'antd';
+import { Button, Popover, Popconfirm, Dropdown, Tabs, message, Spin } from 'antd';
 import type { TabsProps } from 'antd';
-import { PoweroffOutlined, PlayCircleOutlined, ReloadOutlined, ExceptionOutlined, DeleteOutlined, LinkOutlined  } from '@ant-design/icons';
+import { PoweroffOutlined, PlayCircleOutlined, ReloadOutlined,LoadingOutlined, ExceptionOutlined, DeleteOutlined, DownOutlined  } from '@ant-design/icons';
 import { FormattedMessage, useIntl, history } from 'umi';
 import styles from './index.less'
 import { useState, useEffect } from 'react';
@@ -31,6 +31,8 @@ const serviceListDetail: React.FC = () => {
   const [apiLoading, setApiLoading] = useState(false);
   const [currentTab, setCurrentTab] = useState('StatusTab');
   const [dashboardUrl, setDashboardUrl] = useState<any>('');
+  const [dropdpwnStatus, setDropdpwnStatus] = useState(false);
+  const [currentAction, setCurrentAction] = useState('');
 
   const onChange = (key: string) => {
     console.log(key);
@@ -73,33 +75,44 @@ const serviceListDetail: React.FC = () => {
   const handleACT = async (key: string) => {
     if(!serviceId) return
     setSelectACT(key)
+    setDropdpwnStatus(false)
     let result: API.normalResult
     setBtnLoading(true)
     const params = {serviceInstanceId: serviceId}
     switch(key){
       case 'start': 
         result = await startServiceAPI(params);
-        dealResult(result, key)
+        dealResult(result, key, '操作成功')
         break;
       case 'stop': 
         result = await stopServiceAPI(params);
-        dealResult(result, key)
+        dealResult(result, key, '操作成功')
         break;
       case 'restart': 
         result = await restartServiceAPI(params);
-        dealResult(result, key)
+        dealResult(result, key, '操作成功')
         break;
       case 'delete':
         result = await deleteServiceAPI(params)
-        dealResult(result, key);
+        dealResult(result, key, '操作成功');
         break;
       case 'update': 
         result = await upgradeServiceAPI(params)
-        dealResult(result, key);
+        dealResult(result, key, '操作成功');
         break;
       default:;
     }    
+    currentTab === 'StatusTab' && getInfos({serviceInstanceId: serviceId})
     setBtnLoading(false)
+    setCurrentAction('');
+  }
+
+  const handleOpenChange = (flag: boolean) => {
+    setDropdpwnStatus(flag);
+  };
+  const handleCancel = () => {
+    setDropdpwnStatus(false)
+    setCurrentAction('');
   }
 
   const btnLoadingStatus = (key: string) => {
@@ -152,7 +165,105 @@ const serviceListDetail: React.FC = () => {
           title: <>{serviceName}</>,
           extra: [
             <div className={styles.btnsWrap} key="serviceDetailPageBtns" >
-              <Popconfirm
+              <Dropdown 
+                          trigger={['click']}
+                          open={dropdpwnStatus}
+                          onOpenChange={handleOpenChange}
+                          dropdownRender={(menu) => (
+                            <div className={styles.dropdownContent}>
+                              <div className={styles.actionSelects}>
+                                <Popconfirm
+                                      key='startPop'
+                                      placement="left"
+                                      title="确定要启动吗?"
+                                      onConfirm={()=>{ handleACT('start') }}
+                                      onCancel={()=>{ handleCancel()} }
+                                      okText="确定"
+                                      cancelText="取消"
+                                >
+                                  <div className={
+                                    `${styles.actionItem} ${currentAction=='启动' ? styles.clickedItem : ''}`
+                                  } onClick={()=>{setCurrentAction('启动')}} >
+                                    <PlayCircleOutlined/>&nbsp; 启动
+                                  </div> 
+                                </Popconfirm>
+                                <Popconfirm
+                                      key='stopPop'
+                                      placement="left"
+                                      title="确定要停止吗?"
+                                      onConfirm={()=>{ handleACT('stop') }}
+                                      onCancel={()=>{ handleCancel()} }
+                                      okText="确定"
+                                      cancelText="取消"
+                                >
+                                  <div 
+                                    className={`${styles.actionItem} ${currentAction=='停止' ? styles.clickedItem : ''}`}
+                                    onClick={()=>{setCurrentAction('停止')}}
+                                  >
+                                    <PoweroffOutlined/>&nbsp; 停止
+                                  </div> 
+                                </Popconfirm>
+                                <Popconfirm
+                                      key='restartPop'
+                                      placement="left"
+                                      title="确定要重启吗?"
+                                      onConfirm={()=>{ handleACT('restart') }}
+                                      onCancel={()=>{ handleCancel()} }
+                                      okText="确定"
+                                      cancelText="取消"
+                                    >
+                                    <div 
+                                      className={`${styles.actionItem} ${currentAction=='重启' ? styles.clickedItem : ''}`}
+                                      onClick={()=>{setCurrentAction('重启')}}
+                                    >
+                                      <ReloadOutlined/>&nbsp; 重启
+                                    </div> 
+                                </Popconfirm>
+                                <Popconfirm
+                                  placement="left"
+                                  title="确定要更新配置吗"
+                                  onConfirm={()=>{
+                                    handleACT('update')
+                                  }}
+                                  onCancel={()=>{ handleCancel()} }
+                                  okText="确定"
+                                  cancelText="取消"
+                                >
+                                  <div 
+                                    className={`${styles.actionItem} ${currentAction=='更新配置' ? styles.clickedItem : ''}`}
+                                    onClick={()=>{setCurrentAction('更新配置')}}
+                                  >
+                                    <ExceptionOutlined/>&nbsp; 更新配置
+                                  </div> 
+                                </Popconfirm>
+                                <Popconfirm
+                                  placement="left"
+                                  title="确定删除该服务吗？"
+                                  onConfirm={()=>{
+                                    handleACT('delete')
+                                  }}
+                                  onCancel={()=>{ handleCancel()} }
+                                  okText="确定"
+                                  cancelText="取消"
+                                >
+                                  <div 
+                                    className={`${styles.actionItem} ${currentAction=='删除' ? styles.clickedItem : ''}`}
+                                    onClick={()=>{setCurrentAction('删除')}}
+                                  >
+                                    <DeleteOutlined/>&nbsp; 删除
+                                  </div> 
+                                </Popconfirm>
+                              </div>
+                            </div>
+                          )}
+                        >
+                        <a 
+                          onClick={()=>{ setCurrentAction('');setDropdpwnStatus(true) }}
+                        >{btnLoading?<>{`${currentAction}中 `}<LoadingOutlined /></>:<>服务操作&nbsp;<DownOutlined /></>}  
+                        
+                        </a>
+                        </Dropdown>
+              {/* <Popconfirm
                     key='startPop'
                     title="确定要启动吗?"
                     onConfirm={()=>handleACT('start')}
@@ -248,7 +359,7 @@ const serviceListDetail: React.FC = () => {
                   >
                     删除
                   </Button>
-              </Popconfirm>
+              </Popconfirm> */}
             </div> 
           ]
       }}
