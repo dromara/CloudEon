@@ -84,6 +84,13 @@ export default [
     footerRender: false, // 不展示页脚
   },
   {
+    name: 'logSearch',
+    icon: 'FileSearchOutlined',
+    path: '/colony/logSearch',
+    component: './colony/logSearch',
+    footerRender: false, // 不展示页脚
+  },
+  {
     path: '/user',
     layout: false,
     routes: [
