@@ -48,6 +48,19 @@ public class K8sFileBrowserTest {
         }
     }
 
+    /**
+     * Download directory from Pod
+     */
+    @Test
+    public void downloadDirInPod() {
+        try (KubernetesClient k8s = new KubernetesClientBuilder().build()) {
+            File fileToDownload = new File("E:\\workspace\\CloudEon\\");
+            k8s.pods().inNamespace("default") // <- Namespace of Pod
+                    .withName("hadoop-hdfs-datanode-hdfs1-9f5f7c69f-6x2wg") // <- Name of Pod
+                    .dir("/tmp/monitor-dir").copy(fileToDownload.toPath());
+        }
+    }
+
     @Test
     public void viewFileInPod() throws IOException {
         KubernetesClient k8s = new KubernetesClientBuilder().build();
