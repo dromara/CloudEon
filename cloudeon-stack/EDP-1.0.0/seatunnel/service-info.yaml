@@ -1,0 +1,57 @@
+name: SEATUNNEL
+label: "Seatunnel"
+description: "海量数据同步引擎"
+version: 2.3.1
+dockerImage: "registry.cn-hangzhou.aliyuncs.com/udh/seatunnel:2.3.1"
+dependencies:
+    - "HDFS"
+
+runAs: hadoop
+
+supportKerberos: true
+
+dashboard:
+  uid: ""
+
+roles:
+
+  - name: SEATUNNEL_SERVER
+    label: "Seatunnel Server"
+    roleFullName: "seatunnel-server"
+    sortNum: 1
+    type: MASTER
+    minNum: 1
+#    linkExpression: "http://${localhostname}:${conf['flink.history.ui.port']}"
+    logFile: "seatunnel-engine-server.log"
+
+
+persistencePaths:
+  - /opt/edp/${service.serviceName}/conf
+  - /opt/edp/${service.serviceName}/log
+  - /opt/edp/${service.serviceName}/data
+
+
+customConfigFiles: []
+
+
+configurations:
+  - name: "seatunnel.server.join.port"
+    recommendExpression: "5801"
+    valueType: InputNumber
+    configurableInWizard: true
+    description: "seatunnel  server join 端口"
+    tag: "端口"
+
+  - name: "seatunnel.fs.storage"
+    recommendExpression: "/tmp/seatunnel/checkpoint_snapshot"
+    valueType: InputString
+    configurableInWizard: true
+    description: "seatunnel server的存储目录"
+    tag: "常用参数"
+
+  - name: "seatunnel.cluster.name"
+    recommendExpression: "seatunnel"
+    valueType: InputString
+    configurableInWizard: true
+    description: "集群标识"
+    tag: "常用参数"
