@@ -52,8 +52,17 @@ spec:
           timeoutSeconds: 2
         name: "${roleServiceFullName}"
         resources:
-          requests: {}
-          limits: {}
+          requests:
+            memory: "${conf['kafka.container.request.memory']}Mi"
+            cpu: "${conf['kafka.container.request.cpu']}"
+          limits:
+            memory: "${conf['kafka.container.limit.memory']}Mi"
+            cpu: "${conf['kafka.container.limit.cpu']}"
+        env:
+          - name: MEM_LIMIT
+            valueFrom:
+              resourceFieldRef:
+                resource: limits.memory
         securityContext:
           privileged: true
         volumeMounts:
