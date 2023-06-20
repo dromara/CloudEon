@@ -139,22 +139,10 @@ public class ClusterServiceController {
         for (InitServiceRequest.ServiceInfo serviceInfo : sortedServiceInfos) {
 
             Integer stackServiceId = serviceInfo.getStackServiceId();
-            // 查询实例表获取新增的实例序号
-            ServiceInstanceSeqEntity serviceInstanceSeqEntity = serviceInstanceSeqRepository.findByStackServiceId(stackServiceId);
-            Integer maxInstanceSeq;
-            // 不存在该服务的序号，说明之前没安装过
-            if (serviceInstanceSeqEntity == null) {
-                maxInstanceSeq = 1;
-                serviceInstanceSeqEntity = ServiceInstanceSeqEntity.builder().maxSeq(maxInstanceSeq).stackServiceId(stackServiceId).build();
-            } else {
-                maxInstanceSeq = serviceInstanceSeqEntity.getMaxSeq() + 1;
-                serviceInstanceSeqEntity.setMaxSeq(maxInstanceSeq);
-            }
 
             ServiceInstanceEntity serviceInstanceEntity = new ServiceInstanceEntity();
-            serviceInstanceEntity.setInstanceSequence(maxInstanceSeq);
             String stackServiceName = serviceInfo.getStackServiceName().toLowerCase();
-            String serviceName = stackServiceName + maxInstanceSeq;
+            String serviceName = stackServiceName;
             serviceInstanceEntity.setServiceName(serviceName);
             serviceInstanceEntity.setLabel(serviceInfo.getStackServiceLabel());
             serviceInstanceEntity.setClusterId(clusterId);
@@ -169,8 +157,6 @@ public class ClusterServiceController {
 
             // 持久化service信息
             serviceInstanceRepository.save(serviceInstanceEntity);
-            // 持久化service instance 序号
-            serviceInstanceSeqRepository.save(serviceInstanceSeqEntity);
             // 获取持久化后的service 实例id
             Integer serviceInstanceEntityId = serviceInstanceEntity.getId();
             installedServiceInstanceIds.add(serviceInstanceEntityId);

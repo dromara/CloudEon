@@ -41,38 +41,31 @@ spec:
       hostNetwork: true
       containers:
       - args:
-          - "/opt/edp/${service.serviceName}/conf/bootstrap-kafkaserver.sh"
-
+          - "/home/hadoop/apache-seatunnel/config/bootstrap-seatunnelserver.sh"
+        env:
+          - name: "USER"
+            value: "${runAs}"
         image: "${dockerImage}"
         imagePullPolicy: "Always"
         readinessProbe:
           tcpSocket:
-            port: ${conf['kafka.listeners.port']}
+            port: ${conf['seatunnel.server.join.port']}
           initialDelaySeconds: 10
           timeoutSeconds: 2
         name: "${roleServiceFullName}"
         resources:
-          requests:
-            memory: "${conf['kafka.container.request.memory']}Mi"
-            cpu: "${conf['kafka.container.request.cpu']}"
-          limits:
-            memory: "${conf['kafka.container.limit.memory']}Mi"
-            cpu: "${conf['kafka.container.limit.cpu']}"
-        env:
-          - name: MEM_LIMIT
-            valueFrom:
-              resourceFieldRef:
-                resource: limits.memory
+          requests: {}
+          limits: {}
         securityContext:
           privileged: true
         volumeMounts:
         - mountPath: "/opt/edp/${service.serviceName}/data"
           name: "data"
-        - mountPath: "/opt/edp/${service.serviceName}/log"
+        - mountPath: "/home/hadoop/apache-seatunnel/logs"
           name: "log"
         - mountPath: "/etc/localtime"
           name: "timezone"
-        - mountPath: "/opt/edp/${service.serviceName}/conf"
+        - mountPath: "/home/hadoop/apache-seatunnel/config"
           name: "conf"
 
       nodeSelector:
