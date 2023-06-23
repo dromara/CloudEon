@@ -20,6 +20,10 @@
 
 # Set environment variables here.
 
+<#assign ramPercentage = conf['hbase.heap.memory.percentage']?number>
+export HBASE_HEAP_MEMORY=$[ $MEM_LIMIT / 1024 / 1024  * ${ramPercentage} / 100 ]M
+export HBASE_MASTER_OPTS=" -Xmx$HBASE_HEAP_MEMORY -Xms$HBASE_HEAP_MEMORY  $HBASE_MASTER_OPTS"
+export HBASE_REGIONSERVER_OPTS=" -Xmx$HBASE_HEAP_MEMORY -Xms$HBASE_HEAP_MEMORY $HBASE_REGIONSERVER_OPTS"
 
 # Uncomment and adjust to enable JMX exporting
 # See jmxremote.password and jmxremote.access in $JRE_HOME/lib/management to configure remote password access.
