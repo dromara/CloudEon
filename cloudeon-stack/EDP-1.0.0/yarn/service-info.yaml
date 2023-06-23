@@ -332,24 +332,6 @@ configurations:
     valueType: InputString
     confFile: "yarn-site.xml"
     tag: "高级参数"
-  - name: yarn.nodemanager.resource.cpu-vcores
-    recommendExpression: 6
-    min: 2
-    max: 64
-    valueType: Slider
-    unit: core
-    confFile: "yarn-site.xml"
-    configurableInWizard: true
-    tag: "资源管理"
-  - name: yarn.nodemanager.resource.memory-mb
-    recommendExpression: 65536
-    min: 1024
-    max: 165536
-    valueType: Slider
-    unit: MB
-    confFile: "yarn-site.xml"
-    configurableInWizard: true
-    tag: "资源管理"
   - name: yarn.nodemanager.delete.debug-delay-sec
     recommendExpression: 86400
     min: 1
@@ -380,40 +362,147 @@ configurations:
     valueType: InputNumber
     configurableInWizard: true
     tag: "端口"
-    
-  - name: yarn.resourcemanager.memory
+
+  - name: yarn.heap.memory.percentage
+    description: "yarn 系列组件(nodemanager除外) jvm堆内存占容器内存限额的百分比"
+    recommendExpression: 75
+    min: 10
+    max: 80
+    valueType: InputNumber
+    unit: ".0"
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: hadop.yarn.rm.container.limit.cpu
+    description: "Hadoop-yarn resourcemanager容器的CPU使用限额"
+    recommendExpression: 1.0
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: hadop.yarn.rm.container.limit.memory
+    description: "Hadoop-yarn resourcemanager容器的内存使用限额，单位MB"
+    recommendExpression: 2048
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: hadop.yarn.rm.container.request.cpu
+    description: "Hadoop-yarn resourcemanager容器的CPU请求量"
+    recommendExpression: 0.2
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: hadop.yarn.rm.container.request.memory
+    description: "Hadoop-yarn resourcemanager容器的内存请求量，单位MB"
     recommendExpression: 1024
-    min: 1024
-    max: 65536
-    valueType: Slider
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: hadop.yarn.nm.container.limit.cpu
+    description: "Hadoop-yarn nodemanager容器的CPU使用限额"
+    recommendExpression: 4.0
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: hadop.yarn.nm.container.limit.memory
+    description: "Hadoop-yarn nodemanager容器的内存使用限额，单位MB"
+    recommendExpression: 8192
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: hadop.yarn.nm.container.request.cpu
+    description: "Hadoop-yarn nodemanager容器的CPU请求量"
+    recommendExpression: 0.5
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: hadop.yarn.nm.container.request.memory
+    description: "Hadoop-yarn nodemanager容器的内存请求量，单位MB"
+    recommendExpression: 1024
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: yarn.nodemanager.heap.memory
+    description: "Hadoop-yarn nodemanager jvm堆内存，单位MB"
+    recommendExpression: 1024
+    valueType: InputNumber
     unit: MB
     configurableInWizard: true
-    tag: "端口"
-  - name: yarn.nodemanager.memory
-    recommendExpression: 1024
-    min: 1024
-    max: 65536
-    valueType: Slider
-    unit: MB
+    tag: "资源管理"
+  - name: yarn.nodemanager.resource.cpu-vcores
+    description: "yarn-nm pod可以分配给yarn任务容器的vcores的数量,应小于容器cpu limit值(预留部分给nm进程和pod内其他地方使用)"
+    recommendExpression: 3
+    valueType: InputNumber
+    unit: core
+    confFile: "yarn-site.xml"
     configurableInWizard: true
-    tag: "端口"
-  - name: yarn.historyserver.memory
-    recommendExpression: 1024
-    min: 1024
-    max: 65536
-    valueType: Slider
+    tag: "资源管理"
+  - name: yarn.nodemanager.resource.memory-mb
+    description: "yarn-nm pod可以分配给yarn任务容器的内存量，单位为MB。其与yarn.nodemanager.heap.memory参数之和应小于容器内存limit值(预留部分给pod内其他地方使用)"
+    recommendExpression: 6144
+    valueType: InputNumber
     unit: MB
+    confFile: "yarn-site.xml"
     configurableInWizard: true
-    tag: "端口"
-  - name: yarn.timelineserver.memory
+    tag: "资源管理"
+
+  - name: hadop.yarn.hs.container.limit.cpu
+    description: "Hadoop-yarn historyserver容器的CPU使用限额"
+    recommendExpression: 1.0
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: hadop.yarn.hs.container.limit.memory
+    description: "Hadoop-yarn historyserver容器的内存使用限额，单位MB"
+    recommendExpression: 2048
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: hadop.yarn.hs.container.request.cpu
+    description: "Hadoop-yarn historyserver容器的CPU请求量"
+    recommendExpression: 0.2
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: hadop.yarn.hs.container.request.memory
+    description: "Hadoop-yarn historyserver容器的内存请求量，单位MB"
     recommendExpression: 1024
-    min: 1024
-    max: 65536
-    valueType: Slider
-    unit: MB
+    valueType: InputNumber
+    unit: Mi
     configurableInWizard: true
-    tag: "端口"
- 
+    tag: "资源管理"
+
+  - name: hadop.yarn.tl.container.limit.cpu
+    description: "Hadoop-yarn timelineserver容器的CPU使用限额"
+    recommendExpression: 1.0
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: hadop.yarn.tl.container.limit.memory
+    description: "Hadoop-yarn timelineserver容器的内存使用限额，单位MB"
+    recommendExpression: 2048
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: hadop.yarn.tl.container.request.cpu
+    description: "Hadoop-yarn timelineserver容器的CPU请求量"
+    recommendExpression: 0.2
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: hadop.yarn.tl.container.request.memory
+    description: "Hadoop-yarn timelineserver容器的内存请求量，单位MB"
+    recommendExpression: 1024
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
 
 
 
