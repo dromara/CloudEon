@@ -58,8 +58,17 @@ spec:
           timeoutSeconds: 1
         name: "${roleServiceFullName}"
         resources:
-          requests: {}
-          limits: {}
+          requests:
+            memory: "${conf['hadop.hdfs.dn.container.request.memory']}Mi"
+            cpu: "${conf['hadop.hdfs.dn.container.request.cpu']}"
+          limits:
+            memory: "${conf['hadop.hdfs.dn.container.limit.memory']}Mi"
+            cpu: "${conf['hadop.hdfs.dn.container.limit.cpu']}"
+        env:
+          - name: MEM_LIMIT
+            valueFrom:
+              resourceFieldRef:
+                resource: limits.memory
         securityContext:
           privileged: true
         volumeMounts:
