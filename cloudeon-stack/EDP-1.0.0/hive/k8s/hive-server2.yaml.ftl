@@ -47,6 +47,10 @@ spec:
             value: "server2"
           - name: "HIVE_CONF_DIR"
             value: "/opt/edp/${service.serviceName}/conf"
+          - name: MEM_LIMIT
+            valueFrom:
+              resourceFieldRef:
+                resource: limits.memory
         image: "${dockerImage}"
         imagePullPolicy: "Always"
         readinessProbe:
@@ -63,8 +67,12 @@ spec:
           timeoutSeconds: 1
         name: "${roleServiceFullName}"
         resources:
-          requests: {}
-          limits: {}
+          requests:
+            memory: "${conf['hive.server2.container.request.memory']}Mi"
+            cpu: "${conf['hive.server2.container.request.cpu']}"
+          limits:
+            memory: "${conf['hive.server2.container.limit.memory']}Mi"
+            cpu: "${conf['hive.server2.container.limit.cpu']}"
         securityContext:
           privileged: true
         volumeMounts:

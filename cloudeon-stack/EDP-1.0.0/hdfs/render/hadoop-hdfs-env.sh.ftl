@@ -48,27 +48,30 @@ export HADOOP_OPTS="$HADOOP_OPTS -Djava.net.preferIPv4Stack=true $HADOOP_CLIENT_
 
 # Command specific options appended to HADOOP_OPTS when specified
 # Export namenode memory
-<#assign namenodeMemory=conf['hdfs.namenode.memory']?trim?number>
+<#assign hdfsHeapRamPercentage = conf['hdfs.heap.memory.percentage']?trim?number>
+if [ -z $hdfsHeapRam ];then
+    if [ -z $MEM_LIMIT ];then
+        export hdfsHeapRam=2048M
+    else
+        export hdfsHeapRam=$[ $MEM_LIMIT / 1024 / 1024  * ${hdfsHeapRamPercentage} / 100 ]M
+    fi
+fi
+export hdfsZkfcRam=$(( $(echo $hdfsHeapRam | sed 's/[Mm]//g')  / 8 ))M
 
-export NAMENODE_MEMORY=${namenodeMemory?floor?c}m
-export HADOOP_NAMENODE_OPTS="-Xmx${namenodeMemory?floor?c}m -XX:+UseConcMarkSweepGC -XX:+ExplicitGCInvokesConcurrent -Dcom.sun.management.jmxremote.port=9912 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=5542:/opt/edp/${service.serviceName}/conf/jmx_prometheus.yaml $HADOOP_NAMENODE_OPTS"
-export HADOOP_SECONDARYNAMENODE_OPTS="-Xmx${namenodeMemory?floor?c}m -Dcom.sun.management.jmxremote.port=9913 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=5543:/opt/edp/${service.serviceName}/conf/jmx_prometheus.yaml $HADOOP_SECONDARYNAMENODE_OPTS"
+export HADOOP_HEAPSIZE_MAX=$hdfsHeapRam
+export HADOOP_HEAPSIZE_MIN=$hdfsHeapRam
+export HADOOP_NAMENODE_OPTS="-XX:+UseConcMarkSweepGC -XX:+ExplicitGCInvokesConcurrent -Dcom.sun.management.jmxremote.port=9912 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=5542:/opt/edp/${service.serviceName}/conf/jmx_prometheus.yaml $HADOOP_NAMENODE_OPTS"
+export HADOOP_SECONDARYNAMENODE_OPTS="-Dcom.sun.management.jmxremote.port=9913 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=5543:/opt/edp/${service.serviceName}/conf/jmx_prometheus.yaml $HADOOP_SECONDARYNAMENODE_OPTS"
 
-# Export zkfc memory
-<#assign zkfcMemory=conf['hdfs.zkfc.memory']?trim?number>
-export ZKFC_MEMORY=${zkfcMemory?floor?c}m
-export HADOOP_ZKFC_OPTS="-Xmx${zkfcMemory?floor?c}m -Dcom.sun.management.jmxremote.port=9914 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=5544:/opt/edp/${service.serviceName}/conf/jmx_prometheus.yaml $HADOOP_ZKFC_OPTS"
+export HADOOP_ZKFC_OPTS="-Xmx$hdfsZkfcRam -Xms$hdfsZkfcRam $HADOOP_ZKFC_OPTS"
+export HADOOP_ZKFC_OPTS="-Dcom.sun.management.jmxremote.port=9914 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=5544:/opt/edp/${service.serviceName}/conf/jmx_prometheus.yaml $HADOOP_ZKFC_OPTS"
 
 # Export datanode memory
-<#assign datanodeMemory=conf['hdfs.datanode.memory']?trim?number>
-export DATANODE_MEMORY=${datanodeMemory?floor?c}m
-export HADOOP_DATANODE_OPTS="-Xmx${datanodeMemory?floor?c}m -Dcom.sun.management.jmxremote.port=9915 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=5545:/opt/edp/${service.serviceName}/conf/jmx_prometheus.yaml $HADOOP_DATANODE_OPTS"
+export HADOOP_DATANODE_OPTS="-Dcom.sun.management.jmxremote.port=9915 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=5545:/opt/edp/${service.serviceName}/conf/jmx_prometheus.yaml $HADOOP_DATANODE_OPTS"
 
-# Export journalnode memory
-<#assign journalnodeMemory=conf['hdfs.journalnode.memory']?trim?number>export JOURNALNODE_MEMORY=${journalnodeMemory?floor?c}m
-export HADOOP_JOURNALNODE_OPTS="-Xmx${journalnodeMemory?floor?c}m -Dcom.sun.management.jmxremote.port=9916 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=5546:/opt/edp/${service.serviceName}/conf/jmx_prometheus.yaml $HADOOP_JOURNALNODE_OPTS"
+export HADOOP_JOURNALNODE_OPTS="-Dcom.sun.management.jmxremote.port=9916 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=5546:/opt/edp/${service.serviceName}/conf/jmx_prometheus.yaml $HADOOP_JOURNALNODE_OPTS"
 
-export HADOOP_BALANCER_OPTS="-Xmx4096m -Dcom.sun.management.jmxremote $HADOOP_BALANCER_OPTS"
+export HADOOP_BALANCER_OPTS="-Dcom.sun.management.jmxremote $HADOOP_BALANCER_OPTS"
 
 # The following applies to multiple commands (fs, dfs, fsck, distcp etc)
 #export HADOOP_CLIENT_OPTS="-Xmx128m $HADOOP_CLIENT_OPTS"
