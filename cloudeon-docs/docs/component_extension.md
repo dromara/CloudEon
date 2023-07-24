@@ -21,8 +21,7 @@ CloudEon\cloudeon-stack\EDP-1.0.0\组件服务名
 #### 目录介绍
 
 如下7部分内容
-
-![目录介绍](images\目录介绍.png)
+![目录介绍](images/目录介绍.png)
 
 #### docker
 
@@ -30,13 +29,15 @@ CloudEon\cloudeon-stack\EDP-1.0.0\组件服务名
 build.sh：打镜像脚本
 ```
 
-![build.sh](images\build.sh.png)
-
+![build.sh](images/build.sh.png)
+此处推送的远程仓库为cloudeon社区的仓库，没有权限的话可以先推送到你自己的dockerhub或者私有仓库中。
+得保证cloudeon启动后能访问得到。
+image的全路径名和service-info.yaml中的要保持一致。
 ```
 Dockerfile：镜像内容
 ```
 
-![dockerfile](images\dockerfile.png)
+![dockerfile](images/dockerfile.png)
 
 #### icons
 
@@ -48,17 +49,17 @@ Dockerfile：镜像内容
 
 此处yaml.ftl文件前缀的命名就是组件的角色名，此处角色名是在service-info中的roleFullName，需要一一对应
 
-![k8s](images\k8s-1.png)
+![k8s](images/k8s-1.png)
 
 **注意**：如果服务内部需要配置相关环境变量，添加如下内容（以hive为例）
 
-![k8s-2](images\k8s-2.png)
+![k8s-2](images/k8s-2.png)
 
 #### prometheus
 
 此处json.ftl文件前缀的命名就是组件的角色名，此处角色名是在service-info中的roleFullName，需要一一对应
 
-![prometheus](images\prometheus.png)
+![prometheus](images/prometheus.png)
 
 #### render
 
@@ -66,7 +67,7 @@ Dockerfile：镜像内容
 
 1. bootstrap-组件服务名.sh.ftl
 
-   ![render](images\render.png)
+   ![render](images/render.png)
 
 2. 服务conf目录下的文件
 
@@ -90,9 +91,9 @@ rules:
 
 #### service-info
 
-![service-info-1](images\service-info-1.png)
+![service-info-1](images/service-info-1.png)
 
-![service-info-2](images\service-info-2.png)
+![service-info-2](images/service-info-2.png)
 
 ### 监控集成
 
