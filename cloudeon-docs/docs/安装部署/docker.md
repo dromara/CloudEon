@@ -4,6 +4,8 @@
 ```shell
  docker run  -p 7700:7700  --name cloudeon --rm registry.cn-hangzhou.aliyuncs.com/udh/cloudeon:dev
 ```
+其中`dev`对应的是dev分支，如果改成`v1.1.0`则是1.1.0版本。
+
 镜像启动成功后，在浏览器中访问 http://docker_ip:7700 进入登录页。镜像中提供初始账户，用户名 admin 密码 admin
 
 
