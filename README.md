@@ -2,6 +2,10 @@
 <h1>CloudEon云原生大数据平台</h1>
 
 [![GitHub Pull Requests](https://img.shields.io/github/stars/dromara/CloudEon)](https://github.com/dromara/CloudEon/stargazers)
+[![Gitee Star](https://gitee.com/dromara/cloudeon/badge/star.svg?theme=dark)](https://gitee.com/dromara/CloudEon/stargazers)
+
+
+
 [![HitCount](https://views.whatilearened.today/views/github/dromara/CloudEon.svg)](https://github.com/dromara/CloudEon)
 [![Commits](https://img.shields.io/github/commit-activity/m/dromara/CloudEon?color=ffff00)](https://github.com/dromara/CloudEon/commits/main)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
