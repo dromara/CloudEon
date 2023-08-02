@@ -22,9 +22,9 @@
 
 注：如果进度一直卡在等待deployment成功，可通过用`kubectl get pod `以及`kubectl get deployment`查看组件安装部署状态。
 
-如遇错误现象可通过kubectl describe pod ${pod_name}命令查看具体错误信息。
+如遇错误现象可通过`kubectl describe pod ${pod_name}`命令查看具体错误信息。
 
-常见污点问题，可通过去除污点命令kubectl taint nodes --all ${node_name} (该命令可通过以上错误信息中查看)
+常见污点问题，可通过去除污点命令`kubectl taint nodes --all ${node_name} `，(该命令可通过以上错误信息中查看)
 
 
 
