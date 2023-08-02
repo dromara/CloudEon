@@ -2,7 +2,7 @@
 <h1>CloudEon云原生大数据平台</h1>
 
 [![GitHub Pull Requests](https://img.shields.io/github/stars/dromara/CloudEon)](https://github.com/dromara/CloudEon/stargazers)
-[![Gitee Star](https://gitee.com/dromara/cloudeon/badge/star.svg?theme=dark)](https://gitee.com/dromara/CloudEon/stargazers)
+[![Gitee Star](https://gitee.com/dromara/cloudeon/badge/star.svg?theme=gvp)](https://gitee.com/dromara/CloudEon/stargazers)
 
 
 
