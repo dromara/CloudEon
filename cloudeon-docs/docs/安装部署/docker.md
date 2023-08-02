@@ -73,5 +73,5 @@ logging.config=${cloudeon.home.path}/conf/logback.xml
 ## 配置文件挂载
 运行以下命令，使用新建的 application.properties 配置启动镜像
 ```
-docker run -d --name cloudeon -v your_path/application.properties:/usr/local/cloudeon/conf/application.properties -p 7700:7700 peterpoker/cloudeon
+docker run -d --name cloudeon -v your_path/application.properties:/usr/local/cloudeon/conf/application.properties -p 7700:7700 registry.cn-hangzhou.aliyuncs.com/udh/cloudeon:dev
 ```
