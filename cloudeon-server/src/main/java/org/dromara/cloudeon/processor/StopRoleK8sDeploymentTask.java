@@ -63,7 +63,7 @@ public class StopRoleK8sDeploymentTask extends BaseCloudeonTask {
         // 读取本地k8s资源工作目录  ${workHome}/k8s-resource/ZOOKEEPER1/
         String k8sResourceDirPath = workHome + File.separator + Constant.K8S_RESOURCE_DIR + File.separator + serviceInstanceEntity.getServiceName();
         String k8sServiceResourceFilePath = k8sResourceDirPath + File.separator + roleFullName + ".yaml";
-        log.info("本地资源文件: {}", k8sServiceResourceFilePath)
+        log.info("本地资源文件: {}", k8sServiceResourceFilePath);
 
         // 判断k8s资源文件是否存在
         if (new File(k8sServiceResourceFilePath).exists()) {
