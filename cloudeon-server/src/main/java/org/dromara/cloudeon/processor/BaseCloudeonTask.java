@@ -110,8 +110,7 @@ public abstract class BaseCloudeonTask implements Runnable {
     }
 
     private void doWhenError(Exception e) {
-        e.printStackTrace();
-        log.info(taskParam.getCommandTaskId() + ":发生异常，处理异常。。。" + e.getMessage());
+        log.error("CommandTask:"+taskParam.getCommandTaskId() + "发生异常，处理异常。。。" + e.getMessage(),e);
         CommandTaskEntity commandTaskEntity = commandTaskRepository.findById(taskParam.getCommandTaskId()).get();
         commandTaskEntity.setEndTime(new Date());
         commandTaskEntity.setCommandState(CommandState.ERROR);
