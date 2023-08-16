@@ -28,6 +28,7 @@ import okhttp3.Response;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 import org.dromara.cloudeon.dao.ClusterInfoRepository;
+import org.dromara.cloudeon.dto.VolumeMountDTO;
 import org.dromara.cloudeon.utils.ByteConverter;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
@@ -202,49 +203,7 @@ public class K8sTest {
         System.out.println(items.size());
     }
 
-    /**
-     * test.sh
-     * <p>
-     * <p>
-     * for i in $(seq 1 20); do
-     * echo "Loop $i"
-     * sleep 1
-     * if [ $i -eq 13 ]; then
-     * echo "Error occurred"
-     * exit 1
-     * fi
-     * done
-     * <p>
-     * echo "Finished"
-     */
-    @Test
-    public void job() throws FileNotFoundException, InterruptedException {
 
-        Config config = Config.fromKubeconfig("apiVersion: v1\n" +
-                "clusters:\n" +
-                "- cluster:\n" +
-                "    certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUJlRENDQVIyZ0F3SUJBZ0lCQURBS0JnZ3Foa2pPUFFRREFqQWpNU0V3SHdZRFZRUUREQmhyTTNNdGMyVnkKZG1WeUxXTmhRREUyT1RJd01EVTFPRFF3SGhjTk1qTXdPREUwTURrek16QTBXaGNOTXpNd09ERXhNRGt6TXpBMApXakFqTVNFd0h3WURWUVFEREJock0zTXRjMlZ5ZG1WeUxXTmhRREUyT1RJd01EVTFPRFF3V1RBVEJnY3Foa2pPClBRSUJCZ2dxaGtqT1BRTUJCd05DQUFSd1BxcUYwMVFVaDJwenlpekFmSzNqNGh4dDNUMXF0ZXdZYjBkeDFxRDcKVURlUlI5QzR1RXZxY3dwVDRDSTViTytGZjlHM08xOUZockJ0aDNUQUpVblhvMEl3UURBT0JnTlZIUThCQWY4RQpCQU1DQXFRd0R3WURWUjBUQVFIL0JBVXdBd0VCL3pBZEJnTlZIUTRFRmdRVU1oaU95T0ZZUUw0bWd5SzRNeFJ1CjIxc25qTzB3Q2dZSUtvWkl6ajBFQXdJRFNRQXdSZ0loQU5Oais2Q0ZaSUhmZVFvS3ZuRUZVSlo1UlY3RFFWblcKc1FQRTZwYjJjWGxrQWlFQW1oV25FWVRTS3JMYTA0YmVjZkc0aTBoNjFBTUFBcWl3VmlQa2ZIZ2Q1anc9Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K\n" +
-                "    server: https://192.168.65.2:6443\n" +
-                "  name: default\n" +
-                "contexts:\n" +
-                "- context:\n" +
-                "    cluster: default\n" +
-                "    user: default\n" +
-                "  name: default\n" +
-                "current-context: default\n" +
-                "kind: Config\n" +
-                "preferences: {}\n" +
-                "users:\n" +
-                "- name: default\n" +
-                "  user:\n" +
-                "    client-certificate-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUJrakNDQVRlZ0F3SUJBZ0lJS2RjZXJ3SUdMdVV3Q2dZSUtvWkl6ajBFQXdJd0l6RWhNQjhHQTFVRUF3d1kKYXpOekxXTnNhV1Z1ZEMxallVQXhOamt5TURBMU5UZzBNQjRYRFRJek1EZ3hOREE1TXpNd05Gb1hEVEkwTURneApNekE1TXpNd05Gb3dNREVYTUJVR0ExVUVDaE1PYzNsemRHVnRPbTFoYzNSbGNuTXhGVEFUQmdOVkJBTVRESE41CmMzUmxiVHBoWkcxcGJqQlpNQk1HQnlxR1NNNDlBZ0VHQ0NxR1NNNDlBd0VIQTBJQUJEUUVJb3lCajl6ZmNiNFIKdDZrdnlwMkVRQTlkQVZYNlE0dkgyUElWblphM0pNd3dXcVpFZlVxTURFSzIwRWJ3M1kvZmdHQldNeUh4d3MrRQoxVUMrc2ttalNEQkdNQTRHQTFVZER3RUIvd1FFQXdJRm9EQVRCZ05WSFNVRUREQUtCZ2dyQmdFRkJRY0RBakFmCkJnTlZIU01FR0RBV2dCUmhSRnZ0eTlUdExvYzNkYzNjSUYyUWh3bEp0akFLQmdncWhrak9QUVFEQWdOSkFEQkcKQWlFQXJ1aGRxMm93NDFwVjErRFdkTUwyemZ3YXlJL25ZOGVaWnpNSG5seERpL2NDSVFEQ0JMcFJVdGUwVUprNgp3QS80RGRpOWEyd2VONVZaVFZsUVJHRGpFTGt3RWc9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCi0tLS0tQkVHSU4gQ0VSVElGSUNBVEUtLS0tLQpNSUlCZGpDQ0FSMmdBd0lCQWdJQkFEQUtCZ2dxaGtqT1BRUURBakFqTVNFd0h3WURWUVFEREJock0zTXRZMnhwClpXNTBMV05oUURFMk9USXdNRFUxT0RRd0hoY05Nak13T0RFME1Ea3pNekEwV2hjTk16TXdPREV4TURrek16QTAKV2pBak1TRXdId1lEVlFRRERCaHJNM010WTJ4cFpXNTBMV05oUURFMk9USXdNRFUxT0RRd1dUQVRCZ2NxaGtqTwpQUUlCQmdncWhrak9QUU1CQndOQ0FBUXBHRlhKZFhaU3o4T3FxZjd3U3M5aG1lMmtOSzN0VkF6VTVubGxmUUV5CnhFSFc0WUs4UzNtWlVDZUMrOXR1c0VrVSt5d2V6R09lMFVQWXBRNmp4V1ZWbzBJd1FEQU9CZ05WSFE4QkFmOEUKQkFNQ0FxUXdEd1lEVlIwVEFRSC9CQVV3QXdFQi96QWRCZ05WSFE0RUZnUVVZVVJiN2N2VTdTNkhOM1hOM0NCZAprSWNKU2JZd0NnWUlLb1pJemowRUF3SURSd0F3UkFJZ0tMMHpUMDBhczRZZmoySmErMTVlbHdkbEFGVmZWTjVxCkI5OVNyNW1UMTVBQ0lIKzIwTlBMNnJ2S0lIOWJ0T0J1WjhCYWtRb1I1cUlaTDhraDd2WXI3eXlnCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K\n" +
-                "    client-key-data: LS0tLS1CRUdJTiBFQyBQUklWQVRFIEtFWS0tLS0tCk1IY0NBUUVFSUp0V0VJZzNFN3lIV09QbEcyajdqemNiRWRZN1Z5RUhxU3NOZEo4ald6U1hvQW9HQ0NxR1NNNDkKQXdFSG9VUURRZ0FFTkFRaWpJR1AzTjl4dmhHM3FTL0tuWVJBRDEwQlZmcERpOGZZOGhXZGxyY2t6REJhcGtSOQpTb3dNUXJiUVJ2RGRqOStBWUZZeklmSEN6NFRWUUw2eVNRPT0KLS0tLS1FTkQgRUMgUFJJVkFURSBLRVktLS0tLQo=\n");
-        KubernetesClient client = new KubernetesClientBuilder().withConfig(config).build();
-
-        K8sUtil.runJob("init-work",client,"/opt/edp/monitor/conf","openjdk:8-jdk-alpine","/opt/edp/monitor/conf/test.sh",log,"bar");
-
-
-    }
 
     @Test
     public void getPodEvent(){

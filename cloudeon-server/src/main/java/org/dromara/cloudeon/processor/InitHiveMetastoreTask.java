@@ -22,18 +22,22 @@ import cn.hutool.db.handler.StringHandler;
 import cn.hutool.db.sql.SqlExecutor;
 import cn.hutool.extra.spring.SpringUtil;
 import com.jcraft.jsch.Session;
+import io.fabric8.kubernetes.client.KubernetesClient;
 import lombok.NoArgsConstructor;
 import org.dromara.cloudeon.dao.ClusterNodeRepository;
 import org.dromara.cloudeon.dao.ServiceInstanceConfigRepository;
 import org.dromara.cloudeon.dao.ServiceInstanceRepository;
 import org.dromara.cloudeon.dao.ServiceRoleInstanceRepository;
 import org.dromara.cloudeon.dao.StackServiceRepository;
+import org.dromara.cloudeon.dto.VolumeMountDTO;
 import org.dromara.cloudeon.entity.ClusterNodeEntity;
 import org.dromara.cloudeon.entity.ServiceInstanceEntity;
 import org.dromara.cloudeon.entity.ServiceRoleInstanceEntity;
 import org.dromara.cloudeon.entity.StackServiceEntity;
+import org.dromara.cloudeon.service.KubeService;
 import org.dromara.cloudeon.service.SshPoolService;
 import org.dromara.cloudeon.utils.JschUtils;
+import org.dromara.cloudeon.utils.K8sUtil;
 
 import javax.sql.DataSource;
 import java.io.IOException;
@@ -56,6 +60,7 @@ public class InitHiveMetastoreTask extends BaseCloudeonTask {
         ClusterNodeRepository clusterNodeRepository = SpringUtil.getBean(ClusterNodeRepository.class);
         ServiceInstanceConfigRepository configRepository = SpringUtil.getBean(ServiceInstanceConfigRepository.class);
         SshPoolService sshPoolService = SpringUtil.getBean(SshPoolService.class);
+        KubeService kubeService = SpringUtil.getBean(KubeService.class);
 
 
         TaskParam taskParam = getTaskParam();
@@ -93,25 +98,17 @@ public class InitHiveMetastoreTask extends BaseCloudeonTask {
             ServiceRoleInstanceEntity firstNamenode = roleInstanceEntities.get(0);
             Integer nodeId = firstNamenode.getNodeId();
             ClusterNodeEntity nodeEntity = clusterNodeRepository.findById(nodeId).get();
-            String cmd = "";
-            String runtimeContainer = nodeEntity.getRuntimeContainer();
-            if (runtimeContainer.startsWith("docker")) {
-                cmd = String.format("docker run --net=host -v /opt/edp/%s/conf:/opt/edp/%s/conf  -v /opt/edp/%s/log:/opt/edp/%s/log  %s sh -c \"  /opt/edp/%s/conf/init-metastore-db.sh \"   ",
-                        serviceName, serviceName, serviceName, serviceName, stackServiceEntity.getDockerImage(), serviceName);
-            } else if (runtimeContainer.startsWith("containerd")) {
-                cmd = String.format("ctr run --rm --net-host --mount type=bind,src=/opt/edp/%s/conf,dst=/opt/edp/%s/conf,options=rbind:rw --mount type=bind,src=/opt/edp/%s/log,dst=/opt/edp/%s/log,options=rbind:rw  %s  init  sh -c \"  /opt/edp/%s/conf/init-metastore-db.sh \"   ",
-                        serviceName, serviceName, serviceName, serviceName, stackServiceEntity.getDockerImage(), serviceName);
-            }
-            String ip = nodeEntity.getIp();
-            log.info("在节点" + ip + "上执行命令:" + cmd);
-            Session clientSession = sshPoolService.openSession(nodeEntity);
-            try {
-                JschUtils.execCallbackLine(clientSession, Charset.defaultCharset(), DEFAULT_JSCH_TIMEOUT, cmd, null, remoteSshTaskLineHandler, remoteSshTaskErrorLineHandler);
 
-            } catch (IOException e) {
-                e.printStackTrace();
-                throw new RuntimeException(e);
-            }
+            // 启动K8S job
+            String jobCmd = String.format("/opt/edp/%s/conf/init-metastore-db.sh",serviceName);
+            String volumePath = String.format("/opt/edp/%s/conf", serviceName);
+            String volumePath2 = String.format("/opt/edp/%s/log", serviceName);
+            KubernetesClient kubeClient = kubeService.getKubeClient(serviceInstanceEntity.getClusterId());
+            VolumeMountDTO[] volumeMounts = {
+                    new VolumeMountDTO("config-volume", volumePath, volumePath),
+                    new VolumeMountDTO("config-volume2", volumePath2, volumePath2)};
+            K8sUtil.runJob("init-hive-db", kubeClient, volumeMounts, stackServiceEntity.getDockerImage(), jobCmd, log, nodeEntity.getHostname());
+
 
         }
     }

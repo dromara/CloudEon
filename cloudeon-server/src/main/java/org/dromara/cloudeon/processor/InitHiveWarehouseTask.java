@@ -18,17 +18,21 @@ package org.dromara.cloudeon.processor;
 
 import cn.hutool.extra.spring.SpringUtil;
 import com.jcraft.jsch.Session;
+import io.fabric8.kubernetes.client.KubernetesClient;
 import lombok.NoArgsConstructor;
 import org.dromara.cloudeon.dao.ClusterNodeRepository;
 import org.dromara.cloudeon.dao.ServiceInstanceRepository;
 import org.dromara.cloudeon.dao.ServiceRoleInstanceRepository;
 import org.dromara.cloudeon.dao.StackServiceRepository;
+import org.dromara.cloudeon.dto.VolumeMountDTO;
 import org.dromara.cloudeon.entity.ClusterNodeEntity;
 import org.dromara.cloudeon.entity.ServiceInstanceEntity;
 import org.dromara.cloudeon.entity.ServiceRoleInstanceEntity;
 import org.dromara.cloudeon.entity.StackServiceEntity;
+import org.dromara.cloudeon.service.KubeService;
 import org.dromara.cloudeon.service.SshPoolService;
 import org.dromara.cloudeon.utils.JschUtils;
+import org.dromara.cloudeon.utils.K8sUtil;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -46,7 +50,7 @@ public class InitHiveWarehouseTask extends BaseCloudeonTask {
         StackServiceRepository stackServiceRepository = SpringUtil.getBean(StackServiceRepository.class);
         ServiceRoleInstanceRepository roleInstanceRepository = SpringUtil.getBean(ServiceRoleInstanceRepository.class);
         ClusterNodeRepository clusterNodeRepository = SpringUtil.getBean(ClusterNodeRepository.class);
-        SshPoolService sshPoolService = SpringUtil.getBean(SshPoolService.class);
+        KubeService kubeService = SpringUtil.getBean(KubeService.class);
 
         TaskParam taskParam = getTaskParam();
         Integer serviceInstanceId = taskParam.getServiceInstanceId();
@@ -59,24 +63,14 @@ public class InitHiveWarehouseTask extends BaseCloudeonTask {
         ServiceRoleInstanceEntity firstNamenode = roleInstanceEntities.get(0);
         Integer nodeId = firstNamenode.getNodeId();
         ClusterNodeEntity nodeEntity = clusterNodeRepository.findById(nodeId).get();
-        String cmd = "";
-        String runtimeContainer = nodeEntity.getRuntimeContainer();
-        if (runtimeContainer.startsWith("docker")) {
-            cmd = String.format("docker run --net=host -v /opt/edp/%s/conf:/opt/edp/%s/conf  %s sh -c \"  /opt/edp/%s/conf/init-warehouse-dir.sh \"   ",
-                    serviceName, serviceName, stackServiceEntity.getDockerImage(), serviceName);
-        } else if (runtimeContainer.startsWith("containerd")) {
-            cmd = String.format("ctr run --rm --net-host --mount type=bind,src=/opt/edp/%s/conf,dst=/opt/edp/%s/conf,options=rbind:rw  %s  init  sh -c \"  /opt/edp/%s/conf/init-warehouse-dir.sh \"   ",
-                    serviceName, serviceName, stackServiceEntity.getDockerImage(), serviceName);
-        }
-        String ip = nodeEntity.getIp();
-        log.info("在节点" + ip + "上执行命令:" + cmd);
-        Session clientSession = sshPoolService.openSession(nodeEntity);
-        try {
-            JschUtils.execCallbackLine(clientSession, Charset.defaultCharset(), DEFAULT_JSCH_TIMEOUT, cmd, null, remoteSshTaskLineHandler, remoteSshTaskErrorLineHandler);
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
+
+        // 启动K8S job
+        String jobCmd = String.format("/opt/edp/%s/conf/init-warehouse-dir.sh",serviceName);
+        String volumePath = String.format("/opt/edp/%s/conf", serviceName);
+        KubernetesClient kubeClient = kubeService.getKubeClient(serviceInstanceEntity.getClusterId());
+        VolumeMountDTO[] volumeMounts = {new VolumeMountDTO("config-volume", volumePath, volumePath)};
+        K8sUtil.runJob("init-hive-warehouse", kubeClient, volumeMounts, stackServiceEntity.getDockerImage(), jobCmd, log, nodeEntity.getHostname());
+
 
 
     }
