@@ -1,4 +1,5 @@
 -server
+-Xmx${conf['coordinator.jvm.maxHeapSize']}G
 -agentpath:/home/hadoop/trino/bin/libjvmkill.so
 -XX:InitialRAMPercentage=80
 -XX:MaxRAMPercentage=80
