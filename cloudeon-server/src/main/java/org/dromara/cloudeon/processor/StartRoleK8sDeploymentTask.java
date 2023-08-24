@@ -39,6 +39,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -122,10 +124,9 @@ public class StartRoleK8sDeploymentTask extends BaseCloudeonTask {
         }
 
         // 调用k8s命令启动资源
-        KubernetesClient client = kubeService.getKubeClient(serviceInstanceEntity.getClusterId());
-        String deploymentName ="";
-        try {
-            List<HasMetadata> metadata = client.load(new FileInputStream(outPutFile))
+        try (KubernetesClient client = kubeService.getKubeClient(serviceInstanceEntity.getClusterId())) {
+            String deploymentName = "";
+            List<HasMetadata> metadata = client.load(Files.newInputStream(Paths.get(outPutFile)))
                     .inNamespace("default")
                     .create();
             deploymentName = metadata.get(0).getMetadata().getName();
@@ -136,16 +137,12 @@ public class StartRoleK8sDeploymentTask extends BaseCloudeonTask {
             resource.waitUntilReady(amount, TimeUnit.MINUTES);
 
             // 打印deployment的输出日志
+            log.info("开始打印deployment: {} 的输出日志", deploymentName);
             RollableScalableResource<Deployment> scalableResource = client.apps().deployments().inNamespace("default").withName(deploymentName);
             log.info(scalableResource.getLog());
-        } catch (Exception e) {
-            // 打印deployment的输出日志
-            RollableScalableResource<Deployment> scalableResource = client.apps().deployments().inNamespace("default").withName(deploymentName);
-            log.error(scalableResource.getLog());
-            e.printStackTrace();
+        } catch (IOException e) {
+            log.error("k8s资源文件加载失败: {}", outPutFile);
             throw new RuntimeException(e);
-        }finally {
-            client.close();
         }
         // 更新角色实例状态为已启动
         List<ServiceRoleInstanceEntity> roleInstanceEntities = serviceRoleInstanceRepository.findByServiceInstanceIdAndServiceRoleName(serviceInstanceId, stackServiceRoleEntity.getName());

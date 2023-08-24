@@ -34,6 +34,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 为角色实例删除k8s deployment
@@ -72,8 +73,15 @@ public class StopRoleK8sDeploymentTask extends BaseCloudeonTask {
                 client.load(new FileInputStream(k8sServiceResourceFilePath))
                         .inNamespace("default")
                         .delete();
+                // 等待deployment完全停止
+                log.info("等待deployment完全停止: {}", roleFullName);
+                client.apps().deployments()
+                        .inNamespace("default")
+                        .withName(roleFullName)
+                        .waitUntilCondition(d -> d.getStatus().getReadyReplicas() == 0, 10, TimeUnit.MINUTES);
+
             } catch (FileNotFoundException e) {
-                e.printStackTrace();
+                log.error("k8s资源文件不存在: {}", k8sServiceResourceFilePath);
                 throw new RuntimeException(e);
             }
 
