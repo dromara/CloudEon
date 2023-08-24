@@ -17,6 +17,7 @@
 package org.dromara.cloudeon.processor;
 
 import cn.hutool.extra.spring.SpringUtil;
+import org.dromara.cloudeon.dao.ClusterInfoRepository;
 import org.dromara.cloudeon.dao.ServiceInstanceRepository;
 import org.dromara.cloudeon.dao.StackServiceRoleRepository;
 import org.dromara.cloudeon.entity.ServiceInstanceEntity;
@@ -35,6 +36,7 @@ public class ScaleDownK8sServiceTask extends BaseCloudeonTask {
         ServiceInstanceRepository serviceInstanceRepository = SpringUtil.getBean(ServiceInstanceRepository.class);
         KubeService kubeService = SpringUtil.getBean(KubeService.class);
         ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(taskParam.getServiceInstanceId()).get();
+        ClusterInfoRepository clusterInfoRepository = SpringUtil.getBean(ClusterInfoRepository.class);
 
         // 查询框架服务角色名获取deployment名字
         String roleName = taskParam.getRoleName();
@@ -43,8 +45,11 @@ public class ScaleDownK8sServiceTask extends BaseCloudeonTask {
         String serviceInstanceName = taskParam.getServiceInstanceName();
         String deploymentName = String.format("%s-%s", roleFullName, serviceInstanceName);
 
+        // 获取集群的namespace
+        String namespace = clusterInfoRepository.findById(serviceInstanceEntity.getClusterId()).get().getNamespace();
+
         try (KubernetesClient client = kubeService.getKubeClient(serviceInstanceEntity.getClusterId());) {
-            RollableScalableResource<Deployment> resource = client.apps().deployments().inNamespace("default").withName(deploymentName);
+            RollableScalableResource<Deployment> resource = client.apps().deployments().inNamespace(namespace).withName(deploymentName);
             Integer replicas = resource.get().getStatus().getReplicas();
             log.info("当前deployment: {} Replicas: {}", deploymentName, replicas);
             int count = replicas - 1;

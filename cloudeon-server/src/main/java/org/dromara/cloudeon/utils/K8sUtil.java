@@ -41,11 +41,11 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class K8sUtil {
-    public static void runJob(String name, KubernetesClient client, VolumeMountDTO[] volumeMounts, String image, String cmd, Logger logger, String hostname) {
+    public static void runJob(String namespace,String name, KubernetesClient client, VolumeMountDTO[] volumeMounts, String image, String cmd, Logger logger, String hostname) {
         // delete job
         logger.info("delete job if need ,job name: " + name);
         List<StatusDetails> statusDetailsList = client.batch().v1().jobs()
-                .inNamespace("default")
+                .inNamespace(namespace)
                 .withName(name)
                 .delete();
 

@@ -60,6 +60,8 @@ public class StartRoleK8sDeploymentTask extends BaseCloudeonTask {
         ServiceRoleInstanceRepository serviceRoleInstanceRepository = SpringUtil.getBean(ServiceRoleInstanceRepository.class);
         ServiceInstanceConfigRepository configRepository = SpringUtil.getBean(ServiceInstanceConfigRepository.class);
         KubeService kubeService = SpringUtil.getBean(KubeService.class);
+        ClusterInfoRepository clusterInfoRepository = SpringUtil.getBean(ClusterInfoRepository.class);
+
 
         CloudeonConfigProp cloudeonConfigProp = SpringUtil.getBean(CloudeonConfigProp.class);
         String workHome = cloudeonConfigProp.getWorkHome();
@@ -86,6 +88,8 @@ public class StartRoleK8sDeploymentTask extends BaseCloudeonTask {
             log.info("目录{}不存在，创建目录...",k8sResourceOutputPath);
             FileUtil.mkdir(k8sResourceOutputPath);
         }
+        // 获取集群的namespace
+        String namespace = clusterInfoRepository.findById(serviceInstanceEntity.getClusterId()).get().getNamespace();
 
         // 渲染生成k8s资源
         String k8sTemplateFileName = roleFullName + ".yaml.ftl";
@@ -107,6 +111,7 @@ public class StartRoleK8sDeploymentTask extends BaseCloudeonTask {
         dataModel.put("roleNodeCnt", roleNodeCnt);
         dataModel.put("runAs", stackServiceEntity.getRunAs());
         dataModel.put("conf", allConfigEntityList.stream().collect(Collectors.toMap(ServiceInstanceConfigEntity::getName, ServiceInstanceConfigEntity::getValue)));
+        dataModel.put("namespace", namespace);
 
         String outputFileName = null;
         outputFileName=StringUtils.substringBeforeLast(k8sTemplateFileName, ".ftl");
@@ -127,18 +132,18 @@ public class StartRoleK8sDeploymentTask extends BaseCloudeonTask {
         try (KubernetesClient client = kubeService.getKubeClient(serviceInstanceEntity.getClusterId())) {
             String deploymentName = "";
             List<HasMetadata> metadata = client.load(Files.newInputStream(Paths.get(outPutFile)))
-                    .inNamespace("default")
+                    .inNamespace(namespace)
                     .create();
             deploymentName = metadata.get(0).getMetadata().getName();
-            final Deployment deployment = client.apps().deployments().inNamespace("default").withName(deploymentName).get();
-            Resource<Deployment> resource = client.resource(deployment).inNamespace("default");
+            final Deployment deployment = client.apps().deployments().inNamespace(namespace).withName(deploymentName).get();
+            Resource<Deployment> resource = client.resource(deployment).inNamespace(namespace);
             int amount = 20;
             log.info("在k8s上启动deployment: {} ,使用本地资源文件: {} ,持续等待 {} 分钟", deploymentName, outPutFile, amount);
             resource.waitUntilReady(amount, TimeUnit.MINUTES);
 
             // 打印deployment的输出日志
             log.info("开始打印deployment: {} 的输出日志", deploymentName);
-            RollableScalableResource<Deployment> scalableResource = client.apps().deployments().inNamespace("default").withName(deploymentName);
+            RollableScalableResource<Deployment> scalableResource = client.apps().deployments().inNamespace(namespace).withName(deploymentName);
             log.info(scalableResource.getLog());
         } catch (IOException e) {
             log.error("k8s资源文件加载失败: {}", outPutFile);

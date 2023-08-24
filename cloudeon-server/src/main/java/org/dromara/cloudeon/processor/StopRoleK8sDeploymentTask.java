@@ -18,6 +18,7 @@ package org.dromara.cloudeon.processor;
 
 import cn.hutool.extra.spring.SpringUtil;
 import org.dromara.cloudeon.config.CloudeonConfigProp;
+import org.dromara.cloudeon.dao.ClusterInfoRepository;
 import org.dromara.cloudeon.dao.ServiceInstanceRepository;
 import org.dromara.cloudeon.dao.ServiceRoleInstanceRepository;
 import org.dromara.cloudeon.dao.StackServiceRoleRepository;
@@ -47,7 +48,7 @@ public class StopRoleK8sDeploymentTask extends BaseCloudeonTask {
         StackServiceRoleRepository stackServiceRoleRepository = SpringUtil.getBean(StackServiceRoleRepository.class);
         ServiceRoleInstanceRepository serviceRoleInstanceRepository = SpringUtil.getBean(ServiceRoleInstanceRepository.class);
         KubeService kubeService = SpringUtil.getBean(KubeService.class);
-
+        ClusterInfoRepository clusterInfoRepository = SpringUtil.getBean(ClusterInfoRepository.class);
 
         CloudeonConfigProp cloudeonConfigProp = SpringUtil.getBean(CloudeonConfigProp.class);
         String workHome = cloudeonConfigProp.getWorkHome();
@@ -55,6 +56,8 @@ public class StopRoleK8sDeploymentTask extends BaseCloudeonTask {
         // 获取服务实例信息
         Integer serviceInstanceId = taskParam.getServiceInstanceId();
         ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(serviceInstanceId).get();
+        // 获取集群的namespace
+        String namespace = clusterInfoRepository.findById(serviceInstanceEntity.getClusterId()).get().getNamespace();
 
         // 查询框架服务角色信息
         String roleName = taskParam.getRoleName();
@@ -71,12 +74,12 @@ public class StopRoleK8sDeploymentTask extends BaseCloudeonTask {
             log.info("在k8s上停止deployment ,使用本地资源文件: {}", k8sServiceResourceFilePath);
             try (KubernetesClient client = kubeService.getKubeClient(serviceInstanceEntity.getClusterId());) {
                 client.load(new FileInputStream(k8sServiceResourceFilePath))
-                        .inNamespace("default")
+                        .inNamespace(namespace)
                         .delete();
                 // 等待deployment完全停止
                 log.info("等待deployment完全停止: {}", roleFullName);
                 client.apps().deployments()
-                        .inNamespace("default")
+                        .inNamespace(namespace)
                         .withName(roleFullName)
                         .waitUntilCondition(d -> d.getStatus().getReadyReplicas() == 0, 10, TimeUnit.MINUTES);
 

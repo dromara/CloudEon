@@ -44,6 +44,12 @@ public class ClusterInfoEntity implements Serializable {
      * 创建人
      */
     private String createBy;
+
+    /**
+     * k8s的namespace
+     */
+    private String namespace;
+
     /**
      * 创建时间
      */

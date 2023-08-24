@@ -20,10 +20,7 @@ import cn.hutool.extra.spring.SpringUtil;
 import com.jcraft.jsch.Session;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import lombok.NoArgsConstructor;
-import org.dromara.cloudeon.dao.ClusterNodeRepository;
-import org.dromara.cloudeon.dao.ServiceInstanceRepository;
-import org.dromara.cloudeon.dao.ServiceRoleInstanceRepository;
-import org.dromara.cloudeon.dao.StackServiceRepository;
+import org.dromara.cloudeon.dao.*;
 import org.dromara.cloudeon.dto.VolumeMountDTO;
 import org.dromara.cloudeon.entity.ClusterNodeEntity;
 import org.dromara.cloudeon.entity.ServiceInstanceEntity;
@@ -52,6 +49,7 @@ public class InitYARNDirOnHDFSTask extends BaseCloudeonTask {
         ClusterNodeRepository clusterNodeRepository = SpringUtil.getBean(ClusterNodeRepository.class);
         SshPoolService sshPoolService = SpringUtil.getBean(SshPoolService.class);
         KubeService kubeService = SpringUtil.getBean(KubeService.class);
+        ClusterInfoRepository clusterInfoRepository = SpringUtil.getBean(ClusterInfoRepository.class);
 
         TaskParam taskParam = getTaskParam();
         Integer serviceInstanceId = taskParam.getServiceInstanceId();
@@ -65,13 +63,15 @@ public class InitYARNDirOnHDFSTask extends BaseCloudeonTask {
         ServiceRoleInstanceEntity firstNamenode = roleInstanceEntities.get(0);
         Integer nodeId = firstNamenode.getNodeId();
         ClusterNodeEntity nodeEntity = clusterNodeRepository.findById(nodeId).get();
+        // 获取集群的namespace
+        String namespace = clusterInfoRepository.findById(serviceInstanceEntity.getClusterId()).get().getNamespace();
 
         // 启动K8S job
         String jobCmd = String.format("/opt/edp/%s/conf/init-yarn-hdfs-dir.sh",serviceName);
         String volumePath = String.format("/opt/edp/%s/conf", serviceName);
         KubernetesClient kubeClient = kubeService.getKubeClient(serviceInstanceEntity.getClusterId());
         VolumeMountDTO[] volumeMounts = {new VolumeMountDTO("config-volume", volumePath, volumePath)};
-        K8sUtil.runJob("init-yarndir-hdfs", kubeClient, volumeMounts, stackServiceEntity.getDockerImage(), jobCmd, log, nodeEntity.getHostname());
+        K8sUtil.runJob(namespace,"init-yarndir-hdfs", kubeClient, volumeMounts, stackServiceEntity.getDockerImage(), jobCmd, log, nodeEntity.getHostname());
 
 
 

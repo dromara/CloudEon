@@ -17,10 +17,7 @@
 package org.dromara.cloudeon.processor;
 
 import cn.hutool.extra.spring.SpringUtil;
-import org.dromara.cloudeon.dao.ClusterNodeRepository;
-import org.dromara.cloudeon.dao.ServiceInstanceRepository;
-import org.dromara.cloudeon.dao.ServiceRoleInstanceRepository;
-import org.dromara.cloudeon.dao.StackServiceRoleRepository;
+import org.dromara.cloudeon.dao.*;
 import org.dromara.cloudeon.entity.ServiceInstanceEntity;
 import org.dromara.cloudeon.entity.ServiceRoleInstanceEntity;
 import org.dromara.cloudeon.entity.StackServiceRoleEntity;
@@ -41,11 +38,16 @@ public class StopRolePodTask extends BaseCloudeonTask {
         ServiceRoleInstanceRepository serviceRoleInstanceRepository = SpringUtil.getBean(ServiceRoleInstanceRepository.class);
         ServiceInstanceRepository serviceInstanceRepository = SpringUtil.getBean(ServiceInstanceRepository.class);
         KubeService kubeService = SpringUtil.getBean(KubeService.class);
+        ClusterInfoRepository clusterInfoRepository = SpringUtil.getBean(ClusterInfoRepository.class);
+
 
         String serviceInstanceName = taskParam.getServiceInstanceName();
         Integer serviceInstanceId = taskParam.getServiceInstanceId();
         String hostName = taskParam.getHostName();
         ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(taskParam.getServiceInstanceId()).get();
+
+        // 获取集群的namespace
+        String namespace = clusterInfoRepository.findById(serviceInstanceEntity.getClusterId()).get().getNamespace();
 
         // 查询框架服务角色名获取模板名
         String roleName = taskParam.getRoleName();
@@ -54,7 +56,7 @@ public class StopRolePodTask extends BaseCloudeonTask {
         String podLabel = String.format("app=%s-%s", roleFullName, serviceInstanceName);
         try (KubernetesClient client = kubeService.getKubeClient(serviceInstanceEntity.getClusterId());) {
 
-            List<Pod> pods = client.pods().inNamespace("default").withLabel(podLabel).list().getItems();
+            List<Pod> pods = client.pods().inNamespace(namespace).withLabel(podLabel).list().getItems();
             for (Pod pod : pods) {
                 String nodeName = pod.getSpec().getNodeName();
                 if (nodeName != null && nodeName.equals(hostName)) {

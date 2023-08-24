@@ -20,10 +20,7 @@ import cn.hutool.extra.spring.SpringUtil;
 import com.jcraft.jsch.Session;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import lombok.NoArgsConstructor;
-import org.dromara.cloudeon.dao.ClusterNodeRepository;
-import org.dromara.cloudeon.dao.ServiceInstanceRepository;
-import org.dromara.cloudeon.dao.ServiceRoleInstanceRepository;
-import org.dromara.cloudeon.dao.StackServiceRepository;
+import org.dromara.cloudeon.dao.*;
 import org.dromara.cloudeon.dto.VolumeMountDTO;
 import org.dromara.cloudeon.entity.ClusterNodeEntity;
 import org.dromara.cloudeon.entity.ServiceInstanceEntity;
@@ -53,6 +50,7 @@ public class InitFlinkHistoryDirOnHDFSTask extends BaseCloudeonTask {
         ClusterNodeRepository clusterNodeRepository = SpringUtil.getBean(ClusterNodeRepository.class);
         SshPoolService sshPoolService = SpringUtil.getBean(SshPoolService.class);
         KubeService kubeService = SpringUtil.getBean(KubeService.class);
+        ClusterInfoRepository clusterInfoRepository = SpringUtil.getBean(ClusterInfoRepository.class);
 
 
         TaskParam taskParam = getTaskParam();
@@ -63,6 +61,8 @@ public class InitFlinkHistoryDirOnHDFSTask extends BaseCloudeonTask {
         // 查找hdfs的docker镜像
         StackServiceEntity hdfsStackServiceEntity = stackServiceRepository.findByStackIdAndName(stackId, HDFS_SERVICE_NAME);
         String serviceName = serviceInstanceEntity.getServiceName();
+        // 获取集群的namespace
+        String namespace = clusterInfoRepository.findById(serviceInstanceEntity.getClusterId()).get().getNamespace();
 
         // 选择节点执行
         List<ServiceRoleInstanceEntity> roleInstanceEntities = roleInstanceRepository.findByServiceInstanceIdAndServiceRoleName(serviceInstanceId, "FLINK_HISTORY_SERVER");
@@ -75,7 +75,7 @@ public class InitFlinkHistoryDirOnHDFSTask extends BaseCloudeonTask {
         String volumePath = String.format("/opt/edp/%s/conf", serviceName);
         KubernetesClient kubeClient = kubeService.getKubeClient(serviceInstanceEntity.getClusterId());
         VolumeMountDTO[] volumeMounts = {new VolumeMountDTO("config-volume", volumePath, volumePath)};
-        K8sUtil.runJob("init-flinkdir-hdfs", kubeClient, volumeMounts, hdfsStackServiceEntity.getDockerImage(), jobCmd, log, nodeEntity.getHostname());
+        K8sUtil.runJob(namespace,"init-flinkdir-hdfs", kubeClient, volumeMounts, hdfsStackServiceEntity.getDockerImage(), jobCmd, log, nodeEntity.getHostname());
 
 
 

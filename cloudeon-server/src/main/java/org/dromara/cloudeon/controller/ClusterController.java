@@ -92,6 +92,7 @@ public class ClusterController {
         BeanUtils.copyProperties(req, clusterInfoEntity);
         clusterInfoEntity.setCreateTime(new Date());
         clusterInfoEntity.setCreateBy(AdminUserName);
+        clusterInfoEntity.setNamespace(req.getNamespace());
 
         clusterInfoRepository.saveAndFlush(clusterInfoEntity);
         // 加载默认规则到集群中

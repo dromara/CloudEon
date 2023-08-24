@@ -24,11 +24,7 @@ import cn.hutool.extra.spring.SpringUtil;
 import com.jcraft.jsch.Session;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import lombok.NoArgsConstructor;
-import org.dromara.cloudeon.dao.ClusterNodeRepository;
-import org.dromara.cloudeon.dao.ServiceInstanceConfigRepository;
-import org.dromara.cloudeon.dao.ServiceInstanceRepository;
-import org.dromara.cloudeon.dao.ServiceRoleInstanceRepository;
-import org.dromara.cloudeon.dao.StackServiceRepository;
+import org.dromara.cloudeon.dao.*;
 import org.dromara.cloudeon.dto.VolumeMountDTO;
 import org.dromara.cloudeon.entity.ClusterNodeEntity;
 import org.dromara.cloudeon.entity.ServiceInstanceEntity;
@@ -61,6 +57,7 @@ public class InitHiveMetastoreTask extends BaseCloudeonTask {
         ServiceInstanceConfigRepository configRepository = SpringUtil.getBean(ServiceInstanceConfigRepository.class);
         SshPoolService sshPoolService = SpringUtil.getBean(SshPoolService.class);
         KubeService kubeService = SpringUtil.getBean(KubeService.class);
+        ClusterInfoRepository clusterInfoRepository = SpringUtil.getBean(ClusterInfoRepository.class);
 
 
         TaskParam taskParam = getTaskParam();
@@ -69,6 +66,9 @@ public class InitHiveMetastoreTask extends BaseCloudeonTask {
         ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(serviceInstanceId).get();
         StackServiceEntity stackServiceEntity = stackServiceRepository.findById(serviceInstanceEntity.getStackServiceId()).get();
         String serviceName = serviceInstanceEntity.getServiceName();
+        // 获取集群的namespace
+        String namespace = clusterInfoRepository.findById(serviceInstanceEntity.getClusterId()).get().getNamespace();
+
         // 校验metastore里的version和服务的version是否一致
         String username = configRepository.findByServiceInstanceIdAndName(serviceInstanceId, "javax.jdo.option.ConnectionUserName").getValue();
         String password = configRepository.findByServiceInstanceIdAndName(serviceInstanceId, "javax.jdo.option.ConnectionPassword").getValue();
@@ -107,7 +107,7 @@ public class InitHiveMetastoreTask extends BaseCloudeonTask {
             VolumeMountDTO[] volumeMounts = {
                     new VolumeMountDTO("config-volume", volumePath, volumePath),
                     new VolumeMountDTO("config-volume2", volumePath2, volumePath2)};
-            K8sUtil.runJob("init-hive-db", kubeClient, volumeMounts, stackServiceEntity.getDockerImage(), jobCmd, log, nodeEntity.getHostname());
+            K8sUtil.runJob(namespace,"init-hive-db", kubeClient, volumeMounts, stackServiceEntity.getDockerImage(), jobCmd, log, nodeEntity.getHostname());
 
 
         }

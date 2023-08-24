@@ -20,10 +20,7 @@ import cn.hutool.extra.spring.SpringUtil;
 import com.jcraft.jsch.Session;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import lombok.NoArgsConstructor;
-import org.dromara.cloudeon.dao.ClusterNodeRepository;
-import org.dromara.cloudeon.dao.ServiceInstanceRepository;
-import org.dromara.cloudeon.dao.ServiceRoleInstanceRepository;
-import org.dromara.cloudeon.dao.StackServiceRepository;
+import org.dromara.cloudeon.dao.*;
 import org.dromara.cloudeon.dto.VolumeMountDTO;
 import org.dromara.cloudeon.entity.ClusterNodeEntity;
 import org.dromara.cloudeon.entity.ServiceInstanceEntity;
@@ -52,6 +49,7 @@ public class InitDSTablesTask extends BaseCloudeonTask {
         ClusterNodeRepository clusterNodeRepository = SpringUtil.getBean(ClusterNodeRepository.class);
         SshPoolService sshPoolService = SpringUtil.getBean(SshPoolService.class);
         KubeService kubeService = SpringUtil.getBean(KubeService.class);
+        ClusterInfoRepository clusterInfoRepository = SpringUtil.getBean(ClusterInfoRepository.class);
 
 
         TaskParam taskParam = getTaskParam();
@@ -60,6 +58,8 @@ public class InitDSTablesTask extends BaseCloudeonTask {
         ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(serviceInstanceId).get();
         StackServiceEntity stackServiceEntity = stackServiceRepository.findById(serviceInstanceEntity.getStackServiceId()).get();
         String serviceName = serviceInstanceEntity.getServiceName();
+        // 获取集群的namespace
+        String namespace = clusterInfoRepository.findById(serviceInstanceEntity.getClusterId()).get().getNamespace();
 
         // 选择apiserver所在节点执行
         List<ServiceRoleInstanceEntity> roleInstanceEntities = roleInstanceRepository.findByServiceInstanceIdAndServiceRoleName(serviceInstanceId, "DS_API_SERVER");
@@ -78,7 +78,7 @@ public class InitDSTablesTask extends BaseCloudeonTask {
                 new VolumeMountDTO("config-volume2", volumePath2, volumePath2),
                 new VolumeMountDTO("config-volume3", volumePath3, volumePath3),
         };
-        K8sUtil.runJob("init-ds-db", kubeClient, volumeMounts, stackServiceEntity.getDockerImage(), jobCmd, log, nodeEntity.getHostname());
+        K8sUtil.runJob(namespace,"init-ds-db", kubeClient, volumeMounts, stackServiceEntity.getDockerImage(), jobCmd, log, nodeEntity.getHostname());
 
 
 

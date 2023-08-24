@@ -5,7 +5,7 @@ metadata:
   labels:
     name: "${roleServiceFullName}"
   name: "${roleServiceFullName}"
-  namespace: "default"
+  namespace: ${namespace}
 spec:
   replicas: ${roleNodeCnt}
   selector:

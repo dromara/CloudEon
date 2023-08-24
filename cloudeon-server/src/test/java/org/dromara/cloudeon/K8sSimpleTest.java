@@ -70,7 +70,7 @@ public class K8sSimpleTest {
         KubernetesClient client = new KubernetesClientBuilder().withConfig(config).build();
 
         VolumeMountDTO[] volumeMounts = {new VolumeMountDTO("config-volume", "/opt/edp/monitor/conf", "/opt/edp/monitor/conf")};
-        K8sUtil.runJob("init-work",client, volumeMounts,"openjdk:8-jdk-alpine","/opt/edp/monitor/conf/test.sh",log,"iZhp3ivd08e0qfgauq0gmbZ".toLowerCase());
+        K8sUtil.runJob("default","init-work",client, volumeMounts,"openjdk:8-jdk-alpine","/opt/edp/monitor/conf/test.sh",log,"iZhp3ivd08e0qfgauq0gmbZ".toLowerCase());
 
 
     }
