@@ -39,7 +39,8 @@ persistencePaths:
 
 
 customConfigFiles:
-  - zoo.cfg
+  - coordinator-config.properties
+  - worker-config.properties
 
 configurations:
 
