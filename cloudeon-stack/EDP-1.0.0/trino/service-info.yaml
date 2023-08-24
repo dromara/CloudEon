@@ -3,7 +3,9 @@ label: "Trino"
 description: "Trino是一个分布式SQL查询引擎，用于在大型数据集上执行交互式分析。"
 version: "424"
 dockerImage: "registry.cn-hangzhou.aliyuncs.com/udh/trino:424"
-dependencies: []
+dependencies:
+  - "HDFS"
+  - "HIVE"
 
 runAs: hadoop
 
