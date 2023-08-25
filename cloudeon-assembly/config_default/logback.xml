@@ -32,7 +32,7 @@
                 <file>${taskLogHome}/${taskId}.log</file>
                 <append>true</append>
                 <encoder>
-                    <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
+                    <pattern>%d %p %c{2} %L: %m%n</pattern>
                 </encoder>
             </appender>
         </sift>
