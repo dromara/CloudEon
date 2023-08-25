@@ -6,7 +6,7 @@ export async function getClusterListAPI(params: {
   /** 集群id */
   clusterId?: number;
 }) {
-  return request<API.ServiceList>('/apiPre/cluster/list', {
+  return request<API.ColonyList>('/apiPre/cluster/list', {
     method: 'GET',
     params: {
       ...params,
