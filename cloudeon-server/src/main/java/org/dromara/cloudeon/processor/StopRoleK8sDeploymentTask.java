@@ -17,6 +17,8 @@
 package org.dromara.cloudeon.processor;
 
 import cn.hutool.extra.spring.SpringUtil;
+import io.fabric8.kubernetes.api.model.apps.Deployment;
+import io.fabric8.kubernetes.client.dsl.RollableScalableResource;
 import org.apache.commons.lang3.StringUtils;
 import org.dromara.cloudeon.config.CloudeonConfigProp;
 import org.dromara.cloudeon.dao.ClusterInfoRepository;
@@ -81,11 +83,15 @@ public class StopRoleK8sDeploymentTask extends BaseCloudeonTask {
                         .inNamespace(namespace)
                         .delete();
                 // 等待deployment完全停止
-                log.info("等待deployment完全停止: {}", roleFullName);
-                client.apps().deployments()
+                RollableScalableResource<Deployment> deploymentRollableScalableResource = client.apps().deployments()
                         .inNamespace(namespace)
-                        .withName(roleFullName)
-                        .waitUntilCondition(d -> d.getStatus().getReadyReplicas() == 0, 10, TimeUnit.MINUTES);
+                        .withName(roleFullName);
+                if (deploymentRollableScalableResource != null) {
+                    log.info("等待deployment完全停止: {}", roleFullName);
+                    deploymentRollableScalableResource
+                            .waitUntilCondition(d -> d.getStatus().getReadyReplicas() == 0, 10, TimeUnit.MINUTES);
+                }
+
 
             } catch (FileNotFoundException e) {
                 log.error("k8s资源文件不存在: {}", k8sServiceResourceFilePath);
