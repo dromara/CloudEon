@@ -125,10 +125,8 @@ scrape_configs:
     file_sd_configs:
     - files: ['discovery_configs/elasticsearch-node.json']
   - job_name: 'trinocoordinator'
-    metrics_path: '/metrics'
     file_sd_configs:
     - files: ['discovery_configs/trinocoordinator.json']
   - job_name: 'trinoworker'
-    metrics_path: '/metrics'
     file_sd_configs:
     - files: ['discovery_configs/trinoworker.json']

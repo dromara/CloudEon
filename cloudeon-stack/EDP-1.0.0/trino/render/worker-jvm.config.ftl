@@ -19,3 +19,9 @@
 # Disable Preventive GC for performance reasons (JDK-8293861)
 -XX:-G1UsePreventiveGC
 -Dfile.encoding=UTF-8
+-Dcom.sun.management.jmxremote.port=9082
+-Dcom.sun.management.jmxremote.rmi.port=9083
+-Dcom.sun.management.jmxremote
+-Dcom.sun.management.jmxremote.authenticate=false
+-Dcom.sun.management.jmxremote.ssl=false
+-javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=8099:/opt/edp/${service.serviceName}/conf/jmx_prometheus.yaml

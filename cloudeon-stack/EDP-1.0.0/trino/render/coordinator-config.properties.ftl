@@ -11,6 +11,8 @@ http-server.http.port=${conf['coordinator.http.port']}
 discovery.uri=http://${coordinator_hostname}:${conf['coordinator.http.port']}
 
 
+jmx.rmiregistry.port=9080
+jmx.rmiserver.port=9081
 <#list confFiles['coordinator-config.properties'] as key, value>
 ${key}=${value}
 </#list>
