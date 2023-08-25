@@ -96,8 +96,6 @@ public class StopRoleK8sDeploymentTask extends BaseCloudeonTask {
             } catch (FileNotFoundException e) {
                 log.error("k8s资源文件不存在: {}", k8sServiceResourceFilePath);
                 throw new RuntimeException(e);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
             }
 
             // 更新角色实例状态为已停止
