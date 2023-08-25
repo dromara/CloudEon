@@ -20,6 +20,7 @@ import cn.hutool.extra.spring.SpringUtil;
 import com.jcraft.jsch.Session;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.dromara.cloudeon.dao.*;
 import org.dromara.cloudeon.dto.VolumeMountDTO;
 import org.dromara.cloudeon.entity.ClusterNodeEntity;
@@ -65,6 +66,9 @@ public class InitYARNDirOnHDFSTask extends BaseCloudeonTask {
         ClusterNodeEntity nodeEntity = clusterNodeRepository.findById(nodeId).get();
         // 获取集群的namespace
         String namespace = clusterInfoRepository.findById(serviceInstanceEntity.getClusterId()).get().getNamespace();
+        if (StringUtils.isBlank(namespace)) {
+            namespace = "default";
+        }
 
         // 启动K8S job
         String jobCmd = String.format("/opt/edp/%s/conf/init-yarn-hdfs-dir.sh",serviceName);

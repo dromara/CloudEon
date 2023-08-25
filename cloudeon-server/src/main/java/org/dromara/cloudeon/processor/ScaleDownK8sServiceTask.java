@@ -17,6 +17,7 @@
 package org.dromara.cloudeon.processor;
 
 import cn.hutool.extra.spring.SpringUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.dromara.cloudeon.dao.ClusterInfoRepository;
 import org.dromara.cloudeon.dao.ServiceInstanceRepository;
 import org.dromara.cloudeon.dao.StackServiceRoleRepository;
@@ -47,6 +48,9 @@ public class ScaleDownK8sServiceTask extends BaseCloudeonTask {
 
         // 获取集群的namespace
         String namespace = clusterInfoRepository.findById(serviceInstanceEntity.getClusterId()).get().getNamespace();
+        if (StringUtils.isBlank(namespace)) {
+            namespace = "default";
+        }
 
         try (KubernetesClient client = kubeService.getKubeClient(serviceInstanceEntity.getClusterId());) {
             RollableScalableResource<Deployment> resource = client.apps().deployments().inNamespace(namespace).withName(deploymentName);

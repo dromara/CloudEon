@@ -20,6 +20,7 @@ import cn.hutool.extra.spring.SpringUtil;
 import com.jcraft.jsch.Session;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.dromara.cloudeon.dao.*;
 import org.dromara.cloudeon.dto.VolumeMountDTO;
 import org.dromara.cloudeon.entity.ClusterNodeEntity;
@@ -60,6 +61,9 @@ public class InitDSTablesTask extends BaseCloudeonTask {
         String serviceName = serviceInstanceEntity.getServiceName();
         // 获取集群的namespace
         String namespace = clusterInfoRepository.findById(serviceInstanceEntity.getClusterId()).get().getNamespace();
+        if (StringUtils.isBlank(namespace)) {
+            namespace = "default";
+        }
 
         // 选择apiserver所在节点执行
         List<ServiceRoleInstanceEntity> roleInstanceEntities = roleInstanceRepository.findByServiceInstanceIdAndServiceRoleName(serviceInstanceId, "DS_API_SERVER");

@@ -17,6 +17,7 @@
 package org.dromara.cloudeon.processor;
 
 import cn.hutool.extra.spring.SpringUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.dromara.cloudeon.dao.*;
 import org.dromara.cloudeon.entity.ServiceInstanceEntity;
 import org.dromara.cloudeon.entity.ServiceRoleInstanceEntity;
@@ -48,6 +49,9 @@ public class StopRolePodTask extends BaseCloudeonTask {
 
         // 获取集群的namespace
         String namespace = clusterInfoRepository.findById(serviceInstanceEntity.getClusterId()).get().getNamespace();
+        if (StringUtils.isBlank(namespace)) {
+            namespace = "default";
+        }
 
         // 查询框架服务角色名获取模板名
         String roleName = taskParam.getRoleName();

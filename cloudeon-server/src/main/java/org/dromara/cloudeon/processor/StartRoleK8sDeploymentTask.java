@@ -90,6 +90,9 @@ public class StartRoleK8sDeploymentTask extends BaseCloudeonTask {
         }
         // 获取集群的namespace
         String namespace = clusterInfoRepository.findById(serviceInstanceEntity.getClusterId()).get().getNamespace();
+        if (StringUtils.isBlank(namespace)) {
+            namespace = "default";
+        }
 
         // 渲染生成k8s资源
         String k8sTemplateFileName = roleFullName + ".yaml.ftl";
