@@ -82,19 +82,21 @@ public class StopRoleK8sDeploymentTask extends BaseCloudeonTask {
                 client.load(new FileInputStream(k8sServiceResourceFilePath))
                         .inNamespace(namespace)
                         .delete();
-                // 等待deployment完全停止
-                RollableScalableResource<Deployment> deploymentRollableScalableResource = client.apps().deployments()
-                        .inNamespace(namespace)
-                        .withName(roleFullName);
-                if (deploymentRollableScalableResource != null) {
-                    log.info("等待deployment完全停止: {}", roleFullName);
-                    deploymentRollableScalableResource
-                            .waitUntilCondition(d -> d.getStatus().getReadyReplicas() == 0, 10, TimeUnit.MINUTES);
-                }
+                // todo 等待deployment完全停止
+//                RollableScalableResource<Deployment> deploymentRollableScalableResource = client.apps().deployments()
+//                        .inNamespace(namespace)
+//                        .withName(roleFullName);
+//                if (deploymentRollableScalableResource != null) {
+//                    log.info("等待deployment完全停止: {}", roleFullName);
+//                    deploymentRollableScalableResource
+//                            .waitUntilCondition(d -> d.getStatus().getReadyReplicas() == 0, 10, TimeUnit.MINUTES);
+//                }
 
 
             } catch (FileNotFoundException e) {
                 log.error("k8s资源文件不存在: {}", k8sServiceResourceFilePath);
+                throw new RuntimeException(e);
+            } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
 

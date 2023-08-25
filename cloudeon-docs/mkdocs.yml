@@ -80,6 +80,7 @@ nav:
       - 支持组件/DolphinschedulerOnK8s.md
       - 支持组件/ElasticsearchOnK8s.md
       - 支持组件/IcebergOnK8s.md
+      - 支持组件/TrinoOnK8s.md
       - 支持组件/SeatunnelOnK8s.md
   - component_extension.md
   - 社区贡献:
