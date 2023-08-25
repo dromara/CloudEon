@@ -65,6 +65,8 @@ spec:
             memory: "${conf['hadop.hdfs.dn.container.limit.memory']}Mi"
             cpu: "${conf['hadop.hdfs.dn.container.limit.cpu']}"
         env:
+          - name: HDFS_CONF_DIR
+            value: /opt/edp/${service.serviceName}/conf
           - name: MEM_LIMIT
             valueFrom:
               resourceFieldRef:
