@@ -120,6 +120,7 @@ declare namespace API {
   }
 
   type ColonyItem = {
+    namespace?: any;
     serviceCnt?: ReactNode;
     nodeCnt?: ReactNode;
     id?: number,
@@ -162,7 +163,13 @@ declare namespace API {
 
   type StackItem = {
     id?: number,
-    stackCode?: string
+    stackCode?: string,
+    services?: StackService[]
+  }
+
+  type StackService = {
+    name?: string,
+    version?: string
   }
 
   type StackList = {

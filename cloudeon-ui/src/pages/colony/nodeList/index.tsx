@@ -210,7 +210,7 @@ const nodeList: React.FC = () => {
             <Form.Item
               label="选择k8s节点"
               name="ip"
-              initialValue="111"
+              initialValue=""
               rules={[{ required: true, message: '请选择k8s节点!' }]}
             >
                <Select
@@ -231,6 +231,7 @@ const nodeList: React.FC = () => {
             <Form.Item
               label="ssh账号"
               name="sshUser"
+              initialValue={'root'}
               rules={[{ required: true, message: '请输入ssh账号!' }]}
             >
               <Input />
