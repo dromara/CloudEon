@@ -12,7 +12,7 @@ runAs: hadoop
 supportKerberos: false
 
 dashboard:
-  uid: 000000261
+  uid: TGzKne5Wk
 
 roles:
   - name: TRINO_COORDINATOR
