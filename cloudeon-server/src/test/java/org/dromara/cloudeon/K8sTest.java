@@ -204,9 +204,8 @@ public class K8sTest {
     }
 
 
-
     @Test
-    public void getPodEvent(){
+    public void getPodEvent() {
         Config config = Config.fromKubeconfig("apiVersion: v1\n" +
                 "clusters:\n" +
                 "- cluster:\n" +

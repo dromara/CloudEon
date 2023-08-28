@@ -49,4 +49,8 @@ public class KubeService {
         String minor = client.getKubernetesVersion().getMinor();
         log.info("成功连接k8s集群：{}", client.getMasterUrl());
     }
+
+    public boolean checkNamespace(KubernetesClient kubernetesClient, String namespace) {
+        return kubernetesClient.namespaces().withName(namespace).get() != null;
+    }
 }

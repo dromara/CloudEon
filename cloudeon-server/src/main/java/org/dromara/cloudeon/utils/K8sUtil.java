@@ -53,9 +53,9 @@ public class K8sUtil {
         long timeout = 300; // Timeout in seconds
         long startTime = System.currentTimeMillis();
 
-        waitForDeleteJob(name, client, timeout, startTime, logger);
+        waitForDeleteJob(namespace,name, client, timeout, startTime, logger);
 
-        submitJob(name, client, volumeMounts, image, cmd, hostname);
+        submitJob(namespace,name, client, volumeMounts, image, cmd, hostname);
 
 
         // Polling loop to wait for deletion
@@ -63,7 +63,7 @@ public class K8sUtil {
         long waitPodStartTime = System.currentTimeMillis();
 
         String podName = "";
-        podName = waitForCreatePodOfJob(name, client, logger, podName, waitPodStartTime, waitPodTimeout);
+        podName = waitForCreatePodOfJob(namespace,name, client, logger, podName, waitPodStartTime, waitPodTimeout);
         logger.info("Pod name: " + podName);
 
         CountDownLatch jobCompletionLatch = new CountDownLatch(1);
@@ -102,14 +102,14 @@ public class K8sUtil {
         };
 
         Watch watch = client.batch().v1().jobs()
-                .inNamespace("default")
+                .inNamespace(namespace)
                 .withName(name)
                 .watch(watcher);
 
 
         // Print pod logs
         try (LogWatch logWatch = client.pods()
-                .inNamespace("default")
+                .inNamespace(namespace)
                 .withName(podName)
                 .watchLog()) {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(logWatch.getOutput()))) {
@@ -140,14 +140,14 @@ public class K8sUtil {
         }
     }
 
-    private static String waitForCreatePodOfJob(String jobName, KubernetesClient client, Logger logger, String podName, long waitPodStartTime, long waitPodTimeout) {
+    private static String waitForCreatePodOfJob(String namespace, String jobName, KubernetesClient client, Logger logger, String podName, long waitPodStartTime, long waitPodTimeout) {
         // 循环等待创建pod成功
         while (true) {
             // 需要考虑，有可能pod还没创建出来
             //  正在创建也不行 {"kind":"Status","apiVersion":"v1","metadata":{},"status":"Failure","message":"container \"init\" in pod \"init-flinkdir-hdfs-6c9r5\" is waiting to start: ContainerCreating","reason":"BadRequest","code":400}
             // Get the pod name associated with the job
             List<Pod> pods = client.pods()
-                    .inNamespace("default")
+                    .inNamespace(namespace)
                     .withLabel("job-name", jobName)
                     .list().getItems();
 
@@ -182,18 +182,18 @@ public class K8sUtil {
         return podName;
     }
 
-    private static void waitForDeleteJob(String jobName, KubernetesClient client, long timeout, long startTime, Logger logger) {
+    private static void waitForDeleteJob(String namespace, String jobName, KubernetesClient client, long timeout, long startTime, Logger logger) {
 
 
         // 循环等待删除成功
         while (true) {
             Job deletedJob = client.batch().v1().jobs()
-                    .inNamespace("default")
+                    .inNamespace(namespace)
                     .withName(jobName)
                     .get();
 
             List<Pod> podList = client.pods()
-                    .inNamespace("default")
+                    .inNamespace(namespace)
                     .withLabel("job-name", jobName)
                     .list().getItems();
 
@@ -218,7 +218,7 @@ public class K8sUtil {
         }
     }
 
-    private static void submitJob(String name, KubernetesClient client, VolumeMountDTO[] volumeMounts, String image, String cmd, String hostname) {
+    private static void submitJob(String namespace, String name, KubernetesClient client, VolumeMountDTO[] volumeMounts, String image, String cmd, String hostname) {
         List<Volume> volumeList = Arrays.stream(volumeMounts).map(new Function<VolumeMountDTO, Volume>() {
             @Override
             public Volume apply(VolumeMountDTO volumeMount) {
@@ -270,7 +270,7 @@ public class K8sUtil {
                 .build();
 
         client.batch().v1().jobs()
-                .inNamespace("default")
+                .inNamespace(namespace)
                 .resource(job).create();
     }
 }
