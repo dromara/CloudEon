@@ -46,7 +46,7 @@ spec:
           - name: "FLINK_CONF_DIR"
             value: "/opt/edp/${service.serviceName}/conf"
           - name: HADOOP_CLASSPATH
-            value: "/home/flink/apache-hadoop/share/hadoop/common/lib/*:/home/flink/apache-hadoop/share/hadoop/common/*:/home/flink/apache-hadoop/share/hadoop/hdfs:/home/flink/apache-hadoop/share/hadoop/hdfs/lib/*:/home/flink/apache-hadoop/share/hadoop/hdfs/*:/home/flink/apache-hadoop/share/hadoop/mapreduce/*:/home/flink/apache-hadoop/share/hadoop/yarn:/home/flink/apache-hadoop/share/hadoop/yarn/lib/*:/home/flink/apache-hadoop/share/hadoop/yarn/*:/opt/edp/flink14/conf/hadoop-client-api-3.3.4.jar:/opt/edp/flink14/conf/hadoop-client-runtime-3.3.4.jar"
+            value: "/home/flink/apache-hadoop/share/hadoop/common/lib/*:/home/flink/apache-hadoop/share/hadoop/common/*:/home/flink/apache-hadoop/share/hadoop/hdfs:/home/flink/apache-hadoop/share/hadoop/hdfs/lib/*:/home/flink/apache-hadoop/share/hadoop/hdfs/*:/home/flink/apache-hadoop/share/hadoop/mapreduce/*:/home/flink/apache-hadoop/share/hadoop/yarn:/home/flink/apache-hadoop/share/hadoop/yarn/lib/*:/home/flink/apache-hadoop/share/hadoop/yarn/*"
           - name: "HADOOP_CONF_DIR"
             value: "/opt/edp/${service.serviceName}/conf"
           - name: "USER"
