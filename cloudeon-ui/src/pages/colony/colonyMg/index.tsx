@@ -27,6 +27,9 @@ const Colony: React.FC = () => {
   const [kubeConfig, setKubeConfig] = useState('');
   const [colonyForm] = Form.useForm();
   const [editColony, setEditColony] = useState<API.ColonyItem | null>(null);
+  const [stackServiceList, setStackServiceList] = useState<API.StackService[]>();
+
+  
 
   const kubeConfigRef = useRef(kubeConfig)
   kubeConfigRef.current = kubeConfig
@@ -48,6 +51,7 @@ const Colony: React.FC = () => {
 
   useEffect(() => {
     getClusterData({});
+    getStackData({})
   }, []);
 
   const showModal = () => {
@@ -119,7 +123,17 @@ const Colony: React.FC = () => {
 
   const onSelectChange = (value: string) => {
     console.log('onSelectChange:', value);
+    // console.log('stackList:', stackList);
+    setServiceData(value)
   };
+
+  const setServiceData = (value: string|number) => {
+    // console.log('---setServiceData: ', value);
+    const currentItem = stackList?.filter(item=>{ return item.id == +value })
+    if(currentItem && currentItem.length>0){
+      setStackServiceList(currentItem[0].services)
+    }
+  }
 
   const onEditorChange = (value: any) => {
     console.log(value);
@@ -145,8 +159,14 @@ const Colony: React.FC = () => {
     colonyForm.setFieldsValue({
       clusterName: item.clusterName,
       stackId: item.stackId,
+      namespace: item.namespace,
       kubeConfig: item.kubeConfig      
     })
+    if(item.stackId){
+      setServiceData(item.stackId)
+    }else{
+      setStackServiceList([])
+    }
     showModal()
   }
 
@@ -161,6 +181,7 @@ const Colony: React.FC = () => {
               setEditColony(null)
               colonyForm.setFieldsValue({})
               showModal()
+              setStackServiceList([])
             }}
           >
             新增集群
@@ -204,6 +225,7 @@ const Colony: React.FC = () => {
                   const sdata = {
                     clusterId: cItem.id,
                     clusterName: cItem.clusterName,
+                    namespace: cItem.namespace,
                     stackId: cItem.stackId
                   }
                   const getData = JSON.parse(sessionStorage.getItem('colonyData') || '{}')
@@ -257,8 +279,15 @@ const Colony: React.FC = () => {
             <Input className={styles.inputWrap}/>
             </Form.Item>
             <Form.Item
+              label="kubernetes命名空间"
+              name="namespace"
+              rules={[{ required: true, message: '请输入kubernetes命名空间!' }]}
+            >
+            <Input className={styles.inputWrap} disabled={editColony ? true : false}/>
+            </Form.Item>
+            <Form.Item
               label="框架"
-              name="stackId"              
+              name="stackId"
               rules={[{ required: true, message: '请选择框架!' }]}
             >                
                 <Select
@@ -278,6 +307,13 @@ const Colony: React.FC = () => {
                   }
                 </Select>
             </Form.Item>
+            <div className={styles.serviceWrap}>
+                  {
+                    stackServiceList?.map(serviceItem=>{
+                      return (<div key={`${serviceItem.name}: ${serviceItem.version}`} className={styles.serviceItem}>{`${serviceItem.name}: ${serviceItem.version}`}</div>)
+                    })
+                  }
+                </div>
             <Form.Item
               label="kubeConfig"
               name="kubeConfig"

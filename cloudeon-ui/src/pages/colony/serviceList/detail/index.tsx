@@ -170,8 +170,7 @@ const serviceListDetail: React.FC = () => {
                           open={dropdpwnStatus}
                           onOpenChange={handleOpenChange}
                           dropdownRender={(menu) => (
-                            <div className={styles.dropdownContent}>
-                              <div className={styles.actionSelects}>
+                            <div className={`${styles.dropdownContent} ${styles.actionSelects}`}>
                                 <Popconfirm
                                       key='startPop'
                                       placement="left"
@@ -253,15 +252,16 @@ const serviceListDetail: React.FC = () => {
                                     <DeleteOutlined/>&nbsp; 删除
                                   </div> 
                                 </Popconfirm>
-                              </div>
                             </div>
                           )}
                         >
-                        <a 
+                        <Button type="primary"
+                        className={styles.btnText}
                           onClick={()=>{ setCurrentAction('');setDropdpwnStatus(true) }}
+                          loading={btnLoading}
                         >{btnLoading?<>{`${currentAction}中 `}<LoadingOutlined /></>:<>服务操作&nbsp;<DownOutlined /></>}  
                         
-                        </a>
+                        </Button>
                         </Dropdown>
               {/* <Popconfirm
                     key='startPop'

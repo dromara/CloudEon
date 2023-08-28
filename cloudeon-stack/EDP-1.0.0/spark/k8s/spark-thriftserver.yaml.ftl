@@ -5,7 +5,7 @@ metadata:
   labels:
     name: "${roleServiceFullName}"
   name: "${roleServiceFullName}"
-  namespace: "default"
+  namespace: ${namespace}
 spec:
   replicas: ${roleNodeCnt}
   selector:
@@ -49,6 +49,10 @@ spec:
             value: "/opt/edp/${service.serviceName}/conf"
           - name: "USER"
             value: "spark"
+          - name: MEM_LIMIT
+            valueFrom:
+              resourceFieldRef:
+                resource: limits.memory
         image: "${dockerImage}"
         imagePullPolicy: "Always"
         readinessProbe:
@@ -58,8 +62,12 @@ spec:
           timeoutSeconds: 2
         name: "${roleServiceFullName}"
         resources:
-          requests: {}
-          limits: {}
+          requests:
+            memory: "${conf['spark.ts.container.request.memory']}Mi"
+            cpu: "${conf['spark.ts.container.request.cpu']}"
+          limits:
+            memory: "${conf['spark.ts.container.limit.memory']}Mi"
+            cpu: "${conf['spark.ts.container.limit.cpu']}"
         securityContext:
           privileged: true
         volumeMounts:

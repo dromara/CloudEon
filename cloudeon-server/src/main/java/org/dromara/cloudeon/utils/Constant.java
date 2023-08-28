@@ -46,6 +46,7 @@ public class Constant {
     public static final String SPARK_SERVICE_NAME = "SPARK";
     public static final String HDFS_SERVICE_NAME = "HDFS";
     public static final String HIVE_SERVICE_NAME = "HIVE";
+    public static final String TRINO_SERVICE_NAME = "TRINO";
     public static final String ZOOKEEPER_SERVICE_NAME = "ZOOKEEPER";
     public static final String MONITOR_SERVICE_NAME = "MONITOR";
     public static final String DS_SERVICE_NAME = "DOLPHINSCHEDULER";

@@ -143,6 +143,8 @@ const serviceList: React.FC = () => {
                       actions={[ 
                         <Dropdown 
                           trigger={['click']}
+                          arrow={true}
+                          placement='bottom'
                           open={currentId == sItem.id && dropdpwnStatus}
                           onOpenChange={handleOpenChange}
                           dropdownRender={(menu) => (
@@ -216,12 +218,13 @@ const serviceList: React.FC = () => {
                             </div>
                           )}
                         >
-                        <a 
-                          onClick={()=>{ setCurrentId(sItem.id);setCurrentAction('');setDropdpwnStatus(true) }}
-                        >服务操作 <DownOutlined /> </a>
+                        <div 
+                          className={styles.cardClickText}
+                          onMouseEnter={()=>{ setCurrentId(sItem.id);setCurrentAction('');setDropdpwnStatus(true) }}
+                        >服务操作 <DownOutlined /> </div>
                         </Dropdown>,     
                         <div 
-                          onMouseEnter={()=>{setWebUrls([]);setCurrentId(sItem.id);getListWebURLs({serviceInstanceId: sItem.id})}}
+                          onMouseEnter={()=>{setWebUrls([]);setDropdpwnStatus(false);setCurrentId(sItem.id);getListWebURLs({serviceInstanceId: sItem.id})}}
                           style={{width:'100%'}}
                         >
                           {/* webUrls */}
@@ -249,7 +252,7 @@ const serviceList: React.FC = () => {
                                 </div>
                               </Spin>
                             } title="" placement="bottom">
-                            <div style={{width:'100%'}}>webUrls</div>
+                            <div className={styles.cardClickText}>webUrls <DownOutlined /></div>
                           </Popover>
                         </div>, 
                       ]}
@@ -280,7 +283,7 @@ const serviceList: React.FC = () => {
                         }}>
                           <Meta
                             avatar={<Avatar style={{width:'40px', height:'40px'}} src={'data:image/jpeg;base64,'+sItem.icon} />}
-                            title={<div style={{paddingLeft:'2px'}}>{sItem.serviceName}</div>}
+                            title={<div style={{paddingLeft:'2px', fontWeight:'500', fontSize:'18px'}}>{sItem.serviceName}</div>}
                             description={<div style={{paddingLeft:'2px'}}>
                             <span style={{backgroundColor: serviceStatusColor[sItem.serviceStateValue || 0]}} 
                                   className={`${styles.statusCircel} ${[1,2,3,4,5,8].includes(sItem.serviceStateValue) && styles.statusProcessing}`}>

@@ -5,7 +5,7 @@ metadata:
   labels:
     name: "${roleServiceFullName}"
   name: "${roleServiceFullName}"
-  namespace: "default"
+  namespace: ${namespace}
 spec:
   replicas: ${roleNodeCnt}
   selector:
@@ -47,6 +47,10 @@ spec:
             value: "${runAs}"
           - name: "HBASE_CONF_DIR"
             value: "/opt/edp/${service.serviceName}/conf"
+          - name: MEM_LIMIT
+            valueFrom:
+              resourceFieldRef:
+                resource: limits.memory
         image: "${dockerImage}"
         imagePullPolicy: "Always"
         readinessProbe:
@@ -56,8 +60,12 @@ spec:
           timeoutSeconds: 2
         name: "${roleServiceFullName}"
         resources:
-          requests: {}
-          limits: {}
+          requests:
+            memory: "${conf['hbase.master.container.request.memory']}Mi"
+            cpu: "${conf['hbase.master.container.request.cpu']}"
+          limits:
+            memory: "${conf['hbase.master.container.limit.memory']}Mi"
+            cpu: "${conf['hbase.master.container.limit.cpu']}"
         securityContext:
           privileged: true
         volumeMounts:

@@ -5,7 +5,7 @@ metadata:
   labels:
     name: "${roleServiceFullName}"
   name: "${roleServiceFullName}"
-  namespace: "default"
+  namespace: ${namespace}
 spec:
   replicas: ${roleNodeCnt}
   selector:
@@ -54,8 +54,17 @@ spec:
           timeoutSeconds: 1
         name: "${roleServiceFullName}"
         resources:
-          requests: {}
-          limits: {}
+          requests:
+            memory: "${conf['hadop.yarn.tl.container.request.memory']}Mi"
+            cpu: "${conf['hadop.yarn.tl.container.request.cpu']}"
+          limits:
+            memory: "${conf['hadop.yarn.tl.container.limit.memory']}Mi"
+            cpu: "${conf['hadop.yarn.tl.container.limit.cpu']}"
+        env:
+          - name: MEM_LIMIT
+            valueFrom:
+              resourceFieldRef:
+                resource: limits.memory
         securityContext:
           privileged: true
         volumeMounts:

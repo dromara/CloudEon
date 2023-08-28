@@ -1,0 +1,114 @@
+name: TRINO
+label: "Trino"
+description: "Trino是一个分布式SQL查询引擎，用于在大型数据集上执行交互式分析。"
+version: "424"
+dockerImage: "registry.cn-hangzhou.aliyuncs.com/udh/trino:424"
+dependencies:
+  - "HDFS"
+  - "HIVE"
+
+runAs: hadoop
+
+supportKerberos: false
+
+dashboard:
+  uid: 000000261
+
+roles:
+  - name: TRINO_COORDINATOR
+    label: "Trino Coordinator"
+    roleFullName: "trino-coordinator"
+    linkExpression: "http://${localhostname}:${conf['coordinator.http.port']}"
+    sortNum: 1
+    type: MASTER
+    fixedNum: 1
+    logFile: "coordinator-server.log"
+
+  - name: TRINO_WORKER
+    label: "Trino Worker"
+    roleFullName: "trino-worker"
+    linkExpression: "http://${localhostname}:${conf['worker.http.port']}"
+    sortNum: 2
+    type: SLAVE
+    minNum: 1
+    logFile: "worker-server.log"
+
+
+persistencePaths:
+  - /opt/edp/${service.serviceName}/conf
+  - /opt/edp/${service.serviceName}/log
+  - /opt/edp/${service.serviceName}/data
+
+
+customConfigFiles:
+  - coordinator-config.properties
+  - worker-config.properties
+
+configurations:
+
+  - name: environmentName
+    recommendExpression: "production"
+    valueType: InputString
+    configurableInWizard: true
+    description: "集群环境名称"
+    tag: "常用参数"
+
+  - name: coordinator.http.port
+    recommendExpression: 8085
+    valueType: InputNumber
+    configurableInWizard: true
+    description: "Trino Coordinator http访问端口"
+    tag: "端口"
+
+  - name: worker.http.port
+    recommendExpression: 8086
+    valueType: InputNumber
+    configurableInWizard: true
+    description: "Trino Worker http访问端口"
+    tag: "端口"
+
+  - name: query.maxMemory
+    recommendExpression: 4
+    valueType: InputNumber
+    unit: GB
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: worker.query.maxMemoryPerNode
+    recommendExpression: 1
+    valueType: InputNumber
+    unit: "GB"
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: coordinator.query.maxMemoryPerNode
+    recommendExpression: 1
+    valueType: InputNumber
+    unit: "GB"
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: coordinator.jvm.maxHeapSize
+    description: "Trino Coordinator最大内存，单位GB"
+    recommendExpression: 8
+    valueType: InputNumber
+    unit: GB
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: worker.jvm.maxHeapSize
+    description: "Trino Worker最大内存，单位GB"
+    recommendExpression: 8
+    valueType: InputNumber
+    unit: GB
+    configurableInWizard: true
+    tag: "资源管理"
+
+
+
+
+
+
+
+
+

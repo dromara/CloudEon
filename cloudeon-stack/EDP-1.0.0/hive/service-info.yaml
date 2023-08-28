@@ -110,19 +110,6 @@ configurations:
     confFile:  "hive-site.xml"
     tag: "资源管理"
 
-  - name: "hive.server2.memory"
-    recommendExpression: 2048
-    valueType: InputNumber
-    unit: MB
-    label: "Hive server2最大堆内存,单位MB"
-    tag: "资源管理"
-
-  - name: "hive.metasotre.memory"
-    recommendExpression: 2048
-    valueType: InputNumber
-    unit: MB
-    description: "Hive metastore最大堆内存,单位MB"
-    tag: "资源管理"
   - name: "hive.server2.webui.port"
     recommendExpression: 10002
     valueType: InputNumber
@@ -210,3 +197,68 @@ configurations:
     description: "HS2操作日志模式可供客户在会话级别设置"
     confFile:  "hive-site.xml"
     tag: "高级参数"
+
+  - name: hive.heap.memory.percentage
+    description: "Hive Metastore/Server2 jvm堆内存占容器内存限额的百分比"
+    recommendExpression: 75
+    min: 10
+    max: 80
+    valueType: InputNumber
+    unit: ".0"
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: hive.metastore.container.limit.cpu
+    description: "Hive Metastore容器的CPU使用限额"
+    recommendExpression: 1.0
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: hive.metastore.container.limit.memory
+    description: "Hive Metastore容器的内存使用限额，单位MB"
+    recommendExpression: 2048
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: hive.metastore.container.request.cpu
+    description: "Hive Metastore容器的CPU请求量"
+    recommendExpression: 0.2
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: hive.metastore.container.request.memory
+    description: "Hive Metastore容器的内存请求量，单位MB"
+    recommendExpression: 1024
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: hive.server2.container.limit.cpu
+    description: "Hive Server2容器的CPU使用限额"
+    recommendExpression: 1.0
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: hive.server2.container.limit.memory
+    description: "Hive Server2容器的内存使用限额，单位MB"
+    recommendExpression: 2048
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: hive.server2.container.request.cpu
+    description: "Hive Server2容器的CPU请求量"
+    recommendExpression: 0.2
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: hive.server2.container.request.memory
+    description: "Hive Server2容器的内存请求量，单位MB"
+    recommendExpression: 1024
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+
