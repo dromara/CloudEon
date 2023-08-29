@@ -26,8 +26,8 @@ jobmanager.execution.failover-strategy: region
 # Rest & web frontend
 #==============================================================================
 
-rest.address: localhost
-rest.bind-address: localhost
+#rest.address: localhost
+#rest.bind-address: localhost
 
 
 #==============================================================================
