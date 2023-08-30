@@ -47,18 +47,15 @@ ams:
     enabled: true
     thread-count: 10
 
-  database:
-    type: derby
-    jdbc-driver-class: org.apache.derby.jdbc.EmbeddedDriver
-    url: jdbc:derby:/home/hadoop/amoro/derby;create=true
+
 
   #  MySQL database configuration.
-  #  database:
-  #    type: mysql
-  #    jdbc-driver-class: com.mysql.cj.jdbc.Driver
-  #    url: jdbc:mysql://127.0.0.1:3306/db?useUnicode=true&characterEncoding=UTF8&autoReconnect=true&useAffectedRows=true&useSSL=false
-  #    username: root
-  #    password: root
+  database:
+    type: mysql
+    jdbc-driver-class: com.mysql.cj.jdbc.Driver
+    url: ${conf['ams.mysql.ConnectionURL']}
+    username: ${conf['ams.mysql.ConnectionUserName']}
+    password: ${conf['ams.mysql.ConnectionPassword']}
 
   terminal:
     backend: local

@@ -47,6 +47,7 @@ public enum TaskGroupType {
     INIT_FLINK(19, "初始化FLINK", Lists.newArrayList(TaskType.FLINK_HDFS_MKDIR), false),
     INIT_KYLIN(20, "初始化KYLIN", Lists.newArrayList(TaskType.KYLIN_HDFS_MKDIR), false),
     INIT_DINKY(21, "初始化Dinky", Lists.newArrayList(TaskType.INIT_DINKY_DB), false),
+    INIT_AMORO(22, "初始化Amoro", Lists.newArrayList(TaskType.INIT_AMORO_DB), false),
 
     ;
 

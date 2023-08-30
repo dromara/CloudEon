@@ -58,5 +58,27 @@ configurations:
     tag: "端口"
 
 
+  - name: "ams.mysql.ConnectionUserName"
+    recommendExpression: "xxx"
+    valueType: InputString
+    configurableInWizard: true
+    description: "依赖mysql数据库的登录账户"
+    needChangeInWizard: true
+    tag: "常用参数"
 
+  - name: "ams.mysql.ConnectionPassword"
+    recommendExpression: "xxx"
+    valueType: InputString
+    configurableInWizard: true
+    description: "依赖mysql数据库的登录密码"
+    needChangeInWizard: true
+    tag: "常用参数"
+
+  - name: "ams.mysql.ConnectionURL"
+    recommendExpression: "jdbc:mysql://xxx:3306/amoro?useUnicode=true&characterEncoding=UTF8&autoReconnect=true&useAffectedRows=true&useSSL=false"
+    valueType: InputString
+    configurableInWizard: true
+    description: "依赖mysql数据库的jdbc访问地址"
+    needChangeInWizard: true
+    tag: "常用参数"
 
