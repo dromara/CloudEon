@@ -26,9 +26,8 @@
 
 ## 让 Cloudeon 运行起来
 
-让 Cloudeon 的代码在您的开发工具上运行起来，请参阅 本地部署 或者 Cloudeon 启动示例，并且能够断点调试。
+让 Cloudeon 的代码在您的开发工具上运行起来，请参阅 开发指南，并且能够断点调试。
 
-在运行起来之后，可以阅读我们官网收录的源码分析文章，来对 Cloudeon 有更深入的理解。
 ## 寻找任务
 
 寻找您感兴趣的[Issue](https://github.com/dromara/CloudEon/issues) ！在我们的GitHub仓库和邮件列表中，我们经常会发布一些带有` good first issue `或者` status: volunteer wanted` 标签的issue，这些issue都欢迎贡献者的帮助。其中`good first issue`往往门槛较低、适合新手，您可以点击 链接 查看这些issue。
