@@ -1,0 +1,62 @@
+name: AMORO
+label: "Amoro"
+description: "数据湖管理平台"
+version: 0.5.0
+dockerImage: "registry.cn-hangzhou.aliyuncs.com/udh/amoro:0.5.0"
+dependencies:
+  - ZOOKEEPER
+  - HDFS
+  - YARN
+
+runAs: hadoop
+
+supportKerberos: false
+
+dashboard:
+  uid: 000000261
+
+roles:
+  - name: AMORO_AMS
+    label: "AMORO AMS"
+    roleFullName: "amoro-ams"
+    sortNum: 1
+    type: MASTER
+    needOdd: false
+    fixedNum: 1
+    logFile: "ams-info.log"
+    linkExpression: "http://${localhostname}:${conf['http-server.port']}"
+
+
+persistencePaths:
+  - /opt/edp/${service.serviceName}/conf
+  - /opt/edp/${service.serviceName}/log
+  - /opt/edp/${service.serviceName}/data
+
+
+customConfigFiles: []
+
+configurations:
+
+
+
+  - name: optimizing-service.port
+    recommendExpression: 1261
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "端口"
+
+  - name: table-service.port
+    recommendExpression: 1260
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "端口"
+
+  - name: http-server.port
+    recommendExpression: 1630
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "端口"
+
+
+
+
