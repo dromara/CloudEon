@@ -39,38 +39,35 @@
 ## 第一次提交 Pull Request
 
 如果您是第一次提交 Pr，首先您需要 Fork 目标仓库。（如果已经 Fork 则不需要再 Fork）
+![img.png](../images/pr-img.png)
 
-fork
+![img_1.png](../images/pr-img_1.png)
 
+在你的仓库里，创建新的功能分支
+![img_8.png](../images/pr-img_8.png)
+![img_2.png](../images/pr-img_2.png)
 然后 用git命令 将代码下载到本地：
 ```
 
-git clone git@github.com:${YOUR_USERNAME}/${TARGET_REPO}.git #推荐使用# 
+git clone git@github.com:${YOUR_USERNAME}/CloudEon.git #推荐使用# 
 ```
 也可以 
 ```
-git clone https://github.com/${YOUR_USERNAME}/${TARGET_REPO}.git
+git clone https://github.com/${YOUR_USERNAME}/CloudEon.git
 ```
 
 下载完成后，请参考目标仓库的入门指南或者 README 文件对项目进行初始化。
 
-接着，您可以参考如下命令进行代码的提交：
+接着使用Idea打开项目，切换到你刚才新建的功能分支
+![img_6.png](../images/pr-img_6.png)
 
-切换新的分支，进行开发
-```
-git checkout -b a-dev-branch
-```
-提交 commit
-```
-git add <modified file/path> #add后跟着改动的文件或目录
-git commit -m 'necessary instructions'
-```
+完成代码开发后，进行提交
 
-推送到远程仓库
-```
-git push origin a-dev-branch
-```
-然后您就可以在 GitHub 上发起新的 PR (Pull Request)。
+![img_5.png](../images/pr-img_5.png)
+
+创建PR申请(此操作在自己仓库)
 
 请注意 PR 的标题需要符合我们的规范，并且在 PR 中写上必要的说明，来方便 Committer 和其他贡献者进行代码审查。
 
+![img_9.png](../images/pr-img_9.png)
+![img_7.png](../images/pr-img_7.png)
