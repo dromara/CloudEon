@@ -1,0 +1,23 @@
+# Amoro on  K8s
+安装服务
+![img.png](../images/amoro/img.png)
+分配角色实例到指定节点安装
+![img_1.png](../images/amoro/img_1.png)
+修改初始化配置，需要填写mysql信息，数据库得提前自行准备好
+![img_2.png](../images/amoro/img_2.png)
+安装成功
+![img_4.png](../images/amoro/img_4.png)
+可以用在k8s集群上看到对应的pod
+![img_3.png](../images/amoro/img_3.png)
+打开web地址，默认密码是admin/admin
+![img_5.png](../images/amoro/img_5.png)
+可以看到amoro已经正常使用了
+![img_6.png](../images/amoro/img_6.png)
+添加group
+![img_7.png](../images/amoro/img_7.png)
+![img_8.png](../images/amoro/img_8.png)
+启动一个flink作业进行优化表
+![img_9.png](../images/amoro/img_9.png)
+可以看到flink作业已经正常在YARN上启动
+![img_10.png](../images/amoro/img_10.png)
+![img_11.png](../images/amoro/img_11.png)
