@@ -23,3 +23,6 @@ MAX_PERM_CONFIG="128"
 JMX_REMOTE_PORT_CONFIG=""
 JVM_EXTRA_CONFIG="-XX:NewRatio=1 -XX:SurvivorRatio=3"
 LANG_CONFIG="en_US.UTF-8"
+
+export JVM_EXTRA_CONFIG=" -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=5559:/home/hadoop/amoro/conf/jmx_prometheus.yaml "
+export JMX_REMOTE_PORT_CONFIG=9928

@@ -13,7 +13,7 @@ runAs: hadoop
 supportKerberos: false
 
 dashboard:
-  uid: 000000261
+  uid: qugC-I_VJ
 
 roles:
   - name: AMORO_AMS
