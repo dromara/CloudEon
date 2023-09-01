@@ -54,10 +54,12 @@ public class InitDinkyDBTask extends BaseCloudeonTask {
         String username = configRepository.findByServiceInstanceIdAndName(serviceInstanceId, "jdbc.mysql.username").getValue();
         String password = configRepository.findByServiceInstanceIdAndName(serviceInstanceId, "jdbc.mysql.password").getValue();
         String url = configRepository.findByServiceInstanceIdAndName(serviceInstanceId, "jdbc.mysql.address").getValue();
-        DataSource ds = new SimpleDataSource(url, username, password);
 
         String dinkySqlPath = stackLoadPath+ File.separator+ stackServiceEntity.getStackCode() + File.separator + stackServiceEntity.getName().toLowerCase() + File.separator + "sql" + File.separator + "dinky.sql";
-        try (Connection conn = ds.getConnection()) {
+        try (
+                SimpleDataSource ds = new SimpleDataSource(url, username, password);
+                Connection conn = ds.getConnection()
+        ) {
             FileInputStream sqlFileStream = new FileInputStream(dinkySqlPath);
             ScriptRunner initScriptRunner = new ScriptRunner(conn, true, true,log);
             Reader initSqlReader = new InputStreamReader(sqlFileStream);
