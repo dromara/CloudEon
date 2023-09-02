@@ -1,0 +1,48 @@
+name: FILEBEAT
+label: "Filebeat"
+description: "日志采集工具"
+version: 7.16.3
+dockerImage: "registry.cn-hangzhou.aliyuncs.com/udh/filebeat:7.16.3"
+dependencies:
+    - "ELASTICSEARCH"
+
+runAs: root
+
+supportKerberos: false
+
+dashboard:
+  uid: ""
+
+roles:
+
+  - name: FILEBEAT
+    label: "Filebeat"
+    roleFullName: "filebeat"
+    sortNum: 1
+    type: MASTER
+    minNum: 1
+    logFile: "filebeat.log"
+
+
+persistencePaths:
+  - /opt/edp/${service.serviceName}/conf
+  - /opt/edp/${service.serviceName}/log
+  - /opt/edp/${service.serviceName}/data
+
+
+customConfigFiles: []
+
+
+configurations:
+
+  - name: "registry.flush"
+    recommendExpression: "2"
+    valueType: InputNumber
+    configurableInWizard: true
+    description: "控制注册表项写入磁盘（刷新）的时间的超时值。"
+    tag: "常用参数"
+    unit: Seconds
+
+
+
+
