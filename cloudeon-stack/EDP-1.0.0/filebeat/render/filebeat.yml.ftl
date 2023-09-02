@@ -76,8 +76,21 @@ processors:
         hostip: "${localhostip}"
         hostname: "${localhostname}"
 
+  - rename:
+      fields:
+        - from: "log.offset"
+          to: "offset"
+        - from: "log.file.path"
+          to: "filePath"
+        - from: "fields.service"
+          to: "serviceName"
+        - from: "fields.role"
+          to: "roleName"
+
+
+
   - drop_fields:
-      fields: ["agent", "ecs", "input", "host"]
+      fields: ["agent", "ecs", "input", "host","log","fields"]
 
   - drop_event:
       when.or:
