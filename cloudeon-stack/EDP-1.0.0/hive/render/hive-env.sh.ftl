@@ -63,9 +63,9 @@ export HIVE_HEAP_MEMORY=$[ $MEM_LIMIT / 1024 / 1024  * ${ramPercentage} / 100 ]M
 # metastore服务器开启jmx监控
 if [ "$SERVICE" = "metastore" ]; then
     JMX_OPTS="-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.port=9919 -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=5549:/opt/edp/${service.serviceName}/conf/jmx_prometheus.yaml"
-    export HIVE_METASTORE_HADOOP_OPTS="$HIVE_METASTORE_HADOOP_OPTS -Xmx$HIVE_HEAP_MEMORY -Xms$HIVE_HEAP_MEMORY $JMX_OPTS"
+    export HIVE_METASTORE_HADOOP_OPTS="$HIVE_METASTORE_HADOOP_OPTS -Xmx$HIVE_HEAP_MEMORY -Xms$HIVE_HEAP_MEMORY $JMX_OPTS -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:/opt/edp/${service.serviceName}/log/gc-hive-metastore.log"
 fi
 # server2服务开启jmx监控
 if [ "$SERVICE" = "hiveserver2" ]; then
-    export HIVESERVER2_HADOOP_OPTS="$HIVESERVER2_HADOOP_OPTS -Xmx$HIVE_HEAP_MEMORY -Xms$HIVE_HEAP_MEMORY -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.port=9920 -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=5550:/opt/edp/${service.serviceName}/conf/jmx_prometheus.yaml"
+    export HIVESERVER2_HADOOP_OPTS="$HIVESERVER2_HADOOP_OPTS -Xmx$HIVE_HEAP_MEMORY -Xms$HIVE_HEAP_MEMORY -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.port=9920 -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=5550:/opt/edp/${service.serviceName}/conf/jmx_prometheus.yaml  -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:/opt/edp/${service.serviceName}/log/gc-hive-server2.log"
 fi

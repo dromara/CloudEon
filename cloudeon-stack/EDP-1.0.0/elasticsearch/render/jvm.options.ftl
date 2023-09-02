@@ -72,6 +72,8 @@
 
 # specify an alternative path for JVM fatal error logs
 -XX:ErrorFile=/opt/edp/${service.serviceName}/log/hs_err_pid%p.log
+-Xlog:gc*:file=/opt/edp/${service.serviceName}/log/gc-elasticsearch-node.log:time
+
 
 ## JDK 8 GC logging
 8:-XX:+PrintGCDetails

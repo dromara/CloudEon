@@ -25,3 +25,4 @@
 -Dcom.sun.management.jmxremote.authenticate=false
 -Dcom.sun.management.jmxremote.ssl=false
 -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=8099:/opt/edp/${service.serviceName}/conf/jmx_prometheus.yaml
+-Xlog:gc*:file=/opt/edp/${service.serviceName}/log/gc-trino-worker.log:time

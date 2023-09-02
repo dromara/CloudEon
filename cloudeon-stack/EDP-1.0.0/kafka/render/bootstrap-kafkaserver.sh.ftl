@@ -12,6 +12,7 @@ export JMX_PORT=${conf['kafka.jmx.port']}
 export KAFKA_HEAP_OPTS="-Xmx$heapRam -Xms$heapRam -XX:MaxDirectMemorySize=$directRam"
 
 export KAFKA_OPTS="$KAFKA_OPTS -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=5551:/opt/edp/${service.serviceName}/conf/jmx_prometheus.yaml"
+export KAFKA_OPTS="$KAFKA_OPTS -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:/opt/edp/${service.serviceName}/log/gc-kafka-broker.log"
 
 kafka-server-start.sh  /opt/edp/${service.serviceName}/conf/server.properties
 

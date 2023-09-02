@@ -53,8 +53,8 @@ export HADOOP_HEAPSIZE_MAX=$yarnHeapRam
 export HADOOP_HEAPSIZE_MIN=$yarnHeapRam
 
 # 添加jmx监控开放
-export YARN_NODEMANAGER_OPTS="$YARN_NODEMANAGER_OPTS -Dcom.sun.management.jmxremote.port=9917 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=5547:/opt/edp/${service.serviceName}/conf/jmx_prometheus.yaml"
-export YARN_RESOURCEMANAGER_OPTS="$YARN_RESOURCEMANAGER_OPTS -Dcom.sun.management.jmxremote.port=9918 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=5548:/opt/edp/${service.serviceName}/conf/jmx_prometheus.yaml"
+export YARN_NODEMANAGER_OPTS="$YARN_NODEMANAGER_OPTS -Dcom.sun.management.jmxremote.port=9917 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=5547:/opt/edp/${service.serviceName}/conf/jmx_prometheus.yaml -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:/opt/edp/${service.serviceName}/log/gc-hadoop-yarn-resourcemanager.log"
+export YARN_RESOURCEMANAGER_OPTS="$YARN_RESOURCEMANAGER_OPTS -Dcom.sun.management.jmxremote.port=9918 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=5548:/opt/edp/${service.serviceName}/conf/jmx_prometheus.yaml   -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:/opt/edp/${service.serviceName}/log/gc-hadoop-yarn-nodemanager.log"
 
 
 # so that filenames w/ spaces are handled correctly in loops below
