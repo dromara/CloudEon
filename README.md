@@ -77,6 +77,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/pan3793"><img src="https://avatars.githubusercontent.com/u/26535726?v=4?s=100" width="100px;" alt="Cheng Pan"/><br /><sub><b>Cheng Pan</b></sub></a><br /><a href="https://github.com/dromara/CloudEon/commits?author=pan3793" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/limaiwang"><img src="https://avatars.githubusercontent.com/u/23052750?v=4?s=100" width="100px;" alt="maiwang li"/><br /><sub><b>maiwang li</b></sub></a><br /><a href="https://github.com/dromara/CloudEon/commits?author=limaiwang" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/liang281778527"><img src="https://avatars.githubusercontent.com/u/26902335?v=4?s=100" width="100px;" alt="liang281778527"/><br /><sub><b>liang281778527</b></sub></a><br /><a href="https://github.com/dromara/CloudEon/commits?author=liang281778527" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/anzhen-tech"><img src="https://avatars.githubusercontent.com/u/16895736?v=4?s=100" width="100px;" alt="anzhen-tech"/><br /><sub><b>anzhen-tech</b></sub></a><br /><a href="https://github.com/dromara/CloudEon/commits?author=anzhen-tech" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
