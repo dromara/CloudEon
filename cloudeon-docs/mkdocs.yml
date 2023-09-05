@@ -68,6 +68,7 @@ nav:
       - 支持组件/YarnonK8s.md
       - 支持组件/DorisonK8s.md
       - 支持组件/ZookeeperOnK8s.md
+      - 支持组件/AmoroOnK8s.md
       - 支持组件/KafkaOnK8s.md
       - 支持组件/HbaseOnK8s.md
       - 支持组件/FlinkOnK8s.md

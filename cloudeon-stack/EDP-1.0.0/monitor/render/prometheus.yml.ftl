@@ -130,3 +130,6 @@ scrape_configs:
   - job_name: 'trinoworker'
     file_sd_configs:
     - files: ['discovery_configs/trinoworker.json']
+  - job_name: 'ams'
+    file_sd_configs:
+    - files: ['discovery_configs/ams.json']

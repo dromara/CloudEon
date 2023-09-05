@@ -76,6 +76,9 @@ public class CommandHandler {
                 if (stackServiceName.equals(DINKY_SERVICE_NAME)) {
                     taskGroupTypes.add(TaskGroupType.INIT_DINKY);
                 }
+                if (stackServiceName.equals(AMORO_SERVICE_NAME)) {
+                    taskGroupTypes.add(TaskGroupType.INIT_AMORO);
+                }
                 if (stackServiceName.equals(MONITOR_SERVICE_NAME)) {
                     taskGroupTypes.add(TaskGroupType.INIT_MONITOR);
                 }

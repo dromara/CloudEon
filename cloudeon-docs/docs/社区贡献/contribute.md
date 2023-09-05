@@ -5,19 +5,19 @@
 我们欢迎每一位贡献者的加入！
 ## 贡献方式
 
-在 Cludeon 社区，贡献方式有很多：
+在 Cloudeon 社区，贡献方式有很多：
 
 代码：可以帮助社区完成一些任务、编写新的feature或者是修复一些bug；
 
 测试：可以来参与测试代码的编写，包括了单元测试、集成测试、e2e测试；
 
-文档：可以编写或完善文档，来帮助用户更好地了解和使用 Cludeon；
+文档：可以编写或完善文档，来帮助用户更好地了解和使用 Cloudeon；
 
-博客：可以撰写 Cludeon 的相关文章，来帮助社区更好地推广；
+博客：可以撰写 Cloudeon 的相关文章，来帮助社区更好地推广；
 
-讨论：可以参与 Cludeon 新的feature的讨论，将您的想法跟 Cludeon 融合；
+讨论：可以参与 Cloudeon 新的feature的讨论，将您的想法跟 Cloudeon 融合；
 
-布道：可以帮助宣传或推广 Cludeon 社区，在 meetup 或 summit 中演讲；
+布道：可以帮助宣传或推广 Cloudeon 社区，在 meetup 或 summit 中演讲；
 
 建议：也可以对项目或者社区提出一些建议，促进社区的良性发展；
 ****
@@ -26,9 +26,8 @@
 
 ## 让 Cloudeon 运行起来
 
-让 Cloudeon 的代码在您的开发工具上运行起来，请参阅 本地部署 或者 Cloudeon 启动示例，并且能够断点调试。
+让 Cloudeon 的代码在您的开发工具上运行起来，请参阅 开发指南，并且能够断点调试。
 
-在运行起来之后，可以阅读我们官网收录的源码分析文章，来对 Cloudeon 有更深入的理解。
 ## 寻找任务
 
 寻找您感兴趣的[Issue](https://github.com/dromara/CloudEon/issues) ！在我们的GitHub仓库和邮件列表中，我们经常会发布一些带有` good first issue `或者` status: volunteer wanted` 标签的issue，这些issue都欢迎贡献者的帮助。其中`good first issue`往往门槛较低、适合新手，您可以点击 链接 查看这些issue。
