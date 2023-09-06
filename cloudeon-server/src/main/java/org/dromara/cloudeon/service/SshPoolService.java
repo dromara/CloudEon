@@ -17,6 +17,7 @@
 package org.dromara.cloudeon.service;
 
 import cn.hutool.extra.ssh.JschSessionPool;
+import cn.hutool.extra.ssh.JschUtil;
 import com.google.common.collect.Lists;
 import com.jcraft.jsch.Session;
 import org.apache.sshd.client.session.ClientSession;
@@ -35,14 +36,13 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class SshPoolService {
-    private JschSessionPool jschSessionPool = JschSessionPool.INSTANCE;
 
     public Session openSession(String server, int port, String username, String password) {
-        Session session = jschSessionPool.getSession(server, port, username, password);
+        Session session = JschUtil.openSession(server, port, username, password);
         return session;
     }
     public Session openSessionByPrivateKey(String server, int port, String username, String privateKey) {
-        Session session = jschSessionPool.getSession(server, port, username, privateKey,null);
+        Session session = JschUtil.openSession(server, port, username, privateKey, null);
         return session;
     }
 
@@ -50,9 +50,9 @@ public class SshPoolService {
         // 判断是用密码访问还是私钥
         Session session = null;
         if (nodeEntity.getSshAuthType().equals(SshAuthType.PASSWORD)) {
-            session=  jschSessionPool.getSession(nodeEntity.getIp(), nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getSshPassword());
+            session= openSession(nodeEntity.getIp(), nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getSshPassword());
         } else if (nodeEntity.getSshAuthType().equals(SshAuthType.PRIVATEKEY)) {
-            session=  jschSessionPool.getSession(nodeEntity.getIp(), nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getPrivateKeyPath(), null);
+            session= openSessionByPrivateKey(nodeEntity.getIp(), nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getPrivateKeyPath());
         }
         return session;
     }
