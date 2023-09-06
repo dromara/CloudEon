@@ -68,6 +68,9 @@ public class ClusterController {
     @Resource
     private KubeService kubeService;
 
+    @Resource
+    private ServiceRoleInstanceRepository roleInstanceRepository;
+
     @PostMapping("/save")
     @Transactional(rollbackFor = Exception.class)
     public ResultDTO<Void> saveCluster(@RequestBody ModifyClusterInfoRequest req) {
@@ -151,5 +154,11 @@ public class ClusterController {
 
 
 
-
+    @GetMapping("/roleNames")
+    public ResultDTO<List<String>> getServiceRoles(Integer clusterId) {
+        List<String> names = roleInstanceRepository.findByClusterId(clusterId).stream().map(e -> {
+            return e.getServiceRoleName();
+        }).distinct().collect(Collectors.toList());
+        return ResultDTO.success(names);
+    }
 }

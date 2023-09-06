@@ -84,7 +84,7 @@ export async function getListK8sNodeAPI(options?: { [key: string]: any }) {
 }
 
 //新增节点
-export async function createNodeAPI(options?: { [key: string]: any }) {  
+export async function createNodeAPI(options?: { [key: string]: any }) {
   return request<API.normalResult>('/apiPre/node/add', {
     method: 'POST',
     data: {...(options || {})},
@@ -348,7 +348,7 @@ export async function saveRulesAlertAPI(options?: { [key: string]: any }) {
   });
 }
 
- 
+
 /** 获取框架服务列表 */
 export async function getStackServiceRolesAPI(options?: { [key: string]: any }) {
   return request<API.anyResult>('/apiPre/stack/mapStackServiceRoles', {
@@ -357,6 +357,29 @@ export async function getStackServiceRolesAPI(options?: { [key: string]: any }) 
       ...options,
     },
   });
-}       
+}
 
-
+/**
+ * 查询服务日志
+ */
+export async function getServiceLogAPI(options?: { [key: string]: any }) {
+  console.log(options);
+  return request<API.normalResult>('/apiPre/log/serviceRoleLog', {
+    method: 'GET',
+    params: {
+      ...options,
+    },
+  });
+}
+/**
+ * 查询服务日志
+ */
+export async function getRoleNamesAPI(options?: { [key: string]: any }) {
+  console.log(options);
+  return request<API.normalResult>('/apiPre/cluster/roleNames', {
+    method: 'GET',
+    params: {
+      ...options,
+    },
+  });
+}

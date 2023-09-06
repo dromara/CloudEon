@@ -19,7 +19,9 @@ package org.dromara.cloudeon.controller;
 import cn.hutool.core.io.FileUtil;
 import org.dromara.cloudeon.dao.CommandTaskRepository;
 import org.dromara.cloudeon.dto.ResultDTO;
+import org.dromara.cloudeon.dto.ServiceRoleLogPage;
 import org.dromara.cloudeon.entity.CommandTaskEntity;
+import org.dromara.cloudeon.service.LogService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,6 +36,9 @@ public class LogController {
     @Resource
     private CommandTaskRepository commandTaskRepository;
 
+    @Resource
+    private LogService logService;
+
     @GetMapping("/task")
     public ResultDTO<String> commandTaskLog(Integer commandTaskId) {
         CommandTaskEntity commandTaskEntity = commandTaskRepository.findById(commandTaskId).get();
@@ -41,4 +46,17 @@ public class LogController {
         String result = FileUtil.readUtf8String(new File(taskLogPath));
         return ResultDTO.success(result);
     }
+
+    @GetMapping("/serviceRoleLog")
+    public ResultDTO<ServiceRoleLogPage> serviceRoleLog(Integer clusterId,String roleName,String logLevel,Integer from,Integer pageSize) {
+        if (pageSize==null){
+            pageSize = 10;
+        }
+        if (from==null){
+            from = 0;
+        }
+        ServiceRoleLogPage serviceLog = logService.getServiceLog(clusterId, roleName, logLevel, from, pageSize);
+        return ResultDTO.success(serviceLog);
+    }
+
 }

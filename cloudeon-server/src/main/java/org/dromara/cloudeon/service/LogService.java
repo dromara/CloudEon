@@ -18,10 +18,11 @@ package org.dromara.cloudeon.service;
 
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.StrUtil;
-import org.dromara.cloudeon.dao.ClusterNodeRepository;
-import org.dromara.cloudeon.dao.ServiceInstanceRepository;
-import org.dromara.cloudeon.dao.ServiceRoleInstanceRepository;
-import org.dromara.cloudeon.dao.StackServiceRoleRepository;
+import com.google.common.collect.Maps;
+import org.apache.http.HttpHost;
+import org.dromara.cloudeon.dao.*;
+import org.dromara.cloudeon.dto.ServiceRoleLog;
+import org.dromara.cloudeon.dto.ServiceRoleLogPage;
 import org.dromara.cloudeon.dto.WsSessionBean;
 import org.dromara.cloudeon.entity.ClusterNodeEntity;
 import org.dromara.cloudeon.entity.ServiceInstanceEntity;
@@ -34,6 +35,18 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.cloudeon.utils.Constant;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.sort.SortBuilders;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -41,6 +54,10 @@ import org.springframework.web.socket.WebSocketSession;
 import javax.annotation.Resource;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -57,6 +74,9 @@ public class LogService {
 
     @Resource
     private ClusterNodeRepository clusterNodeRepository;
+
+    @Resource
+    private ServiceInstanceConfigRepository serviceInstanceConfigRepository;
 
     /**
      * 主要逻辑
@@ -121,5 +141,60 @@ public class LogService {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public ServiceRoleLogPage getServiceLog(Integer clusterId,String roleName,String logLevel,int from,int pageSize) {
+        ServiceRoleLogPage result = ServiceRoleLogPage.builder().build();
+        // 查询es服务实例
+        Integer serviceInstanceId = serviceInstanceRepository.findByServiceNameAndClusterId("ELASTICSEARCH",clusterId).getId();
+        List<ServiceRoleInstanceEntity> roleInstanceEntities = roleInstanceRepository.findByServiceInstanceIdAndServiceRoleName(serviceInstanceId, "ELASTICSEARCH_NODE");
+        ServiceRoleInstanceEntity serviceRoleInstanceEntity = roleInstanceEntities.get(0);
+        String ip = clusterNodeRepository.findById(serviceRoleInstanceEntity.getNodeId()).get().getIp();
+        String value = serviceInstanceConfigRepository.findByServiceInstanceIdAndName(serviceInstanceId, "elasticsearch.http.listeners.port").getValue();
+
+
+        RestHighLevelClient client = new RestHighLevelClient(
+            RestClient.builder(
+                new HttpHost(ip, Integer.parseInt(value), "http") // Elasticsearch主机和端口
+            )
+        );
+
+        // 构建查询条件
+        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
+            .must(QueryBuilders.termQuery("roleName", roleName))
+            .must(QueryBuilders.termQuery("logLevel", logLevel));
+
+        SearchRequest request = new SearchRequest("filebeat-7.16.3");
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder()
+            .query(boolQuery)
+            .sort(SortBuilders.fieldSort("bizTime").order(SortOrder.DESC))
+            .from(from)
+            .size(pageSize);
+
+        request.source(sourceBuilder);
+
+        SearchResponse response = null;
+        try {
+            response = client.search(request, RequestOptions.DEFAULT);
+            long totalHits = response.getHits().getTotalHits().value; // 获取总匹配的文档数量
+            long totalPages = (totalHits + pageSize - 1) / pageSize; // 计算总页数
+            result.setTotalPage(totalPages);
+
+            List<ServiceRoleLog> serviceRoleLogs = Arrays.stream(response.getHits().getHits()).map(new Function<SearchHit, ServiceRoleLog>() {
+                @Override
+                public ServiceRoleLog apply(SearchHit documentFields) {
+                    String message = (String) documentFields.getSourceAsMap().get("message");
+                    String hostip = (String) documentFields.getSourceAsMap().get("hostip");
+                    String bizTime = (String) documentFields.getSourceAsMap().get("bizTime");
+                    return ServiceRoleLog.builder().message(message).hostip(hostip).bizTime(bizTime).build();
+                }
+            }).collect(Collectors.toList());
+            result.setLogs(serviceRoleLogs);
+            client.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return result;
     }
 }
