@@ -27,6 +27,10 @@ import freemarker.cache.StringTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import io.fabric8.kubernetes.api.model.Event;
+import io.fabric8.kubernetes.api.model.EventList;
+import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.client.KubernetesClient;
 import io.vertx.core.Vertx;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.cloudeon.config.CloudeonConfigProp;
@@ -39,6 +43,7 @@ import org.dromara.cloudeon.entity.*;
 import org.dromara.cloudeon.enums.*;
 import org.dromara.cloudeon.processor.TaskParam;
 import org.dromara.cloudeon.service.CommandHandler;
+import org.dromara.cloudeon.service.KubeService;
 import org.dromara.cloudeon.utils.DAG;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -49,6 +54,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -114,6 +121,12 @@ public class ClusterServiceController {
 
     @Resource
     private ServiceInstanceSeqRepository serviceInstanceSeqRepository;
+
+    @Resource
+    private ClusterInfoRepository clusterInfoRepository;
+
+    @Resource
+    private KubeService kubeService;
 
     @PostMapping("/initService")
     public ResultDTO<Void> initService(@RequestBody InitServiceRequest req) {
@@ -922,6 +935,70 @@ public class ClusterServiceController {
         }).collect(Collectors.toList());
 
         return ResultDTO.success(result);
+    }
+
+
+    @GetMapping("/rolePodEvents")
+    public ResultDTO<List<RolePodEventVO>> rolePodEvents(Integer roleId,Integer clusterId) {
+        ServiceRoleInstanceEntity roleInstanceEntity = roleInstanceRepository.findById(roleId).get();
+        StackServiceRoleEntity stackServiceRoleEntity = stackServiceRoleRepository.findById(roleInstanceEntity.getStackServiceRoleId()).get();
+        Integer nodeId = roleInstanceEntity.getNodeId();
+        String hostIp = clusterNodeRepository.findById(nodeId).get().getIp();
+        String namespace = clusterInfoRepository.findById(clusterId).get().getNamespace();
+        ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(roleInstanceEntity.getServiceInstanceId()).get();
+        KubernetesClient client = kubeService.getKubeClient(clusterId);
+        String roleServiceFullName = stackServiceRoleEntity.getRoleFullName() + "-" + serviceInstanceEntity.getServiceName().toLowerCase();
+
+        // 带有标签的pod
+        List<Pod> podList = client.pods().inNamespace(namespace).withLabel("app", roleServiceFullName).list().getItems();
+        // 指定节点的pod
+        Pod pod = podList.stream().filter(new Predicate<Pod>() {
+            @Override
+            public boolean test(Pod pod) {
+                return pod.getStatus().getHostIP().equals(hostIp);
+            }
+        }).findFirst().get();
+
+
+        EventList eventList = client.v1().events()
+            .inNamespace(namespace)
+            .withField("involvedObject.name",pod.getMetadata().getName())
+            .list();
+        // 创建 SimpleDateFormat 对象，指定输入的日期格式
+        SimpleDateFormat inputSdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        List<RolePodEventVO> rolePodEventVOS = eventList.getItems().stream().map(new Function<Event, RolePodEventVO>() {
+            @Override
+            public RolePodEventVO apply(Event event) {
+                // 设置时区为 UTC
+                inputSdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+                // 解析 UTC 时间字符串为 Date 对象
+                Date utcDate = null;
+                try {
+                    utcDate = inputSdf.parse(event.getLastTimestamp());
+                } catch (ParseException e) {
+                    throw new RuntimeException(e);
+                }
+
+                // 创建 SimpleDateFormat 对象，指定输出的日期格式
+                SimpleDateFormat outputSdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+                // 设置时区为北京时间（东八区）
+                outputSdf.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"));
+
+                // 格式化为北京时间字符串
+                String beijingTimeStr = outputSdf.format(utcDate);
+                RolePodEventVO eventVO = RolePodEventVO.builder()
+                    .type(event.getType())
+                    .message(event.getMessage())
+                    .reason(event.getReason())
+                    .count(event.getCount())
+                    .lastTimestamp(beijingTimeStr)
+                    .build();
+                return eventVO;
+            }
+        }).collect(Collectors.toList());
+        return ResultDTO.success(rolePodEventVOS);
     }
 
 }
