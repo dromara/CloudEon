@@ -383,3 +383,12 @@ export async function getRoleNamesAPI(options?: { [key: string]: any }) {
     },
   });
 }
+export async function rolePodEventsAPI(options?: { [key: string]: any }) {
+  console.log(options);
+  return request<API.normalResult>('/apiPre/service/rolePodEvents', {
+    method: 'GET',
+    params: {
+      ...options,
+    },
+  });
+}
