@@ -1,6 +1,6 @@
 import type {ProColumns} from '@ant-design/pro-components';
 import {ProTable, ActionType, TableDropdown} from '@ant-design/pro-components';
-import {Spin, Button, Popconfirm, message, Tooltip, Modal, Table} from 'antd';
+import {Spin, Button, Popconfirm, message, Tooltip, Modal, Table, Tabs} from 'antd';
 import {AlertFilled} from '@ant-design/icons';
 import {useState, useEffect, useRef} from 'react';
 import styles from './index.less'
@@ -25,6 +25,7 @@ const roleTab:React.FC<{ serviceId: any}> = ({serviceId}) => {
     const [podEventData, setPodEventData] = useState<PodEventDataType[]>();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isPodEventModalOpen, setIsPodEventModalOpen] = useState(false);
+    const [roleNameTabs, setRoleNameTabs] = useState<any[]>();
     const [sessionId, setSessionId] = useState('');
     const [logInfo, setLogInfo] = useState('');
     const [socketRef, setSocketRef] = useState<WebSocket>();
@@ -77,7 +78,9 @@ const roleTab:React.FC<{ serviceId: any}> = ({serviceId}) => {
         const result = await getServiceRolesAPI(params)
         setApiLoading(false)
         if(result?.success){
-        setRolesInfo(result?.data)
+            setRolesInfo(result?.data)
+            fetchRoleData(result)
+
         }
     }
 
@@ -185,6 +188,7 @@ const roleTab:React.FC<{ serviceId: any}> = ({serviceId}) => {
             title: '名称',
             key:'name',
             dataIndex: 'name',
+            hideInTable: true,
             render: (_, record) => <>
             <span>{record.name}</span>
             {
@@ -206,6 +210,17 @@ const roleTab:React.FC<{ serviceId: any}> = ({serviceId}) => {
             }
             </>,
         },
+
+        {
+            title: '主机名称',
+            key:'nodeHostname',
+            dataIndex: 'nodeHostname',
+        },
+        {
+            title: '主机ip',
+            key:'nodeHostIp',
+            dataIndex: 'nodeHostIp',
+        },
         {
             title: '状态',
             key:'roleStatusValue',
@@ -219,16 +234,6 @@ const roleTab:React.FC<{ serviceId: any}> = ({serviceId}) => {
                 4: { text: '角色停止中', status: 'Error' },
                 // error: { text: '异常', status: 'Error' },
             },
-        },
-        {
-            title: '主机名称',
-            key:'nodeHostname',
-            dataIndex: 'nodeHostname',
-        },
-        {
-            title: '主机ip',
-            key:'nodeHostIp',
-            dataIndex: 'nodeHostIp',
         },
         {
             title: '操作',
@@ -286,23 +291,51 @@ const roleTab:React.FC<{ serviceId: any}> = ({serviceId}) => {
             ],
         },
     ];
+     function fetchRoleData(result: API.serviceRolesResult) {
+        const roleNames = result.data?.map((value, index, array) => {
+            return String(value.name)
+        })
+
+        // roleNames去重
+        const roleTabs= Array.from(new Set(roleNames))?.map((name, i) => {
+            return {
+                label: `${name}`,
+                key: name,
+                children:  (
+                    <Spin tip="Loading" size="small" spinning={!!apiLoading || !!confirmLoading}>
+                        <ProTable
+                            dataSource={result.data?.filter((item) => {
+                                return item.name === name
+                            })}
+
+                            rowKey="id"
+                            pagination={{
+                                showQuickJumper: true,
+                            }}
+                            columns={columns}
+                            search={false}
+                            options={false}
+
+
+                        />
+                    </Spin>),
+            };
+        })
+
+        setRoleNameTabs(roleTabs)
+    }
+
+
 
     return (
         <div style={{minHeight:'200px'}} className={styles.roleTab}>
-            <Spin tip="Loading" size="small" spinning={!!apiLoading || !!confirmLoading}>
-                <ProTable
-                    dataSource={rolesInfo}
-                    rowKey="id"
-                    pagination={{
-                        showQuickJumper: true,
-                    }}
-                    columns={columns}
-                    search={false}
-                    request={async (params = {}, sort, filter) => {
-                        return getServiceRolesAPI({serviceInstanceId: serviceId})
-                      }}
-                />
-            </Spin>
+            <Tabs
+                defaultActiveKey="1"
+                tabPosition={'left'}
+                // style={{ height: 220 }}
+                items={roleNameTabs}
+            />
+
             <Modal
                 key="logmodal"
                 title={<>日志信息 &nbsp;&nbsp;<Spin size="small"/></>}
