@@ -18,6 +18,7 @@ package org.dromara.cloudeon.controller;
 
 import cn.hutool.core.bean.BeanUtil;
 import org.dromara.cloudeon.controller.response.CommandDetailVO;
+import org.dromara.cloudeon.controller.response.CommandVO;
 import org.dromara.cloudeon.dao.CommandRepository;
 import org.dromara.cloudeon.dao.CommandTaskRepository;
 import org.dromara.cloudeon.dto.ResultDTO;
@@ -49,9 +50,28 @@ public class CommandController {
 
 
     @GetMapping("/list")
-    public ResultDTO<List<CommandEntity>> listCommand(Integer clusterId) {
-        List<CommandEntity> result;
-        result = commandRepository.findByClusterIdOrderBySubmitTimeDesc(clusterId);
+    public ResultDTO<List<CommandVO>> listCommand(Integer clusterId) {
+        List<CommandVO> result;
+        result = commandRepository.findByClusterIdOrderBySubmitTimeDesc(clusterId).stream().map(new Function<CommandEntity, CommandVO>() {
+            @Override
+            public CommandVO apply(CommandEntity commandEntity) {
+                CommandVO commandVO = new CommandVO();
+                BeanUtil.copyProperties(commandEntity, commandVO);
+                // 查出关联的commandTask
+                List<CommandTaskEntity> taskEntities = commandTaskRepository.findByCommandId(commandEntity.getId());
+                List<String> serviceNames = taskEntities.stream().map(new Function<CommandTaskEntity, String>() {
+                    @Override
+                    public String apply(CommandTaskEntity commandTaskEntity) {
+                        return commandTaskEntity.getServiceInstanceName();
+                    }
+                }).distinct().collect(Collectors.toList());
+                commandVO.setServiceNames(serviceNames);
+                return commandVO;
+            }
+        }).collect(Collectors.toList());
+
+
+
         return ResultDTO.success(result);
     }
 
