@@ -1,6 +1,7 @@
 import {PageContainer, ProTable} from '@ant-design/pro-components';
 import React, {useEffect, useState} from 'react';
 import {getRoleNamesAPI, getServiceLogAPI} from '@/services/ant-design-pro/colony';
+import styles from './index.less'
 
 const actionList: React.FC = () => {
     const [logListData, setLogListData] = useState<any[]>();
@@ -106,7 +107,7 @@ const actionList: React.FC = () => {
 
 
     return (
-        <PageContainer>
+        <PageContainer className={styles.logSearchPageContainer} header={{title:''}}>
 
             <ProTable
                 search={{defaultCollapsed:false}}

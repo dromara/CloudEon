@@ -176,7 +176,7 @@ const actionList: React.FC = () => {
 
 
   return (
-    <PageContainer>
+    <PageContainer className={styles.actionListPageContainer}>
       {/* <div>
         <div className={styles.carBar}>
           <div>

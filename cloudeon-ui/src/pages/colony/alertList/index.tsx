@@ -12,7 +12,7 @@ import styles from './index.less'
 const { TextArea } = Input;
 
 const alertList: React.FC = () => {
-  const intl = useIntl();
+  // const intl = useIntl();
   const [alertLevelOptions, setAlertLevelOptions] = useState<any[]>();
   const [serviceOptions, setServiceOptions] = useState<any[]>();
   const [roleOptions, setRoleOptions] = useState<any[]>();
@@ -372,7 +372,7 @@ const alertList: React.FC = () => {
       onFilter: true,
       render: (_: any, record:API.alertRulesItem) => {
         return (
-          <div style={{minWidth:'100px',maxWidth:'300px'}}>{record.promql}</div>
+          <div style={{minWidth:'100px',maxWidth:'200px'}}>{record.promql}</div>
         )
       }
     },
@@ -396,7 +396,7 @@ const alertList: React.FC = () => {
       onFilter: true,
       render: (_: any, record:API.alertRulesItem) => {
         return (
-          <div style={{minWidth:'100px'}}>{record.alertAdvice }</div>
+          <div>{record.alertAdvice }</div>
         )
       }
     },
@@ -540,7 +540,7 @@ const alertList: React.FC = () => {
   
 
   return (
-    <PageContainer>
+    <PageContainer className={styles.alertListPageContainer} header={{title:''}}>
       <div className={styles.tabsBar}>
           {
             tabs.map(item=>{

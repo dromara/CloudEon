@@ -1,5 +1,5 @@
-import { QuestionCircleOutlined, AppstoreFilled } from '@ant-design/icons';
-import { Space } from 'antd';
+import { QuestionCircleFilled,GithubFilled, AppstoreFilled, InfoCircleFilled } from '@ant-design/icons';
+import { Space, Tooltip } from 'antd';
 import React from 'react';
 import { SelectLang, useModel, history } from 'umi';
 import HeaderSearch from '../HeaderSearch';
@@ -44,6 +44,37 @@ const GlobalHeaderRight: React.FC = () => {
           </div>
         ):''
       }
+
+      <div className={styles.aWrap}>
+        <Tooltip title="官网" placement="bottom">
+          <InfoCircleFilled 
+            className={styles.aText}
+            key="InfoCircleFilled" 
+            onClick={() => {
+              window.open('https://cloudeon.top/');
+            }}
+          />
+        </Tooltip>
+        <Tooltip title="文档" placement="bottom">
+          <QuestionCircleFilled 
+            className={styles.aText}
+            key="QuestionCircleFilled" 
+            onClick={() => {
+              window.open('https://docs.cloudeon.top/en/dev/');
+            }}
+          />
+        </Tooltip>
+        <Tooltip title="github" placement="bottom">
+          <GithubFilled 
+            className={styles.aText}
+            key="GithubFilled"
+            onClick={() => {
+              window.open('https://github.com/dromara/CloudEon');
+            }}
+          />
+        </Tooltip>
+        
+      </div>
       {/* <HeaderSearch
         className={`${styles.action} ${styles.search}`}
         placeholder="站内搜索"
