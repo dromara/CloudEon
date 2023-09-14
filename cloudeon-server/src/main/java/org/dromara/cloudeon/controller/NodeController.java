@@ -86,7 +86,9 @@ public class NodeController {
         NodeInfoVO k8sNodeInfoVO = items.stream().filter(new Predicate<Node>() {
             @Override
             public boolean test(Node node) {
-                String nodeIp = node.getStatus().getAddresses().get(0).getAddress();
+                String nodeIp = node.getStatus().getAddresses().stream().filter(n -> {
+                    return n.getType().equals("InternalIP");
+                }).findFirst().get().getAddress();
                 return ip.equals(nodeIp);
             }
         }).map(new Function<Node, NodeInfoVO>() {
@@ -149,7 +151,9 @@ public class NodeController {
         Map<String, Node> nodeMap = items.stream().collect(Collectors.toMap(new Function<Node, String>() {
             @Override
             public String apply(Node node) {
-                return node.getStatus().getAddresses().get(0).getAddress();
+                return node.getStatus().getAddresses().stream().filter(n -> {
+                    return n.getType().equals("InternalIP");
+                }).findFirst().get().getAddress();
             }
         }, node -> node));
         // 从数据库查出当前集群绑定的节点
