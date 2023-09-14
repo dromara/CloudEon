@@ -191,7 +191,9 @@ public class NodeController {
         List<NodeInfoVO> result = items.stream().filter(new Predicate<Node>() {
             @Override
             public boolean test(Node node) {
-                String ip = node.getStatus().getAddresses().get(0).getAddress();
+                String ip = node.getStatus().getAddresses().stream().filter(n -> {
+                    return n.getType().equals("InternalIP");
+                }).findFirst().get().getAddress();
                 //  过滤出未绑定的节点
                 return !clusterIpSets.contains(ip);
             }
