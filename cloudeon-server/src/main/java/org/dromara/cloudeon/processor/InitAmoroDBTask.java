@@ -53,7 +53,7 @@ public class InitAmoroDBTask  extends BaseCloudeonTask  {
         String url = configRepository.findByServiceInstanceIdAndName(serviceInstanceId, "ams.mysql.ConnectionURL").getValue();
         DataSource ds = new SimpleDataSource(url, username, password);
 
-        String sqlPath = stackLoadPath+ File.separator+ stackServiceEntity.getStackCode() + File.separator + stackServiceEntity.getName() + File.separator + Constant.StackPackageRenderDir + File.separator+ "mysql"+ File.separator+ "ams-mysql-init.sql";
+        String sqlPath = stackLoadPath+ File.separator+ stackServiceEntity.getStackCode() + File.separator + stackServiceEntity.getName().toLowerCase() + File.separator + Constant.StackPackageRenderDir + File.separator+ "mysql"+ File.separator+ "ams-mysql-init.sql";
         try (Connection conn = ds.getConnection()) {
             FileInputStream sqlFileStream = new FileInputStream(sqlPath);
             ScriptRunner initScriptRunner = new ScriptRunner(conn, true, true,log);
