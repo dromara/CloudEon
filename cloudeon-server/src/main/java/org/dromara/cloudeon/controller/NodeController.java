@@ -86,7 +86,7 @@ public class NodeController {
         NodeInfoVO k8sNodeInfoVO = items.stream().filter(new Predicate<Node>() {
             @Override
             public boolean test(Node node) {
-                String nodeIp = node.getStatus().getAddresses().get(0).getAddress();
+                String nodeIp = getNodeIp(node);
                 return ip.equals(nodeIp);
             }
         }).map(new Function<Node, NodeInfoVO>() {
@@ -149,7 +149,7 @@ public class NodeController {
         Map<String, Node> nodeMap = items.stream().collect(Collectors.toMap(new Function<Node, String>() {
             @Override
             public String apply(Node node) {
-                return node.getStatus().getAddresses().get(0).getAddress();
+                return getNodeIp(node);
             }
         }, node -> node));
         // 从数据库查出当前集群绑定的节点
@@ -187,7 +187,7 @@ public class NodeController {
         List<NodeInfoVO> result = items.stream().filter(new Predicate<Node>() {
             @Override
             public boolean test(Node node) {
-                String ip = node.getStatus().getAddresses().get(0).getAddress();
+                String ip = getNodeIp(node);
                 //  过滤出未绑定的节点
                 return !clusterIpSets.contains(ip);
             }
@@ -205,13 +205,8 @@ public class NodeController {
         int cpu = e.getStatus().getCapacity().get("cpu").getNumericalAmount().intValue();
         long memory = e.getStatus().getCapacity().get("memory").getNumericalAmount().longValue();
         long storage = e.getStatus().getCapacity().get("ephemeral-storage").getNumericalAmount().longValue();
-        List<NodeAddress> nodeAddresses = e.getStatus().getAddresses();
-        String ip =  nodeAddresses.stream().filter(n -> {
-            return n.getType().equals("InternalIP");
-        }).findFirst().get().getAddress();
-        String hostname = nodeAddresses.stream().filter(n -> {
-            return n.getType().equals("Hostname");
-        }).findFirst().get().getAddress();
+        String ip =  getNodeIp(e);
+        String hostname = getNodeHostname(e);
         String architecture = e.getStatus().getNodeInfo().getArchitecture();
         String containerRuntimeVersion = e.getStatus().getNodeInfo().getContainerRuntimeVersion();
         String kubeletVersion = e.getStatus().getNodeInfo().getKubeletVersion();
@@ -231,5 +226,17 @@ public class NodeController {
                 .osImage(osImage)
                 .build();
         return nodeInfoVO;
+    }
+
+    private String getNodeIp(Node e) {
+        return e.getStatus().getAddresses().stream().filter(n -> {
+            return n.getType().equals("InternalIP");
+        }).findFirst().get().getAddress();
+    }
+
+    private String getNodeHostname(Node e) {
+        return e.getStatus().getAddresses().stream().filter(n -> {
+            return n.getType().equals("Hostname");
+        }).findFirst().get().getAddress();
     }
 }
