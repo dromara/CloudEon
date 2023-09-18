@@ -23,3 +23,16 @@
 ![dinky11.png](../images/dinky/dinky11.png)
 可以看到flink作业已经正常在flink集群上启动
 ![dinky12.png](../images/dinky/dinky12.png)
+
+
+Dinky支持Flink Yarn Application模式
+
+在注册中心的集群管理中使用集群配置管理功能创建flink集群
+![dinky13.png](../images/dinky/dinky13.png)
+注意:
+Hadoop 配置文件路径:/opt/edp/dinky/conf/  (固定)<br />
+Flink 配置文件路径:/opt/flink-1.15.4/conf (固定)<br />
+lib 路径:hdfs:///flink/lib    (默认，可自定义，但是需要将Flink的lib目录下的jar上传至自定义的hdfs目录)<br />
+如需上传至自定义目录可进入dinky容器执行以下命令:<br />
+hdfs dfs -put $FLINK_HOME/lib/*.jar  newpath
+![dinky14.png](../images/dinky/dinky14.png)
