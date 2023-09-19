@@ -97,6 +97,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/liang281778527"><img src="https://avatars.githubusercontent.com/u/26902335?v=4?s=100" width="100px;" alt="liang281778527"/><br /><sub><b>liang281778527</b></sub></a><br /><a href="https://github.com/dromara/CloudEon/commits?author=liang281778527" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/anzhen-tech"><img src="https://avatars.githubusercontent.com/u/16895736?v=4?s=100" width="100px;" alt="anzhen-tech"/><br /><sub><b>anzhen-tech</b></sub></a><br /><a href="https://github.com/dromara/CloudEon/commits?author=anzhen-tech" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://lidong1665.github.io"><img src="https://avatars.githubusercontent.com/u/9442552?v=4?s=100" width="100px;" alt="奋斗吧少年"/><br /><sub><b>奋斗吧少年</b></sub></a><br /><a href="https://github.com/dromara/CloudEon/commits?author=lidong1665" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/rugalcrimson"><img src="https://avatars.githubusercontent.com/u/15381951?v=4?s=100" width="100px;" alt="rugalcrimson"/><br /><sub><b>rugalcrimson</b></sub></a><br /><a href="https://github.com/dromara/CloudEon/commits?author=rugalcrimson" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
