@@ -19,7 +19,7 @@ COPY cloudeon-assembly-* .
 RUN mv   cloudeon-assembly-*   cloudeon-assembly
 
 # 健康检查
-HEALTHCHECK CMD curl -X POST -f http://localhost:7700 || exit 1
+HEALTHCHECK CMD curl -X GET -f http://localhost:7700 || exit 1
 
 EXPOSE 7700
 
