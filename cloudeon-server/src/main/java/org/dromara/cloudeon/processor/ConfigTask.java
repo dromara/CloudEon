@@ -277,7 +277,6 @@ public class ConfigTask extends BaseCloudeonTask {
                 || stackServiceName.equalsIgnoreCase(Constant.SPARK_SERVICE_NAME )
                 || stackServiceName.equalsIgnoreCase(Constant.KYUUBI_SERVICE_NAME )
                 || stackServiceName.equalsIgnoreCase(Constant.KYLIN_SERVICE_NAME )
-                || stackServiceName.equalsIgnoreCase(Constant.DINKY_SERVICE_NAME )
                 ) {
             List<Integer> instanceIds = Arrays.stream(depServiceInstanceIds).map(new Function<String, Integer>() {
                 @Override
