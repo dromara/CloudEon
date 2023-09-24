@@ -25,7 +25,6 @@ public enum TaskType {
 
     TAG_HOST(1, "添加k8s节点标签", "org.dromara.cloudeon.processor.TagHostLabelTask", true),
     START_K8S_SERVICE(2, "启动角色k8s服务", "org.dromara.cloudeon.processor.StartRoleK8sDeploymentTask", false),
-    PULL_IMAGE_FROM_REGISTRY_TO_HOST(3, "拉取容器镜像到节点", "org.dromara.cloudeon.processor.PullImageTask", true),
     INSTALL_ROLE_TO_HOST(4, "初始化安装目录到节点", "org.dromara.cloudeon.processor.InstallTask", true),
     CONFIG_ROLE_TO_HOST(5, "分发配置到节点", "org.dromara.cloudeon.processor.ConfigTask", true),
     INIT_HDFS_NAMENODE(6, "初始化NameNode", "org.dromara.cloudeon.processor.HdfsZkfcFormatTask", false),
