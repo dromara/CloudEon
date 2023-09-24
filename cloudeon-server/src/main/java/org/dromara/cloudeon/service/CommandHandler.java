@@ -16,6 +16,11 @@
  */
 package org.dromara.cloudeon.service;
 
+import com.google.common.collect.Lists;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.dromara.cloudeon.dto.NodeInfo;
 import org.dromara.cloudeon.dto.ServiceTaskGroupType;
 import org.dromara.cloudeon.dto.SpecRoleHost;
@@ -23,11 +28,6 @@ import org.dromara.cloudeon.dto.TaskModel;
 import org.dromara.cloudeon.enums.CommandType;
 import org.dromara.cloudeon.enums.TaskGroupType;
 import org.dromara.cloudeon.enums.TaskType;
-import com.google.common.collect.Lists;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -52,7 +52,6 @@ public class CommandHandler {
         switch (commandType) {
             case INSTALL_SERVICE:
                 List<TaskGroupType> taskGroupTypes = Lists.newArrayList();
-                taskGroupTypes.add(TaskGroupType.PULL_IMAGE_FROM_REGISTRY);
                 taskGroupTypes.add(TaskGroupType.INSTALL_SERVICE);
                 taskGroupTypes.add(TaskGroupType.CONFIG_SERVICE);
                 if (stackServiceName.equals(HDFS_SERVICE_NAME)) {
