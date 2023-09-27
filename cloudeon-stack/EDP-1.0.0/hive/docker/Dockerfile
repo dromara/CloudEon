@@ -10,6 +10,10 @@ RUN wget https://archive.apache.org/dist/hadoop/common/hadoop-3.3.4/hadoop-3.3.4
     && wget https://archive.apache.org/dist/hive/hive-3.1.3/apache-hive-3.1.3-bin.tar.gz && tar -zxvf apache-hive-3.1.3-bin.tar.gz -C /home/hive/ \
     && rm -f apache-hive-3.1.3-bin.tar.gz && mv apache-hive-3.1.3-bin  apache-hive
 
+RUN wget https://repo1.maven.org/maven2/org/apache/hudi/hudi-hadoop-mr-bundle/0.13.1/hudi-hadoop-mr-bundle-0.13.1.jar
+RUN wget https://repo1.maven.org/maven2/org/apache/hudi/hudi-hive-sync/0.13.1/hudi-hive-sync-0.13.1.jar
+RUN mv *.jar /home/hive/apache-hive/lib/
+
 ENV HADOOP_HOME=/home/hive/apache-hadoop
 ENV HIVE_HOME=/home/hive/apache-hive
 
