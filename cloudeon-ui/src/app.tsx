@@ -236,17 +236,17 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
       useEffect(()=>{
         const getCount = async()=>{
           const result = await getCountActiveAPI({clusterId:getData.clusterId})
-            setActionCount(result?.data || 0)
+            setActionCount(result?.data || 0 )
         }
         if(getData && getData.clusterId && !timer && !location.href.includes('user/login') && !location.href.includes('colony/colonyMg')){
           getCount()
           timer = setInterval(getCount,3000)
-        } 
+        }
         return ()=>{
           timer && clearInterval(timer)
           timer = null
         }        
-      },[])  
+      },[])
 
      return <div className={styles.menuList} style={{height:'100%',display:'flex',justifyContent: 'center',flexDirection:'column', alignItems:'center',width:'100%'}} 
         onClick={() => {
@@ -258,7 +258,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
               {itemProps.name == '指令' ? (<>
               <div className={`${styles.countWrap} ${actionCount ? styles.countBoxshow:''}`}>
                 <div className={styles.countBox}>
-                  {actionCount}
+                 {actionCount}
                 </div>
               </div>
               </>):''}
