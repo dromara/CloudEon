@@ -16,9 +16,15 @@
  */
 package org.dromara.cloudeon.service;
 
-import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.StrUtil;
-import com.google.common.collect.Maps;
+import cn.hutool.extra.spring.SpringUtil;
+import io.fabric8.kubernetes.api.model.Container;
+import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.dsl.ContainerResource;
+import io.fabric8.kubernetes.client.dsl.LogWatch;
+import io.fabric8.kubernetes.client.dsl.PodResource;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
 import org.dromara.cloudeon.dao.*;
 import org.dromara.cloudeon.dto.ServiceRoleLog;
@@ -28,14 +34,6 @@ import org.dromara.cloudeon.entity.ClusterNodeEntity;
 import org.dromara.cloudeon.entity.ServiceInstanceEntity;
 import org.dromara.cloudeon.entity.ServiceRoleInstanceEntity;
 import org.dromara.cloudeon.entity.StackServiceRoleEntity;
-import com.jcraft.jsch.ChannelExec;
-import com.jcraft.jsch.Session;
-import freemarker.cache.StringTemplateLoader;
-import freemarker.template.Configuration;
-import freemarker.template.Template;
-import freemarker.template.TemplateException;
-import lombok.extern.slf4j.Slf4j;
-import org.dromara.cloudeon.utils.Constant;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
@@ -52,10 +50,12 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import javax.annotation.Resource;
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -80,9 +80,9 @@ public class LogService {
 
     /**
      * 主要逻辑
-     * 1. 准备要执行的Shell命令：tail -1f 日志文件的绝对路径，例如：tail -1f /data/blog.hackyle.com/blog-business-logs/blog-business.log
-     * 2. 获取sshSession，创建一个执行Shell命令的Channel
-     * 3. 从Channel中读取流，包装为字符流，一次读取一行日志数据
+     * 1. 根据roleServiceFullName寻找pod
+     * 2. 如果pod内有多个容器，则优先使用名称为server的容器，否则使用VolumeMount数量最多的容器
+     * 3. 读取容器日志
      * 4. 获取WebSocket Session，只要它没有被关闭，就将日志数据通过该Session推送出去
      *
      * @param wsSessionBean 前端Client与后端WebSocketServer建立的连接实例
@@ -94,56 +94,61 @@ public class LogService {
         ClusterNodeEntity clusterNodeEntity = clusterNodeRepository.findById(nodeId).get();
         String hostname = clusterNodeEntity.getHostname();
         StackServiceRoleEntity stackServiceRoleEntity = stackServiceRoleRepository.findById(roleInstanceEntity.getStackServiceRoleId()).get();
-        String logFile = stackServiceRoleEntity.getLogFile();
+        KubeService kubeService = SpringUtil.getBean(KubeService.class);
 
-        // 用模板生成获取日志文件名
-        String logFileName = genRoleInstanceLogFileName(logFile, hostname);
+        WebSocketSession wsSession = wsSessionBean.getWebSocketSession();
 
-        if (StrUtil.isNotBlank(logFileName)) {
-            WebSocketSession wsSession = wsSessionBean.getWebSocketSession();
-            Session sshSession = wsSessionBean.getSshSession();
-            String host = sshSession.getHost();
+        String roleServiceFullName = stackServiceRoleEntity.getRoleFullName() + "-" + serviceInstanceEntity.getServiceName().toLowerCase();
 
-            //String command = "ssh tpbbsc01 \"tail -" +count+ "f " +logPath+ "\""; //二级SSH跳板机在这里修改
-            String command = String.format("tail -20f  /opt/edp/%s/log/%s", serviceInstanceEntity.getServiceName(), logFileName);
-            log.info("查看服务器" + host + "上的角色实例日志，command: " + command);
-
-            //创建一个执行Shell命令的Channel
-            ChannelExec channelExec = (ChannelExec) sshSession.openChannel("exec");
-            channelExec.setCommand(command);
-            channelExec.connect();
-            InputStream inputStream = channelExec.getInputStream();
-
-            //包装为字符流，方便每次读取一行
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
-            String buf = "";
-            while ((buf = reader.readLine()) != null && wsSession.isOpen()) {
-                //往WebSocket中推送数据
-                wsSession.sendMessage(new TextMessage(buf));
+        KubernetesClient client = kubeService.getKubeClient(serviceInstanceEntity.getClusterId());
+        Optional<Pod> podOptional = client.pods().withLabel("app", roleServiceFullName).list().getItems().stream().filter(
+                pod -> {
+                    if (pod.getSpec() == null) {
+                        return false;
+                    }
+                    return hostname.equals(pod.getSpec().getNodeName());
+                }
+        ).findFirst();
+        if (!podOptional.isPresent()) {
+            wsSession.sendMessage(new TextMessage(StrUtil.format("未找到Pod app标签值为{}且所在节点名为{}的Pod", roleServiceFullName, hostname)));
+            return;
+        }
+        Pod pod = podOptional.get();
+        PodResource podResource = client.pods().resource(pod);
+        List<Container> containers = pod.getSpec().getContainers();
+        Container mainContainer = containers.get(0);
+        if (containers.size() > 1) {
+            Optional<Container> serverContainerOp = containers.stream().filter(c -> c.getName().equalsIgnoreCase("server")).findFirst();
+            if (serverContainerOp.isPresent()) {
+                mainContainer = serverContainerOp.get();
+            } else {
+                int lastVolumnMountSize = 0;
+                for (Container container : containers) {
+                    if (container.getVolumeMounts().size() > lastVolumnMountSize) {
+                        lastVolumnMountSize = container.getVolumeMounts().size();
+                        mainContainer = container;
+                    }
+                }
             }
-            log.info("退出监听服务器日志: sessionID {}",wsSessionBean.getWsSessionId());
         }
+        ContainerResource containerResource = podResource.inContainer(mainContainer.getName());
 
+        try (LogWatch logWatch = containerResource.tailingLines(200).watchLog();
+             BufferedReader reader = new BufferedReader(new InputStreamReader(logWatch.getOutput()))) {
+            while (true) {
+                String line = reader.readLine();
+                if (line == null || !wsSession.isOpen()) {
+                    break;
+                } else {
+                    wsSession.sendMessage(new TextMessage(line));
+                }
+            }
+        }
+        log.info("退出监听服务器日志: sessionID {}", wsSessionBean.getWsSessionId());
     }
 
-    private String genRoleInstanceLogFileName(String logFileTemplate, String hostname) {
-        // 渲染
-        Configuration cfg = new Configuration();
-        StringTemplateLoader stringLoader = new StringTemplateLoader();
-        String template = "webUITemplate";
-        stringLoader.putTemplate(template, logFileTemplate);
-        cfg.setTemplateLoader(stringLoader);
-        try (Writer out = new StringWriter(2048);) {
-            Template temp = cfg.getTemplate(template, "utf-8");
-            temp.process(Dict.create().set("localhostname", hostname), out);
-            return out.toString();
-        } catch (IOException | TemplateException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 
-    public ServiceRoleLogPage getServiceLog(Integer clusterId,String roleName,String logLevel,int from,int pageSize) {
+    public ServiceRoleLogPage getServiceLog(Integer clusterId, String roleName, String logLevel, int from, int pageSize) {
         ServiceRoleLogPage result = ServiceRoleLogPage.builder().build();
         // 查询es服务实例
         Integer serviceInstanceId = serviceInstanceRepository.findByServiceNameAndClusterId("ELASTICSEARCH",clusterId).getId();
@@ -154,22 +159,22 @@ public class LogService {
 
 
         RestHighLevelClient client = new RestHighLevelClient(
-            RestClient.builder(
-                new HttpHost(ip, Integer.parseInt(value), "http") // Elasticsearch主机和端口
-            )
+                RestClient.builder(
+                        new HttpHost(ip, Integer.parseInt(value), "http") // Elasticsearch主机和端口
+                )
         );
 
         // 构建查询条件
         BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
-            .must(QueryBuilders.termQuery("roleName", roleName))
-            .must(QueryBuilders.termQuery("logLevel", logLevel));
+                .must(QueryBuilders.termQuery("roleName", roleName))
+                .must(QueryBuilders.termQuery("logLevel", logLevel));
 
         SearchRequest request = new SearchRequest("filebeat-7.16.3");
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder()
-            .query(boolQuery)
-            .sort(SortBuilders.fieldSort("bizTime").order(SortOrder.DESC))
-            .from(from)
-            .size(pageSize);
+                .query(boolQuery)
+                .sort(SortBuilders.fieldSort("bizTime").order(SortOrder.DESC))
+                .from(from)
+                .size(pageSize);
 
         request.source(sourceBuilder);
 
