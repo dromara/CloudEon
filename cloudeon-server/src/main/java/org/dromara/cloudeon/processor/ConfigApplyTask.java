@@ -16,13 +16,7 @@
  */
 package org.dromara.cloudeon.processor;
 
-import lombok.NoArgsConstructor;
-
-/**
- * 为角色实例创建k8s资源
- */
-@NoArgsConstructor
-public class StartRoleK8sDeploymentTask extends RoleK8sTask {
+public class ConfigApplyTask extends ConfigTask {
 
     @Override
     public boolean isApplyTask() {

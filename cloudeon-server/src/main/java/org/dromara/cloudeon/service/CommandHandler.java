@@ -35,8 +35,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.dromara.cloudeon.utils.Constant.*;
-
 @Service
 public class CommandHandler {
 
@@ -52,50 +50,15 @@ public class CommandHandler {
         switch (commandType) {
             case INSTALL_SERVICE:
                 List<TaskGroupType> taskGroupTypes = Lists.newArrayList();
-                taskGroupTypes.add(TaskGroupType.INSTALL_SERVICE);
                 taskGroupTypes.add(TaskGroupType.CONFIG_SERVICE);
-                if (stackServiceName.equals(HDFS_SERVICE_NAME)) {
-                    taskGroupTypes.add(TaskGroupType.INIT_HDFS);
-                }
-                if (stackServiceName.equals(KYLIN_SERVICE_NAME)) {
-                    taskGroupTypes.add(TaskGroupType.INIT_KYLIN);
-                }
-                if (stackServiceName.equals(YARN_SERVICE_NAME)) {
-                    taskGroupTypes.add(TaskGroupType.INIT_YARN);
-                }
-                if (stackServiceName.equals(HIVE_SERVICE_NAME)) {
-                    taskGroupTypes.add(TaskGroupType.INIT_HIVE);
-                }
-                if (stackServiceName.equals(SPARK_SERVICE_NAME)) {
-                    taskGroupTypes.add(TaskGroupType.INIT_SPARK);
-                }
-                if (stackServiceName.equals(FLINK_SERVICE_NAME)) {
-                    taskGroupTypes.add(TaskGroupType.INIT_FLINK);
-                }
-                if (stackServiceName.equals(DINKY_SERVICE_NAME)) {
-                    taskGroupTypes.add(TaskGroupType.INIT_DINKY);
-                }
-                if (stackServiceName.equals(AMORO_SERVICE_NAME)) {
-                    taskGroupTypes.add(TaskGroupType.INIT_AMORO);
-                }
-                if (stackServiceName.equals(MONITOR_SERVICE_NAME)) {
-                    taskGroupTypes.add(TaskGroupType.INIT_MONITOR);
-                }
-                if (stackServiceName.equals(DS_SERVICE_NAME)) {
-                    taskGroupTypes.add(TaskGroupType.INIT_DS);
-                }
                 taskGroupTypes.add(TaskGroupType.TAG_AND_START_K8S_SERVICE);
-
-                if (stackServiceName.equals(DORIS_SERVICE_NAME)) {
-                    taskGroupTypes.add(TaskGroupType.INIT_DORIS);
-                }
-                taskGroupTypes.add(TaskGroupType.REGISTER_MONITOR);
+//                taskGroupTypes.add(TaskGroupType.REGISTER_MONITOR);
                 taskGroupTypes.add(TaskGroupType.UPDATE_SERVICE_STATE);
                 return taskGroupTypes;
             case START_SERVICE:
                 return Lists.newArrayList(TaskGroupType.TAG_AND_START_K8S_SERVICE, TaskGroupType.UPDATE_SERVICE_STATE);
             case RESTART_SERVICE:
-                return Lists.newArrayList(TaskGroupType.CANCEL_TAG_AND_STOP_K8S_SERVICE, TaskGroupType.TAG_AND_START_K8S_SERVICE, TaskGroupType.UPDATE_SERVICE_STATE);
+                return Lists.newArrayList(TaskGroupType.CANCEL_TAG_AND_STOP_K8S_SERVICE, TaskGroupType.DELETE_SERVICE, TaskGroupType.CONFIG_SERVICE, TaskGroupType.TAG_AND_START_K8S_SERVICE, TaskGroupType.UPDATE_SERVICE_STATE);
 
             case STOP_SERVICE:
                 return Lists.newArrayList(TaskGroupType.CANCEL_TAG_AND_STOP_K8S_SERVICE,TaskGroupType.UPDATE_SERVICE_STATE);
