@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: global-render-config
+  labels:
+    app: global
+data:
+  bootstrap.sh: |
+    #!/bin/bash
+    set -e
+    mkdir -p $RENDER_TPL_DIR-output
+    find $RENDER_TPL_DIR -type f ! -name '*.ftl' | xargs -I {} cp {} $RENDER_TPL_DIR-output
+    freemarker-generator   \
+    --data-model env:///    \
+    --template-encoding=UTF-8  \
+    --input-encoding=UTF-8  \
+    --output-encoding=UTF-8  \
+    --data-model=$RENDER_MODEL  \
+    --template=$RENDER_TPL_DIR  \
+    --template-include=*.ftl  \
+    --output=$RENDER_TPL_DIR-output
+    
