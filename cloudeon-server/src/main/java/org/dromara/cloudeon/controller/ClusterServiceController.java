@@ -33,6 +33,7 @@ import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.vertx.core.Vertx;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.dromara.cloudeon.config.CloudeonConfigProp;
 import org.dromara.cloudeon.controller.request.InitServiceRequest;
 import org.dromara.cloudeon.controller.request.ServiceConfUpgradeRequest;
@@ -969,32 +970,33 @@ public class ClusterServiceController {
         List<RolePodEventVO> rolePodEventVOS = eventList.getItems().stream().map(new Function<Event, RolePodEventVO>() {
             @Override
             public RolePodEventVO apply(Event event) {
-                // 设置时区为 UTC
-                inputSdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-                // 解析 UTC 时间字符串为 Date 对象
-                Date utcDate = null;
-                try {
-                    utcDate = inputSdf.parse(event.getLastTimestamp());
-                } catch (ParseException e) {
-                    throw new RuntimeException(e);
-                }
-
-                // 创建 SimpleDateFormat 对象，指定输出的日期格式
-                SimpleDateFormat outputSdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-                // 设置时区为北京时间（东八区）
-                outputSdf.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"));
-
-                // 格式化为北京时间字符串
-                String beijingTimeStr = outputSdf.format(utcDate);
                 RolePodEventVO eventVO = RolePodEventVO.builder()
-                    .type(event.getType())
-                    .message(event.getMessage())
-                    .reason(event.getReason())
-                    .count(event.getCount())
-                    .lastTimestamp(beijingTimeStr)
-                    .build();
+                        .type(event.getType())
+                        .message(event.getMessage())
+                        .reason(event.getReason())
+                        .count(event.getCount())
+                        .build();
+                if (StringUtils.isNotBlank(event.getLastTimestamp())) {
+                    // 设置时区为 UTC
+                    inputSdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+                    // 解析 UTC 时间字符串为 Date 对象
+                    Date utcDate = null;
+                    try {
+                        utcDate = inputSdf.parse(event.getLastTimestamp());
+                    } catch (ParseException e) {
+                        throw new RuntimeException(e);
+                    }
+                    // 创建 SimpleDateFormat 对象，指定输出的日期格式
+                    SimpleDateFormat outputSdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+                    // 设置时区为北京时间（东八区）
+                    outputSdf.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"));
+
+                    // 格式化为北京时间字符串
+                    String beijingTimeStr = outputSdf.format(utcDate);
+                    eventVO.setLastTimestamp(beijingTimeStr);
+                }
                 return eventVO;
             }
         }).collect(Collectors.toList());
