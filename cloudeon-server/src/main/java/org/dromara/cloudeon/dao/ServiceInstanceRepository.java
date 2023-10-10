@@ -37,6 +37,8 @@ public interface ServiceInstanceRepository extends JpaRepository<ServiceInstance
 
     List<ServiceInstanceEntity> findByClusterId(Integer clusterId);
 
+    ServiceInstanceEntity findByServiceNameAndClusterId(String serviceName,Integer clusterId);
+
     List<ServiceInstanceEntity> findByClusterIdAndDependenceServiceInstanceIdsNotNull(Integer clusterId);
 
 

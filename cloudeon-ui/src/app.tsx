@@ -1,13 +1,13 @@
 import Footer from '@/components/Footer';
 import RightContent from '@/components/RightContent';
-import { BookOutlined, LinkOutlined } from '@ant-design/icons';
+import { QuestionCircleFilled, GithubFilled } from '@ant-design/icons';
 import type { Settings as LayoutSettings } from '@ant-design/pro-components';
 import { PageLoading, SettingDrawer } from '@ant-design/pro-components';
 import type { RunTimeLayoutConfig } from 'umi';
 import { history, RequestConfig, useModel } from 'umi';
 import { message, Image, notification } from 'antd';
 import defaultSettings from '../config/defaultSettings';
-import { currentUser as queryCurrentUser } from './services/ant-design-pro/api';
+// import { currentUser as queryCurrentUser } from './services/ant-design-pro/api';
 import logoImg from '../src/assets/images/logo2.png';
 import userImg from '../src/assets/images/user.png'
 import React, { useEffect } from 'react';
@@ -221,7 +221,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
       );
     },
     ...initialState?.settings,
-    logo:<><Image src={logoImg}/></>,
+    logo:<><Image preview={false} src={logoImg}/></>,
     // layout: 'side',
     breakpoint: true,
     fixedHeader:true,
@@ -236,19 +236,19 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
       useEffect(()=>{
         const getCount = async()=>{
           const result = await getCountActiveAPI({clusterId:getData.clusterId})
-            setActionCount(result?.data || 0)
+            setActionCount(result?.data || 0 )
         }
         if(getData && getData.clusterId && !timer && !location.href.includes('user/login') && !location.href.includes('colony/colonyMg')){
           getCount()
           timer = setInterval(getCount,3000)
-        } 
+        }
         return ()=>{
           timer && clearInterval(timer)
           timer = null
         }        
-      },[])  
+      },[])
 
-     return <div style={{height:'100%',display:'flex',justifyContent: 'center',flexDirection:'column', alignItems:'center',width:'100%'}} 
+     return <div className={styles.menuList} style={{height:'100%',display:'flex',justifyContent: 'center',flexDirection:'column', alignItems:'center',width:'100%'}} 
         onClick={() => {
           history.push(itemProps.path);
         }}>
@@ -258,14 +258,14 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
               {itemProps.name == '指令' ? (<>
               <div className={`${styles.countWrap} ${actionCount ? styles.countBoxshow:''}`}>
                 <div className={styles.countBox}>
-                  {actionCount}
+                 {actionCount}
                 </div>
               </div>
               </>):''}
               {/* {createIcon(itemProps.icon)} */}
-              <div style={{fontSize: '24px'}}>{itemProps.icon}</div>
+              <div className={styles.menuIcon} >{itemProps.icon}</div>
             </div>
-            <div style={{lineHeight:'20px',fontSize:'12px'}}>{itemProps.name}</div>
+            <div className={styles.menuText} >{itemProps.name}</div>
       </div>
   }
   };

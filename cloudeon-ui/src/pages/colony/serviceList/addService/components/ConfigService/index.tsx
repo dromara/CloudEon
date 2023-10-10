@@ -2,7 +2,7 @@
 import styles from './index.less'
 import React, { useState, useEffect, useRef } from 'react';
 import { Menu, Form, Table, Button, Typography, Popconfirm, InputNumber, Input, Tooltip, Modal, Select, Slider, Switch, notification } from 'antd';
-import { QuestionCircleFilled } from '@ant-design/icons';
+import { RollbackOutlined, DeleteOutlined } from '@ant-design/icons';
 import { getServiceConfAPI } from '@/services/ant-design-pro/colony';
 import {cloneDeep} from 'lodash'
 // const { TextArea } = Input;
@@ -275,7 +275,7 @@ const ConfigService:React.FC<{checkConfNext: any}> = ( {checkConfNext} )=>{
                 return (
                     <span>
                         {record.name} 
-                        {record.description? <Tooltip title={record.description}><QuestionCircleFilled style={{marginLeft:'5px'}} /></Tooltip>:''}
+                        {/* {record.description? <Tooltip title={record.description}><QuestionCircleFilled style={{marginLeft:'5px'}} /></Tooltip>:''} */}
                     </span>
                 )
             }
@@ -291,9 +291,38 @@ const ConfigService:React.FC<{checkConfNext: any}> = ( {checkConfNext} )=>{
         // },
         {
             title: '值',
-            dataIndex: 'recommendExpression',
+            dataIndex: 'value',
             editable: true,
             render: (_: any, record: Item, index: any) => {
+                let resultDom1 = <></>
+                let resultDom2 = <></>
+                const formData = form.getFieldsValue(true)
+                if(isEditMode){
+                    if(formData[`${record.name}-value`] && formData[`${record.name}-value`] != record.recommendExpression && !record.isCustomConf){
+                        resultDom1 = (<div style={{marginRight: '5px'}}>
+                            <Popconfirm title="确定恢复到初始值吗?" onConfirm={()=>resetSource(record)}>
+                            <Tooltip title="恢复初始值" color="orange">
+                                <Button className={styles.editWrapBtn} type='primary'><RollbackOutlined /></Button> 
+                            </Tooltip>
+                            {/* 恢复初始值 */}
+                            </Popconfirm>
+                        </div>)
+                    }
+                    if(record.isCustomConf){
+                        resultDom2 = (
+                            <div>
+                                <Popconfirm title="确定删除吗?" onConfirm={()=>handleDelete(record)}>
+                                <Tooltip title="删除" color="red">
+                                    <Button className={styles.editWrapBtn} type='primary' danger><DeleteOutlined /></Button>
+                                </Tooltip>
+                                {/* 删除 */}
+                                </Popconfirm>
+                            </div>
+                            
+                        )
+                    }
+                }
+
                 // <span>{record.value}&nbsp;{record.unit?record.unit:''}</span>
                 let inputNode = <Input style={{ width: '100%' }} onChange={(e)=>actionOnChange(e.target.value,record)} addonAfter={record?.unit || ''} />
                 // const inputNode = inputType === 'number' ? <InputNumber /> : <Input />;
@@ -321,59 +350,71 @@ const ConfigService:React.FC<{checkConfNext: any}> = ( {checkConfNext} )=>{
                         ;break;
                 }
                   return  isEditMode?(
-                    <Form.Item
-                        name={`${record.name}-value`}
-                        initialValue={record.value}
-                        // key={record.name}
-                        style={{ margin: 0 }}
-                        rules={[
-                        {
-                            required: true,
-                            message: `请输入值/选择值!`,
-                        },
-                        ]}
-                    >
-                        {inputNode}
-                    </Form.Item>                    
+                    <div className={styles.editWrap}>
+                        <Form.Item
+                            name={`${record.name}-value`}
+                            initialValue={record.value}
+                            // key={record.name}
+                            // style={{ margin:' 0 10px 0 0' }}
+                            className={styles.editFormItem}
+                            rules={[
+                            {
+                                required: true,
+                                message: `请输入值/选择值!`,
+                            },
+                            ]}
+                        >
+                            {inputNode}
+                        </Form.Item>
+                        {resultDom1}{resultDom2}
+                    </div>                    
                   ):(<> <span className={(record?.value != record?.recommendExpression && !record.isCustomConf) ? styles.hasEdited:''}>{record.valueType == "Switch" ?record.value.toString() : record.value}&nbsp;{record.unit?record.unit:''}</span> </>)
             },
         },
         {
-            title: '配置文件',
-            dataIndex: 'confFile',
-            width: 200,
+            title: '描述',
+            dataIndex: 'description',
             editable: false,
+            render: (_: any, record: Item)=>{
+                return (record.description||'-')
+            }
         },
-        {
-            title: '操作',
-            width: 150,
-            dataIndex: 'operation',
-            render: (_: any, record: Item, index:any) => {
-                let resultDom1 = <></>
-                let resultDom2 = <></>
-                const formData = form.getFieldsValue(true)
-                if(isEditMode){
-                    if(formData[`${record.name}-value`] != record.recommendExpression && !record.isCustomConf){
-                        resultDom1 = (<div style={{marginRight: '5px'}}>
-                            <Popconfirm title="确定恢复到初始值吗?" onConfirm={()=>resetSource(record)}>
-                                <a >恢复初始值</a>
-                            </Popconfirm>
-                        </div>)
-                    }
-                    if(record.isCustomConf){
-                        resultDom2 = (
-                            <div>
-                                <Popconfirm title="确定删除吗?" onConfirm={()=>handleDelete(record)}>
-                                    <a>删除</a>
-                                </Popconfirm>
-                            </div>
+        // {
+        //     title: '配置文件',
+        //     dataIndex: 'confFile',
+        //     width: 200,
+        //     editable: false,
+        // },
+        // {
+        //     title: '操作',
+        //     width: 150,
+        //     dataIndex: 'operation',
+        //     render: (_: any, record: Item, index:any) => {
+        //         let resultDom1 = <></>
+        //         let resultDom2 = <></>
+        //         const formData = form.getFieldsValue(true)
+        //         if(isEditMode){
+        //             if(formData[`${record.name}-value`] != record.recommendExpression && !record.isCustomConf){
+        //                 resultDom1 = (<div style={{marginRight: '5px'}}>
+        //                     <Popconfirm title="确定恢复到初始值吗?" onConfirm={()=>resetSource(record)}>
+        //                         <a >恢复初始值</a>
+        //                     </Popconfirm>
+        //                 </div>)
+        //             }
+        //             if(record.isCustomConf){
+        //                 resultDom2 = (
+        //                     <div>
+        //                         <Popconfirm title="确定删除吗?" onConfirm={()=>handleDelete(record)}>
+        //                             <a>删除</a>
+        //                         </Popconfirm>
+        //                     </div>
                             
-                        )
-                    }
-                }
-                return <>{resultDom1}{resultDom2}</>
-            },
-          },
+        //                 )
+        //             }
+        //         }
+        //         return <>{resultDom1}{resultDom2}</>
+        //     },
+        //   },
     ]
 
     const mergedColumns = configColumns.map(col => {

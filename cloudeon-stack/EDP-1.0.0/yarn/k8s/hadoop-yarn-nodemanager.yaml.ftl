@@ -5,7 +5,7 @@ metadata:
   labels:
     name: "${roleServiceFullName}"
   name: "${roleServiceFullName}"
-  namespace: "default"
+  namespace: ${namespace}
 spec:
   replicas: ${roleNodeCnt}
   selector:
@@ -35,7 +35,7 @@ spec:
                 name: "${roleServiceFullName}"
                 podConflictName: "${roleServiceFullName}"
             namespaces:
-            - "default"
+            - "${namespace}"
             topologyKey: "kubernetes.io/hostname"
       hostPID: false
       hostNetwork: true
@@ -58,8 +58,19 @@ spec:
           timeoutSeconds: 1
         name: "${roleServiceFullName}"
         resources:
-          requests: {}
-          limits: {}
+          requests:
+            memory: "${conf['hadop.yarn.nm.container.request.memory']}Mi"
+            cpu: "${conf['hadop.yarn.nm.container.request.cpu']}"
+          limits:
+            memory: "${conf['hadop.yarn.nm.container.limit.memory']}Mi"
+            cpu: "${conf['hadop.yarn.nm.container.limit.cpu']}"
+        env:
+          - name: MEM_LIMIT
+            valueFrom:
+              resourceFieldRef:
+                resource: limits.memory
+          - name: yarnHeapRam
+            value: "${conf['yarn.nodemanager.heap.memory']}"
         securityContext:
           privileged: true
         volumeMounts:

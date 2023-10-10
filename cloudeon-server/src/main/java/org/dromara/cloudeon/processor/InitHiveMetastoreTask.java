@@ -22,16 +22,19 @@ import cn.hutool.db.handler.StringHandler;
 import cn.hutool.db.sql.SqlExecutor;
 import cn.hutool.extra.spring.SpringUtil;
 import com.jcraft.jsch.Session;
+import io.fabric8.kubernetes.client.KubernetesClient;
 import lombok.NoArgsConstructor;
-import org.apache.sshd.client.session.ClientSession;
+import org.apache.commons.lang3.StringUtils;
 import org.dromara.cloudeon.dao.*;
+import org.dromara.cloudeon.dto.VolumeMountDTO;
 import org.dromara.cloudeon.entity.ClusterNodeEntity;
 import org.dromara.cloudeon.entity.ServiceInstanceEntity;
 import org.dromara.cloudeon.entity.ServiceRoleInstanceEntity;
 import org.dromara.cloudeon.entity.StackServiceEntity;
+import org.dromara.cloudeon.service.KubeService;
 import org.dromara.cloudeon.service.SshPoolService;
 import org.dromara.cloudeon.utils.JschUtils;
-import org.dromara.cloudeon.utils.SshUtils;
+import org.dromara.cloudeon.utils.K8sUtil;
 
 import javax.sql.DataSource;
 import java.io.IOException;
@@ -54,6 +57,8 @@ public class InitHiveMetastoreTask extends BaseCloudeonTask {
         ClusterNodeRepository clusterNodeRepository = SpringUtil.getBean(ClusterNodeRepository.class);
         ServiceInstanceConfigRepository configRepository = SpringUtil.getBean(ServiceInstanceConfigRepository.class);
         SshPoolService sshPoolService = SpringUtil.getBean(SshPoolService.class);
+        KubeService kubeService = SpringUtil.getBean(KubeService.class);
+        ClusterInfoRepository clusterInfoRepository = SpringUtil.getBean(ClusterInfoRepository.class);
 
 
         TaskParam taskParam = getTaskParam();
@@ -62,6 +67,12 @@ public class InitHiveMetastoreTask extends BaseCloudeonTask {
         ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(serviceInstanceId).get();
         StackServiceEntity stackServiceEntity = stackServiceRepository.findById(serviceInstanceEntity.getStackServiceId()).get();
         String serviceName = serviceInstanceEntity.getServiceName();
+        // 获取集群的namespace
+        String namespace = clusterInfoRepository.findById(serviceInstanceEntity.getClusterId()).get().getNamespace();
+        if (StringUtils.isBlank(namespace)) {
+            namespace = "default";
+        }
+
         // 校验metastore里的version和服务的version是否一致
         String username = configRepository.findByServiceInstanceIdAndName(serviceInstanceId, "javax.jdo.option.ConnectionUserName").getValue();
         String password = configRepository.findByServiceInstanceIdAndName(serviceInstanceId, "javax.jdo.option.ConnectionPassword").getValue();
@@ -86,25 +97,22 @@ public class InitHiveMetastoreTask extends BaseCloudeonTask {
         if (StrUtil.isNotBlank(qureyResult)) {
             log.info("检查到hive元数据库已经初始化过，无需执行初始化脚本...");
         } else {
-            // todo 能捕获到执行日志吗？
-            String cmd = String.format("sudo docker  run --net=host -v /opt/edp/%s/conf:/opt/edp/%s/conf  -v /opt/edp/%s/log:/opt/edp/%s/log  %s sh -c \"  /opt/edp/%s/conf/init-metastore-db.sh \"   ",
-                    serviceName, serviceName, serviceName, serviceName, stackServiceEntity.getDockerImage(), serviceName);
-
             // 选择metastore所在节点执行
             List<ServiceRoleInstanceEntity> roleInstanceEntities = roleInstanceRepository.findByServiceInstanceIdAndServiceRoleName(serviceInstanceId, "HIVE_SERVER2");
             ServiceRoleInstanceEntity firstNamenode = roleInstanceEntities.get(0);
             Integer nodeId = firstNamenode.getNodeId();
             ClusterNodeEntity nodeEntity = clusterNodeRepository.findById(nodeId).get();
-            String ip = nodeEntity.getIp();
-            log.info("在节点" + ip + "上执行命令:" + cmd);
-            Session clientSession = sshPoolService.openSession(ip, nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getSshPassword());
-            try {
-                JschUtils.execCallbackLine(clientSession, Charset.defaultCharset(), DEFAULT_JSCH_TIMEOUT,cmd ,null,remoteSshTaskLineHandler,remoteSshTaskErrorLineHandler );
 
-            } catch (IOException e) {
-                e.printStackTrace();
-                throw new RuntimeException(e);
-            }
+            // 启动K8S job
+            String jobCmd = String.format("/opt/edp/%s/conf/init-metastore-db.sh",serviceName);
+            String volumePath = String.format("/opt/edp/%s/conf", serviceName);
+            String volumePath2 = String.format("/opt/edp/%s/log", serviceName);
+            KubernetesClient kubeClient = kubeService.getKubeClient(serviceInstanceEntity.getClusterId());
+            VolumeMountDTO[] volumeMounts = {
+                    new VolumeMountDTO("config-volume", volumePath, volumePath),
+                    new VolumeMountDTO("config-volume2", volumePath2, volumePath2)};
+            K8sUtil.runJob(namespace,"init-hive-db", kubeClient, volumeMounts, stackServiceEntity.getDockerImage(), jobCmd, log, nodeEntity.getHostname());
+
 
         }
     }

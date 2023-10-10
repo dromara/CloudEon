@@ -5,7 +5,7 @@ metadata:
   labels:
     name: "${roleServiceFullName}"
   name: "${roleServiceFullName}"
-  namespace: "default"
+  namespace: ${namespace}
 spec:
   replicas: ${roleNodeCnt}
   selector:
@@ -35,7 +35,7 @@ spec:
                 name: "${roleServiceFullName}"
                 podConflictName: "${roleServiceFullName}"
             namespaces:
-            - "default"
+            - "${namespace}"
             topologyKey: "kubernetes.io/hostname"
       hostPID: false
       hostNetwork: true
@@ -43,10 +43,16 @@ spec:
       - args:
           - "/opt/edp/${service.serviceName}/conf/bootstrap-historyserver.sh"
         env:
+          - name: "SPARK_CONF_DIR"
+            value: "/opt/edp/${service.serviceName}/conf"
           - name: "HADOOP_CONF_DIR"
             value: "/opt/edp/${service.serviceName}/conf"
           - name: "USER"
             value: "spark"
+          - name: MEM_LIMIT
+            valueFrom:
+              resourceFieldRef:
+                resource: limits.memory
         image: "${dockerImage}"
         imagePullPolicy: "Always"
         readinessProbe:
@@ -63,8 +69,12 @@ spec:
           timeoutSeconds: 1
         name: "${roleServiceFullName}"
         resources:
-          requests: {}
-          limits: {}
+          requests:
+            memory: "${conf['spark.hs.container.request.memory']}Mi"
+            cpu: "${conf['spark.hs.container.request.cpu']}"
+          limits:
+            memory: "${conf['spark.hs.container.limit.memory']}Mi"
+            cpu: "${conf['spark.hs.container.limit.cpu']}"
         securityContext:
           privileged: true
         volumeMounts:

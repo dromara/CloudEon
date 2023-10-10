@@ -68,6 +68,7 @@ nav:
       - 支持组件/YarnonK8s.md
       - 支持组件/DorisonK8s.md
       - 支持组件/ZookeeperOnK8s.md
+      - 支持组件/AmoroOnK8s.md
       - 支持组件/KafkaOnK8s.md
       - 支持组件/HbaseOnK8s.md
       - 支持组件/FlinkOnK8s.md
@@ -78,10 +79,16 @@ nav:
       - 支持组件/KylinOnK8s.md
       - 支持组件/DinkyOnK8s.md
       - 支持组件/DolphinschedulerOnK8s.md
+      - 支持组件/ElasticsearchOnK8s.md
+      - 支持组件/IcebergOnK8s.md
+      - 支持组件/TrinoOnK8s.md
+      - 支持组件/SeatunnelOnK8s.md
+  - component_extension.md
   - 社区贡献:
       - 社区贡献/communicate.md
       - 社区贡献/contribute.md
       - 社区贡献/develop.md
       - 社区贡献/windows-develop.md
+  - sponsor.md
   - FAQ.md
   - Roadmap.md

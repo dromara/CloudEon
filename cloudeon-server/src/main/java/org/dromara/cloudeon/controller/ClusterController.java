@@ -68,6 +68,9 @@ public class ClusterController {
     @Resource
     private KubeService kubeService;
 
+    @Resource
+    private ServiceRoleInstanceRepository roleInstanceRepository;
+
     @PostMapping("/save")
     @Transactional(rollbackFor = Exception.class)
     public ResultDTO<Void> saveCluster(@RequestBody ModifyClusterInfoRequest req) {
@@ -89,9 +92,16 @@ public class ClusterController {
         // 检验kubeconfig是否正确能连接k8s集群
         KubernetesClient kubernetesClient = kubeService.getKubernetesClient(req.getKubeConfig());
         kubeService.testConnect(kubernetesClient);
+
+        // 校验 k8s namespace是否存在
+        if (!kubeService.checkNamespace(kubernetesClient, req.getNamespace())) {
+            return ResultDTO.failed("k8s namespace不存在");
+        }
+
         BeanUtils.copyProperties(req, clusterInfoEntity);
         clusterInfoEntity.setCreateTime(new Date());
         clusterInfoEntity.setCreateBy(AdminUserName);
+        clusterInfoEntity.setNamespace(req.getNamespace());
 
         clusterInfoRepository.saveAndFlush(clusterInfoEntity);
         // 加载默认规则到集群中
@@ -144,5 +154,11 @@ public class ClusterController {
 
 
 
-
+    @GetMapping("/roleNames")
+    public ResultDTO<List<String>> getServiceRoles(Integer clusterId) {
+        List<String> names = roleInstanceRepository.findByClusterId(clusterId).stream().map(e -> {
+            return e.getServiceRoleName();
+        }).distinct().collect(Collectors.toList());
+        return ResultDTO.success(names);
+    }
 }

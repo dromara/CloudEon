@@ -23,7 +23,7 @@ roles:
     roleFullName: "kylin-server"
     sortNum: 1
     type: MASTER
-    minNum: 1
+    fixedNum: 1
     linkExpression: "http://${localhostname}:${conf['kylin.ui.port']}/kylin/index.html"
     logFile: "kylin.log"
 

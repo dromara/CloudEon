@@ -17,37 +17,29 @@
 package org.dromara.cloudeon.controller;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.ssh.JschUtil;
 import cn.hutool.extra.ssh.Sftp;
 import com.jcraft.jsch.Session;
+import io.fabric8.kubernetes.api.model.NodeAddress;
 import org.dromara.cloudeon.config.CloudeonConfigProp;
 import org.dromara.cloudeon.controller.request.SaveNodeRequest;
 import org.dromara.cloudeon.controller.response.NodeInfoVO;
 import org.dromara.cloudeon.dao.ClusterNodeRepository;
 import org.dromara.cloudeon.dto.ResultDTO;
 import org.dromara.cloudeon.entity.ClusterNodeEntity;
+import org.dromara.cloudeon.enums.SshAuthType;
 import org.dromara.cloudeon.service.KubeService;
 import org.dromara.cloudeon.service.SshPoolService;
 import org.dromara.cloudeon.utils.ByteConverter;
-import org.dromara.cloudeon.utils.JschUtils;
-import org.dromara.cloudeon.utils.SshUtils;
 import io.fabric8.kubernetes.api.model.Node;
 import io.fabric8.kubernetes.api.model.NodeList;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import org.apache.sshd.client.session.ClientSession;
-import org.apache.sshd.sftp.client.SftpClientFactory;
-import org.apache.sshd.sftp.client.fs.SftpFileSystem;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -83,10 +75,10 @@ public class NodeController {
         Integer clusterId = req.getClusterId();
         // 检查ip不能重复
         if (clusterNodeRepository.countByIp(ip) > 0) {
-           return ResultDTO.failed("已添加ip为：" + ip + " 的节点(服务器)");
+            return ResultDTO.failed("已添加ip为：" + ip + " 的节点(服务器)");
         }
         // 校验ssh服务
-        checkSSH(ip, sshPort, sshUser, sshPassword);
+        checkSSH(ip, sshPort, sshUser, sshPassword, req.getPrivateKeyPath(), req.getSshAuthType());
         KubernetesClient kubeClient = kubeService.getKubeClient(clusterId);
         NodeList nodeList = kubeClient.nodes().list();
         List<Node> items = nodeList.getItems();
@@ -94,7 +86,7 @@ public class NodeController {
         NodeInfoVO k8sNodeInfoVO = items.stream().filter(new Predicate<Node>() {
             @Override
             public boolean test(Node node) {
-                String nodeIp = node.getStatus().getAddresses().get(0).getAddress();
+                String nodeIp = getNodeIp(node);
                 return ip.equals(nodeIp);
             }
         }).map(new Function<Node, NodeInfoVO>() {
@@ -107,6 +99,12 @@ public class NodeController {
         // 保存到数据库
         ClusterNodeEntity newClusterNodeEntity = new ClusterNodeEntity();
         BeanUtil.copyProperties(req, newClusterNodeEntity);
+        if (req.getSshAuthType() != null && req.getSshAuthType().toUpperCase().equals(SshAuthType.PRIVATEKEY.name())) {
+            newClusterNodeEntity.setPrivateKeyPath(req.getPrivateKeyPath());
+            newClusterNodeEntity.setSshAuthType(SshAuthType.PRIVATEKEY);
+        } else {
+            newClusterNodeEntity.setSshAuthType(SshAuthType.PASSWORD);
+        }
         newClusterNodeEntity.setCreateTime(new Date());
         newClusterNodeEntity.setRuntimeContainer(containerRuntimeVersion);
         clusterNodeRepository.save(newClusterNodeEntity);
@@ -118,23 +116,28 @@ public class NodeController {
     /**
      * 查询服务器基础信息
      */
-    public void checkSSH(String sshHost, Integer sshPort, String sshUser, String password) throws IOException {
+    public void checkSSH(String sshHost, Integer sshPort, String sshUser, String password, String privateKey, String sshAuthType) throws IOException {
+        Session session = null;
+        if (sshAuthType == null || sshAuthType.toUpperCase().equals(SshAuthType.PASSWORD.name())) {
+            session = sshPoolService.openSession(sshHost, sshPort, sshUser, password);
+        } else if (sshAuthType.toUpperCase().equals(SshAuthType.PRIVATEKEY.name())) {
+            session = sshPoolService.openSessionByPrivateKey(sshHost, sshPort, sshUser, privateKey);
+        }
 
-        Session session = sshPoolService.openSession(sshHost, sshPort, sshUser, password);
         Sftp sftp = JschUtil.createSftp(session);
         String sftpHome = sftp.home();
         boolean connected = session.isConnected();
         if (connected && StrUtil.isNotBlank(sftpHome)) {
             JschUtil.close(sftp.getClient());
             return;
-        }else {
+        } else {
             throw new RuntimeException("ssh连接异常");
         }
     }
 
 
     /**
-     *  根据集群id查询绑定的k8s节点信息
+     * 根据集群id查询绑定的k8s节点信息
      */
     @GetMapping("/list")
     public ResultDTO<List<NodeInfoVO>> listNode(Integer clusterId) {
@@ -146,7 +149,7 @@ public class NodeController {
         Map<String, Node> nodeMap = items.stream().collect(Collectors.toMap(new Function<Node, String>() {
             @Override
             public String apply(Node node) {
-                return node.getStatus().getAddresses().get(0).getAddress();
+                return getNodeIp(node);
             }
         }, node -> node));
         // 从数据库查出当前集群绑定的节点
@@ -184,7 +187,7 @@ public class NodeController {
         List<NodeInfoVO> result = items.stream().filter(new Predicate<Node>() {
             @Override
             public boolean test(Node node) {
-                String ip = node.getStatus().getAddresses().get(0).getAddress();
+                String ip = getNodeIp(node);
                 //  过滤出未绑定的节点
                 return !clusterIpSets.contains(ip);
             }
@@ -202,8 +205,8 @@ public class NodeController {
         int cpu = e.getStatus().getCapacity().get("cpu").getNumericalAmount().intValue();
         long memory = e.getStatus().getCapacity().get("memory").getNumericalAmount().longValue();
         long storage = e.getStatus().getCapacity().get("ephemeral-storage").getNumericalAmount().longValue();
-        String ip = e.getStatus().getAddresses().get(0).getAddress();
-        String hostname = e.getStatus().getAddresses().get(1).getAddress();
+        String ip =  getNodeIp(e);
+        String hostname = getNodeHostname(e);
         String architecture = e.getStatus().getNodeInfo().getArchitecture();
         String containerRuntimeVersion = e.getStatus().getNodeInfo().getContainerRuntimeVersion();
         String kubeletVersion = e.getStatus().getNodeInfo().getKubeletVersion();
@@ -223,5 +226,17 @@ public class NodeController {
                 .osImage(osImage)
                 .build();
         return nodeInfoVO;
+    }
+
+    private String getNodeIp(Node e) {
+        return e.getStatus().getAddresses().stream().filter(n -> {
+            return n.getType().equals("InternalIP");
+        }).findFirst().get().getAddress();
+    }
+
+    private String getNodeHostname(Node e) {
+        return e.getStatus().getAddresses().stream().filter(n -> {
+            return n.getType().equals("Hostname");
+        }).findFirst().get().getAddress();
     }
 }

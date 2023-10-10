@@ -5,7 +5,7 @@ metadata:
   labels:
     name: "${roleServiceFullName}"
   name: "${roleServiceFullName}"
-  namespace: "default"
+  namespace: ${namespace}
 spec:
   replicas: ${roleNodeCnt}
   selector:
@@ -35,7 +35,7 @@ spec:
                 name: "${roleServiceFullName}"
                 podConflictName: "${roleServiceFullName}"
             namespaces:
-            - "default"
+            - "${namespace}"
             topologyKey: "kubernetes.io/hostname"
       hostPID: false
       hostNetwork: true
@@ -45,6 +45,10 @@ spec:
         env:
           - name: "USER"
             value: "${runAs}"
+          - name: "HIVE_CONF_DIR"
+            value: "/home/hadoop/apache-kylin/conf"
+          - name: "HADOOP_CONF_DIR"
+            value: "/home/hadoop/apache-kylin/conf"
         image: "${dockerImage}"
         imagePullPolicy: "Always"
         readinessProbe:

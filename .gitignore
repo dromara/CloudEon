@@ -44,6 +44,8 @@ build/
 */.trc
 
 ### cloudeon-ui
+cloudeon-server/src/main/resources/static/
+cloudeon-ui/node/
 cloudeon-ui/node_modules
 cloudeon-ui/src/.umi
 cloudeon-ui/src/.umi-production

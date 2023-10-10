@@ -15,6 +15,7 @@ html,
 body,
 #root {
   height: 100%;
+  // overflow: hidden;
 }
 
 .colorWeak {
@@ -72,11 +73,23 @@ ol {
   .ant-pro-global-header-layout-mix {
     background-color: #434343 !important;// #001529;
   }
-  .ant-menu-item{
-    height: 72px !important;
-    margin: 0!important;
-    padding: 0 !important;
+  .ant-layout-sider-children{
+    .ant-menu-item{
+      display: block !important;
+      height: 65px !important;
+      margin: 5px 0!important;
+      padding: 0 !important;
+    }
+
   }
+
+  .ant-btn-primary{
+    text-shadow:none !important;
+    font-weight: 600 !important;
+}
+.ant-tooltip-inner{
+    font-weight: 600 !important;
+}
   // .ant-pro-sider-links{
   //   display: none !important;
   // }

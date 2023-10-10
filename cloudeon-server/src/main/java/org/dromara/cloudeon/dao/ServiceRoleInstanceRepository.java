@@ -39,4 +39,6 @@ public interface ServiceRoleInstanceRepository extends JpaRepository<ServiceRole
 
     @Query(value = "select b.label  from ServiceRoleInstanceEntity a join StackServiceRoleEntity b on a.stackServiceRoleId = b.id where  a.id =:roleInstanceId")
     String getRoleInstanceLabel(@Param("roleInstanceId") Integer roleInstanceId);
+
+    List<ServiceRoleInstanceEntity> findByClusterId(Integer clusterId);
 }

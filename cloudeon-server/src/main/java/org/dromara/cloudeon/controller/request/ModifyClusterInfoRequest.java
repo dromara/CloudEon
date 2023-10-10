@@ -23,6 +23,7 @@ public class ModifyClusterInfoRequest {
     private Integer id;
     private Integer stackId;
     private String clusterName;
+    private String namespace;
     private String clusterCode;
     private String kubeConfig;
 }

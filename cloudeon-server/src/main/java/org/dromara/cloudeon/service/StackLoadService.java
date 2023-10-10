@@ -21,6 +21,7 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
+import lombok.extern.slf4j.Slf4j;
 import org.dromara.cloudeon.config.CloudeonConfigProp;
 import org.dromara.cloudeon.dao.*;
 import org.dromara.cloudeon.dto.StackConfiguration;
@@ -31,7 +32,6 @@ import org.dromara.cloudeon.entity.*;
 import org.dromara.cloudeon.enums.AlertLevel;
 import org.dromara.cloudeon.enums.ConfValueType;
 import org.dromara.cloudeon.utils.ImageUtil;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -68,6 +68,8 @@ public class StackLoadService implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
+        alertRuleRepository.deleteAll();
+        stackServiceConfRepository.deleteAll();
         Yaml yaml = new Yaml();
         File[] stackPath = FileUtil.ls(cloudeonConfigProp.getStackLoadPath());
         for (File file : stackPath) {

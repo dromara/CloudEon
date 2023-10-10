@@ -39,32 +39,23 @@ if [ "$JAVA_HOME" = "" ]; then
   echo "Error: JAVA_HOME is not set."
   exit 1
 fi
+<#assign yarnHeapRamPercentage = conf['yarn.heap.memory.percentage']?trim?number>
+if [ -z $yarnHeapRam ];then
+    if [ -z $MEM_LIMIT ];then
+        export yarnHeapRam=2048M
+    else
+        export yarnHeapRam=$[ $MEM_LIMIT / 1024 / 1024  * ${yarnHeapRamPercentage} / 100 ]M
+    fi
 
-JAVA=$JAVA_HOME/bin/java
-JAVA_HEAP_MAX=-Xmx4096m
-<#--resource manager memory-->
-<#assign resourcemanagerMemory=conf['yarn.resourcemanager.memory']?trim?number>
-export YARN_RESOURCEMANAGER_HEAPSIZE=${resourcemanagerMemory?floor?c}m
-<#--node manager memory-->
-<#assign nodemanagerMemory=conf['yarn.nodemanager.memory']?trim?number>
-export YARN_NODEMANAGER_HEAPSIZE=${nodemanagerMemory?floor?c}m
-<#--historyserver memory-->
-<#assign historyserverMemory=conf['yarn.historyserver.memory']?trim?number>
-export YARN_HISTORYSERVER_HEAPSIZE=${historyserverMemory?floor?c}m
-<#--timelineserver memory-->
-<#assign timelineserverMemory=conf['yarn.timelineserver.memory']?trim?number>
-export YARN_TIMELINESERVER_HEAPSIZE=${timelineserverMemory?floor?c}m
+fi
+
+export HADOOP_HEAPSIZE_MAX=$yarnHeapRam
+export HADOOP_HEAPSIZE_MIN=$yarnHeapRam
 
 # 添加jmx监控开放
-export YARN_NODEMANAGER_OPTS="$YARN_NODEMANAGER_OPTS -Dcom.sun.management.jmxremote.port=9917 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=5547:/opt/edp/${service.serviceName}/conf/jmx_prometheus.yaml"
-export YARN_RESOURCEMANAGER_OPTS="$YARN_RESOURCEMANAGER_OPTS -Dcom.sun.management.jmxremote.port=9918 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=5548:/opt/edp/${service.serviceName}/conf/jmx_prometheus.yaml"
+export YARN_NODEMANAGER_OPTS="$YARN_NODEMANAGER_OPTS -Dcom.sun.management.jmxremote.port=9917 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=5547:/opt/edp/${service.serviceName}/conf/jmx_prometheus.yaml -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:/opt/edp/${service.serviceName}/log/gc-hadoop-yarn-resourcemanager.log"
+export YARN_RESOURCEMANAGER_OPTS="$YARN_RESOURCEMANAGER_OPTS -Dcom.sun.management.jmxremote.port=9918 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.14.0.jar=5548:/opt/edp/${service.serviceName}/conf/jmx_prometheus.yaml   -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:/opt/edp/${service.serviceName}/log/gc-hadoop-yarn-nodemanager.log"
 
-# check envvars which might override default args
-if [ "$YARN_HEAPSIZE" != "" ]; then
-  #echo "run with heapsize $YARN_HEAPSIZE"
-  JAVA_HEAP_MAX="-Xmx""$YARN_HEAPSIZE""m"
-  #echo $JAVA_HEAP_MAX
-fi
 
 # so that filenames w/ spaces are handled correctly in loops below
 IFS=

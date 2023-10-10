@@ -5,7 +5,7 @@ metadata:
   labels:
     name: "${roleServiceFullName}"
   name: "${roleServiceFullName}"
-  namespace: "default"
+  namespace: ${namespace}
 spec:
   replicas: ${roleNodeCnt}
   selector:
@@ -35,7 +35,7 @@ spec:
                 name: "${roleServiceFullName}"
                 podConflictName: "${roleServiceFullName}"
             namespaces:
-            - "default"
+            - "${namespace}"
             topologyKey: "kubernetes.io/hostname"
       hostPID: false
       hostNetwork: true
@@ -70,8 +70,19 @@ spec:
           successThreshold: 1
           timeoutSeconds: 1
         resources:
-          requests: {}
-          limits: {}
+          requests:
+            memory: "${conf['hadop.hdfs.nn.container.request.memory']}Mi"
+            cpu: "${conf['hadop.hdfs.nn.container.request.cpu']}"
+          limits:
+            memory: "${conf['hadop.hdfs.nn.container.limit.memory']}Mi"
+            cpu: "${conf['hadop.hdfs.nn.container.limit.cpu']}"
+        env:
+          - name: HADOOP_CONF_DIR
+            value: /opt/edp/${service.serviceName}/conf
+          - name: MEM_LIMIT
+            valueFrom:
+              resourceFieldRef:
+                resource: limits.memory
         securityContext:
           privileged: true
         volumeMounts:

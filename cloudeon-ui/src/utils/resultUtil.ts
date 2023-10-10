@@ -7,8 +7,11 @@ export const resultMessage = {
     'update':'更新成功'
   }
 
-export const dealResult = (result: API.normalResult, key: string) => {
-    if(result?.success && key){
+export const dealResult = (result: API.normalResult, key: string, msg?:string) => {
+    if(result?.success &&msg){
+        message.success(msg);
+    }
+    else if(result?.success && key){
         message.success(resultMessage[key]);
     }
 }

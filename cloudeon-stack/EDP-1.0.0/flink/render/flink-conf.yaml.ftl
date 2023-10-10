@@ -1,45 +1,43 @@
+#==============================================================================
+# Fault tolerance and checkpointing
+#==============================================================================
 
+state.backend: rocksdb
+state.checkpoints.dir: hdfs:///flink/checkpoints
+state.savepoints.dir: hdfs:///flink/savepoints
+execution.checkpointing.mode: EXACTLY_ONCE
+
+#==============================================================================
+# Common
+#==============================================================================
 
 jobmanager.rpc.address: localhost
-
-
 jobmanager.rpc.port: 6123
-
-
 jobmanager.bind-host: localhost
-
-
 jobmanager.memory.process.size: 1600m
-
-
 taskmanager.bind-host: localhost
-
 taskmanager.host: localhost
-
-
 taskmanager.memory.process.size: 1728m
-
 taskmanager.numberOfTaskSlots: 1
-
-
 parallelism.default: 1
-
-
 jobmanager.execution.failover-strategy: region
 
-rest.address: localhost
+#==============================================================================
+# Rest & web frontend
+#==============================================================================
+
+#rest.address: localhost
+#rest.bind-address: localhost
 
 
-rest.bind-address: localhost
+#==============================================================================
+# HistoryServer
+#==============================================================================
 
 jobmanager.archive.fs.dir: ${conf['flink.history.fs.logDirectory']}
-
 historyserver.web.address: 0.0.0.0
-
 historyserver.web.port: ${conf['flink.history.ui.port']}
-
 historyserver.archive.fs.dir: ${conf['flink.history.fs.logDirectory']}
-
 historyserver.web.tmpdir: /opt/edp/${service.serviceName}/data/tmp
 
 

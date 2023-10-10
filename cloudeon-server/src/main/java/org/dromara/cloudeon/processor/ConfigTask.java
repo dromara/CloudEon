@@ -151,7 +151,7 @@ public class ConfigTask extends BaseCloudeonTask {
 
         // ssh上传所有配置文件到指定目录
         ClusterNodeEntity nodeEntity = clusterNodeRepository.findByHostname(taskParam.getHostName());
-        Session clientSession = sshPoolService.openSession(nodeEntity.getIp(), nodeEntity.getSshPort(), nodeEntity.getSshUser(), nodeEntity.getSshPassword());
+        Session clientSession = sshPoolService.openSession(nodeEntity);
         Sftp sftp = JschUtil.createSftp(clientSession);
         String remoteConfDirPath = "/opt/edp/" + serviceInstanceEntity.getServiceName() +"/conf/";
         log.info("拷贝本地配置目录：" + outputConfPath + " 到节点" + taskParam.getHostName() + "的：" + remoteConfDirPath);
@@ -227,7 +227,10 @@ public class ConfigTask extends BaseCloudeonTask {
                 ||stackServiceName.equalsIgnoreCase(Constant.DOLPHINSCHEDULER_SERVICE_NAME)
                 ||stackServiceName.equalsIgnoreCase(Constant.FLINK_SERVICE_NAME)
                 ||stackServiceName.equalsIgnoreCase(Constant.SPARK_SERVICE_NAME)
-                ||stackServiceName.equalsIgnoreCase(Constant.HIVE_SERVICE_NAME)) {
+                ||stackServiceName.equalsIgnoreCase(Constant.TRINO_SERVICE_NAME)
+                ||stackServiceName.equalsIgnoreCase(Constant.AMORO_SERVICE_NAME)
+                ||stackServiceName.equalsIgnoreCase(Constant.HIVE_SERVICE_NAME)
+                ||stackServiceName.equalsIgnoreCase(Constant.DINKY_SERVICE_NAME)) {
             List<Integer> instanceIds = Arrays.stream(depServiceInstanceIds).map(new Function<String, Integer>() {
                 @Override
                 public Integer apply(String s) {
@@ -274,7 +277,7 @@ public class ConfigTask extends BaseCloudeonTask {
                 || stackServiceName.equalsIgnoreCase(Constant.SPARK_SERVICE_NAME )
                 || stackServiceName.equalsIgnoreCase(Constant.KYUUBI_SERVICE_NAME )
                 || stackServiceName.equalsIgnoreCase(Constant.KYLIN_SERVICE_NAME )
-                || stackServiceName.equalsIgnoreCase(Constant.FLINK_SERVICE_NAME )) {
+                ) {
             List<Integer> instanceIds = Arrays.stream(depServiceInstanceIds).map(new Function<String, Integer>() {
                 @Override
                 public Integer apply(String s) {

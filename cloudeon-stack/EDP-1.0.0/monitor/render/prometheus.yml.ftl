@@ -117,3 +117,19 @@ scrape_configs:
   - job_name: 'kylinserver'
     file_sd_configs:
     - files: ['discovery_configs/kylinserver.json']
+  - job_name: 'dinky'
+    file_sd_configs:
+    - files: ['discovery_configs/dinky.json']
+  - job_name: 'elasticsearch'
+    metrics_path: '/metrics'
+    file_sd_configs:
+    - files: ['discovery_configs/elasticsearch-node.json']
+  - job_name: 'trinocoordinator'
+    file_sd_configs:
+    - files: ['discovery_configs/trinocoordinator.json']
+  - job_name: 'trinoworker'
+    file_sd_configs:
+    - files: ['discovery_configs/trinoworker.json']
+  - job_name: 'ams'
+    file_sd_configs:
+    - files: ['discovery_configs/ams.json']

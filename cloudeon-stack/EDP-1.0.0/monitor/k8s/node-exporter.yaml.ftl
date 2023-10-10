@@ -5,7 +5,7 @@ metadata:
   labels:
     name: "${roleServiceFullName}"
   name: "${roleServiceFullName}"
-  namespace: "default"
+  namespace: ${namespace}
 spec:
   replicas: ${roleNodeCnt}
   selector:
@@ -35,7 +35,7 @@ spec:
                 name: "${roleServiceFullName}"
                 podConflictName: "${roleServiceFullName}"
             namespaces:
-            - "default"
+            - "${namespace}"
             topologyKey: "kubernetes.io/hostname"
       hostPID: false
       hostNetwork: true

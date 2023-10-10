@@ -6,13 +6,14 @@ dockerImage: "registry.cn-hangzhou.aliyuncs.com/udh/flink:1.15.4"
 dependencies:
     - "HDFS"
     - "YARN"
+    - "ZOOKEEPER"
 
 runAs: flink
 
 supportKerberos: true
 
 dashboard:
-  uid: ""
+  uid: "qugC-I_Vk"
 
 roles:
 
@@ -38,6 +39,43 @@ customConfigFiles:
 
 
 configurations:
+  - name: flink.hs.container.limit.cpu
+    description: "Flink HistoryServer容器的CPU使用限额"
+    recommendExpression: 1.0
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: flink.hs.container.limit.memory
+    description: "Flink HistoryServer容器的内存使用限额，单位MB"
+    recommendExpression: 2048
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: flink.hs.container.request.cpu
+    description: "Flink HistoryServer容器的CPU请求量"
+    recommendExpression: 0.2
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: flink.hs.container.request.memory
+    description: "Flink HistoryServer容器的内存请求量，单位MB"
+    recommendExpression: 1024
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: flink.hs.jvm.memory.percentage
+    description: "Flink HistoryServer JVM占容器内存限额的百分比"
+    recommendExpression: 75
+    valueType: InputNumber
+    unit: ".0"
+    configurableInWizard: true
+    tag: "资源管理"
 
   - name: "flink.history.ui.port"
     recommendExpression: "8082"
@@ -62,8 +100,18 @@ configurations:
     tag: "高级参数"
     unit: Ms
 
-
-
+  - name: "plugin.iceberg"
+    recommendExpression: false
+    valueType: Switch
+    description: "是否启用iceberg"
+    configurableInWizard: false
+    tag: "数据湖"
+  - name: "plugin.iceberg.warehouse"
+    recommendExpression: "hdfs:///iceberg/warehouse"
+    valueType: InputString
+    configurableInWizard: false
+    description: "iceberg数据目录"
+    tag: "数据湖"
 
 
 

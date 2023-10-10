@@ -15,3 +15,5 @@ ENV HADOOP_HOME=/home/flink/apache-hadoop
 
 ENV PATH=$PATH:$FLINK_HOME/bin:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
 
+# iceberg support
+RUN wget https://repo1.maven.org/maven2/org/apache/iceberg/iceberg-flink-runtime-1.15/1.2.1/iceberg-flink-runtime-1.15-1.2.1.jar

@@ -1,13 +1,14 @@
 // 集群管理页面
 import { PageContainer, ProCard } from '@ant-design/pro-components';
-import { Space, Button, Avatar, Card, Spin, Popconfirm, message,Popover,Tooltip } from 'antd';
+import { Space, Button, Avatar, Card, Spin, Popconfirm, message,Popover,Tooltip,Dropdown } from 'antd';
 import { FormattedMessage, useIntl, history } from 'umi';
-import { PlayCircleOutlined, ReloadOutlined, PoweroffOutlined, DeleteOutlined, AlertFilled } from '@ant-design/icons';
-import { serviceListAPI, deleteServiceAPI, restartServiceAPI, stopServiceAPI, startServiceAPI } from '@/services/ant-design-pro/colony';
+import { PlayCircleOutlined, ReloadOutlined, PoweroffOutlined, DeleteOutlined, AlertFilled, DownOutlined } from '@ant-design/icons';
+import { serviceListAPI, deleteServiceAPI, restartServiceAPI, stopServiceAPI, startServiceAPI, getListWebURLsAPI } from '@/services/ant-design-pro/colony';
 import { useState, useEffect } from 'react';
 import { dealResult } from '../../../utils/resultUtil'
 import styles from './index.less'
 import { statusColor,serviceStatusColor } from '@/utils/colonyColor'
+
 
 const { Meta } = Card;
 
@@ -16,8 +17,13 @@ const serviceList: React.FC = () => {
   const [serviceList, setServiceList] = useState<any[]>();
   const [loading, setLoading] = useState(false);
   const [currentId, setCurrentId] = useState(0);
+  const [currentAction, setCurrentAction] = useState('');
   const [btnLoading, setBtnLoading] = useState(false);
+  const [webUrlLoading, setWebUrlLoading] = useState(false);
   const colonyData = JSON.parse(sessionStorage.getItem('colonyData') || '{}')
+  const [dropdpwnStatus, setDropdpwnStatus] = useState(false);
+  const [webUrls, setWebUrls] = useState<API.webUrlsItem[]>();
+  
 
   const getServiceListData = async (showLoading:boolean) => {
     const params = {
@@ -40,9 +46,19 @@ const serviceList: React.FC = () => {
     }
   }
 
+  const handleOpenChange = (flag: boolean) => {
+    setDropdpwnStatus(flag);
+  };
+  const handleCancel = () => {
+    setDropdpwnStatus(false)
+    setCurrentAction('');
+  }
+
   const handleACT = async (key: string, serviceId:number) => {
     if(!serviceId) return
     setCurrentId(serviceId)
+    setCurrentAction('');
+    setDropdpwnStatus(false)
     let result: API.normalResult
     setBtnLoading(true)
     const params = {serviceInstanceId: serviceId}
@@ -71,6 +87,18 @@ const serviceList: React.FC = () => {
 
   const btnLoadingStatus = (id: number) => {
     return currentId == id && btnLoading
+  }
+
+  // 获取webUI地址
+  const getListWebURLs = async (params:any) => {
+    setWebUrlLoading(true)
+    const result = await getListWebURLsAPI(params)
+    setWebUrlLoading(false)
+    if(result?.success){
+      setWebUrls(result?.data)
+    }else{
+      setWebUrls([])
+    }
   }
 
   useEffect(()=>{
@@ -112,56 +140,121 @@ const serviceList: React.FC = () => {
                     <Card
                       hoverable
                       key={sItem.serviceName}
-                      actions={[                      
-                        <Popconfirm
-                              key='startPop'
-                              title="确定要启动吗?"
-                              onConfirm={()=>{ handleACT('start',sItem.id) }}
-                              okText="确定"
-                              cancelText="取消"
+                      actions={[ 
+                        <Dropdown 
+                          trigger={['click']}
+                          arrow={true}
+                          placement='bottom'
+                          open={currentId == sItem.id && dropdpwnStatus}
+                          onOpenChange={handleOpenChange}
+                          dropdownRender={(menu) => (
+                            <div className={styles.dropdownContent}>
+                              <div className={styles.actionSelects}>
+                                <Popconfirm
+                                      key='startPop'
+                                      placement="right"
+                                      title="确定要启动吗?"
+                                      onConfirm={()=>{ handleACT('start',sItem.id) }}
+                                      onCancel={()=>{ handleCancel()} }
+                                      okText="确定"
+                                      cancelText="取消"
+                                >
+                                  <div className={
+                                    `${styles.actionItem} ${currentAction=='start' && currentId===sItem.id ? styles.clickedItem : ''}`
+                                  } onClick={()=>{setCurrentAction('start')}} >
+                                    <PlayCircleOutlined/>&nbsp; 启动
+                                  </div> 
+                                </Popconfirm>
+                                <Popconfirm
+                                      key='stopPop'
+                                      placement="right"
+                                      title="确定要停止吗?"
+                                      onConfirm={()=>{ handleACT('stop',sItem.id) }}
+                                      onCancel={()=>{ handleCancel()} }
+                                      okText="确定"
+                                      cancelText="取消"
+                                >
+                                  <div 
+                                    className={`${styles.actionItem} ${currentAction=='stop' && currentId===sItem.id ? styles.clickedItem : ''}`}
+                                    onClick={()=>{setCurrentAction('stop')}}
+                                  >
+                                    <PoweroffOutlined/>&nbsp; 停止
+                                  </div> 
+                                </Popconfirm>
+                                <Popconfirm
+                                      key='restartPop'
+                                      placement="right"
+                                      title="确定要重启吗?"
+                                      onConfirm={()=>{ handleACT('restart',sItem.id) }}
+                                      onCancel={()=>{ handleCancel()} }
+                                      okText="确定"
+                                      cancelText="取消"
+                                    >
+                                    <div 
+                                      className={`${styles.actionItem} ${currentAction=='restart' && currentId===sItem.id ? styles.clickedItem : ''}`}
+                                      onClick={()=>{setCurrentAction('restart')}}
+                                    >
+                                      <ReloadOutlined/>&nbsp; 重启
+                                    </div> 
+                                </Popconfirm>
+                                <Popconfirm
+                                  placement="right"
+                                  title="确定删除该服务吗？"
+                                  onConfirm={()=>{
+                                    handleDeleteService({serviceInstanceId: sItem.id })
+                                  }}
+                                  onCancel={()=>{ handleCancel()} }
+                                  okText="确定"
+                                  cancelText="取消"
+                                >
+                                  <div 
+                                    className={`${styles.actionItem} ${currentAction=='delete' && currentId===sItem.id ? styles.clickedItem : ''}`}
+                                    onClick={()=>{setCurrentAction('delete')}}
+                                  >
+                                    <DeleteOutlined/>&nbsp; 删除
+                                  </div> 
+                                </Popconfirm>
+                              </div>
+                            </div>
+                          )}
                         >
-                          <Popover content="启动" title="">
-                            <PlayCircleOutlined/>
+                        <div 
+                          className={styles.cardClickText}
+                          onMouseEnter={()=>{ setCurrentId(sItem.id);setCurrentAction('');setDropdpwnStatus(true) }}
+                        >服务操作 <DownOutlined /> </div>
+                        </Dropdown>,     
+                        <div 
+                          onMouseEnter={()=>{setWebUrls([]);setDropdpwnStatus(false);setCurrentId(sItem.id);getListWebURLs({serviceInstanceId: sItem.id})}}
+                          style={{width:'100%'}}
+                        >
+                          {/* webUrls */}
+                          <Popover
+                            
+                            content={
+                              <Spin spinning={currentId===sItem.id && webUrlLoading} tip="加载中" >
+                                <div style={{minHeight:'30px',minWidth:'200px'}}>                                  
+                                {
+                                  webUrls?.map(urlItem=>{
+                                    if(urlItem && (urlItem.ipUrl || urlItem.hostnameUrl)){
+                                      return (
+                                        <div key={urlItem.ipUrl || urlItem.hostnameUrl}>
+                                          <div>{urlItem.name}
+                                            <a href={urlItem.hostnameUrl} target="_blank">&nbsp;&nbsp;地址1 </a>
+                                            <a href={urlItem.ipUrl} target="_blank">&nbsp;地址2 &nbsp;</a>
+                                          </div>
+                                          {/* <div><a href={urlItem.ipUrl} target="_blank">{urlItem.name} <LinkOutlined /></a></div> */}
+                                        </div>
+                                      )
+                                              
+                                    }
+                                  })
+                                }
+                                </div>
+                              </Spin>
+                            } title="" placement="bottom">
+                            <div className={styles.cardClickText}>webUrls <DownOutlined /></div>
                           </Popover>
-                        </Popconfirm>,
-                        <Popconfirm
-                              key='stopPop'
-                              title="确定要停止吗?"
-                              onConfirm={()=>{ handleACT('stop',sItem.id) }}
-                              okText="确定"
-                              cancelText="取消"
-                        >
-                        <Popover content="停止" title="">
-                          <PoweroffOutlined />
-                        </Popover>
-                        </Popconfirm>,
-                        <Popconfirm
-                              key='restartPop'
-                              title="确定要重启吗?"
-                              onConfirm={()=>{ handleACT('restart',sItem.id) }}
-                              okText="确定"
-                              cancelText="取消"
-                        >
-                        <Popover content="重启" title="">
-                          <ReloadOutlined />
-                        </Popover>
-                        </Popconfirm>,
-                        <Popover content="删除" title="">
-                          <Popconfirm
-                            title="确定删除该服务吗？"
-                            onConfirm={()=>{
-                              handleDeleteService({serviceInstanceId: sItem.id })
-                            }}
-                            onCancel={()=>{}}
-                            okText="确定"
-                            cancelText="取消"
-                          >
-                            <DeleteOutlined key="setting"/>
-                          </Popconfirm>
-                        </Popover>,
-                        // <SettingOutlined />,
-                        // <EditOutlined key="edit" />,
-                        // <EllipsisOutlined key="ellipsis" />,
+                        </div>, 
                       ]}
                     >
                       {
@@ -190,7 +283,7 @@ const serviceList: React.FC = () => {
                         }}>
                           <Meta
                             avatar={<Avatar style={{width:'40px', height:'40px'}} src={'data:image/jpeg;base64,'+sItem.icon} />}
-                            title={<div style={{paddingLeft:'2px'}}>{sItem.serviceName}</div>}
+                            title={<div style={{paddingLeft:'2px', fontWeight:'500', fontSize:'18px'}}>{sItem.serviceName}</div>}
                             description={<div style={{paddingLeft:'2px'}}>
                             <span style={{backgroundColor: serviceStatusColor[sItem.serviceStateValue || 0]}} 
                                   className={`${styles.statusCircel} ${[1,2,3,4,5,8].includes(sItem.serviceStateValue) && styles.statusProcessing}`}>
@@ -203,33 +296,12 @@ const serviceList: React.FC = () => {
                   </Spin>
                 </div>
               )
-
             })
 
           ):(
             <div>
               暂无数据，请新增服务
             </div>
-            // <Card
-            //   style={{ width: 300 }}
-            //   actions={[
-            //     <SettingOutlined key="setting" />,
-            //     <EditOutlined key="edit" />,
-            //     <EllipsisOutlined key="ellipsis" />,
-            //   ]}
-            // >
-            //   <div 
-            //   style={{cursor:'pointer'}}
-            //   onClick={() => {
-            //     history.push('/colony/serviceList/detail');
-            //   }}>
-            //       <Meta
-            //         avatar={<Avatar src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" />}
-            //         title="测试 title"
-            //         description="This is the description"
-            //       />
-            //   </div>
-            // </Card>
           )
         }
       </div>

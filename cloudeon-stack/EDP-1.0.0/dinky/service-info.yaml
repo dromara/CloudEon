@@ -6,13 +6,14 @@ dockerImage: "registry.cn-hangzhou.aliyuncs.com/udh/dinky:0.7.3"
 dependencies:
   - "HDFS"
   - "YARN"
+  - "ZOOKEEPER"
 
 runAs: root
 
 supportKerberos: false
 
 dashboard:
-  uid: "kGFhlowrt"
+  uid: "cMEJaI_4z"
 
 roles:
   - name: DINKY_SERVER

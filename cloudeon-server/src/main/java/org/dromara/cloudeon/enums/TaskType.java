@@ -25,9 +25,8 @@ public enum TaskType {
 
     TAG_HOST(1, "添加k8s节点标签", "org.dromara.cloudeon.processor.TagHostLabelTask", true),
     START_K8S_SERVICE(2, "启动角色k8s服务", "org.dromara.cloudeon.processor.StartRoleK8sDeploymentTask", false),
-    PULL_IMAGE_FROM_REGISTRY_TO_HOST(3, "拉取容器镜像到节点", "org.dromara.cloudeon.processor.PullImageTask", true),
-    INSTALL_ROLE_TO_HOST(4, "安装服务角色到节点", "org.dromara.cloudeon.processor.InstallTask", true),
-    CONFIG_ROLE_TO_HOST(5, "配置服务角色到节点", "org.dromara.cloudeon.processor.ConfigTask", true),
+    INSTALL_ROLE_TO_HOST(4, "初始化安装目录到节点", "org.dromara.cloudeon.processor.InstallTask", true),
+    CONFIG_ROLE_TO_HOST(5, "分发配置到节点", "org.dromara.cloudeon.processor.ConfigTask", true),
     INIT_HDFS_NAMENODE(6, "初始化NameNode", "org.dromara.cloudeon.processor.HdfsZkfcFormatTask", false),
     YARN_HDFS_MKDIR(7, "HDFS上创建目录", "org.dromara.cloudeon.processor.InitYARNDirOnHDFSTask", false),
     CANCEL_TAG_HOST(8, "移除节点上的标签", "org.dromara.cloudeon.processor.CancelHostTagTask", true),
@@ -48,6 +47,8 @@ public enum TaskType {
     REGISTER_FE(22, "注册fe Follwer节点", "org.dromara.cloudeon.processor.RegisterDorisFeTask", false),
     FLINK_HDFS_MKDIR(23, "HDFS上创建Flink History目录", "org.dromara.cloudeon.processor.InitFlinkHistoryDirOnHDFSTask", false),
     KYLIN_HDFS_MKDIR(24, "HDFS上创建Kylin 工作目录", "org.dromara.cloudeon.processor.InitKylinWorkDirTask", false),
+    INIT_DINKY_DB(25, "初始化Dinky数据库", "org.dromara.cloudeon.processor.InitDinkyDBTask", false),
+    INIT_AMORO_DB(26, "初始化Amoro数据库", "org.dromara.cloudeon.processor.InitAmoroDBTask", false),
 
 
 

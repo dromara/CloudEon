@@ -26,7 +26,6 @@ import java.util.List;
 @AllArgsConstructor
 public enum TaskGroupType {
 
-    PULL_IMAGE_FROM_REGISTRY(1, "从dockerRegistry拉取镜像", Lists.newArrayList(TaskType.PULL_IMAGE_FROM_REGISTRY_TO_HOST), true),
     INSTALL_SERVICE(2, "安装服务", Lists.newArrayList(TaskType.INSTALL_ROLE_TO_HOST), true),
     CONFIG_SERVICE(3, "配置服务", Lists.newArrayList(TaskType.CONFIG_ROLE_TO_HOST), true),
     TAG_AND_START_K8S_SERVICE(4, "添加标签并启动k8s服务", Lists.newArrayList(TaskType.TAG_HOST, TaskType.START_K8S_SERVICE), true),
@@ -46,6 +45,8 @@ public enum TaskGroupType {
     INIT_DS(18, "初始化DS", Lists.newArrayList(TaskType.INIT_DS_DB), false),
     INIT_FLINK(19, "初始化FLINK", Lists.newArrayList(TaskType.FLINK_HDFS_MKDIR), false),
     INIT_KYLIN(20, "初始化KYLIN", Lists.newArrayList(TaskType.KYLIN_HDFS_MKDIR), false),
+    INIT_DINKY(21, "初始化Dinky", Lists.newArrayList(TaskType.INIT_DINKY_DB), false),
+    INIT_AMORO(22, "初始化Amoro", Lists.newArrayList(TaskType.INIT_AMORO_DB), false),
 
     ;
 

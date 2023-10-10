@@ -63,7 +63,7 @@ public class ClusterInfoVO implements Serializable {
      * 服务数
      */
     private Integer serviceCnt;
-
+    private String namespace;
 
 
 

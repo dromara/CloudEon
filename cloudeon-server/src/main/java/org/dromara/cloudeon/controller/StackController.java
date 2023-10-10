@@ -23,12 +23,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import org.dromara.cloudeon.controller.request.RoleAllocationRequest;
 import org.dromara.cloudeon.controller.request.ValidServicesDepRequest;
-import org.dromara.cloudeon.controller.response.AllocationRoleVO;
-import org.dromara.cloudeon.controller.response.ServiceConfVO;
-import org.dromara.cloudeon.controller.response.StackServiceConfVO;
-import org.dromara.cloudeon.controller.response.StackServiceVO;
+import org.dromara.cloudeon.controller.response.*;
 import org.dromara.cloudeon.dao.*;
 import org.dromara.cloudeon.dto.ResultDTO;
+import org.dromara.cloudeon.dto.StackService;
 import org.dromara.cloudeon.entity.*;
 import org.springframework.data.domain.Example;
 import org.springframework.web.bind.annotation.*;
@@ -71,9 +69,17 @@ public class StackController {
 
 
     @GetMapping("/list")
-    public ResultDTO<List<StackInfoEntity>> listStackInfo() {
-        List<StackInfoEntity> result;
-        result = stackInfoRepository.findAll();
+    public ResultDTO<List<StackInfoVO>> listStackInfo() {
+        List<StackInfoEntity> stackInfoEntities= stackInfoRepository.findAll();
+        List<StackInfoVO> result = stackInfoEntities.stream().map(e -> {
+            StackInfoVO stackInfoVO = new StackInfoVO();
+            BeanUtil.copyProperties(e, stackInfoVO);
+            List<StackService> services = serviceRepository.findByStackId(e.getId()).stream().map(s -> {
+                return StackService.builder().name(s.getLabel()).version(s.getVersion()).build();
+            }).collect(Collectors.toList());
+            stackInfoVO.setServices(services);
+            return stackInfoVO;
+        }).collect(Collectors.toList());
         return ResultDTO.success(result);
     }
 

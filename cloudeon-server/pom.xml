@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.dromara</groupId>
         <artifactId>cloudeon</artifactId>
-        <version>v1.0.0</version>
+        <version>v1.2.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cloudeon-server</artifactId>
@@ -37,7 +37,7 @@
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>cloudeon-ui</artifactId>
-            <version>${cloudeon.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <!-- lombok -->
         <dependency>
@@ -56,6 +56,17 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.elasticsearch.client</groupId>
+            <artifactId>elasticsearch-rest-high-level-client</artifactId>
+            <version>7.16.3</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>snakeyaml</artifactId>
+                    <groupId>org.yaml</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -165,6 +176,12 @@
             <artifactId>commons-lang3</artifactId>
             <version>${commons.lang.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>1.21</version>
+        </dependency>
+
         <!-- guava -->
         <dependency>
             <groupId>com.google.guava</groupId>

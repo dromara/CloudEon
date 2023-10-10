@@ -15,4 +15,35 @@
             // max-width: 300px;
         }
     }
+    .hasEdited{
+        &::after{
+            content: '已修改';
+            width: 60px;
+            height: 20px;
+            background-color: var(--cloudeon-primary-color); // #fa541c
+            position: absolute;
+            top: 0;
+            right: 0;
+            color: #fff;
+            font-size: 12px;
+            z-index: 99;
+            font-weight: 600;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 0 0 0 10px;
+        }
+    }
+    .editFormItem{
+        flex: 1;
+    }
+    .editWrapBtn{
+        width: 50px;
+        flex-shrink: 0;
+    }
+    .editWrap{
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
 }

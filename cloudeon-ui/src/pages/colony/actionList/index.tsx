@@ -1,13 +1,11 @@
-import { PageContainer, ProCard, ProTable } from '@ant-design/pro-components';
-import { Space, Card, Table, Tag, Button, Modal, Form, Progress, message, Spin } from 'antd';
-import React, { useState, useEffect, useRef } from 'react';
-import type { FormInstance } from 'antd/es/form';
-import { FormattedMessage, useIntl, history } from 'umi';
-import { getCommandListAPI } from '@/services/ant-design-pro/colony';
-import { formatDate } from '@/utils/common'
+import {PageContainer, ProColumns, ProTable} from '@ant-design/pro-components';
+import {Form, Progress, Tag} from 'antd';
+import React, {useEffect, useState} from 'react';
+import {history, useIntl} from 'umi';
+import {getCommandListAPI} from '@/services/ant-design-pro/colony';
+import {formatDate} from '@/utils/common'
+import {statusColor} from '../../../utils/colonyColor'
 import styles from './index.less'
-import { RightOutlined } from '@ant-design/icons';
-import { statusColor } from '../../../utils/colonyColor'
 
 const actionList: React.FC = () => {
   const intl = useIntl();
@@ -44,6 +42,7 @@ const actionList: React.FC = () => {
       name: string;
       startTime: string;
       endTime: string;
+      serviceNames: string[];
       submitTime: string;
       currentProgress: number;
       commandState: string;
@@ -56,7 +55,7 @@ const actionList: React.FC = () => {
   // }
 
 
-  const columns = [
+  const columns :ProColumns[] = [
     {
       title: '指令名称',
       dataIndex: 'name',
@@ -99,9 +98,21 @@ const actionList: React.FC = () => {
       },
     },
     {
+      title: '关联服务',
+      dataIndex: 'serviceNames',
+      key: 'serviceNames',
+      width: '20%',
+      render: (_: any, record: Item) => {
+        return record.serviceNames.map((item: any) => {
+          return <div className={styles.serviceItem}>{item}</div>
+        })
+      },
+    },
+    {
       title: '提交时间',
       dataIndex: 'submitTime',
       key: 'submitTime',
+      hideInTable: true,
       render: (_: any, record: Item) => {
         return (
           <div>{formatDate(record.submitTime, 'yyyy-MM-dd hh:mm:ss')}</div>
@@ -135,12 +146,12 @@ const actionList: React.FC = () => {
       // width: 150,
       render: (_: any, record: Item) => {
         return (
-          <Progress 
-            percent={record.currentProgress} 
-            strokeWidth={8} 
-            strokeColor={statusColor[record.commandState]} 
-            size="small" 
-            status={record.commandState=='RUNNING'?"active":'normal'} 
+          <Progress
+            percent={record.currentProgress}
+            strokeWidth={8}
+            strokeColor={statusColor[record.commandState]}
+            size="small"
+            status={record.commandState=='RUNNING'?"active":'normal'}
             style={{minWidth:'150px'}}
           />
         )
@@ -162,15 +173,15 @@ const actionList: React.FC = () => {
     //   key: 'totalMem',
     // }
   ]
-  
+
 
   return (
-    <PageContainer>
+    <PageContainer className={styles.actionListPageContainer}>
       {/* <div>
         <div className={styles.carBar}>
           <div>
             <Tag color="#f50">#f50</Tag>
-            <a 
+            <a
             onClick={()=>{
               history.push(`/colony/actionList/detail`);
             }}>名称 <RightOutlined /></a>
@@ -180,10 +191,10 @@ const actionList: React.FC = () => {
           </div>
         </div>
       </div> */}
-      <ProTable 
-        search={false} 
-        rowKey="id" 
-        columns={columns} 
+      <ProTable
+        search={false}
+        rowKey="id"
+        columns={columns}
         dataSource={actionListData}
         request={async (params = {}, sort, filter) => {
           // console.log(sort, filter);

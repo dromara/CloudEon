@@ -13,7 +13,7 @@ runAs: spark
 supportKerberos: true
 
 dashboard:
-  uid: ""
+  uid: "ziOC-S_4z"
 
 roles:
   - name: SPAKR_THRIFT_SERVER
@@ -45,6 +45,75 @@ customConfigFiles:
   - hive-site.xml
 
 configurations:
+
+  - name: spark.daemon.jvm.memory.percentage
+    description: "Spark进程JVM占容器内存限额的百分比"
+    recommendExpression: 75
+    valueType: InputNumber
+    unit: ".0"
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: spark.hs.container.limit.cpu
+    description: "Spark HistoryServer容器的CPU使用限额"
+    recommendExpression: 1.0
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: spark.hs.container.limit.memory
+    description: "Spark HistoryServer容器的内存使用限额，单位MB"
+    recommendExpression: 2048
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: spark.hs.container.request.cpu
+    description: "Spark HistoryServer容器的CPU请求量"
+    recommendExpression: 0.2
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: spark.hs.container.request.memory
+    description: "Spark HistoryServer容器的内存请求量，单位MB"
+    recommendExpression: 1024
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: spark.ts.container.limit.cpu
+    description: "Spark ThriftServer容器的CPU使用限额"
+    recommendExpression: 1.0
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: spark.ts.container.limit.memory
+    description: "Spark ThriftServer容器的内存使用限额，单位MB"
+    recommendExpression: 2048
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: spark.ts.container.request.cpu
+    description: "Spark ThriftServer容器的CPU请求量"
+    recommendExpression: 0.2
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: spark.ts.container.request.memory
+    description: "Spark ThriftServer容器的内存请求量，单位MB"
+    recommendExpression: 1024
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+
   - name: "spark.hive.server2.thrift.port"
     recommendExpression: "10005"
     valueType: InputNumber
@@ -177,3 +246,21 @@ configurations:
     confFile:  "hive-site.xml"
     tag: "高级参数"
     unit: Ms
+  - name: "plugin.iceberg"
+    recommendExpression: false
+    valueType: Switch
+    description: "是否启用iceberg"
+    configurableInWizard: false
+    tag: "数据湖"
+  - name: "plugin.iceberg.warehouse"
+    recommendExpression: "hdfs:///iceberg/warehouse"
+    valueType: InputString
+    configurableInWizard: false
+    description: "iceberg数据目录"
+    tag: "数据湖"
+  - name: "plugin.iceberg.as.defaultCatalog"
+    recommendExpression: false
+    valueType: Switch
+    configurableInWizard: false
+    description: "是否默认用iceberg catalog，如果是则不用 ` use iceberg_catalog; `语句进行切换catalog。开启后，如果要切换回默认的catalog查询hive上的数据，则需用语句`use spark_catalog; `"
+    tag: "数据湖"

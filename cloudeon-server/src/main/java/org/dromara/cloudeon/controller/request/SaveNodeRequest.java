@@ -26,4 +26,7 @@ public class SaveNodeRequest {
     private Integer clusterId;
     private String ip;
     private String hostname;
+    private String privateKeyPath;
+    private String sshAuthType;
+
 }

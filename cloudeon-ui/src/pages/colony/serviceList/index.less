@@ -1,3 +1,4 @@
+@import (reference) '~antd/es/style/themes/index';
 .serviceList{
     display: flex;
     flex-wrap: wrap;
@@ -44,6 +45,49 @@
         color: var(--cloudeon-red-color);
         // font-size: 18px;
     }
+}
+
+:global {
+    .ant-popover-placement-right{
+        padding-left: 0px !important;
+    }
+}
+.cardClickText{
+    width: 100%;
+    // font-weight: 600;
+    color: var(--cloudeon-primary-color);
+}
+.actionSelects{
+    background-color: #ffffff;
+    line-height: 30px;
+    width: 100%;
+    padding: 5px 0;
+    .actionItem{
+        width: 100%;
+        line-height: 30px;
+        padding: 2px 10px 2px 15px;
+        color: rgba(0, 0, 0, 1);
+        // display: flex;
+        // align-items: center;
+        // justify-content: center;
+        cursor: pointer;
+        &:hover{
+            color: var(--cloudeon-primary-color);
+        }
+    }
+    .clickedItem{
+        color: var(--cloudeon-primary-color);
+    }
+}
+
+.dropdownContent {
+    border-radius: 5px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 3px 6px -4px rgba(0,0,0,0.12), 0 6px 16px 0 rgba(0,0,0,8%), 0 9px 28px 8px rgba(0,0,0,5%);
+}
+.dropdownContent .ant-dropdown-menu {
+    box-shadow: none;
 }
 
 .alertText{

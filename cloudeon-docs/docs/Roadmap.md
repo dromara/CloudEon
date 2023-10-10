@@ -29,6 +29,7 @@
 - [ ] 支持streampark服务在Kubernetes上运行
 - [x] 支持dinky服务在Kubernetes上运行
 - [ ] 支持trino服务在Kubernetes上运行
+- [ ] 支持elasticsearch服务在Kubernetes上运行
 - [ ] 支持prestodb服务在Kubernetes上运行
 - [ ] 支持alluxiio服务在Kubernetes上运行
 - [ ] 支持iotdb服务在Kubernetes上运行

@@ -1,6 +1,7 @@
 # 项目介绍
 ## 🚀 什么是CloudEon
-CloudEon是一款基于kubernetes的开源大数据平台，旨在为用户提供一种简单、高效、可扩展的大数据解决方案。该平台致力于简化多种大数据服务在kubernetes上的部署和管理，如Hadoop、Doris、Spark、Flink、Hive、Kafka等，能够满足不同规模和业务需求下的大数据处理和分析需求。
+CloudEon 将基于 Kubernetes 的资源安装部署开源大数据组件，实现开源大数据平台的容器化运行，您可减少对于底层资源的运维关注。
+
 ## 🔍特性
 
 - 快速搭建大数据集群
@@ -15,20 +16,4 @@ CloudEon是一款基于kubernetes的开源大数据平台，旨在为用户提�
 
 ##  🍓 实现思路
 ![图片.png](images/silu.png)
-
-## 🥰 感谢
-感谢如下优秀的项目，没有这些项目，不可能会有CloudEon：
-
-- 后端技术栈
-   - [springboot-v2.7.4](https://github.com/spring-projects/spring-boot)
-   - [lombok-v1.18.12](https://github.com/projectlombok/lombok)
-   - [hutool-v5.8.9](https://github.com/dromara/hutool)
-   - [hibernate-v5.6.11](https://github.com/hibernate/hibernate-orm)
-   - [freemarker-v2.3.31](https://github.com/apache/freemarker)
-- 前端技术栈
-   - [react](https://github.com/facebook/react)
-   - [ant-design](https://github.com/ant-design/ant-design)
-- 另外特别感谢
-  - [Ambari](https://github.com/apache/ambari)  ：参考其对大数据组件的安全管理、可拓展大数据组件包管理
-  - [datasophon](https://github.com/datasophon/datasophon) ：参考其优秀的监控告警体系
 

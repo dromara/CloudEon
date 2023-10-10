@@ -17,10 +17,8 @@
 package org.dromara.cloudeon.processor;
 
 import cn.hutool.extra.spring.SpringUtil;
-import org.dromara.cloudeon.dao.ClusterNodeRepository;
-import org.dromara.cloudeon.dao.ServiceInstanceRepository;
-import org.dromara.cloudeon.dao.ServiceRoleInstanceRepository;
-import org.dromara.cloudeon.dao.StackServiceRoleRepository;
+import org.apache.commons.lang3.StringUtils;
+import org.dromara.cloudeon.dao.*;
 import org.dromara.cloudeon.entity.ServiceInstanceEntity;
 import org.dromara.cloudeon.entity.ServiceRoleInstanceEntity;
 import org.dromara.cloudeon.entity.StackServiceRoleEntity;
@@ -40,10 +38,18 @@ public class ScaleUpK8sServiceTask extends BaseCloudeonTask {
         ClusterNodeRepository clusterNodeRepository = SpringUtil.getBean(ClusterNodeRepository.class);
         ServiceRoleInstanceRepository serviceRoleInstanceRepository = SpringUtil.getBean(ServiceRoleInstanceRepository.class);
         KubeService kubeService = SpringUtil.getBean(KubeService.class);
+        ClusterInfoRepository clusterInfoRepository = SpringUtil.getBean(ClusterInfoRepository.class);
+
 
         ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(taskParam.getServiceInstanceId()).get();
         String serviceName = serviceInstanceEntity.getServiceName();
         Integer serviceInstanceId = taskParam.getServiceInstanceId();
+
+        // 获取集群的namespace
+        String namespace = clusterInfoRepository.findById(serviceInstanceEntity.getClusterId()).get().getNamespace();
+        if (StringUtils.isBlank(namespace)) {
+            namespace = "default";
+        }
 
 
         // 查询框架服务角色名获取deployment名字
@@ -55,7 +61,7 @@ public class ScaleUpK8sServiceTask extends BaseCloudeonTask {
         String tag = roleFullName + "-" + serviceName.toLowerCase();
 
         try (KubernetesClient client = kubeService.getKubeClient(serviceInstanceEntity.getClusterId());) {
-            RollableScalableResource<Deployment> resource = client.apps().deployments().inNamespace("default").withName(deploymentName);
+            RollableScalableResource<Deployment> resource = client.apps().deployments().inNamespace(namespace).withName(deploymentName);
             Integer replicas = resource.get().getStatus().getReplicas();
             if (replicas == null) {
                 replicas = 0;

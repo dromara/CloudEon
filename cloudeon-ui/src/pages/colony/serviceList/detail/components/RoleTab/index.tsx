@@ -1,13 +1,20 @@
-import type { ProColumns } from '@ant-design/pro-components';
-import { ProTable, ActionType, TableDropdown } from '@ant-design/pro-components';
-import { Spin, Button, Popconfirm, message,Tooltip, Modal } from 'antd';
-import { AlertFilled } from '@ant-design/icons';
-import { useState, useEffect, useRef } from 'react';
+import type {ProColumns} from '@ant-design/pro-components';
+import {ProTable, ActionType, TableDropdown} from '@ant-design/pro-components';
+import {Spin, Button, Popconfirm, message, Tooltip, Modal, Table, Tabs} from 'antd';
+import {AlertFilled} from '@ant-design/icons';
+import {useState, useEffect, useRef} from 'react';
 import styles from './index.less'
-import { startRoleAPI, stopRoleAPI, getServiceRolesAPI } from '@/services/ant-design-pro/colony';
+import {
+    startRoleAPI,
+    stopRoleAPI,
+    getServiceRolesAPI,
+    getRoleNamesAPI,
+    rolePodEventsAPI
+} from '@/services/ant-design-pro/colony';
 
 import SyntaxHighlighter from 'react-syntax-highlighter';
-import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import {tomorrow} from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import {ColumnsType} from "antd/lib/table";
 
 const roleTab:React.FC<{ serviceId: any}> = ({serviceId}) => {
     const [confirmLoading, setConfirmLoading] = useState(false);
@@ -15,7 +22,10 @@ const roleTab:React.FC<{ serviceId: any}> = ({serviceId}) => {
     const [currentType, setCurrentType] = useState('');
     const [apiLoading, setApiLoading] = useState(false);
     const [rolesInfo, setRolesInfo] = useState<API.rolesInfos[]>();
+    const [podEventData, setPodEventData] = useState<PodEventDataType[]>();
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isPodEventModalOpen, setIsPodEventModalOpen] = useState(false);
+    const [roleNameTabs, setRoleNameTabs] = useState<any[]>();
     const [sessionId, setSessionId] = useState('');
     const [logInfo, setLogInfo] = useState('');
     const [socketRef, setSocketRef] = useState<WebSocket>();
@@ -23,6 +33,43 @@ const roleTab:React.FC<{ serviceId: any}> = ({serviceId}) => {
     logInfoRef.current = logInfo
     // const actionRef = useRef<ActionType>();
 
+    interface PodEventDataType {
+        type: string;
+        count: number;
+        lastTimestamp: string;
+        reason: string;
+        message:string;
+
+
+    }
+
+    const podEventColumns: ColumnsType<PodEventDataType> = [
+        {
+            title: '类型',
+            dataIndex: 'type',
+            key: 'type'
+        }
+        , {
+            title: '触发次数',
+            dataIndex: 'count',
+            key: 'count'
+        },
+        {
+            title: '最近触发时间',
+            dataIndex: 'lastTimestamp',
+            key: 'lastTimestamp'
+        },
+        {
+            title: '原因',
+            dataIndex: 'reason',
+            key: 'reason'
+        },
+        {
+            title: '信息',
+            dataIndex: 'message',
+            key: 'message'
+        }
+    ]
 
     // 获取角色数据
     const getRoles = async () =>{
@@ -31,13 +78,15 @@ const roleTab:React.FC<{ serviceId: any}> = ({serviceId}) => {
         const result = await getServiceRolesAPI(params)
         setApiLoading(false)
         if(result?.success){
-        setRolesInfo(result?.data)
+            setRolesInfo(result?.data)
+            fetchRoleData(result)
+
         }
     }
 
     const getLog = (id: any) => {
         try {
-            let url = `ws://${process.env.UMI_ENV == 'dev' ? process.env.API_HOST : window.location.host}/log`  // 'ws://bsvksx.natappfree.cc/log' 
+            let url = `ws://${process.env.UMI_ENV == 'dev' ? process.env.API_HOST : window.location.host}/log`  // 'ws://bsvksx.natappfree.cc/log'
             let socket = new window.WebSocket(url)
             setSocketRef(socket)
             socket.onopen = function(){ // socket已连接
@@ -56,15 +105,15 @@ const roleTab:React.FC<{ serviceId: any}> = ({serviceId}) => {
             };
             socket.onclose = function(evt) {
                 console.log("Connection closed.");
-            }; 
-            
+            };
+
             socket.onerror = function(evt) {
-                console.log("error!!!", evt); 
-            }; 
+                console.log("error!!!", evt);
+            };
         } catch (error) {
-            console.log(error);  
+            console.log(error);
         }
-    }     
+    }
 
     const handleOk = () => {
         setIsModalOpen(false);
@@ -78,7 +127,7 @@ const roleTab:React.FC<{ serviceId: any}> = ({serviceId}) => {
         // console.log('socketRef: ', socketRef);
         // if (socketRef?.readyState===1) {
         //     socketRef?.send("##colose")
-        // }       
+        // }
         socketRef?.close()
     };
 
@@ -112,7 +161,7 @@ const roleTab:React.FC<{ serviceId: any}> = ({serviceId}) => {
             getRoles()
         }else{
             message.error('启动失败：'+result?.message, 3)
-        } 
+        }
     }
 
     const stopRole = async(params:any)=>{
@@ -126,19 +175,27 @@ const roleTab:React.FC<{ serviceId: any}> = ({serviceId}) => {
             message.error('停止失败：'+result?.message, 3)
         }
     }
+    const getData = JSON.parse(sessionStorage.getItem('colonyData') || '{}')
+
+    const getPodEvent = async (id: number | undefined) => {
+        const result: API.normalResult =  await rolePodEventsAPI({ clusterId: getData.clusterId,roleId: id });
+        setPodEventData(result?.data)
+    };
+
 
     const columns: ProColumns<API.rolesInfos>[] = [
         {
             title: '名称',
             key:'name',
             dataIndex: 'name',
+            hideInTable: true,
             render: (_, record) => <>
             <span>{record.name}</span>
             {
                 record.alertMsgCnt ?
-                <Tooltip 
-                    placement="top" 
-                    color="#fff" 
+                <Tooltip
+                    placement="top"
+                    color="#fff"
                     title={
                     <div className={styles.alertText}>
                         {`告警：`}
@@ -153,6 +210,17 @@ const roleTab:React.FC<{ serviceId: any}> = ({serviceId}) => {
             }
             </>,
         },
+
+        {
+            title: '主机名称',
+            key:'nodeHostname',
+            dataIndex: 'nodeHostname',
+        },
+        {
+            title: '主机ip',
+            key:'nodeHostIp',
+            dataIndex: 'nodeHostIp',
+        },
         {
             title: '状态',
             key:'roleStatusValue',
@@ -166,16 +234,6 @@ const roleTab:React.FC<{ serviceId: any}> = ({serviceId}) => {
                 4: { text: '角色停止中', status: 'Error' },
                 // error: { text: '异常', status: 'Error' },
             },
-        },
-        {
-            title: '主机名称',
-            key:'nodeHostname',
-            dataIndex: 'nodeHostname',
-        },
-        {
-            title: '主机ip',
-            key:'nodeHostIp',
-            dataIndex: 'nodeHostIp',
         },
         {
             title: '操作',
@@ -201,15 +259,24 @@ const roleTab:React.FC<{ serviceId: any}> = ({serviceId}) => {
                 >
                     <Button className={styles.roleBtn} loading={currentType=='stop' && currentId == record.id} type="link" >停止</Button>
                 </Popconfirm>,
-                <Button 
-                    key='logbtn' 
+                <Button
+                    key='logbtn'
                     onClick={()=>{
                         getLog(record.id)
                         setIsModalOpen(true);
-                    }} 
-                    className={styles.roleBtn} 
-                    type="link" 
+                    }}
+                    className={styles.roleBtn}
+                    type="link"
                 >实时日志</Button>,
+                <Button
+                    key='eventbtn'
+                    onClick={() => {
+                        getPodEvent(record.id)
+                        setIsPodEventModalOpen(true);
+                    }}
+                    className={styles.roleBtn}
+                    type="link"
+                >pod事件</Button>
 
                 // <a key="link">启动</a>,
                 // <a key="link2">停止</a>,
@@ -224,23 +291,51 @@ const roleTab:React.FC<{ serviceId: any}> = ({serviceId}) => {
             ],
         },
     ];
+     function fetchRoleData(result: API.serviceRolesResult) {
+        const roleNames = result.data?.map((value, index, array) => {
+            return String(value.name)
+        })
+
+        // roleNames去重
+        const roleTabs= Array.from(new Set(roleNames))?.map((name, i) => {
+            return {
+                label: `${name}`,
+                key: name,
+                children:  (
+                    <Spin tip="Loading" size="small" spinning={!!apiLoading || !!confirmLoading}>
+                        <ProTable
+                            dataSource={result.data?.filter((item) => {
+                                return item.name === name
+                            })}
+
+                            rowKey="id"
+                            pagination={{
+                                showQuickJumper: true,
+                            }}
+                            columns={columns}
+                            search={false}
+                            options={false}
+
+
+                        />
+                    </Spin>),
+            };
+        })
+
+        setRoleNameTabs(roleTabs)
+    }
+
+
 
     return (
         <div style={{minHeight:'200px'}} className={styles.roleTab}>
-            <Spin tip="Loading" size="small" spinning={!!apiLoading || !!confirmLoading}>
-                <ProTable
-                    dataSource={rolesInfo}
-                    rowKey="id"
-                    pagination={{
-                        showQuickJumper: true,
-                    }}
-                    columns={columns}
-                    search={false}
-                    request={async (params = {}, sort, filter) => {
-                        return getServiceRolesAPI({serviceInstanceId: serviceId})
-                      }}
-                />
-            </Spin>
+            <Tabs
+                defaultActiveKey="1"
+                tabPosition={'left'}
+                // style={{ height: 220 }}
+                items={roleNameTabs}
+            />
+
             <Modal
                 key="logmodal"
                 title={<>日志信息 &nbsp;&nbsp;<Spin size="small"/></>}
@@ -253,14 +348,28 @@ const roleTab:React.FC<{ serviceId: any}> = ({serviceId}) => {
                 onCancel={handleCancel}
                 footer={null}
             >
-                <SyntaxHighlighter 
-                    language="yaml" 
-                    style={tomorrow} 
-                    showLineNumbers 
+                <SyntaxHighlighter
+                    language="yaml"
+                    style={tomorrow}
+                    showLineNumbers
                     customStyle={{height:'60vh',overflow:'auto'}}
                 >
                     {logInfoRef.current}
                 </SyntaxHighlighter>
+            </Modal>
+            <Modal
+                key="eventmodal"
+                title={<>pod事件信息 &nbsp;&nbsp;</>}
+                width="80%"
+                style={{height: '80vh'}}
+                forceRender={true}
+                destroyOnClose={false}
+                open={isPodEventModalOpen}
+                onOk={() => setIsPodEventModalOpen(false)}
+                onCancel={() => setIsPodEventModalOpen(false)}
+                footer={null}
+            >
+                <Table columns={podEventColumns} dataSource={podEventData}/>;
             </Modal>
         </div>
     )
