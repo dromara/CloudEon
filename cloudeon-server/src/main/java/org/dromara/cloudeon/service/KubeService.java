@@ -16,11 +16,13 @@
  */
 package org.dromara.cloudeon.service;
 
-import org.dromara.cloudeon.dao.ClusterInfoRepository;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.dromara.cloudeon.dao.ClusterInfoRepository;
+import org.dromara.cloudeon.entity.ClusterInfoEntity;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -33,10 +35,16 @@ public class KubeService {
     private ClusterInfoRepository clusterInfoRepository;
 
     public KubernetesClient getKubeClient(Integer clusterId) {
-        String kubeConfig = clusterInfoRepository.findById(clusterId).get().getKubeConfig();
-        KubernetesClient client = getKubernetesClient(kubeConfig);
+        ClusterInfoEntity clusterInfo = clusterInfoRepository.findById(clusterId).get();
+        KubernetesClient client = getKubernetesClient(clusterInfo.getKubeConfig(), clusterInfo.getNamespace());
         testConnect(client);
         return client;
+    }
+
+    public KubernetesClient getKubernetesClient(String kubeConfig, String namespace) {
+        Config config = Config.fromKubeconfig(kubeConfig);
+        config.setNamespace(StringUtils.isBlank(namespace) ? "default" : namespace);
+        return new KubernetesClientBuilder().withConfig(config).build();
     }
 
     public KubernetesClient getKubernetesClient(String kubeConfig) {
