@@ -868,19 +868,30 @@ public class ClusterServiceController {
         ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(serviceInstanceId).get();
         StackServiceEntity stackServiceEntity = stackServiceRepository.findById(serviceInstanceEntity.getStackServiceId()).get();
 
+
+        // 通过服务框架的dashboard和Grafana地址拼接完整url
+        String dashboardUid = stackServiceEntity.getDashboardUid();
+        Integer globalServiceInstanceId = serviceInstanceRepository.findByClusterIdAndStackServiceName(serviceInstanceEntity.getClusterId(), "GLOBAL");
+        List<ServiceInstanceConfigEntity> globalConfigEntityList = serviceInstanceConfigRepository.findByServiceInstanceId(globalServiceInstanceId);
+        Map<String, String> globalConfigMap = globalConfigEntityList.stream().collect(Collectors.toMap(ServiceInstanceConfigEntity::getName, ServiceInstanceConfigEntity::getValue));
+
+        String grafanaUrl = globalConfigMap.get("global.kube-prometheus.grafana.url");
+
+        if (Boolean.parseBoolean(globalConfigMap.get("global.kube-prometheus.enable")) && StringUtils.isNotBlank(grafanaUrl)) {
+            String url = String.format("%s/d/%s/?theme=light&orgId=1&from=now-5m&to=now&kiosk=tv", grafanaUrl, dashboardUid);
+            return ResultDTO.success(url);
+        }
+
         // 如果没安装monitor服务，则提示请先安装
         ServiceInstanceEntity monitorServiceInstance = serviceInstanceRepository.findEntityByClusterIdAndStackServiceName(serviceInstanceEntity.getClusterId(), MONITOR_SERVICE_NAME);
         if (monitorServiceInstance == null) {
             return ResultDTO.success("请先安装Monitor服务");
         }
-
-        // 通过服务框架的dashboard和Grafana地址拼接完整url
         Integer monitorServiceInstanceId = monitorServiceInstance.getId();
         String grafanaHttpPort = serviceInstanceConfigRepository.findByServiceInstanceIdAndName(monitorServiceInstanceId, "grafana.http.port").getValue();
         ServiceRoleInstanceEntity grafana = roleInstanceRepository.findByServiceInstanceIdAndServiceRoleName(monitorServiceInstanceId, MONITOR_ROLE_GRAFANA).get(0);
         Integer grafanaNodeId = grafana.getNodeId();
         ClusterNodeEntity grafanaNodeEntity = clusterNodeRepository.findById(grafanaNodeId).get();
-        String dashboardUid = stackServiceEntity.getDashboardUid();
 //        http://fl001:3000/d/eea-9_siks/?theme=light&orgId=1&kiosk
         String url = String.format("http://%s:%s/d/%s/?theme=light&orgId=1&from=now-5m&to=now&kiosk=tv", grafanaNodeEntity.getIp(), grafanaHttpPort, dashboardUid);
 
