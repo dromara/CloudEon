@@ -33,7 +33,12 @@ public class Constant {
     public static final String ICON_DANGER="danger.png";
 
     public static final String K8S_DIR = "k8s";
+    public static final String SERVICE_RENDER_DIR = "service-render";
+    public static final String SERVICE_COMMON_DIR = "service-common";
+    public static final String K8S_COMMON_DIR = "k8s-common";
+    public static final String K8S_RENDER_DIR = "k8s-render";
     public static final String K8S_RESOURCE_DIR = "k8s-resource";
+    public static final String KUBE_PROMETHEUS_RENDER_DIR = "kube-prometheus-render";
     public static final String ALERT_RULE_RESOURCE_DIR = "alert-rule";
     public static final String YARN_SERVICE_NAME = "YARN";
     public static final String HBASE_SERVICE_NAME = "HBASE";
