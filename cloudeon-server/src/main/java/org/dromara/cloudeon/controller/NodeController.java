@@ -17,24 +17,18 @@
 package org.dromara.cloudeon.controller;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.ssh.JschUtil;
-import cn.hutool.extra.ssh.Sftp;
-import com.jcraft.jsch.Session;
-import io.fabric8.kubernetes.api.model.NodeAddress;
+import io.fabric8.kubernetes.api.model.Node;
+import io.fabric8.kubernetes.api.model.NodeList;
+import io.fabric8.kubernetes.client.KubernetesClient;
 import org.dromara.cloudeon.config.CloudeonConfigProp;
 import org.dromara.cloudeon.controller.request.SaveNodeRequest;
 import org.dromara.cloudeon.controller.response.NodeInfoVO;
 import org.dromara.cloudeon.dao.ClusterNodeRepository;
 import org.dromara.cloudeon.dto.ResultDTO;
 import org.dromara.cloudeon.entity.ClusterNodeEntity;
-import org.dromara.cloudeon.enums.SshAuthType;
 import org.dromara.cloudeon.service.KubeService;
 import org.dromara.cloudeon.service.SshPoolService;
 import org.dromara.cloudeon.utils.ByteConverter;
-import io.fabric8.kubernetes.api.model.Node;
-import io.fabric8.kubernetes.api.model.NodeList;
-import io.fabric8.kubernetes.client.KubernetesClient;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -69,16 +63,11 @@ public class NodeController {
     @Transactional(rollbackFor = Exception.class)
     public ResultDTO<Void> addNode(@RequestBody SaveNodeRequest req) throws IOException {
         String ip = req.getIp().trim();
-        Integer sshPort = req.getSshPort();
-        String sshUser = req.getSshUser();
-        String sshPassword = req.getSshPassword();
         Integer clusterId = req.getClusterId();
         // 检查ip不能重复
         if (clusterNodeRepository.countByIp(ip) > 0) {
             return ResultDTO.failed("已添加ip为：" + ip + " 的节点(服务器)");
         }
-        // 校验ssh服务
-        checkSSH(ip, sshPort, sshUser, sshPassword, req.getPrivateKeyPath(), req.getSshAuthType());
         KubernetesClient kubeClient = kubeService.getKubeClient(clusterId);
         NodeList nodeList = kubeClient.nodes().list();
         List<Node> items = nodeList.getItems();
@@ -99,12 +88,6 @@ public class NodeController {
         // 保存到数据库
         ClusterNodeEntity newClusterNodeEntity = new ClusterNodeEntity();
         BeanUtil.copyProperties(req, newClusterNodeEntity);
-        if (req.getSshAuthType() != null && req.getSshAuthType().toUpperCase().equals(SshAuthType.PRIVATEKEY.name())) {
-            newClusterNodeEntity.setPrivateKeyPath(req.getPrivateKeyPath());
-            newClusterNodeEntity.setSshAuthType(SshAuthType.PRIVATEKEY);
-        } else {
-            newClusterNodeEntity.setSshAuthType(SshAuthType.PASSWORD);
-        }
         newClusterNodeEntity.setCreateTime(new Date());
         newClusterNodeEntity.setRuntimeContainer(containerRuntimeVersion);
         clusterNodeRepository.save(newClusterNodeEntity);
@@ -112,29 +95,6 @@ public class NodeController {
 
         return ResultDTO.success(null);
     }
-
-    /**
-     * 查询服务器基础信息
-     */
-    public void checkSSH(String sshHost, Integer sshPort, String sshUser, String password, String privateKey, String sshAuthType) throws IOException {
-        Session session = null;
-        if (sshAuthType == null || sshAuthType.toUpperCase().equals(SshAuthType.PASSWORD.name())) {
-            session = sshPoolService.openSession(sshHost, sshPort, sshUser, password);
-        } else if (sshAuthType.toUpperCase().equals(SshAuthType.PRIVATEKEY.name())) {
-            session = sshPoolService.openSessionByPrivateKey(sshHost, sshPort, sshUser, privateKey);
-        }
-
-        Sftp sftp = JschUtil.createSftp(session);
-        String sftpHome = sftp.home();
-        boolean connected = session.isConnected();
-        if (connected && StrUtil.isNotBlank(sftpHome)) {
-            JschUtil.close(sftp.getClient());
-            return;
-        } else {
-            throw new RuntimeException("ssh连接异常");
-        }
-    }
-
 
     /**
      * 根据集群id查询绑定的k8s节点信息
