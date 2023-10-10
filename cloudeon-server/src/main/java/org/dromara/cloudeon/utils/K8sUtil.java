@@ -41,7 +41,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class K8sUtil {
-    public static void runJob(String namespace,String name, KubernetesClient client, VolumeMountDTO[] volumeMounts, String image, String cmd, Logger logger, String hostname) {
+    public static void runJob(String namespace, String name, KubernetesClient client, VolumeMountDTO[] volumeMounts, String image, String cmd, Logger logger, String hostname) {
         // delete job
         logger.info("delete job if need ,job name: " + name);
         List<StatusDetails> statusDetailsList = client.batch().v1().jobs()
@@ -53,9 +53,9 @@ public class K8sUtil {
         long timeout = 300; // Timeout in seconds
         long startTime = System.currentTimeMillis();
 
-        waitForDeleteJob(namespace,name, client, timeout, startTime, logger);
+        waitForDeleteJob(namespace, name, client, timeout, startTime, logger);
 
-        submitJob(namespace,name, client, volumeMounts, image, cmd, hostname);
+        submitJob(namespace, name, client, volumeMounts, image, cmd, hostname);
 
 
         // Polling loop to wait for deletion
@@ -63,7 +63,7 @@ public class K8sUtil {
         long waitPodStartTime = System.currentTimeMillis();
 
         String podName = "";
-        podName = waitForCreatePodOfJob(namespace,name, client, logger, podName, waitPodStartTime, waitPodTimeout);
+        podName = waitForCreatePodOfJob(namespace, name, client, logger, podName, waitPodStartTime, waitPodTimeout);
         logger.info("Pod name: " + podName);
 
         CountDownLatch jobCompletionLatch = new CountDownLatch(1);
@@ -115,7 +115,7 @@ public class K8sUtil {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(logWatch.getOutput()))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    logger.info("p> "+line);  // You can replace this with your desired logging mechanism
+                    logger.info("p> " + line);  // You can replace this with your desired logging mechanism
                 }
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
@@ -140,7 +140,83 @@ public class K8sUtil {
         }
     }
 
-    private static String waitForCreatePodOfJob(String namespace, String jobName, KubernetesClient client, Logger logger, String podName, long waitPodStartTime, long waitPodTimeout) {
+    //TODO: JOB可能执行多次，只要有一个执行成功，则job视为成功，目前逻辑有问题
+    public static void waitForJobCompleted(String namespace, String jobName, KubernetesClient client, Logger logger, String podName) {
+        CountDownLatch jobCompletionLatch = new CountDownLatch(1);
+
+        AtomicBoolean isJobEndSuccess = new AtomicBoolean(false);
+        Watcher<Job> watcher = new Watcher<Job>() {
+            @Override
+            public void eventReceived(Action action, Job job) {
+
+                if (action == Action.ADDED || action == Action.MODIFIED) {
+                    JobStatus status = job.getStatus();
+                    if (status != null) {
+                        boolean isJobSuccessful = status.getSucceeded() != null && status.getSucceeded() > 0;
+                        boolean isJobFailed = status.getFailed() != null && status.getFailed() > 0;
+
+                        if (isJobSuccessful) {
+                            isJobEndSuccess.set(true);
+                            jobCompletionLatch.countDown(); // Decrement the latch count
+                        } else if (isJobFailed) {
+                            isJobEndSuccess.set(false);
+                            jobCompletionLatch.countDown(); // Decrement the latch count
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onClose(WatcherException cause) {
+                logger.info("Watcher closed");
+                if (cause != null) {
+                    logger.error(cause.getMessage(), cause);
+                }
+            }
+
+
+        };
+
+        Watch watch = client.batch().v1().jobs()
+                .inNamespace(namespace)
+                .withName(jobName)
+                .watch(watcher);
+
+
+        // Print pod logs
+        try (LogWatch logWatch = client.pods()
+                .inNamespace(namespace)
+                .withName(podName)
+                .watchLog()) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(logWatch.getOutput()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    logger.info("p> " + line);  // You can replace this with your desired logging mechanism
+                }
+            } catch (IOException e) {
+                logger.error(e.getMessage(), e);
+            } finally {
+                logWatch.close();
+            }
+
+            // Wait for the job to complete
+            logger.info("Waiting  for job to complete...");
+            jobCompletionLatch.await();
+
+        } catch (InterruptedException e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            watch.close();
+        }
+
+        boolean flag = isJobEndSuccess.get();
+        logger.info("Job completed with success status: " + flag);
+        if (!flag) {
+            throw new RuntimeException("Job failed.");
+        }
+    }
+
+    public static String waitForCreatePodOfJob(String namespace, String jobName, KubernetesClient client, Logger logger, String podName, long waitPodStartTime, long waitPodTimeout) {
         // 循环等待创建pod成功
         while (true) {
             // 需要考虑，有可能pod还没创建出来
@@ -182,7 +258,7 @@ public class K8sUtil {
         return podName;
     }
 
-    private static void waitForDeleteJob(String namespace, String jobName, KubernetesClient client, long timeout, long startTime, Logger logger) {
+    public static void waitForDeleteJob(String namespace, String jobName, KubernetesClient client, long timeout, long startTime, Logger logger) {
 
 
         // 循环等待删除成功
