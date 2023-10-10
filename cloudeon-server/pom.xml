@@ -146,7 +146,7 @@
         <dependency>
             <groupId>io.fabric8</groupId>
             <artifactId>kubernetes-client</artifactId>
-            <version>6.5.0</version>
+            <version>6.6.2</version>
             <exclusions>
                 <exclusion>
                     <artifactId>snakeyaml</artifactId>

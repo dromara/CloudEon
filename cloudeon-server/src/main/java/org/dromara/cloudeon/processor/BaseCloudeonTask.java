@@ -18,14 +18,14 @@ package org.dromara.cloudeon.processor;
 
 import ch.qos.logback.classic.ClassicConstants;
 import cn.hutool.extra.spring.SpringUtil;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.dromara.cloudeon.dao.CommandRepository;
 import org.dromara.cloudeon.dao.CommandTaskRepository;
 import org.dromara.cloudeon.entity.CommandEntity;
 import org.dromara.cloudeon.entity.CommandTaskEntity;
 import org.dromara.cloudeon.enums.CommandState;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.dromara.cloudeon.utils.RemoteSshTaskErrorLineHandler;
 import org.dromara.cloudeon.utils.RemoteSshTaskLineHandler;
 import org.slf4j.Logger;
@@ -50,7 +50,6 @@ public abstract class BaseCloudeonTask implements Runnable {
 
     protected RemoteSshTaskLineHandler remoteSshTaskLineHandler;
     protected RemoteSshTaskErrorLineHandler remoteSshTaskErrorLineHandler;
-
 
 
     private void init() {

@@ -33,6 +33,7 @@ import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.vertx.core.Vertx;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.dromara.cloudeon.config.CloudeonConfigProp;
 import org.dromara.cloudeon.controller.request.InitServiceRequest;
 import org.dromara.cloudeon.controller.request.ServiceConfUpgradeRequest;
@@ -164,9 +165,6 @@ public class ClusterServiceController {
             serviceInstanceEntity.setEnableKerberos(req.getEnableKerberos());
             serviceInstanceEntity.setStackServiceId(stackServiceId);
             serviceInstanceEntity.setServiceState(ServiceState.INIT_SERVICE);
-            // 生成持久化宿主机路径
-            String persistencePaths = stackServiceRepository.findById(stackServiceId).get().getPersistencePaths();
-            serviceInstanceEntity.setPersistencePaths(genPersistencePaths(persistencePaths, serviceInstanceEntity));
 
             // 持久化service信息
             serviceInstanceRepository.save(serviceInstanceEntity);
@@ -870,19 +868,30 @@ public class ClusterServiceController {
         ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(serviceInstanceId).get();
         StackServiceEntity stackServiceEntity = stackServiceRepository.findById(serviceInstanceEntity.getStackServiceId()).get();
 
+
+        // 通过服务框架的dashboard和Grafana地址拼接完整url
+        String dashboardUid = stackServiceEntity.getDashboardUid();
+        Integer globalServiceInstanceId = serviceInstanceRepository.findByClusterIdAndStackServiceName(serviceInstanceEntity.getClusterId(), "GLOBAL");
+        List<ServiceInstanceConfigEntity> globalConfigEntityList = serviceInstanceConfigRepository.findByServiceInstanceId(globalServiceInstanceId);
+        Map<String, String> globalConfigMap = globalConfigEntityList.stream().collect(Collectors.toMap(ServiceInstanceConfigEntity::getName, ServiceInstanceConfigEntity::getValue));
+
+        String grafanaUrl = globalConfigMap.get("global.kube-prometheus.grafana.url");
+
+        if (Boolean.parseBoolean(globalConfigMap.get("global.kube-prometheus.enable")) && StringUtils.isNotBlank(grafanaUrl)) {
+            String url = String.format("%s/d/%s/?theme=light&orgId=1&from=now-5m&to=now&kiosk=tv", grafanaUrl, dashboardUid);
+            return ResultDTO.success(url);
+        }
+
         // 如果没安装monitor服务，则提示请先安装
         ServiceInstanceEntity monitorServiceInstance = serviceInstanceRepository.findEntityByClusterIdAndStackServiceName(serviceInstanceEntity.getClusterId(), MONITOR_SERVICE_NAME);
         if (monitorServiceInstance == null) {
             return ResultDTO.success("请先安装Monitor服务");
         }
-
-        // 通过服务框架的dashboard和Grafana地址拼接完整url
         Integer monitorServiceInstanceId = monitorServiceInstance.getId();
         String grafanaHttpPort = serviceInstanceConfigRepository.findByServiceInstanceIdAndName(monitorServiceInstanceId, "grafana.http.port").getValue();
         ServiceRoleInstanceEntity grafana = roleInstanceRepository.findByServiceInstanceIdAndServiceRoleName(monitorServiceInstanceId, MONITOR_ROLE_GRAFANA).get(0);
         Integer grafanaNodeId = grafana.getNodeId();
         ClusterNodeEntity grafanaNodeEntity = clusterNodeRepository.findById(grafanaNodeId).get();
-        String dashboardUid = stackServiceEntity.getDashboardUid();
 //        http://fl001:3000/d/eea-9_siks/?theme=light&orgId=1&kiosk
         String url = String.format("http://%s:%s/d/%s/?theme=light&orgId=1&from=now-5m&to=now&kiosk=tv", grafanaNodeEntity.getIp(), grafanaHttpPort, dashboardUid);
 
@@ -969,32 +978,33 @@ public class ClusterServiceController {
         List<RolePodEventVO> rolePodEventVOS = eventList.getItems().stream().map(new Function<Event, RolePodEventVO>() {
             @Override
             public RolePodEventVO apply(Event event) {
-                // 设置时区为 UTC
-                inputSdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-                // 解析 UTC 时间字符串为 Date 对象
-                Date utcDate = null;
-                try {
-                    utcDate = inputSdf.parse(event.getLastTimestamp());
-                } catch (ParseException e) {
-                    throw new RuntimeException(e);
-                }
-
-                // 创建 SimpleDateFormat 对象，指定输出的日期格式
-                SimpleDateFormat outputSdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-                // 设置时区为北京时间（东八区）
-                outputSdf.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"));
-
-                // 格式化为北京时间字符串
-                String beijingTimeStr = outputSdf.format(utcDate);
                 RolePodEventVO eventVO = RolePodEventVO.builder()
-                    .type(event.getType())
-                    .message(event.getMessage())
-                    .reason(event.getReason())
-                    .count(event.getCount())
-                    .lastTimestamp(beijingTimeStr)
-                    .build();
+                        .type(event.getType())
+                        .message(event.getMessage())
+                        .reason(event.getReason())
+                        .count(event.getCount())
+                        .build();
+                if (StringUtils.isNotBlank(event.getLastTimestamp())) {
+                    // 设置时区为 UTC
+                    inputSdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+                    // 解析 UTC 时间字符串为 Date 对象
+                    Date utcDate = null;
+                    try {
+                        utcDate = inputSdf.parse(event.getLastTimestamp());
+                    } catch (ParseException e) {
+                        throw new RuntimeException(e);
+                    }
+                    // 创建 SimpleDateFormat 对象，指定输出的日期格式
+                    SimpleDateFormat outputSdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+                    // 设置时区为北京时间（东八区）
+                    outputSdf.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"));
+
+                    // 格式化为北京时间字符串
+                    String beijingTimeStr = outputSdf.format(utcDate);
+                    eventVO.setLastTimestamp(beijingTimeStr);
+                }
                 return eventVO;
             }
         }).collect(Collectors.toList());

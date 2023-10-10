@@ -1,0 +1,71 @@
+name: GLOBAL
+label: "Global"
+description: "全局配置"
+version: 1.0.0
+
+dependencies: []
+
+supportKerberos: false
+
+dashboard:
+  uid: global001
+
+roles:
+  - name: CONFIG
+    label: "CONFIG"
+    roleFullName: "config"
+    linkExpression: ""
+    sortNum: 1
+    type: EMPTY
+
+    needOdd: true
+    fixedNum: 1
+
+
+customConfigFiles: []
+
+
+configurations:
+  - name: global.kube-prometheus.enable
+    description: "是否启用外部kube-prometheus支持"
+    recommendExpression: false
+    valueType: Switch
+    configurableInWizard: true
+    tag: "kube-prometheus"
+
+  - name: global.kube-prometheus.grafana.url
+    description: "外部grafana地址"
+    recommendExpression: "http://localhost:30902"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "kube-prometheus"
+
+  - name: global.imagePullPolicy
+    description: "镜像拉取策略"
+    recommendExpression: "IfNotPresent"
+    valueType: Select
+    options: ["IfNotPresent","Always","Never"]
+    configurableInWizard: true
+    tag: "global"
+
+  - name: global.user.list
+    description: "自定义用户列表,对不存在的用户名或组名将自动创建,格式为:[用户名a,组名a;用户名b,组名b]"
+    recommendExpression: "user001,group001;user002,group002"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "global"
+
+  - name: alert.node.disk.thresholdValue
+    description: "磁盘使用率告警阈值"
+    recommendExpression: 80.0
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "告警"
+
+  - name: alert.node.memory.thresholdValue
+    description: "内存使用率告警阈值"
+    recommendExpression: 80.0
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "告警"
+

@@ -1,0 +1,165 @@
+name: ZOOKEEPER
+label: "ZooKeeper"
+description: "分布式协调系统"
+version: 3.7.1
+
+dependencies:
+  - "GLOBAL"
+
+supportKerberos: false
+
+dashboard:
+  uid: zookeeper001
+
+roles:
+  - name: ZOOKEEPER_SERVER
+    label: "Zookeeper Server"
+    roleFullName: "zookeeper-server"
+    linkExpression: ""
+    sortNum: 1
+    type: MASTER
+
+    needOdd: true
+    minNum: 3
+
+customConfigFiles:
+  - zoo.cfg
+
+configurations:
+  - name: serverImage
+    description: "服务镜像"
+    recommendExpression: "registry.cn-guangzhou.aliyuncs.com/bigdata200/zookeeper:3.7.1"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "镜像"
+
+  - name: zookeeper.container.limit.cpu
+    description: "Zookeeper Server容器的CPU使用限额"
+    recommendExpression: 1.0
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: zookeeper.container.limit.memory
+    description: "Zookeeper Server容器的内存使用限额，单位MB"
+    recommendExpression: 2048
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: zookeeper.container.request.cpu
+    description: "Zookeeper Server容器的CPU请求量"
+    recommendExpression: 0.2
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: zookeeper.container.request.memory
+    description: "Zookeeper Server容器的内存请求量，单位MB"
+    recommendExpression: 1024
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: zookeeper.jvm.memory.percentage
+    description: "Zookeeper Server JVM占容器内存限额的百分比"
+    recommendExpression: 75
+    valueType: InputNumber
+    unit: ".0"
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: zookeeper.peer.communicate.port
+    recommendExpression: 2888
+    valueType: InputNumber
+    configurableInWizard: true
+    description: ""
+    label: ""
+    tag: "端口"
+
+
+  - name: zookeeper.client.port
+    recommendExpression: 2181
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "端口"
+
+  - name: zookeeper.leader.elect.port
+    recommendExpression: 3888
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "端口"
+
+  - name: zookeeper.jmxremote.port
+    recommendExpression: 9911
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "端口"
+
+  - name: zookeeper.metrics.port
+    recommendExpression: 2187
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "端口"
+
+  - name: tickTime
+    recommendExpression: 9000
+    valueType: InputNumber
+    unit: MILLISECONDS
+    confFile: "zoo.cfg"
+    configurableInWizard: true
+    label: "心跳时间"
+    description: "Zookeeper服务器与客户端心跳时间，单位毫秒"
+    tag: "常用参数"
+
+  - name: initLimit
+    recommendExpression: 10
+    valueType: InputNumber
+    confFile: "zoo.cfg"
+    configurableInWizard: true
+    tag: "常用参数"
+
+
+  - name: syncLimit
+    recommendExpression: 5
+    valueType: InputNumber
+    confFile: "zoo.cfg"
+    configurableInWizard: true
+    tag: "常用参数"
+
+
+  - name: maxClientCnxns
+    recommendExpression: 0
+    valueType: InputNumber
+    confFile: "zoo.cfg"
+    tag: "常用参数"
+
+  - name: sasl.oauth2.enabled
+    recommendExpression: true
+    valueType: Switch
+    tag: "安全"
+
+
+  - name: extendedTypesEnabled
+    recommendExpression: false
+    valueType: Switch
+    confFile: "zoo.cfg"
+    tag: "高级参数"
+
+
+  - name: 4lw.commands.whitelist
+    recommendExpression: "*"
+    valueType: InputString
+    confFile: "zoo.cfg"
+    label: "指令白名单"
+    description: "用于控制指令白名单"
+    tag: "安全"
+
+  - name: znode.container.checkIntervalMs
+    recommendExpression: 1000
+    valueType: InputNumber
+    unit: MILLISECONDS
+    tag: "高级参数"
+
