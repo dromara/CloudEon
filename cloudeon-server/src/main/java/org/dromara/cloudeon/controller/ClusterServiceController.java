@@ -165,9 +165,6 @@ public class ClusterServiceController {
             serviceInstanceEntity.setEnableKerberos(req.getEnableKerberos());
             serviceInstanceEntity.setStackServiceId(stackServiceId);
             serviceInstanceEntity.setServiceState(ServiceState.INIT_SERVICE);
-            // 生成持久化宿主机路径
-            String persistencePaths = stackServiceRepository.findById(stackServiceId).get().getPersistencePaths();
-            serviceInstanceEntity.setPersistencePaths(genPersistencePaths(persistencePaths, serviceInstanceEntity));
 
             // 持久化service信息
             serviceInstanceRepository.save(serviceInstanceEntity);
