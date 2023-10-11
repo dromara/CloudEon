@@ -66,81 +66,9 @@ public class K8sUtil {
         podName = waitForCreatePodOfJob(namespace, name, client, logger, podName, waitPodStartTime, waitPodTimeout);
         logger.info("Pod name: " + podName);
 
-        CountDownLatch jobCompletionLatch = new CountDownLatch(1);
-
-        AtomicBoolean isJobEndSuccess = new AtomicBoolean(false);
-        Watcher<Job> watcher = new Watcher<Job>() {
-            @Override
-            public void eventReceived(Action action, Job job) {
-
-                if (action == Action.ADDED || action == Action.MODIFIED) {
-                    JobStatus status = job.getStatus();
-                    if (status != null) {
-                        boolean isJobSuccessful = status.getSucceeded() != null && status.getSucceeded() > 0;
-                        boolean isJobFailed = status.getFailed() != null && status.getFailed() > 0;
-
-                        if (isJobSuccessful) {
-                            isJobEndSuccess.set(true);
-                            jobCompletionLatch.countDown(); // Decrement the latch count
-                        } else if (isJobFailed) {
-                            isJobEndSuccess.set(false);
-                            jobCompletionLatch.countDown(); // Decrement the latch count
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void onClose(WatcherException cause) {
-                logger.info("Watcher closed");
-                if (cause != null) {
-                    logger.error(cause.getMessage(), cause);
-                }
-            }
-
-
-        };
-
-        Watch watch = client.batch().v1().jobs()
-                .inNamespace(namespace)
-                .withName(name)
-                .watch(watcher);
-
-
-        // Print pod logs
-        try (LogWatch logWatch = client.pods()
-                .inNamespace(namespace)
-                .withName(podName)
-                .watchLog()) {
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(logWatch.getOutput()))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    logger.info("p> " + line);  // You can replace this with your desired logging mechanism
-                }
-            } catch (IOException e) {
-                logger.error(e.getMessage(), e);
-            } finally {
-                logWatch.close();
-            }
-
-            // Wait for the job to complete
-            logger.info("Waiting  for job to complete...");
-            jobCompletionLatch.await();
-
-        } catch (InterruptedException e) {
-            logger.error(e.getMessage(), e);
-        } finally {
-            watch.close();
-        }
-
-        boolean flag = isJobEndSuccess.get();
-        logger.info("Job completed with success status: " + flag);
-        if (!flag) {
-            throw new RuntimeException("Job failed.");
-        }
+        waitForJobCompleted(namespace, name, client, logger, podName);
     }
 
-    //TODO: JOB可能执行多次，只要有一个执行成功，则job视为成功，目前逻辑有问题
     public static void waitForJobCompleted(String namespace, String jobName, KubernetesClient client, Logger logger, String podName) {
         CountDownLatch jobCompletionLatch = new CountDownLatch(1);
 
@@ -148,10 +76,12 @@ public class K8sUtil {
         Watcher<Job> watcher = new Watcher<Job>() {
             @Override
             public void eventReceived(Action action, Job job) {
-
                 if (action == Action.ADDED || action == Action.MODIFIED) {
                     JobStatus status = job.getStatus();
                     if (status != null) {
+                        if (status.getActive() != null && status.getActive() > 0) {
+                            return;
+                        }
                         boolean isJobSuccessful = status.getSucceeded() != null && status.getSucceeded() > 0;
                         boolean isJobFailed = status.getFailed() != null && status.getFailed() > 0;
 
