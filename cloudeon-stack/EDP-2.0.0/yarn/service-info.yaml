@@ -1,0 +1,499 @@
+name: YARN
+label: "YARN"
+description: "分布式计算资源调度"
+version: 3.3.4
+dependencies:
+  - "ZOOKEEPER"
+  - "HDFS"
+
+supportKerberos: false
+
+dashboard:
+  uid: yarn001
+
+roles:
+  - name: YARN_RESOURCEMANAGER
+    label: Resource Manager
+    roleFullName: hadoop-yarn-resourcemanager
+    linkExpression: "http://${localhostname}:${conf['resourcemanager.webapp.port']}/?user.name=yarn"
+    sortNum: 1
+    type: MASTER
+
+    minNum: 1
+
+  - name: YARN_NODEMANAGER
+    label: "Node Manager"
+    roleFullName: "hadoop-yarn-nodemanager"
+    linkExpression: "http://${localhostname}:${conf['nodemanager.webapp.port']}/node/allApplications/?user.name=yarn"
+    sortNum: 2
+    type: SLAVE
+
+    minNum: 1
+
+  - name: YARN_HISTORYSERVER
+    label: "History Server"
+    roleFullName: hadoop-yarn-historyserver
+    linkExpression: "http://${localhostname}:${conf['historyserver.http-port']}"
+    sortNum: 3
+    type: MASTER
+
+    minNum: 1
+
+  - name: YARN_TIMELINESERVER
+    label: "Timeline Server"
+    roleFullName: hadoop-yarn-timelineserver
+    linkExpression: "http://${localhostname}:${conf['timelineserver.http.port']}"
+    sortNum: 4
+    type: MASTER
+
+    minNum: 1
+
+
+
+
+customConfigFiles:
+  - capacity-scheduler.xml
+  - mapred-site.xml
+  - yarn-site.xml
+
+
+
+configurations:
+  - name: serverImage
+    description: "服务镜像"
+    recommendExpression: "registry.cn-guangzhou.aliyuncs.com/bigdata200/hadoop:3.3.4"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "镜像"
+
+  - name: yarn.scheduler.capacity.root.default.acl_submit_applications
+    recommendExpression: "*"
+    valueType: InputString
+    confFile:  "capacity-scheduler.xml"
+    tag: "资源管理"
+  - name: yarn.scheduler.capacity.maximum-applications
+    recommendExpression: 10000
+    valueType: InputNumber
+    confFile:  "capacity-scheduler.xml"
+    tag: "资源管理"
+  - name: yarn.scheduler.capacity.root.maximum-capacity
+    recommendExpression: 100
+    valueType: InputNumber
+    confFile: "capacity-scheduler.xml"
+    tag: "资源管理"
+  - name: yarn.scheduler.capacity.root.maximum-am-resource-percent
+    recommendExpression: 0.1
+    valueType: InputNumber
+    confFile: "capacity-scheduler.xml"
+    tag: "资源管理"
+  - name: yarn.scheduler.capacity.root.user-limit-factor
+    recommendExpression: 1
+    valueType: InputNumber
+    confFile: "capacity-scheduler.xml"
+    tag: "资源管理"
+  - name: yarn.scheduler.capacity.root.state
+    recommendExpression: RUNNING
+    valueType: InputString
+    confFile: "capacity-scheduler.xml"
+    tag: "资源管理"
+  - name: yarn.scheduler.capacity.root.acl_administer_queue
+    recommendExpression: "*"
+    valueType: InputString
+    confFile: "capacity-scheduler.xml"
+    tag: "资源管理"
+  - name: yarn.scheduler.capacity.node-locality-delay
+    recommendExpression: -1
+    valueType: InputNumber
+    confFile: "capacity-scheduler.xml"
+    tag: "资源管理"
+  - name: yarn.scheduler.capacity.root.queues
+    recommendExpression: default
+    valueType: InputString
+    confFile: "capacity-scheduler.xml"
+    tag: "资源管理"
+  - name: org.apache.hadoop.yarn.util.resource.DominantResourceCalculator
+    recommendExpression: default
+    valueType: InputString
+    confFile: "capacity-scheduler.xml"
+    tag: "资源管理"
+  - name: yarn.scheduler.capacity.root.default.user-limit-factor
+    recommendExpression: 1
+    valueType: InputNumber
+    confFile: "capacity-scheduler.xml"
+    tag: "资源管理"
+  - name: yarn.scheduler.capacity.root.default.maximum-capacity
+    recommendExpression: 100
+    valueType: InputNumber
+    confFile: "capacity-scheduler.xml"
+    tag: "资源管理"
+  - name: yarn.scheduler.capacity.root.default.capacity
+    recommendExpression: 100
+    valueType: InputNumber
+    confFile: "capacity-scheduler.xml"
+    tag: "资源管理"
+  - name: yarn.scheduler.capacity.root.default.state
+    recommendExpression: RUNNING
+    valueType: InputString
+    confFile: "capacity-scheduler.xml"
+    tag: "资源管理"
+  - name: yarn.scheduler.capacity.root.maximum-applications
+    recommendExpression: 10000
+    valueType: InputNumber
+    confFile: "capacity-scheduler.xml"
+    tag: "资源管理"
+  - name: yarn.scheduler.capacity.maximum-am-resource-percent
+    recommendExpression: 0.1
+    valueType: InputNumber
+    confFile: "capacity-scheduler.xml"
+    tag: "资源管理"
+  - name: yarn.scheduler.capacity.root.acl_submit_applications
+    recommendExpression: "*"
+    valueType: InputString
+    confFile: "capacity-scheduler.xml"
+    tag: "资源管理"
+  - name: yarn.scheduler.capacity.root.default.acl_administer_queue
+    recommendExpression: "*"
+    valueType: InputString
+    confFile: "capacity-scheduler.xml"
+    tag: "资源管理"
+  - name: yarn.scheduler.capacity.root.capacity
+    recommendExpression: 100
+    valueType: InputNumber
+    confFile: "capacity-scheduler.xml"
+    tag: "资源管理"
+  - name: remote.app.log.dir
+    recommendExpression: "/var/log/hadoop-yarn/apps"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: mapreduce.am.staging.dir
+    recommendExpression: "/user"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: mapreduce.job.max.split.locations
+    recommendExpression: 500
+    valueType: InputNumber
+    confFile: "mapred-site.xml"
+    tag: "资源管理"
+  - name: mapreduce.framework.name
+    recommendExpression: yarn
+    valueType: InputString
+    confFile: "mapred-site.xml"
+    tag: "资源管理"
+  - name: mapreduce.map.speculative
+    recommendExpression: true
+    valueType: Switch
+    confFile: "mapred-site.xml"
+    tag: "资源管理"
+  - name: raid.distraid.max.files
+    recommendExpression: 300
+    valueType: InputNumber
+    confFile: "mapred-site.xml"
+    tag: "资源管理"
+  - name: mapred.child.heapsize
+    recommendExpression: 2048
+    min: 1024
+    max: 65536
+    valueType: Slider
+    unit: MB
+    confFile: "mapred-site.xml"
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: raidnode.files.fix.per.job
+    recommendExpression: 500
+    valueType: InputNumber
+    confFile: "mapred-site.xml"
+    tag: "高级参数"
+  - name: mapreduce.job.reduce.slowstart.completedmaps
+    recommendExpression: 1
+    valueType: InputNumber
+    confFile: "mapred-site.xml"
+    tag: "高级参数"
+  - name: mapreduce.job.maps
+    recommendExpression: 1
+    valueType: InputNumber
+    confFile: "mapred-site.xml"
+    tag: "高级参数"
+  - name: mapreduce.reduce.speculative
+    recommendExpression: false
+    valueType: Switch
+    confFile: "mapred-site.xml"
+    tag: "高级参数"
+  - name: raid.distraid.max.jobs
+    recommendExpression: 10
+    valueType: InputNumber
+    confFile: "mapred-site.xml"
+    tag: "高级参数"
+
+
+
+  - name: resourcemanager.admin.port
+    recommendExpression: 8033
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "端口"
+  - name: resourcemanager.port
+    recommendExpression: 8032
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "端口"
+  - name: resourcemanager.resource-tracker.port
+    recommendExpression: 8031
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "端口"
+  - name: resourcemanager.scheduler.port
+    recommendExpression: 8030
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "端口"
+  - name: resourcemanager.webapp.port
+    recommendExpression: 8088
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "端口"
+  - name: nodemanager.webapp.port
+    recommendExpression: 8042
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "端口"
+  - name: timelineserver.port
+    recommendExpression: 10021
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "端口"
+  - name: timelineserver.http.port
+    recommendExpression: 8188
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "端口"
+  - name: mapreduce.shuffle.port
+    recommendExpression: 13562
+    valueType: InputNumber
+    tag: "端口"
+
+
+
+
+  - name: "yarn.application.classpath"
+    description: "yarn应用程序加载的classpath"
+    valueType: InputString
+    confFile: "yarn-site.xml"
+    recommendExpression: "${HADOOP_HOME}/etc/hadoop,${HADOOP_HOME}/share/hadoop/common/lib/*,${HADOOP_HOME}/share/hadoop/common/*,${HADOOP_HOME}/share/hadoop/hdfs,${HADOOP_HOME}/share/hadoop/hdfs/lib/*,${HADOOP_HOME}/share/hadoop/hdfs/*,${HADOOP_HOME}/share/hadoop/mapreduce/lib/*,${HADOOP_HOME}/share/hadoop/mapreduce/*,${HADOOP_HOME}/share/hadoop/yarn,${HADOOP_HOME}/share/hadoop/yarn/lib/*,${HADOOP_HOME}/share/hadoop/yarn/*"
+    configurableInWizard: true
+    tag: "高级参数"
+  - name: yarn.scheduler.maximum-allocation-mb
+    recommendExpression: 98304
+    min: 1024
+    max: 98304
+    valueType: Slider
+    unit: MB
+    confFile: "yarn-site.xml"
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: yarn.scheduler.maximum-allocation-vcores
+    recommendExpression: 96
+    min: 10
+    max: 100
+    valueType: Slider
+    unit: core
+    confFile: "yarn-site.xml"
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: yarn.nodemanager.vmem-check-enabled
+    recommendExpression: false
+    valueType: Switch
+    confFile: "yarn-site.xml"
+    tag: "资源管理"
+  - name: yarn.resourcemanager.scheduler.class
+    recommendExpression: org.apache.hadoop.yarn.server.resourcemanager.scheduler.capacity.CapacityScheduler
+    valueType: InputString
+    confFile: "yarn-site.xml"
+    tag: "高级参数"
+  - name: yarn.nodemanager.aux-services.mapreduce_shuffle.class
+    recommendExpression: org.apache.hadoop.mapred.ShuffleHandler
+    valueType: InputString
+    confFile: "yarn-site.xml"
+    tag: "高级参数"
+  - name: yarn.nodemanager.pmem-check-enabled
+    recommendExpression: false
+    valueType: Switch
+    confFile: "yarn-site.xml"
+    tag: "资源管理"
+  - name: yarn.nodemanager.aux-services
+    recommendExpression: mapreduce_shuffle
+    valueType: InputString
+    confFile: "yarn-site.xml"
+    tag: "高级参数"
+  - name: yarn.nodemanager.delete.debug-delay-sec
+    recommendExpression: 86400
+    min: 1
+    max: 165536
+    valueType: Slider
+    unit: SECONDS
+    confFile: "yarn-site.xml"
+    tag: "高级参数"
+  - name: yarn.log-aggregation-enable
+    recommendExpression: false
+    valueType: Switch
+    confFile: "yarn-site.xml"
+    tag: "高级参数"
+
+
+  - name: historyserver.port
+    recommendExpression: 10020
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "端口"
+  - name: historyserver.admin-port
+    recommendExpression: 10033
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "端口"
+  - name: historyserver.http-port
+    recommendExpression: 19888
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "端口"
+
+  - name: yarn.heap.memory.percentage
+    description: "yarn 系列组件(nodemanager除外) jvm堆内存占容器内存限额的百分比"
+    recommendExpression: 75
+    min: 10
+    max: 80
+    valueType: InputNumber
+    unit: ".0"
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: hadop.yarn.rm.container.limit.cpu
+    description: "Hadoop-yarn resourcemanager容器的CPU使用限额"
+    recommendExpression: 1.0
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: hadop.yarn.rm.container.limit.memory
+    description: "Hadoop-yarn resourcemanager容器的内存使用限额，单位MB"
+    recommendExpression: 2048
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: hadop.yarn.rm.container.request.cpu
+    description: "Hadoop-yarn resourcemanager容器的CPU请求量"
+    recommendExpression: 0.2
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: hadop.yarn.rm.container.request.memory
+    description: "Hadoop-yarn resourcemanager容器的内存请求量，单位MB"
+    recommendExpression: 1024
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: hadop.yarn.nm.container.limit.cpu
+    description: "Hadoop-yarn nodemanager容器的CPU使用限额"
+    recommendExpression: 4.0
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: hadop.yarn.nm.container.limit.memory
+    description: "Hadoop-yarn nodemanager容器的内存使用限额，单位MB"
+    recommendExpression: 8192
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: hadop.yarn.nm.container.request.cpu
+    description: "Hadoop-yarn nodemanager容器的CPU请求量"
+    recommendExpression: 0.5
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: hadop.yarn.nm.container.request.memory
+    description: "Hadoop-yarn nodemanager容器的内存请求量，单位MB"
+    recommendExpression: 1024
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: yarn.nodemanager.heap.memory
+    description: "Hadoop-yarn nodemanager jvm堆内存，单位MB"
+    recommendExpression: 1024
+    valueType: InputNumber
+    unit: MB
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: yarn.nodemanager.resource.cpu-vcores
+    description: "yarn-nm pod可以分配给yarn任务容器的vcores的数量,应小于容器cpu limit值(预留部分给nm进程和pod内其他地方使用)"
+    recommendExpression: 3
+    valueType: InputNumber
+    unit: core
+    confFile: "yarn-site.xml"
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: yarn.nodemanager.resource.memory-mb
+    description: "yarn-nm pod可以分配给yarn任务容器的内存量，单位为MB。其与yarn.nodemanager.heap.memory参数之和应小于容器内存limit值(预留部分给pod内其他地方使用)"
+    recommendExpression: 6144
+    valueType: InputNumber
+    unit: MB
+    confFile: "yarn-site.xml"
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: hadop.yarn.hs.container.limit.cpu
+    description: "Hadoop-yarn historyserver容器的CPU使用限额"
+    recommendExpression: 1.0
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: hadop.yarn.hs.container.limit.memory
+    description: "Hadoop-yarn historyserver容器的内存使用限额，单位MB"
+    recommendExpression: 2048
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: hadop.yarn.hs.container.request.cpu
+    description: "Hadoop-yarn historyserver容器的CPU请求量"
+    recommendExpression: 0.2
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: hadop.yarn.hs.container.request.memory
+    description: "Hadoop-yarn historyserver容器的内存请求量，单位MB"
+    recommendExpression: 1024
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: hadop.yarn.tl.container.limit.cpu
+    description: "Hadoop-yarn timelineserver容器的CPU使用限额"
+    recommendExpression: 1.0
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: hadop.yarn.tl.container.limit.memory
+    description: "Hadoop-yarn timelineserver容器的内存使用限额，单位MB"
+    recommendExpression: 2048
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: hadop.yarn.tl.container.request.cpu
+    description: "Hadoop-yarn timelineserver容器的CPU请求量"
+    recommendExpression: 0.2
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: hadop.yarn.tl.container.request.memory
+    description: "Hadoop-yarn timelineserver容器的内存请求量，单位MB"
+    recommendExpression: 1024
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"

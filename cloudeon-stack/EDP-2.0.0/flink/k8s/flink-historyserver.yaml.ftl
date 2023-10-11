@@ -4,14 +4,16 @@ kind: "Deployment"
 metadata:
   labels:
     name: "${roleServiceFullName}"
-    sname: ${serviceFullName}
+    sname: "${serviceFullName}"
+    roleFullName: "${roleFullName}"
   name: "${roleServiceFullName}"
 spec:
   replicas: ${roleNodeCnt}
   selector:
     matchLabels:
       app: "${roleServiceFullName}"
-      sname: ${serviceFullName}
+      sname: "${serviceFullName}"
+      roleFullName: "${roleFullName}"
   strategy:
     type: "RollingUpdate"
     rollingUpdate:
@@ -23,9 +25,10 @@ spec:
     metadata:
       labels:
         name: "${roleServiceFullName}"
+        sname: "${serviceFullName}"
+        roleFullName: "${roleFullName}"
         app: "${roleServiceFullName}"
         podConflictName: "${roleServiceFullName}"
-        sname: ${serviceFullName}
     spec:
       affinity:
         podAntiAffinity:
@@ -40,6 +43,7 @@ spec:
       containers:
       - image: "${conf['serverImage']}"
         imagePullPolicy: "${conf['global.imagePullPolicy']}"
+        name: "${roleServiceFullName}"
         command: ["/bin/bash","-c"]
         args:
           - |
@@ -49,35 +53,36 @@ spec:
           exec:
             command:
             - "/bin/bash"
-            - "/opt/service-common/readiness.sh"
+            - "-c"
+            - "curl --fail --connect-timeout 15 --max-time 15 \"http://`hostname`:${conf['flink.history.ui.port']}/\"\
+            \n"
           failureThreshold: 3
-          initialDelaySeconds: 3
-          periodSeconds: 30
+          initialDelaySeconds: 10
+          periodSeconds: 10
           successThreshold: 1
-          timeoutSeconds: 15
-        name: "${roleServiceFullName}"
+          timeoutSeconds: 1
         resources:
           requests:
-            memory: "${conf['zookeeper.container.request.memory']}Mi"
-            cpu: "${conf['zookeeper.container.request.cpu']}"
+            memory: "${conf['flink.hs.container.request.memory']}Mi"
+            cpu: "${conf['flink.hs.container.request.cpu']}"
           limits:
-            memory: "${conf['zookeeper.container.limit.memory']}Mi"
-            cpu: "${conf['zookeeper.container.limit.cpu']}"
+            memory: "${conf['flink.hs.container.limit.memory']}Mi"
+            cpu: "${conf['flink.hs.container.limit.cpu']}"
         env:
-        - name: NODE_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: spec.nodeName
-        - name: MEM_LIMIT
-          valueFrom:
-            resourceFieldRef:
-              resource: limits.memory
-        - name: ZK_CLIENT_PORT
-          value: "${conf['zookeeper.client.port']}"
-        - name: RENDER_TPL_DIR
-          value: "/opt/service-render"
-        - name: RENDER_MODEL
-          value: "/opt/service-common/values.json"
+          - name: NODE_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+          - name: MEM_LIMIT
+            valueFrom:
+              resourceFieldRef:
+                resource: limits.memory
+          - name: RENDER_TPL_DIR
+            value: "/opt/service-render"
+          - name: RENDER_MODEL
+            value: "/opt/service-common/values.json"
+          - name: ROLE_FULL_NAME
+            value: "${roleFullName}"
         volumeMounts:
         - mountPath: "/etc/localtime"
           name: "timezone"
@@ -94,6 +99,10 @@ spec:
           mountPath: /opt/service-common
         - mountPath: "/workspace"
           name: "workspace"
+        - name: hdfs-config
+          mountPath: /etc/hdfs-config
+        - name: yarn-config
+          mountPath: /etc/yarn-config
       nodeSelector:
         ${roleServiceFullName}: "true"
       terminationGracePeriodSeconds: 30
@@ -112,12 +121,17 @@ spec:
           name: global-usersync-config
       - name: service-render
         configMap:
-          name: zookeeper-service-render
+          name: flink-service-render
       - name: service-common
         configMap:
-          name: zookeeper-service-common
+          name: flink-service-common
       - hostPath:
           path: "/opt/edp/${roleFullName}"
           type: DirectoryOrCreate
         name: "workspace"
-
+      - name: hdfs-config
+        configMap:
+          name: hdfs-config
+      - name: yarn-config
+        configMap:
+          name: yarn-config
