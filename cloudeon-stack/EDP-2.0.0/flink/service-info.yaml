@@ -1,0 +1,109 @@
+name: FLINK
+label: "Flink"
+description: "实时计算引擎"
+version: 1.15.4
+dependencies:
+    - "HDFS"
+    - "YARN"
+
+supportKerberos: false
+
+dashboard:
+  uid: "flink001"
+
+roles:
+
+  - name: FLINK_HISTORY_SERVER
+    label: "Flink History Server"
+    roleFullName: "flink-historyserver"
+    sortNum: 1
+    type: MASTER
+    fixedNum: 1
+    linkExpression: "http://${localhostname}:${conf['flink.history.ui.port']}"
+
+customConfigFiles:
+  - flink-conf.yaml
+
+
+configurations:
+  - name: serverImage
+    description: "服务镜像"
+    recommendExpression: "registry.cn-guangzhou.aliyuncs.com/bigdata200/flink:1.15.4"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "镜像"
+
+  - name: flink.hs.container.limit.cpu
+    description: "Flink HistoryServer容器的CPU使用限额"
+    recommendExpression: 1.0
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: flink.hs.container.limit.memory
+    description: "Flink HistoryServer容器的内存使用限额，单位MB"
+    recommendExpression: 2048
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: flink.hs.container.request.cpu
+    description: "Flink HistoryServer容器的CPU请求量"
+    recommendExpression: 0.2
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: flink.hs.container.request.memory
+    description: "Flink HistoryServer容器的内存请求量，单位MB"
+    recommendExpression: 1024
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: flink.hs.jvm.memory.percentage
+    description: "Flink HistoryServer JVM占容器内存限额的百分比"
+    recommendExpression: 75
+    valueType: InputNumber
+    unit: ".0"
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: "flink.history.ui.port"
+    recommendExpression: "8082"
+    valueType: InputNumber
+    configurableInWizard: true
+    description: "flink history server web ui端口"
+    tag: "端口"
+  - name: "flink.history.fs.logDirectory"
+    recommendExpression: "hdfs:///flink/completed-jobs/"
+    valueType: InputString
+    configurableInWizard: true
+    description: "flink history server的日志目录"
+    tag: "常用参数"
+
+
+  - name: "historyserver.archive.fs.refresh-interval"
+    recommendExpression: 10000
+    valueType: InputNumber
+    description: "historyserver定时刷新的时间间隔"
+    configurableInWizard: true
+    confFile:  "flink-conf.yaml"
+    tag: "高级参数"
+    unit: Ms
+
+  - name: "plugin.iceberg"
+    recommendExpression: false
+    valueType: Switch
+    description: "是否启用iceberg"
+    configurableInWizard: false
+    tag: "数据湖"
+  - name: "plugin.iceberg.warehouse"
+    recommendExpression: "hdfs:///iceberg/warehouse"
+    valueType: InputString
+    configurableInWizard: false
+    description: "iceberg数据目录"
+    tag: "数据湖"
+
