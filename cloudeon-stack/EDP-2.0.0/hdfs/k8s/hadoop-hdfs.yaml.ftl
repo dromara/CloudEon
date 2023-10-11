@@ -153,6 +153,8 @@ spec:
           subPath: bootstrap.sh
         - name: global-render-config
           mountPath: /opt/global/10.render
+        - name: global-usersync-config
+          mountPath: /opt/global/20.usersync
         - name: service-render
           mountPath: /opt/service-render
         - name: service-common
@@ -172,6 +174,9 @@ spec:
       - name: global-render-config
         configMap:
           name: global-render-config
+      - name: global-usersync-config
+        configMap:
+          name: global-usersync-config
       - name: service-render
         configMap:
           name: hdfs-service-render

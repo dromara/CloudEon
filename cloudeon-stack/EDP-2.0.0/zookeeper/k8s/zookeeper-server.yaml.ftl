@@ -78,8 +78,6 @@ spec:
           value: "/opt/service-render"
         - name: RENDER_MODEL
           value: "/opt/service-common/values.json"
-        securityContext:
-          privileged: true
         volumeMounts:
         - mountPath: "/etc/localtime"
           name: "timezone"
