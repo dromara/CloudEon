@@ -151,12 +151,8 @@ public abstract class RoleK8sTask extends BaseCloudeonTask implements ApplyOrDel
                     resourceName = metadata.get(0).getMetadata().getName();
                     switch (roleType.toUpperCase()) {
                         case "JOB":
-                            long waitPodTimeout = 300; // Timeout in seconds
-                            long waitPodStartTime = System.currentTimeMillis();
-
-                            String podName = "";
-                            podName = K8sUtil.waitForCreatePodOfJob(namespace, resourceName, client, log, podName, waitPodStartTime, waitPodTimeout);
-                            K8sUtil.waitForJobCompleted(namespace, resourceName, client, log, podName);
+                            long waitSeconds = 300;
+                            K8sUtil.waitForJobCompleted(namespace, resourceName, client, log, waitSeconds);
                             break;
                         default:
                             final Deployment deployment = client.apps().deployments().withName(resourceName).get();

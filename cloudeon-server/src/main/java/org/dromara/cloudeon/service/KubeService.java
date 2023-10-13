@@ -16,13 +16,11 @@
  */
 package org.dromara.cloudeon.service;
 
-import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.dromara.cloudeon.dao.ClusterInfoRepository;
 import org.dromara.cloudeon.entity.ClusterInfoEntity;
+import org.dromara.cloudeon.utils.K8sUtil;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -36,22 +34,11 @@ public class KubeService {
 
     public KubernetesClient getKubeClient(Integer clusterId) {
         ClusterInfoEntity clusterInfo = clusterInfoRepository.findById(clusterId).get();
-        KubernetesClient client = getKubernetesClient(clusterInfo.getKubeConfig(), clusterInfo.getNamespace());
+        KubernetesClient client = K8sUtil.getKubernetesClient(clusterInfo.getKubeConfig(), clusterInfo.getNamespace());
         testConnect(client);
         return client;
     }
 
-    public KubernetesClient getKubernetesClient(String kubeConfig, String namespace) {
-        Config config = Config.fromKubeconfig(kubeConfig);
-        config.setNamespace(StringUtils.isBlank(namespace) ? "default" : namespace);
-        return new KubernetesClientBuilder().withConfig(config).build();
-    }
-
-    public KubernetesClient getKubernetesClient(String kubeConfig) {
-        Config config = Config.fromKubeconfig(kubeConfig);
-        KubernetesClient client = new KubernetesClientBuilder().withConfig(config).build();
-        return client;
-    }
 
     public void testConnect(KubernetesClient client) {
         String minor = client.getKubernetesVersion().getMinor();

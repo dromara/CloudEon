@@ -16,16 +16,16 @@
  */
 package org.dromara.cloudeon;
 
+import cn.hutool.core.io.IoUtil;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
+import io.fabric8.kubernetes.client.dsl.ParameterNamespaceListVisitFromServerGetDeleteRecreateWaitApplicable;
 import lombok.extern.slf4j.Slf4j;
-import org.dromara.cloudeon.dto.VolumeMountDTO;
 import org.dromara.cloudeon.utils.K8sUtil;
 import org.junit.Test;
 
-import java.io.FileNotFoundException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -36,31 +36,14 @@ import java.util.function.Predicate;
 @Slf4j
 public class K8sSimpleTest {
 
-    /**
-     * test.sh
-     * <p>
-     * <p>
-
-     for i in $(seq 1 20); do
-     echo "Loop $i"
-     sleep 1
-     if [ $i -eq 13 ]; then
-     echo "Error occurred"
-     exit 1
-     fi
-     done
-
-     * <p>
-     * echo "Finished"
-     */
-    @Test
-    public void job() throws FileNotFoundException, InterruptedException {
-
-        Config config = Config.fromKubeconfig("apiVersion: v1\n" +
+    private KubernetesClient getClient() {
+        String kubeConfig = "" +
+                "" +
+                "apiVersion: v1\n" +
                 "clusters:\n" +
                 "- cluster:\n" +
-                "    certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUM2VENDQWRHZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFWTVJNd0VRWURWUVFERXdwcmRXSmwKY201bGRHVnpNQ0FYRFRJek1EZ3hOakEyTWpFMU1Gb1lEekl4TWpNd056SXpNRFl5TVRVd1dqQVZNUk13RVFZRApWUVFERXdwcmRXSmxjbTVsZEdWek1JSUJJakFOQmdrcWhraUc5dzBCQVFFRkFBT0NBUThBTUlJQkNnS0NBUUVBCjFuMWc0b2kvS0UvOEVOcXR0dStmQ29UNVNMRFZsZ09YVVNjN0lIOEVrR0dKOGI2R2JiU2EvdHdRWndZUFdmQTIKcDhEc0EzMkpEbVFHSVEvYStsSG96Ym5QbE9KWkxSN1lBNldjdEM4YTV2TW5MaTVJcHozRnlXVVNQSjcxRlhuWApaVXd4ZDc2aHN5WDVzTkZtc0dKdDRvMGs3dkNmWVRCTmNWTlRyMlVGNG9zT1dMbTBIN3VhU0FYWlFsRHlSZHpHCkp3bmMwZ3dTL0h2aTY0a1RnalVIUWJkcm92dUtQN2tjY043NktqZFpWa0FUS0JndkJuN21tVWI2RzNiTkF1VjYKeXRucFdnQVhwcUJDckdpbXpMQU1RQ3VORDFTWGtpTnJKUStPRW5kU0FUTThpb1A3TTF3YUVsdlk3cFQ3WjczQwppMGhoU0c2MThEMnBnSEtpb09za25RSURBUUFCbzBJd1FEQU9CZ05WSFE4QkFmOEVCQU1DQXFRd0R3WURWUjBUCkFRSC9CQVV3QXdFQi96QWRCZ05WSFE0RUZnUVV5SDFIZjlyYVR1RFZNNk5GZEh2dnJxMFRkZ0F3RFFZSktvWkkKaHZjTkFRRUxCUUFEZ2dFQkFCN0lXRi9MMm1zdjJlRGFxdWRIQzVvUkkxR2VHalVGdWZVMCsyTTRGZ2dOWUR4ZgpiN0ozR2J4R3AyT3BpNE5QbG5UQU0rVlQxUFI2bW1keXQ1M013dUJLTTlTMG93WEZzanE4L3p3K0s1ejkxRkoyCmIvS2dMMmJtNUdJQmNUSjJ0cHNwakVqbVlpSzBFU0Z5SXZkNnJuVm5WeDgzK2xERnZQOHNYYTF1ajF1K0ZnRWUKTGlOOXZRTGQySVRBakNWSlo3aFB0elhkUUVjL1phQW55VWo1amltSU9uOTEvblJtT0xMR3F1ejE3OE4wTzBlWAorNHJzS05ZTGVmdlN4dTR3ZjBuZ05tNGZidDE5c0J3Y0FNK3g0R2swcGZvTlUvcUQ3V3NLRldNZ05VUXJ0c01VCk4xMC9NdVIrMkVoQXg0cXlVaEJ2VjVHWEpNbjc2c2VoSC9vMVROdz0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=\n" +
-                "    server: http://39.104.203.111:8001\n" +
+                "    certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUMvRENDQWVTZ0F3SUJBZ0lVTGpWWFk5Y0lSMkhNdnhEWjJUU1VpYTdHWWhzd0RRWUpLb1pJaHZjTkFRRUwKQlFBd0ZURVRNQkVHQTFVRUF3d0thM1ZpWlhKdVpYUmxjekFnRncweU16QTFNekF3TmpRd01qVmFHQTh5TVRJegpNRFV3TmpBMk5EQXlOVm93RlRFVE1CRUdBMVVFQXd3S2EzVmlaWEp1WlhSbGN6Q0NBU0l3RFFZSktvWklodmNOCkFRRUJCUUFEZ2dFUEFEQ0NBUW9DZ2dFQkFPT2pJZTZqTjMwNC9jdC9VZmQ1VjB0WGF2OTBDWE1HaXd4NW0ycnEKNE5ZWGE0ay9ldEVnQndLV2ZHUStzbGhGWng3UjI5ajZvQ0N6SGwxNXlSUzhteEhSdG5LWWMxMWlYbGdQZlVlVQpCUHFxTzFkT1RjcTIxbW5UME80TFZ5Z1NaU3ZWSjZubGovK0R3YnZkSStXeXVHajN5c1lCQmcyQ3dVNFM0VVViCnRHdk1oVWpab3VvT2F6ZXEwVENOcHpqYUc3TU5VK24xTkNmTzV2dDY4Y0tVcGlIVmMxeGpiS3JoSjFiL0p3bXQKcHF4WGJyMWZVRWpSSVhtc1BrdExNSExVOXlGbnUxS2VyMEVJN0haUUx4ZURaL1RCa0djb2kveXM1Y2MrRGZ3VgpwYXFHTkx3czVrZkRVeXltRGlRRHNyYy9EcmJtUjdLbzIrNmQrMjFhMUNSYkZWY0NBd0VBQWFOQ01FQXdEd1lEClZSMFRBUUgvQkFVd0F3RUIvekFPQmdOVkhROEJBZjhFQkFNQ0FxUXdIUVlEVlIwT0JCWUVGSFA3MDVnNUNsS3UKRjRhUzZlMnFMUUVJampDN01BMEdDU3FHU0liM0RRRUJDd1VBQTRJQkFRQjVQMHJDMEVmMG9GRysvWFNva3VFLwpHWHJrNDA3NGxtb1JkcFpjYkZ4YytTaUI3bS9WMzMrcHcwOHcwbTMwY0tITk9aZ1J1bGJKL1p3azcxNU1mLzlBCkEzakF5RlZXS3VFR1JTbUNVZEJGem92ZjNNREZuRUExUWlMb0VyVndhTVNWNEs1bUg5UzdhZzNTZnFHR2xqYkIKVkhxVmdMdm9RbkM0M0lRcmlZUVp0bmY5NWJZNWlYdDhacElVVDZleHF6dFpvMGhyUXMzVVVJbmx4Wkltdis4eAp6Z1J0dC9zMEJSMTdMU0ZQUjFIVWt2dmV6VEFzamp1WExaOVltODl5bldhYWUzS3EvOFJEK01vSG5jWXc1ZUJUCkU2ekY3L3M0S1Jna3NsRW9PbnR5YnpDMVpNeEcrZFpnVWgybzF0ekdoSUZOTC9rSTBhZkd4bDlMVzVNdG1XWHgKLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=\n" +
+                "    server: https://192.168.100.192:8443\n" +
                 "  name: kubernetes\n" +
                 "contexts:\n" +
                 "- context:\n" +
@@ -73,15 +56,53 @@ public class K8sSimpleTest {
                 "users:\n" +
                 "- name: kubernetes-admin\n" +
                 "  user:\n" +
-                "    client-certificate-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURGVENDQWYyZ0F3SUJBZ0lJZERJZ2QwOXdFQXN3RFFZSktvWklodmNOQVFFTEJRQXdGVEVUTUJFR0ExVUUKQXhNS2EzVmlaWEp1WlhSbGN6QWdGdzB5TXpBNE1UWXdOakl4TlRCYUdBOHlNVEl6TURjeU16QTJNakUxTjFvdwpOREVYTUJVR0ExVUVDaE1PYzNsemRHVnRPbTFoYzNSbGNuTXhHVEFYQmdOVkJBTVRFR3QxWW1WeWJtVjBaWE10CllXUnRhVzR3Z2dFaU1BMEdDU3FHU0liM0RRRUJBUVVBQTRJQkR3QXdnZ0VLQW9JQkFRRG5mMjZoUHFXNGRCQTIKQi9RaHFFWWROb0FjRWg3M2REOTlxajhna2xOSzhOaEJLMVFUditxeEttbXIzK2tiWjF3Vm0zaFpVdTE3c3RoeQozbXpIMjVXN3g4ZlJNYkY4Q2NJNERjRHg2ZGtFbVRRbVc3MjFGdDFhMExWNDNLaU0yVlV4a2M4ODNxbUpaSlFFCnhCbVhtU1NDSjhTODJ6Y2RBWDBQdXNLclk0S1k4cEJGVW5SeDd5NFVkOWpTY01nUVNkaEdQVjBFd1dWRE9Eb3MKTVRkQVBka1ZxeUdpRmRtcklmOGN1ZWdsYzlKY3Z0ODg0MzcvNWRMY1VNdzlwOXVENVo0MHJtMjBQSFpRWCtRNQptMTk2NGk0ZW9JRXBtSEFCc0ZGditiWXkxOHhJUzV2Q29vRmNXR1hobUxHK1pVcUMzZWtLMHZJaGNRTi8yeXh5CmdjeW0vNks3QWdNQkFBR2pTREJHTUE0R0ExVWREd0VCL3dRRUF3SUZvREFUQmdOVkhTVUVEREFLQmdnckJnRUYKQlFjREFqQWZCZ05WSFNNRUdEQVdnQlRJZlVkLzJ0cE80TlV6bzBWMGUrK3VyUk4yQURBTkJna3Foa2lHOXcwQgpBUXNGQUFPQ0FRRUFENkI5YUQ0UTdTcXNJOTVPSzZwL1hwTE9YMnQyZks4MXZraEZlVmxMR1BkbjZkTUxObWNiCnBNYlJQY2ExZUNnSWI1UFJyQ2hVaFQ5ZnFoN25aaXNoSjFiYWlGRUprQXVIR0R3ZUdsd3hkL2hEOUd4eDF6aXkKeGcrUkZhQVNMV29yWFJYT0NoZHVQVHRwaGxldGFjRE5tZkJ3NkFpZjRxRWFNMWxEZ0ZENnRhMGJZaHlXeERacwpNMWJhRjlrV1ZzREpEUWZVUllaSDFsbmQ1eUQ2SEl2cndTQUs2eW5tNUFNZ2h6SlBTZjVpbTBGU3QwVEpKVkZxClphTzA5aDhsSTEwWVNRYlVUYkZMd1Rhem5vQk93NnZpaTc3S0xzdHRoL09yUXRtanlZb1lTbFJJNk51WE40c2QKZVdaajVHQlRLODZCd0I0UHFHN1dRWVpndFpJb2l4MHU1UT09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K\n" +
-                "    client-key-data: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFb2dJQkFBS0NBUUVBNTM5dW9UNmx1SFFRTmdmMElhaEdIVGFBSEJJZTkzUS9mYW8vSUpKVFN2RFlRU3RVCkU3L3FzU3BwcTkvcEcyZGNGWnQ0V1ZMdGU3TFljdDVzeDl1VnU4ZkgwVEd4ZkFuQ09BM0E4ZW5aQkprMEpsdTkKdFJiZFd0QzFlTnlvak5sVk1aSFBQTjZwaVdTVUJNUVpsNWtrZ2lmRXZOczNIUUY5RDdyQ3EyT0NtUEtRUlZKMApjZTh1RkhmWTBuRElFRW5ZUmoxZEJNRmxRemc2TERFM1FEM1pGYXNob2hYWnF5SC9ITG5vSlhQU1hMN2ZQT04rCi8rWFMzRkRNUGFmYmcrV2VOSzV0dER4MlVGL2tPWnRmZXVJdUhxQ0JLWmh3QWJCUmIvbTJNdGZNU0V1YndxS0IKWEZobDRaaXh2bVZLZ3QzcEN0THlJWEVEZjlzc2NvSE1wditpdXdJREFRQUJBb0lCQUI4VXRlYkNRWCs5WFh2VApuNHh4U2xDYnc2R0JNVlVwNzJoUTFqN3FSbktXV1lLT2JiQmxJUDUrWWtlb1BXVG5nSzZKL0NPS0JjYUk0WlN5CmxrcFRDZ3gzS3pYRUJUOVJGQmx3aDBvemltYWFweXpMUG5JMHlxMXB2aU9uQko0OGc3cXZCL0wxTmkvektBaG4KeDhQWjFOUUF3T0pXVUZUOW9TdmVlRXFJaHIwLytuMENMTE82eHhlMm92MElJN29GM3E1b0tpK2R3L29EdFU2bQpwT3FRbzA3Z1dKZm5BUTljK25hZ3N0ZllsREg4V3E5UFFLdTUvZ1BmVWNBazVJUVlNV3gxbXkzSmpvbUpFRkpiCjVMem82cUpMVHdJcW13d0QyVjVnK3NHcDQ2ajMyaUdsRDYyTS96MjAzSGVRWXQ4NVg3ZU80aFRJZmlPcjQxZ3oKN1p0eHUra0NnWUVBL3JMaHFyeHlqUUFNSTFKNTlHT1VOenErYkNQc0hBbjU3UmRmallObDA3VEkzN3FmLzN6VgpLaVhja1RhNGY4d2ZOZHN3ampzNkVRNHk3UXNhOGVFTmxURnJkTFF0b0JRNWhOazNhY1RUbGFNdTdaRGtHcWhTCkZ6NFZiVjZBUkpLcE02N0xpU2V2NkQyRnp5bXV0NWJjNDFOWkJyekhHMFNYbUt0cnB1emRBbzhDZ1lFQTZLNDAKemRmVlNOS2VGR295cmtFMzFaUzgzWUlFT2hKcGFNd3poUHhQc0cvK2FDOVZ0RW9jOHFiaFFPdmx0aXJISnU3VwpPM3VZbDJzM09WRmZJTlFGaGdMNFJPeTN6bjVEZUk5UUxFUyt2c3NNRHRyWXlFRFF5Z2V4NnlDYnNEM3RCOExkCmEwamI2QVNhKzVidHVVNzVzVHFsQkw1MStlcC9aUDNWZWZrZFF4VUNnWUEyU2NpaUROTFp6UVhKVFo0akFrcW8KVHdRaHBySi84M3hyRmMxUEs0Kzd4VS8vcUJiTWJUNCtZcDJWOGpUM1FIbnlqOHJVdGprVlE1S0ZSaFd6TXNZagpZOHBFc05iOHhQTFJwejhSYzF1cURJTkhMZGdBK3Btc3pKWGludjcySHRDajdJRUR0Z3JmbEtWOTE2T2ZEQy8rCjRGZ2NnSVpzQUgzVGs4NDVZVWxtYndLQmdEQzhaR1VGSXpCb3BTSERpTEFGQ3d2YVpxREMzZDNJQTNvbTQxZWsKZlpDSU5MSmZ6OFMralVlcCtwNWRpclRZU3ZSMXJEdXpUS2ZTbGpPVVBxZWlvVEdMcDdMUUhrUExJSmk4ODk4QgoyeTRkVzM0MUNwa1BNbXhPcGs2SWV2TzBWTlIrVldCbVYyRkdyYXVxMWtvdEo1R2VwZmZUYU9TYTRHb24zTEg2Cm9zMXRBb0dBSzlRdHBJRTNLRVhuSFlZNldGQ0VMaUpTd3JvTWsvYkQ1dURQWUdmUDNlb3FVb3pBcUlvMnFsZmEKWW5YMGFjcXZYMTlBVzhXMTZidHQ3Z3I1UWsrb29yeHoydkJhVk9lZDNxT0pOZ3NVVHd5VTBaR2cwYk94NDZxTgo3Q2JFb0NLZ0ZtV2kvcGM1WGdwQlZiY0lCOUwzQWJRblRXY1czUGsvYlRnSFlhYmNDRWs9Ci0tLS0tRU5EIFJTQSBQUklWQVRFIEtFWS0tLS0tCg==");
-        KubernetesClient client = new KubernetesClientBuilder().withConfig(config).build();
-
-        VolumeMountDTO[] volumeMounts = {new VolumeMountDTO("config-volume", "/opt/edp/monitor/conf", "/opt/edp/monitor/conf")};
-        K8sUtil.runJob("default","init-work",client, volumeMounts,"openjdk:8-jdk-alpine","/opt/edp/monitor/conf/test.sh",log,"iZhp3ivd08e0qfgauq0gmbZ".toLowerCase());
-
-
+                "    client-certificate-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURTekNDQWpPZ0F3SUJBZ0lVZmdLeGwrV2xvWHB0UFk4YVkrbnd1R1FKdlU4d0RRWUpLb1pJaHZjTkFRRUwKQlFBd0ZURVRNQkVHQTFVRUF3d0thM1ZpWlhKdVpYUmxjekFnRncweU16QTFNekF3TmpRd05EbGFHQTh5TVRJegpNRFV3TmpBMk5EQTBPVm93TkRFWk1CY0dBMVVFQXd3UWEzVmlaWEp1WlhSbGN5MWhaRzFwYmpFWE1CVUdBMVVFCkNnd09jM2x6ZEdWdE9tMWhjM1JsY25Nd2dnRWlNQTBHQ1NxR1NJYjNEUUVCQVFVQUE0SUJEd0F3Z2dFS0FvSUIKQVFETXhCWnVweGpIRVkvaVF2NHhyOW1KdDhTaVJySGNtdUpvV2VCVDJNd1VLT0pTK1pFaFRtKzZkbDdBb0Iydgp1WXpWbHlkZmhoTWVtSUFQZnl5Y3dWbHRYZnhCcWFCOElkcThCM2FubnNDQ3JRMGUrQXBHM0V2dm12TUoxU3lQCkxTdWVvUWlKWWQ3UWZVM3BYdEdzYlorclpXT2J3Tm1RYTFWS3UvalFONlJlbytmZjRpcmE4ZEROdHU3SU1iVGgKT1pmYmVmMmdiR01nYXhJTStZSUI1bXpMODJ3NmJjeVAxUHkwY0d0ZVhydHJCSnZOT1NWQXlKcS9Oa2dNNno0RApzNGVxclNTME81MFB1LzlPTUNtVmtSSnp6MXFaYTdtdnc2emlwMC9nSEhtYkJqY2dndDNYNFpuOWR6NnhGQnppCjlqR1V4SDgvdW5MVFRFcnNNMW9OTlNoVEFnTUJBQUdqY2pCd01Ba0dBMVVkRXdRQ01BQXdEZ1lEVlIwUEFRSC8KQkFRREFnV2dNQk1HQTFVZEpRUU1NQW9HQ0NzR0FRVUZCd01DTUIwR0ExVWREZ1FXQkJSVzFNWWZFajlZOFBFRwoyVFRHTU41emhZdDB2REFmQmdOVkhTTUVHREFXZ0JSeis5T1lPUXBTcmhlR2t1bnRxaTBCQ0k0d3V6QU5CZ2txCmhraUc5dzBCQVFzRkFBT0NBUUVBR2FRdDJQdWRmTUlSUFNJamdzbWRUOUlVK3B6ZU9GblZvajdHZWVSNjcxL1QKZ1VmdXRSeTZsQ3FFMzFPaXA0LzlCelNNd1lPZDdMaThXUVFCYlNkZjdtdEo2SDFuVUpGcDdZZnRKaGlqN3hXdwpIeU4zbTVwYlBIcWVHMFAyM1pyeGVCbEhTN0ZhNXFtRzFRR0JId0kzblVLS1hXaDZpdUVZZE5mMm9GY1ByK2hoCk5CbjFweFY0aS9na1BoZHoxZ2o1YjVLd25kdVJTRDl4WDVtRW1SRGJvbHpRV3ZjNEU3UXc3bllNL0pwdlo3MlcKaUJ0NytHTGYzZ0E4aXowTHJZcnlXRnpUbUFvQ24ySHdYa0VyWGdDS1ZHTTBzczk1WThSOGhhN1VBYkp1ZGZlUwpZeUt3SGhtNHYwbEF2MlNnSU9vdzd5SzJnMVlOb0dtVWpoTmU1U3ZZcUE9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==\n" +
+                "    client-key-data: LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUV2d0lCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQktrd2dnU2xBZ0VBQW9JQkFRRE14Qlp1cHhqSEVZL2kKUXY0eHI5bUp0OFNpUnJIY211Sm9XZUJUMk13VUtPSlMrWkVoVG0rNmRsN0FvQjJ2dVl6Vmx5ZGZoaE1lbUlBUApmeXljd1ZsdFhmeEJxYUI4SWRxOEIzYW5uc0NDclEwZStBcEczRXZ2bXZNSjFTeVBMU3Vlb1FpSllkN1FmVTNwClh0R3NiWityWldPYndObVFhMVZLdS9qUU42UmVvK2ZmNGlyYThkRE50dTdJTWJUaE9aZmJlZjJnYkdNZ2F4SU0KK1lJQjVtekw4Mnc2YmN5UDFQeTBjR3RlWHJ0ckJKdk5PU1ZBeUpxL05rZ002ejREczRlcXJTUzBPNTBQdS85TwpNQ21Wa1JKenoxcVphN212dzZ6aXAwL2dISG1iQmpjZ2d0M1g0Wm45ZHo2eEZCemk5akdVeEg4L3VuTFRURXJzCk0xb05OU2hUQWdNQkFBRUNnZ0VBVk9GQnhUdVo3MGNONUVaTjlZM0YrS3NISlJkMStoTHdJRDZGV1d4b2FFRHMKVkdYa2JiQ0Vhd0JQVmJ6cG9XS2lpUlYvdWo2ckpVY2s2b2VXbUNJajdreUQyVG8xN3M3Znk0cXllbGc1eDlGeApPM0dwWE9kTHlQWnJvWnRPdmNrRktGdnJYSHVINzlmSldLQTMvU2h5QkF2aXh2a2hscGFQaEF1NFg2TjVETXRZCjNsa3c0NExHbXdYTWpGbk9oQnpMNjQxNDNQU0VRejUrYzRnL216RU9QTGgxSENqelJEVnNZdTlJQW90MzZJaUYKZWVFYVhYSEllNkoxRXhiMEE4V2lFdzAvWUp1cm1Lc09zVGNHNHpVeUxLMFhqNys1TysvVjcxdno2Qy9ZZUUwcwpFeXdDR1VoUUZuUjFUNHFaa3hPQndLaHVnSy9ZMjFZWlZ1OXlxbDNoalFLQmdRRE9BY0pSWGZjVWpac1UxZzd1CmNKRnNaQ3JiR05rckphVkp0VG52STBkdFMwZGNpaDRTQzExaFN1S2hHNkVjOXJqYnJhYmZiYktJc2VnVjA3cWIKU2UxYlhncCtkUlhZZGJTOTFGQ2pQOUNwMWV0MmxIeWtmV2VacWtQYTJtZmdqMmNSSEN0aWR4UXh4VUs2ajNRTQpCaFh4aDlWcy9YMmpvazRwbU1jcDRZeDFod0tCZ1FEK2RUeXRtZ2FDUGZkRHNyM1JzbkYzZ1RESFBjcU05MnpFCmdLT2duVG5nWkxyZ1hRcVB6ZlZTeUhSK1dqVzErWmw5RGF6M2hCSGg3RUlkQ3o3KzhnUWZyTTF5UVN4UXR1N2UKa05oaXRTdi9FNEtjYXROOXg4M2pGWGR2MW83V1A3R2lORTVQZWdQelo2a3FZT0tibi83YXJWUEwxUUlKRGNtVApDc1U2aUlWcDFRS0JnUUN5dUNQMG95aHYxRW51VWFheWhVWWtXdUl6SWVPRjR5cjZQeGI3dUFlSGNmOSs4UFFWCmczYUhxWWZqYlN6aEM4cGtDc3J5bXlDQUpwZktGOTJVU3haNFphV0UvOTdyNDNIaUhnZTNHTzNWNlpoVlQ0eXkKeDNqUmZ6MU82SnVsM2NMMHZST0dZUGhNRlc1R201MTVzTzNvbEljNy9zNjQzMTRnQ0VNQXVvUTRrUUtCZ1FEVQp4aEc4Rkl5V3dkd09KdHRsQ3JLb3ZFV2VoVVBuQmtwVU1rRWczL2Z5ZENoenpqa3pzSVFQK2dDM1d4V0ltak5ICmgzVDM3OTdJTExmSDg0eDB3TWpEOThvL1hOSUNtRVU3cEtEY1FTU09BYkY0dkRjbStUbG5ScDc5ek1yWnlwN3QKeEpFckVodFZvSHVyTFNLd0FXU3BWTUE2TkY2a1ZYd1YwYTdFV0Q0L0ZRS0JnUUNvV3JXSVB2MzdkUHFrTlhuaAp5NWNORmhJS1JJYURpSWt1bUxuMkZha1Z1VEJwRnlNR2M1cFdvZXBKcWN4eHU1ZnJGaGowWEtPOXZCODNETjNGCmRxclVma3d2YXpSdVdoVHRYdFlNbGV0aUtIY1RZcXpodjNQRWd5MFBvVEwwTHhPZmxmaUhOR2t2RS9PdWkwTzEKY2pyVkRWdVloeHBraGd6blVZc3pzWnJlalE9PQotLS0tLUVORCBQUklWQVRFIEtFWS0tLS0tCg==" +
+                "";
+        return K8sUtil.getKubernetesClient(kubeConfig);
     }
+
+    @Test
+    public void waitForJobCompleted() {
+        String jobYamlStr = "" +
+                "" +
+                "apiVersion: batch/v1\n" +
+                "kind: Job\n" +
+                "metadata:\n" +
+                "  name: random-exit-job  \n" +
+                "spec:\n" +
+                "  completions : 2\n" +
+//                "  backoffLimit: 2\n" +
+                "  template:\n" +
+                "    spec:\n" +
+                "      restartPolicy: Never\n" +
+                "      containers:\n" +
+                "      - name: random-exit\n" +
+                "        image: centos:7\n" +
+                "        command: [\"/bin/bash\"]  \n" +
+                "        args:\n" +
+                "        - -c\n" +
+                "        - |\n" +
+                "          date && sleep 1\n" +
+                "          if [[ $(($RANDOM % 2)) -eq 0 ]]; then  \n" +
+                "            exit 0\n" +
+                "          else\n" +
+                "            exit 1\n" +
+                "          fi\n" +
+                "";
+        KubernetesClient client = getClient();
+        while (true) {
+            ParameterNamespaceListVisitFromServerGetDeleteRecreateWaitApplicable<HasMetadata> loaded = client.load(IoUtil.toUtf8Stream(jobYamlStr));
+            if (loaded.get().get(0) != null) {
+                loaded.delete();
+            }
+            List<HasMetadata> metadata = loaded.forceConflicts().serverSideApply();
+            String resourceName = metadata.get(0).getMetadata().getName();
+            int retryCount = K8sUtil.waitForJobCompleted("default", resourceName, client, log, 60);
+            log.info("retryCount: " + retryCount);
+        }
+    }
+
 
 
     @Test
