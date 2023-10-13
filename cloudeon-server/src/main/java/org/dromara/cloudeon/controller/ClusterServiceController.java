@@ -27,7 +27,6 @@ import freemarker.cache.StringTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import io.fabric8.kubernetes.api.model.Event;
 import io.fabric8.kubernetes.api.model.EventList;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClient;
@@ -46,6 +45,7 @@ import org.dromara.cloudeon.processor.TaskParam;
 import org.dromara.cloudeon.service.CommandHandler;
 import org.dromara.cloudeon.service.KubeService;
 import org.dromara.cloudeon.utils.DAG;
+import org.dromara.cloudeon.utils.K8sUtil;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,8 +55,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -973,40 +971,16 @@ public class ClusterServiceController {
             .inNamespace(namespace)
             .withField("involvedObject.name",pod.getMetadata().getName())
             .list();
-        // 创建 SimpleDateFormat 对象，指定输入的日期格式
-        SimpleDateFormat inputSdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-        List<RolePodEventVO> rolePodEventVOS = eventList.getItems().stream().map(new Function<Event, RolePodEventVO>() {
-            @Override
-            public RolePodEventVO apply(Event event) {
-                RolePodEventVO eventVO = RolePodEventVO.builder()
-                        .type(event.getType())
-                        .message(event.getMessage())
-                        .reason(event.getReason())
-                        .count(event.getCount())
-                        .build();
-                if (StringUtils.isNotBlank(event.getLastTimestamp())) {
-                    // 设置时区为 UTC
-                    inputSdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-                    // 解析 UTC 时间字符串为 Date 对象
-                    Date utcDate = null;
-                    try {
-                        utcDate = inputSdf.parse(event.getLastTimestamp());
-                    } catch (ParseException e) {
-                        throw new RuntimeException(e);
-                    }
-                    // 创建 SimpleDateFormat 对象，指定输出的日期格式
-                    SimpleDateFormat outputSdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-                    // 设置时区为北京时间（东八区）
-                    outputSdf.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"));
-
-                    // 格式化为北京时间字符串
-                    String beijingTimeStr = outputSdf.format(utcDate);
-                    eventVO.setLastTimestamp(beijingTimeStr);
-                }
-                return eventVO;
-            }
+        List<RolePodEventVO> rolePodEventVOS = eventList.getItems().stream().map(event -> {
+            RolePodEventVO eventVO = RolePodEventVO.builder()
+                    .type(event.getType())
+                    .message(event.getMessage())
+                    .reason(event.getReason())
+                    .count(event.getCount())
+                    .lastTimestamp(K8sUtil.formatK8sDateStr(event.getLastTimestamp()))
+                    .build();
+            return eventVO;
         }).collect(Collectors.toList());
         return ResultDTO.success(rolePodEventVOS);
     }

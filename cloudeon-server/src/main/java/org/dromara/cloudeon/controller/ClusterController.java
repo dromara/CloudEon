@@ -17,6 +17,7 @@
 package org.dromara.cloudeon.controller;
 
 import cn.hutool.core.bean.BeanUtil;
+import io.fabric8.kubernetes.client.KubernetesClient;
 import org.dromara.cloudeon.controller.request.ModifyClusterInfoRequest;
 import org.dromara.cloudeon.controller.response.ClusterInfoVO;
 import org.dromara.cloudeon.dao.*;
@@ -24,7 +25,7 @@ import org.dromara.cloudeon.dto.ResultDTO;
 import org.dromara.cloudeon.entity.ClusterAlertRuleEntity;
 import org.dromara.cloudeon.entity.ClusterInfoEntity;
 import org.dromara.cloudeon.service.KubeService;
-import io.fabric8.kubernetes.client.KubernetesClient;
+import org.dromara.cloudeon.utils.K8sUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -90,7 +91,7 @@ public class ClusterController {
             clusterInfoEntity = clusterInfoRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("can't find cluster info by id:" + id));
         }
         // 检验kubeconfig是否正确能连接k8s集群
-        KubernetesClient kubernetesClient = kubeService.getKubernetesClient(req.getKubeConfig());
+        KubernetesClient kubernetesClient = K8sUtil.getKubernetesClient(req.getKubeConfig());
         kubeService.testConnect(kubernetesClient);
 
         // 校验 k8s namespace是否存在
