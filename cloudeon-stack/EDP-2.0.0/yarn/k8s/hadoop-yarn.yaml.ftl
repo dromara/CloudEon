@@ -187,7 +187,7 @@ spec:
         configMap:
           name: yarn-service-common
       - hostPath:
-          path: "/opt/edp/${roleFullName}"
+          path: "${conf['global.persistence.basePath']}/${roleFullName}"
           type: DirectoryOrCreate
         name: "workspace"
       - name: hdfs-config
