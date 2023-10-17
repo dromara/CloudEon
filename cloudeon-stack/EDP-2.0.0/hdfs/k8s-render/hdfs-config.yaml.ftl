@@ -126,7 +126,7 @@ data:
         <@property "dfs.datanode.http.address" hostname + ":" + conf["datanode.http-port"]/>
         <@property "dfs.datanode.ipc.address" hostname + ":" + conf["datanode.ipc-port"]/>
     <#--handleOther-->
-        <@property "dfs.hosts.exclude" "/opt/edp/${serviceName}/conf/dfs.exclude"/>
+        <@property "dfs.hosts.exclude" "/opt/hadoop/etc/hadoop/dfs.exclude"/>
 
     <#--    dn_socket需要其父目录权限为755，否则会报错   -->
     <#--    <@property "dfs.domain.socket.path" "/opt/edp/${serviceName}/data/dn_socket"/>-->

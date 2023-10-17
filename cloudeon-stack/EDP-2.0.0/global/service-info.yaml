@@ -26,6 +26,13 @@ customConfigFiles: []
 
 
 configurations:
+  - name: global.persistence.basePath
+    description: "全局持久化存储路径，是各组件在各节点上的存储根目录"
+    recommendExpression: /data/edp
+    valueType: InputString
+    configurableInWizard: true
+    tag: "global"
+
   - name: global.kube-prometheus.enable
     description: "是否启用外部kube-prometheus支持"
     recommendExpression: false

@@ -79,7 +79,7 @@
     <@property "yarn.timeline-service.webapp.address" timelineServer + ":${conf['timelineserver.http.port']}"/>
 </#if>
 
-    <@property "yarn.resourcemanager.nodes.exclude-path" "/opt/edp/" + serviceName + "/conf/yarn.exclude"/>
+    <@property "yarn.resourcemanager.nodes.exclude-path" "/opt/hadoop/etc/hadoop/yarn.exclude"/>
 <#--Take properties from the context-->
 <#list confFiles['yarn-site.xml'] as key, value>
     <@property key value/>
