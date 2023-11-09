@@ -25,15 +25,15 @@
 - [ ] 服务角色实例新增，删除
 - [x] 支持kyuubi服务在Kubernetes上运行
 - [ ] 支持EFAK服务在Kubernetes上运行
-- [ ] 支持Arctic服务在Kubernetes上运行
+- [x] 支持Amoro服务在Kubernetes上运行
 - [ ] 支持streampark服务在Kubernetes上运行
 - [x] 支持dinky服务在Kubernetes上运行
-- [ ] 支持trino服务在Kubernetes上运行
-- [ ] 支持elasticsearch服务在Kubernetes上运行
+- [x] 支持trino服务在Kubernetes上运行
+- [x] 支持elasticsearch服务在Kubernetes上运行
 - [ ] 支持prestodb服务在Kubernetes上运行
 - [ ] 支持alluxiio服务在Kubernetes上运行
 - [ ] 支持iotdb服务在Kubernetes上运行
-- [ ] 支持iceberg服务在Kubernetes上运行
+- [x] 支持iceberg服务在Kubernetes上运行
 - [x] 支持kylin服务在Kubernetes上运行
 - [x] 支持seatunnel等服务在Kubernetes上运行
 - [ ] 更聪明的安装服务分配节点机制
