@@ -28,7 +28,9 @@ hdfs dfs -put dlink-app.jar /dlink/jar/
 rm -rf dlink-app.jar
 hdfs dfs -mkdir -p  /flink/lib/
 hdfs dfs -put $FLINK_HOME/lib/*.jar  /flink/lib/
-
-java $JAVA_OPTS \
+nohup java $JAVA_OPTS \
  -cp $CLASS_PATH \
--Dlogging.config=$DINKY_CONF/log4j2.xml  -Dspring.config.location=$DINKY_CONF/dinky-application.yaml,$DINKY_CONF/application.properties com.dlink.Dlink
+-Dlogging.config=$DINKY_CONF/log4j2.xml  -Dspring.config.location=$DINKY_CONF/dinky-application.yaml,$DINKY_CONF/application.properties com.dlink.Dlink     > $log 2>&1 &
+
+echo $! > $pid
+tail -f /opt/edp/${service.serviceName}/log/dinky-$HOSTNAME.out
