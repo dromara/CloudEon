@@ -14,6 +14,7 @@ persistencePaths:
   - /opt/edp/${service.serviceName}/conf
   - /opt/edp/${service.serviceName}/log
   - /opt/edp/${service.serviceName}/data
+  - ${conf['dfs.datanode.data.dir']}
 
 dashboard:
   uid: huM_B3dZz
@@ -189,6 +190,15 @@ configurations:
     valueType: InputString
     description: WebHDFS页面上访问的静态用户名
     confFile: "core-site.xml"
+    tag: "常用参数"
+
+
+  - name: dfs.datanode.data.dir
+    recommendExpression: /opt/edp/hdfs/data/datanode
+    valueType: InputString
+    description: HDFS数据目录，多个目录使用","分割
+    confFile:  "hdfs-site.xml"
+    configurableInWizard: true
     tag: "常用参数"
 
 

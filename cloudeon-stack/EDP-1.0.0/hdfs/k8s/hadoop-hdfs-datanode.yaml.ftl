@@ -74,8 +74,13 @@ spec:
         securityContext:
           privileged: true
         volumeMounts:
-        - mountPath: "/opt/edp/${service.serviceName}/data"
-          name: "data"
+      <#assign dataDirs = conf['dfs.datanode.data.dir']?split(",")>
+      <#list dataDirs as dir>
+        - mountPath: ${dir}
+          name: "data-${dir?index}"
+      </#list>
+<#--        - mountPath: "/opt/edp/${service.serviceName}/data"-->
+<#--          name: "data"-->
         - mountPath: "/opt/edp/${service.serviceName}/log"
           name: "log"
         - mountPath: "/etc/localtime"
@@ -87,9 +92,14 @@ spec:
         ${roleServiceFullName}: "true"
       terminationGracePeriodSeconds: 30
       volumes:
+    <#list dataDirs as dir>
       - hostPath:
-          path: "/opt/edp/${service.serviceName}/data"
-        name: "data"
+          path: ${dir}
+        name: "data-${dir?index}"
+    </#list>
+<#--      - hostPath:-->
+<#--          path: "/opt/edp/${service.serviceName}/data"-->
+<#--        name: "data"-->
       - hostPath:
           path: "/opt/edp/${service.serviceName}/log"
         name: "log"
