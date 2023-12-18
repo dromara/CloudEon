@@ -100,6 +100,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/rugalcrimson"><img src="https://avatars.githubusercontent.com/u/15381951?v=4?s=100" width="100px;" alt="rugalcrimson"/><br /><sub><b>rugalcrimson</b></sub></a><br /><a href="https://github.com/dromara/CloudEon/commits?author=rugalcrimson" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/q443048756"><img src="https://avatars.githubusercontent.com/u/47968271?v=4?s=100" width="100px;" alt="buer"/><br /><sub><b>buer</b></sub></a><br /><a href="https://github.com/dromara/CloudEon/commits?author=q443048756" title="Code">💻</a></td>
     </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/stdnt-xiao"><img src="https://avatars.githubusercontent.com/u/20313983?v=4?s=100" width="100px;" alt="stdnt-xiao"/><br /><sub><b>stdnt-xiao</b></sub></a><br /><a href="https://github.com/dromara/CloudEon/commits?author=stdnt-xiao" title="Code">💻</a></td>
+    </tr>
   </tbody>
 </table>
 
