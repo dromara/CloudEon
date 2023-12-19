@@ -279,10 +279,10 @@
                             <!-- 前端资源目录，即：存放前端包目录-->
                             <directory>src/main/resources/static</directory>
                         </fileset>
-<!--                    <fileset>-->
-<!--                        &lt;!&ndash; Vue项目打包自动生成的dist目录 &ndash;&gt;-->
-<!--                        <directory>${frontend-project-dist-dir}</directory>-->
-<!--                    </fileset>-->
+<!--                        <fileset>-->
+<!--                            &lt;!&ndash; Vue项目打包自动生成的dist目录 &ndash;&gt;-->
+<!--                            <directory>${frontend-project-dist-dir}</directory>-->
+<!--                        </fileset>-->
                     </filesets>
                 </configuration>
             </plugin>
