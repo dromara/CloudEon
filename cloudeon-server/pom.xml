@@ -154,7 +154,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!--        解决 JcaPEMKeyConverter is provided by BouncyCastle, an optional dependency. To use support for EC Keys you must explicitly add this dependency to classpath-->
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15on</artifactId>
@@ -279,10 +278,6 @@
                             <!-- 前端资源目录，即：存放前端包目录-->
                             <directory>src/main/resources/static</directory>
                         </fileset>
-                        <!--                        <fileset>-->
-                        <!--                            &lt;!&ndash; Vue项目打包自动生成的dist目录 &ndash;&gt;-->
-                        <!--                            <directory>${frontend-project-dist-dir}</directory>-->
-                        <!--                        </fileset>-->
                     </filesets>
                 </configuration>
             </plugin>
