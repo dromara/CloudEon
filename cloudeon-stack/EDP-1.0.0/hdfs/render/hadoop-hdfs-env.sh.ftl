@@ -105,5 +105,5 @@ export JOURNALNODE_RPC_PORT=${conf['journalnode.rpc-port']}
 export DATANODE_DATA_DIRS=/opt/edp/${service.serviceName}/data/datanode
 
 # Export dfs.namenode.name.dir
-export NAMENODE_DATA_DIRS=/opt/edp/${service.serviceName}/data/namenode
+export DATANODE_DATA_DIRS=${conf['dfs.datanode.data.dir']}
 
