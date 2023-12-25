@@ -168,10 +168,10 @@ configurations:
     confFile: "capacity-scheduler.xml"
     tag: "资源管理"
   - name: remote.app.log.dir
-    recommendExpression: "/var/log/hadoop-yarn/apps"
+    recommendExpression: "/hadoop-yarn/apps"
     valueType: InputString
     configurableInWizard: true
-    tag: "资源管理"
+    tag: "日志相关"
   - name: mapreduce.am.staging.dir
     recommendExpression: "/user"
     valueType: InputString
@@ -340,11 +340,32 @@ configurations:
     unit: SECONDS
     confFile: "yarn-site.xml"
     tag: "高级参数"
+
   - name: yarn.log-aggregation-enable
-    recommendExpression: false
+    recommendExpression: true
     valueType: Switch
     confFile: "yarn-site.xml"
-    tag: "高级参数"
+    tag: "日志相关"
+
+  - name: yarn.log-aggregation.retain-seconds
+    recommendExpression: 2592000
+    valueType: InputNumber
+    confFile: "yarn-site.xml"
+    description: "日志保留的时间（以秒为单位），默认30天"
+    tag: "日志相关"
+
+  - name: mapreduce.jobhistory.intermediate-done-dir
+    recommendExpression: /mr-history/tmp
+    valueType: InputString
+    confFile: "mapred-site.xml"
+    tag: "日志相关"
+
+  - name: mapreduce.jobhistory.done-dir
+    recommendExpression: /mr-history/done
+    valueType: InputString
+    confFile: "mapred-site.xml"
+    tag: "日志相关"
+
 
 
   - name: historyserver.port
