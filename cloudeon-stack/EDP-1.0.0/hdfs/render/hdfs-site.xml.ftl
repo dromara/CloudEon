@@ -48,7 +48,7 @@
 </#if>
 
 <#--handle data dir-->
-<@property "dfs.datanode.data.dir" "/opt/edp/${serviceName}/data/datanode"/>
+<@property "dfs.datanode.data.dir" "${conf['dfs.datanode.data.dir']}"/>
 <@property "dfs.namenode.name.dir" "/opt/edp/${serviceName}/data/namenode"/>
 <@property "dfs.journalnode.edits.dir" "/opt/edp/${serviceName}/data/journal"/>
 

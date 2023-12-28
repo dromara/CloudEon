@@ -40,19 +40,7 @@ spec:
       hostPID: false
       hostNetwork: true
       containers:
-      - args:
-          - "/opt/edp/${service.serviceName}/conf/bootstrap-hiveserver2.sh"
-        env:
-          - name: "SERVICE_NAME"
-            value: "server2"
-          - name: HADOOP_CONF_DIR
-            value: /opt/edp/${service.serviceName}/conf
-          - name: "HIVE_CONF_DIR"
-            value: "/opt/edp/${service.serviceName}/conf"
-          - name: MEM_LIMIT
-            valueFrom:
-              resourceFieldRef:
-                resource: limits.memory
+      -
         image: "${dockerImage}"
         imagePullPolicy: "Always"
         readinessProbe:
@@ -60,7 +48,7 @@ spec:
             command:
             - "/bin/bash"
             - "-c"
-            - "curl --fail --connect-timeout 15 --max-time 15 \"http://`hostname`:${conf['hive.server2.webui.port']}/\"\
+            - "curl --fail --connect-timeout 15 --max-time 15 \"http://`hostname`:${conf['http-server.port']}/\"\
             \n"
           failureThreshold: 3
           initialDelaySeconds: 10
@@ -68,32 +56,23 @@ spec:
           successThreshold: 1
           timeoutSeconds: 1
         name: "${roleServiceFullName}"
-        resources:
-          requests:
-            memory: "${conf['hive.server2.container.request.memory']}Mi"
-            cpu: "${conf['hive.server2.container.request.cpu']}"
-          limits:
-            memory: "${conf['hive.server2.container.limit.memory']}Mi"
-            cpu: "${conf['hive.server2.container.limit.cpu']}"
+
         securityContext:
           privileged: true
         volumeMounts:
-        - mountPath: "/opt/edp/${service.serviceName}/data"
-          name: "data"
-        - mountPath: "/opt/edp/${service.serviceName}/log"
+
+        - mountPath: "/usr/share/hue/logs"
           name: "log"
         - mountPath: "/etc/localtime"
           name: "timezone"
-        - mountPath: "/opt/edp/${service.serviceName}/conf"
+        - mountPath: "/usr/share/hue/desktop/conf"
           name: "conf"
 
       nodeSelector:
         ${roleServiceFullName}: "true"
       terminationGracePeriodSeconds: 30
       volumes:
-      - hostPath:
-          path: "/opt/edp/${service.serviceName}/data"
-        name: "data"
+
       - hostPath:
           path: "/opt/edp/${service.serviceName}/log"
         name: "log"

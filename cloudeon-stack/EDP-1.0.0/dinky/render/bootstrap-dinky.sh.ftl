@@ -33,4 +33,4 @@ nohup java $JAVA_OPTS \
 -Dlogging.config=$DINKY_CONF/log4j2.xml  -Dspring.config.location=$DINKY_CONF/dinky-application.yaml,$DINKY_CONF/application.properties com.dlink.Dlink     > $log 2>&1 &
 
 echo $! > $pid
-tail -f /dev/null
+tail -f /opt/edp/${service.serviceName}/log/dinky-$HOSTNAME.out

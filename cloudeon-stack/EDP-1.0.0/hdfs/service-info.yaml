@@ -192,6 +192,15 @@ configurations:
     tag: "常用参数"
 
 
+  - name: dfs.datanode.data.dir
+    recommendExpression: /opt/edp/hdfs/data/datanode1
+    valueType: InputString
+    description: HDFS数据目录，多个目录使用","分割。子目录需datanode所在宿主机的/opt/edp/hdfs/data目录下。默认会在datanode初始化时自动创建，如果希望挂载数据盘，需要自行提前创建并设置目录权限为和容器内操作用户相同的uid。如容器内uid为1002，则需在宿主机上执行 chown -R  1002:1002 data/datanode1
+    confFile:  "hdfs-site.xml"
+    configurableInWizard: true
+    tag: "常用参数"
+
+
   - name: dfs.datanode.data.dir.perm
     recommendExpression: 755
     valueType: InputNumber

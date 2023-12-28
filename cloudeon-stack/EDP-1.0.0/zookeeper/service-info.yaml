@@ -145,6 +145,12 @@ configurations:
     confFile: "zoo.cfg"
     tag: "高级参数"
 
+  - name: electionPortBindRetry
+    recommendExpression: 0
+    valueType: InputNumber
+    confFile: "zoo.cfg"
+    description: "zooKeeper服务连接leader选举端口失败的重连次数。0代表不限制重连次数。"
+    tag: "高级参数"
 
   - name: 4lw.commands.whitelist
     recommendExpression: "*"
