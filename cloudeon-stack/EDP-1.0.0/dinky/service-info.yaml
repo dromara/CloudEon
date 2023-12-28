@@ -1,8 +1,8 @@
 name: DINKY
 label: "DINKY"
 description: "实时计算平台"
-version: 0.7.3
-dockerImage: "registry.cn-hangzhou.aliyuncs.com/udh/dinky:0.7.3"
+version: 0.7.5
+dockerImage: "registry.cn-hangzhou.aliyuncs.com/udh/dinky:0.7.5"
 dependencies:
   - "HDFS"
   - "YARN"
