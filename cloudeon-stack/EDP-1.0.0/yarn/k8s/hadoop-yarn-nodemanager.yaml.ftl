@@ -69,6 +69,8 @@ spec:
             valueFrom:
               resourceFieldRef:
                 resource: limits.memory
+          - name: HADOOP_CONF_DIR
+            value: /opt/edp/${service.serviceName}/conf
           - name: yarnHeapRam
             value: "${conf['yarn.nodemanager.heap.memory']}"
         securityContext:

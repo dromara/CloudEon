@@ -45,6 +45,8 @@ spec:
         env:
           - name: "SERVICE_NAME"
             value: "metastore"
+          - name: HADOOP_CONF_DIR
+            value: /opt/edp/${service.serviceName}/conf
           - name: "HIVE_CONF_DIR"
             value: "/opt/edp/${service.serviceName}/conf"
           - name: MEM_LIMIT

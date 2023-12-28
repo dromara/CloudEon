@@ -61,6 +61,8 @@ spec:
             memory: "${conf['hadop.yarn.tl.container.limit.memory']}Mi"
             cpu: "${conf['hadop.yarn.tl.container.limit.cpu']}"
         env:
+          - name: HADOOP_CONF_DIR
+            value: /opt/edp/${service.serviceName}/conf
           - name: MEM_LIMIT
             valueFrom:
               resourceFieldRef:
