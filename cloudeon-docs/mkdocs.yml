@@ -61,6 +61,7 @@ nav:
       - 安装部署/install_pre.md
       - 安装部署/docker.md
       - 安装部署/local.md
+      - 安装部署/minikube.md
   - quickstart.md
   - 支持组件:
       - 支持组件/supportservice.md
