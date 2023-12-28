@@ -83,6 +83,7 @@ nav:
       - 支持组件/IcebergOnK8s.md
       - 支持组件/TrinoOnK8s.md
       - 支持组件/SeatunnelOnK8s.md
+      - 支持组件/HueOnK8s.md
   - component_extension.md
   - 社区贡献:
       - 社区贡献/communicate.md
