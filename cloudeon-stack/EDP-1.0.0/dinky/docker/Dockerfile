@@ -7,7 +7,7 @@ WORKDIR /opt
 ARG FLINK_VERSION=1.15.4
 ARG FLINK_BIG_VERSION=1.15
 ARG SCALA_VERSION=2.12
-ARG DINKY_VERSION=0.7.3
+ARG DINKY_VERSION=0.7.5
 ARG HADOOP_VERSION=3.3.4
 
 RUN wget   https://github.com/DataLinkDC/dinky/releases/download/v${DINKY_VERSION}/dlink-release-${DINKY_VERSION}.tar.gz  &&  tar zxvf dlink-release-${DINKY_VERSION}.tar.gz -C /opt && rm -f dlink-release-${DINKY_VERSION}.tar.gz \

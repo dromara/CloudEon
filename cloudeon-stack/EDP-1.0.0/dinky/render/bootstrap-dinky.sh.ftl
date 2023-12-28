@@ -22,7 +22,7 @@ rm -rf plugins/flink1.14
 rm -rf plugins/flink1.16
 rm -rf plugins/flink1.17
 
-cp jar/dlink-app-$FLINK_BIG_VERSION-0.7.3-jar-with-dependencies.jar  dlink-app.jar
+cp jar/dlink-app-$FLINK_BIG_VERSION-$DINKY_VERSION-jar-with-dependencies.jar  dlink-app.jar
 hdfs dfs -mkdir -p  /dlink/jar/
 hdfs dfs -put dlink-app.jar /dlink/jar/
 rm -rf dlink-app.jar
