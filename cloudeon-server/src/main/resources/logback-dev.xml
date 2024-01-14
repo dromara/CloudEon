@@ -40,7 +40,12 @@
     <logger name="org.dromara.cloudeon.processor" level="INFO">
         <appender-ref ref="TASK-LOG"/>
     </logger>
-
+    <logger name="org.dromara.cloudeon.utils.LogOutputStream" level="INFO">
+        <appender-ref ref="TASK-LOG"/>
+    </logger>
+    <logger name="org.dromara.cloudeon.utils.K8sUtil" level="INFO">
+        <appender-ref ref="TASK-LOG"/>
+    </logger>
 
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>

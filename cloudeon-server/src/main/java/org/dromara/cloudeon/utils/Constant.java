@@ -31,6 +31,7 @@ public class Constant {
     public static final String DIR_ICON="icons";
     public static final String ICON_DEFAULT="default.png";
     public static final String ICON_DANGER="danger.png";
+    public static final String TASK_ID = "taskId";
 
     public static final String K8S_DIR = "k8s";
     public static final String SERVICE_RENDER_DIR = "service-render";
