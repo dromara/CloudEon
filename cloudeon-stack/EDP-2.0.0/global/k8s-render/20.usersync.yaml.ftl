@@ -75,7 +75,7 @@ data:
 
     basepath=$(cd `dirname $0`; pwd)
 
-    echo "执行user-sync模块"
+    echo "execute user-sync ..."
     if [ "$ENABLE_SUDO" != "" ];then
       # 设置不重置环境变量
       sed -i "s/env_reset/\!env_reset/g"  /etc/sudoers
