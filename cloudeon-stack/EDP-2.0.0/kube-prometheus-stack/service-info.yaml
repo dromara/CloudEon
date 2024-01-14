@@ -1,0 +1,125 @@
+name: KUBE_PROMETHEUS_STACK
+label: "KubePrometheusStack"
+description: "基于helm部署的kube-prometheus套件"
+version: 1.0.0
+
+dependencies:
+  - HELM_CONTROLLER
+
+supportKerberos: false
+
+dashboard:
+  uid: ""
+
+roles:
+  - name: KUBE_PROMETHEUS_STACK
+    label: "KUBE PROMETHEUS STACK HELM CHART"
+    roleFullName: "kube-prometheus-stack"
+    sortNum: 1
+    type: HELM_CHART
+    needOdd: false
+    fixedNum: 1
+  - name: PROMETHEUS
+    label: "PROMETHEUS"
+    roleFullName: "prometheus"
+    sortNum: 2
+    type: EMPTY
+    needOdd: false
+    minNum: 1
+    linkExpression: "http://${localhostname}:${conf['prometheus.service.nodePort']}"
+  - name: GRAFANA
+    label: "GRAFANA"
+    roleFullName: "grafana"
+    sortNum: 3
+    type: EMPTY
+    needOdd: false
+    minNum: 1
+    linkExpression: "http://${localhostname}:${conf['grafana.service.nodePort']}"
+  - name: ALERTMANAGER
+    label: "ALERTMANAGER"
+    roleFullName: "alertmanager"
+    sortNum: 4
+    type: EMPTY
+    needOdd: false
+    minNum: 1
+    linkExpression: "http://${localhostname}:${conf['alertmanager.service.nodePort']}"
+
+customConfigFiles:
+  - kube-prometheus-stack.conf
+
+configurations: 
+
+  - name: kube-prometheus.namespace
+    description: "kube-prometheus部署命名空间。当大数据组件监控方案类型为INTERNAL_HELM_KUBE_PROMETHEUS时有效(需提前创建)"
+    recommendExpression: "monitoring"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "k8s"
+
+  - name: kube-prometheus.helm.repo
+    description: "kube-prometheus部署所用的helm仓库。\n
+    网络允许推荐使用：https://prometheus-community.github.io/helm-charts\n
+    国内镜像可使用：https://charts.grapps.cn 、 https://helm-charts.itboon.top/prometheus-community\n
+    内网环境：需要使用私有helm仓库，如果没有的话可以用CloudEon自带的helm镜像仓库服务: http://CloudEonWeb地址/apiPre/charts/2\n
+      CloudEon自带的helm仓库服务只支持两个版本的kube-prometheus-stack:\n
+      当kubeVersion>=1.19.0-0 : 使用55.0.0\n
+      当kubeVersion>=1.16.0-0且<1.19.0-0 : 使用49.2.0\n
+      另外，内网环境下需要将镜像上传到私有镜像仓库，并在kube-prometheus-stack.conf添加配置项\n
+      如：global.imageRegistry 。具体参考对应版本的kube-prometheus-stack的values.yaml文件
+    "
+    recommendExpression: "https://helm-charts.itboon.top/prometheus-community"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "k8s"
+
+  - name: prometheus.service.type
+    recommendExpression: NodePort
+    valueType: InputString
+    confFile:  "kube-prometheus-stack.conf"
+    tag: "prometheus"
+
+  - name: prometheus.service.nodePort
+    recommendExpression: 30900
+    valueType: InputNumber
+    confFile:  "kube-prometheus-stack.conf"
+    configurableInWizard: true
+    tag: "prometheus"
+
+  - name: alertmanager.service.type
+    recommendExpression: NodePort
+    valueType: InputString
+    confFile:  "kube-prometheus-stack.conf"
+    tag: "alertmanager"
+
+  - name: alertmanager.service.nodePort
+    recommendExpression: 30903
+    valueType: InputNumber
+    confFile:  "kube-prometheus-stack.conf"
+    configurableInWizard: true
+    tag: "alertmanager"
+
+  - name: grafana.service.type
+    recommendExpression: NodePort
+    valueType: InputString
+    confFile:  "kube-prometheus-stack.conf"
+    tag: "grafana"
+
+  - name: grafana.service.nodePort
+    recommendExpression: 30902
+    valueType: InputNumber
+    confFile:  "kube-prometheus-stack.conf"
+    configurableInWizard: true
+    tag: "grafana"
+
+  - name: grafana.adminPassword
+    recommendExpression: cloudeon
+    valueType: InputString
+    confFile:  "kube-prometheus-stack.conf"
+    configurableInWizard: true
+    tag: "grafana"
+
+  - name: grafana.defaultDashboardsTimezone
+    recommendExpression: Asia/Shanghai
+    valueType: InputString
+    confFile:  "kube-prometheus-stack.conf"
+    tag: "grafana"
