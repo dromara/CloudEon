@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
  * 为角色实例删除k8s资源
  */
 @NoArgsConstructor
-public class StopRoleK8sDeploymentTask extends RoleK8sTask {
+public class RoleK8sDeleteTask extends RoleK8sTask {
     @Override
     public boolean isApplyTask() {
         return false;

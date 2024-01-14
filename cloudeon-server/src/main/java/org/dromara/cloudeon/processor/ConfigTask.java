@@ -19,6 +19,7 @@ package org.dromara.cloudeon.processor;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.io.resource.ResourceUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.json.JSONUtil;
 import com.google.common.collect.ImmutableMap;
@@ -35,8 +36,10 @@ import org.dromara.cloudeon.dao.*;
 import org.dromara.cloudeon.dto.RoleNodeInfo;
 import org.dromara.cloudeon.entity.*;
 import org.dromara.cloudeon.service.KubeService;
+import org.dromara.cloudeon.service.ServiceService;
 import org.dromara.cloudeon.utils.Constant;
 import org.dromara.cloudeon.utils.FreemarkerUtil;
+import org.dromara.cloudeon.utils.K8sUtil;
 import org.springframework.core.env.Environment;
 
 import java.io.File;
@@ -51,6 +54,8 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public abstract class ConfigTask extends BaseCloudeonTask implements ApplyOrDeleteTask {
 
+    private ServiceService serviceService = SpringUtil.getBean(ServiceService.class);
+    private ClusterInfoRepository clusterInfoRepository = SpringUtil.getBean(ClusterInfoRepository.class);
     private StackServiceRepository stackServiceRepository = SpringUtil.getBean(StackServiceRepository.class);
     private ServiceInstanceRepository serviceInstanceRepository = SpringUtil.getBean(ServiceInstanceRepository.class);
     private ClusterNodeRepository clusterNodeRepository = SpringUtil.getBean(ClusterNodeRepository.class);
@@ -77,14 +82,14 @@ public abstract class ConfigTask extends BaseCloudeonTask implements ApplyOrDele
         }
 
         String stackCode = stackServiceEntity.getStackCode();
-        String stackServiceName = stackServiceEntity.getName().toLowerCase();
+        String stackServiceName = K8sUtil.formatK8sNameStr(stackServiceEntity.getName());
 
         KubeService kubeService = SpringUtil.getBean(KubeService.class);
         KubernetesClient client = kubeService.getKubeClient(serviceInstanceEntity.getClusterId());
 
         Map<String, Object> dataModel = getDataModel(serviceInstanceId);
         Map<String, String> labels = Maps.newHashMap();
-        labels.put("name", stackServiceEntity.getName().toLowerCase());
+        labels.put("name", K8sUtil.formatK8sNameStr(stackServiceEntity.getName()));
 
         // 设置加载的目录
         String serviceBaseDir = cloudeonConfigProp.getStackLoadPath() + File.separator + stackCode + File.separator + stackServiceName;
@@ -183,10 +188,9 @@ public abstract class ConfigTask extends BaseCloudeonTask implements ApplyOrDele
         } else {
             log.info("k8sRender目录为空");
         }
-
-        if (Boolean.parseBoolean(globalConfigMap.get("global.kube-prometheus.enable"))) {
-            // 加载kube-prometheus-render目录
-            // 目录下的每一个文件都将视为k8s模板文件进行渲染后操作
+        // 加载kube-prometheus-render目录
+        // 目录下的每一个文件都将视为k8s模板文件进行渲染后操作
+        if (!"NONE".equals(globalConfigMap.get("global.monitor.type"))) {
             String kubePrometheusRenderDir = serviceBaseDir + File.separator + Constant.KUBE_PROMETHEUS_RENDER_DIR;
             File kubePrometheusRenderDirFile = new File(kubePrometheusRenderDir);
             if (!FileUtil.isEmpty(kubePrometheusRenderDirFile)) {
@@ -225,11 +229,16 @@ public abstract class ConfigTask extends BaseCloudeonTask implements ApplyOrDele
 
         // 查询服务实例所有配置项,包括全局
         List<ServiceInstanceConfigEntity> allConfigEntityList = configRepository.findByServiceInstanceId(serviceInstanceId);
+        if ("HELM_CONTROLLER".equalsIgnoreCase(stackServiceEntity.getName())) {
+            String kubeConfig = clusterInfoRepository.findById(serviceInstanceEntity.getClusterId()).get().getKubeConfig();
+            dataModel.put("super", MapUtil.of("kube_config", kubeConfig));
+        }
         if (!"GLOBAL".equalsIgnoreCase(stackServiceEntity.getName())) {
             Integer globalServiceInstanceId = serviceInstanceRepository.findByClusterIdAndStackServiceName(serviceInstanceEntity.getClusterId(), "GLOBAL");
             allConfigEntityList.addAll(configRepository.findByServiceInstanceId(globalServiceInstanceId));
         }
-        dataModel.put("serviceFullName", serviceInstanceEntity.getServiceName().toLowerCase());
+        dataModel.put("namespace", serviceService.getNamespace(serviceInstanceEntity));
+        dataModel.put("serviceFullName", K8sUtil.formatK8sNameStr(serviceInstanceEntity.getServiceName()));
         dataModel.put("service", serviceInstanceEntity);
         dataModel.put("conf", allConfigEntityList.stream().collect(Collectors.toMap(ServiceInstanceConfigEntity::getName, ServiceInstanceConfigEntity::getValue)));
         dataModel.put("serviceRoles", getServiceRoles(roleInstanceEntities, clusterNodeRepository));
