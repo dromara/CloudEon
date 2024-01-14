@@ -29,7 +29,6 @@ public enum TaskGroupType {
     CONFIG_SERVICE(3, "配置服务", Lists.newArrayList(TaskType.APPLY_ROLE_CONFIGMAP), false),
     TAG_AND_START_K8S_SERVICE(4, "添加标签并启动k8s服务", Lists.newArrayList(TaskType.TAG_HOST, TaskType.START_K8S_SERVICE), true),
     CANCEL_TAG_AND_STOP_K8S_SERVICE(7, "移除标签并停止k8s服务", Lists.newArrayList(TaskType.CANCEL_TAG_HOST, TaskType.STOP_K8S_SERVICE), true),
-    REGISTER_MONITOR(9, "注册监控到Monitor服务", Lists.newArrayList(TaskType.REGISTER_PROMETHEUS), false),
     DELETE_SERVICE(10, "删除服务", Lists.newArrayList(TaskType.DELETE_ROLE_CONFIGMAP), true),
     DELETE_DB_DATA(11, "删除db中服务相关数据", Lists.newArrayList(TaskType.DELETE_SERVICE_DB_DATA), false),
     STOP_ROLE(12, "停止服务的角色实例", Lists.newArrayList(TaskType.CANCEL_TAG_HOST,TaskType.STOP_ROLE_POD,TaskType.SCALE_DOWN_K8S_SERVICE), true),
