@@ -9,7 +9,7 @@ dependencies:
 supportKerberos: false
 
 dashboard:
-  uid: "flink001"
+  uid: ""
 
 roles:
 
@@ -17,7 +17,7 @@ roles:
     label: "Flink History Server"
     roleFullName: "flink-historyserver"
     sortNum: 1
-    type: MASTER
+    type: DEPLOYMENT
     fixedNum: 1
     linkExpression: "http://${localhostname}:${conf['flink.history.ui.port']}"
 

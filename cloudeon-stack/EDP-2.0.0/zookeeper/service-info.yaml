@@ -17,7 +17,7 @@ roles:
     roleFullName: "zookeeper-server"
     linkExpression: ""
     sortNum: 1
-    type: MASTER
+    type: DEPLOYMENT
 
     needOdd: true
     minNum: 3

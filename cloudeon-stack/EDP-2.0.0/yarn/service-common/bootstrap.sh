@@ -29,3 +29,15 @@ tail -F /workspace/logs/* &
 
 echo "---------------------------------------------开始----------------------------------------------"
 tail -f /dev/null
+
+# 功能测试，不会自动执行
+yarn jar $HADOOP_HOME/share/hadoop/mapreduce/hadoop-mapreduce-examples-*.jar  pi 16 10000
+
+hadoop fs -mkdir /tmp
+hadoop fs -put README.txt  /tmp/
+hadoop fs -rm -r /tmp/output
+yarn jar $HADOOP_HOME/share/hadoop/mapreduce/hadoop-mapreduce-examples-*.jar  wordcount /tmp/README.txt /tmp/output
+hadoop fs -ls /tmp/output
+hadoop fs -cat /tmp/output/part-r-00000
+hadoop fs -rm -r /tmp/output
+hadoop fs -rm -r /tmp/README.txt

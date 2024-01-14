@@ -43,3 +43,10 @@ tail -F /workspace/logs/* &
 
 echo "---------------------------------------------开始----------------------------------------------"
 tail -f /dev/null
+
+# 功能测试，不会自动执行
+hadoop fs -ls /
+hadoop fs -mkdir /tmp
+hadoop fs -put -f $HADOOP_HOME/README.txt /tmp
+hadoop fs -cat /tmp/README.txt
+hadoop fs -rm /tmp/README.txt

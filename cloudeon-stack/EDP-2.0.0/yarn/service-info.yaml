@@ -17,7 +17,7 @@ roles:
     roleFullName: hadoop-yarn-resourcemanager
     linkExpression: "http://${localhostname}:${conf['resourcemanager.webapp.port']}/?user.name=yarn"
     sortNum: 1
-    type: MASTER
+    type: DEPLOYMENT
 
     minNum: 1
 
@@ -26,7 +26,7 @@ roles:
     roleFullName: "hadoop-yarn-nodemanager"
     linkExpression: "http://${localhostname}:${conf['nodemanager.webapp.port']}/node/allApplications/?user.name=yarn"
     sortNum: 2
-    type: SLAVE
+    type: DEPLOYMENT
 
     minNum: 1
 
@@ -35,7 +35,7 @@ roles:
     roleFullName: hadoop-yarn-historyserver
     linkExpression: "http://${localhostname}:${conf['historyserver.http-port']}"
     sortNum: 3
-    type: MASTER
+    type: DEPLOYMENT
 
     minNum: 1
 
@@ -44,7 +44,7 @@ roles:
     roleFullName: hadoop-yarn-timelineserver
     linkExpression: "http://${localhostname}:${conf['timelineserver.http.port']}"
     sortNum: 4
-    type: MASTER
+    type: DEPLOYMENT
 
     minNum: 1
 

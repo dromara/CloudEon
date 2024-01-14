@@ -20,7 +20,7 @@ tail -F /workspace/logs/* &
 echo "---------------------------------------------开始----------------------------------------------"
 tail -f /dev/null
 
-
+# 功能测试，不会自动执行
 export HADOOP_CLASSPATH=`hadoop classpath`
 flink run-application -t yarn-application \
 ${FLINK_HOME}/examples/batch/WordCount.jar
