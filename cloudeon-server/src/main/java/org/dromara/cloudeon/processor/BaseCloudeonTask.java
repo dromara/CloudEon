@@ -125,11 +125,4 @@ public abstract class BaseCloudeonTask implements Runnable {
     abstract public void internalExecute();
 
 
-    private void doSleep(int ms) {
-        try {
-            Thread.sleep(ms);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
 }
