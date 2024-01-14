@@ -23,7 +23,7 @@ roles:
     roleFullName: "hadoop-hdfs-journalnode"
     linkExpression: "http://${localhostname}:${conf['journalnode.http-port']}/?user.name=hdfs"
     sortNum: 1
-    type: MASTER
+    type: DEPLOYMENT
 
     needOdd: true
     minNum: 3
@@ -33,7 +33,7 @@ roles:
     roleFullName: "hadoop-hdfs-namenode"
     linkExpression: "http://${localhostname}:${conf['namenode.http-port']}/?user.name=hdfs"
     sortNum: 2
-    type: MASTER
+    type: DEPLOYMENT
 
     fixedNum: 2
 
@@ -42,7 +42,7 @@ roles:
     roleFullName: hadoop-hdfs-datanode
     linkExpression: "http://${localhostname}:${conf['datanode.http-port']}/?user.name=hdfs"
     sortNum: 3
-    type: SLAVE
+    type: DEPLOYMENT
 
     minNum: 3
 
@@ -51,7 +51,7 @@ roles:
     roleFullName: hadoop-hdfs-httpfs
     linkExpression: "http://${localhostname}:${conf['httpfs.http-port']}/webhdfs/v1?op=gethomedirectory&user.name=hive"
     sortNum: 4
-    type: SLAVE
+    type: DEPLOYMENT
 
     minNum: 1
 

@@ -10,42 +10,36 @@ supportKerberos: false
 dashboard:
   uid: global001
 
-roles:
-  - name: CONFIG
-    label: "CONFIG"
-    roleFullName: "config"
-    linkExpression: ""
-    sortNum: 1
-    type: EMPTY
-
-    needOdd: true
-    fixedNum: 1
-
+roles: []
 
 customConfigFiles: []
 
-
 configurations:
+
+  - name: global.monitor.type
+    description: "大数据组件监控方案类型。支持： 
+    1.CloudEon管理的基于helm部署的kube-prometheus-stack（需部署kube-prometheus-stack组件） 
+    2.外部部署的kube-prometheus (需填写global.kube-prometheus.external.grafana.url)
+    3.不启用"
+    recommendExpression: "INTERNAL_HELM_KUBE_PROMETHEUS"
+    valueType: Select
+    options: ["INTERNAL_HELM_KUBE_PROMETHEUS","EXTERNAL_KUBE_PROMETHEUS","NONE"]
+    configurableInWizard: true
+    tag: "监控"
+
+  - name: global.kube-prometheus.external.grafana.url
+    description: "外部grafana地址。当大数据组件监控方案类型为EXTERNAL_KUBE_PROMETHEUS时有效"
+    recommendExpression: "http://localhost:30902"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "监控"
+
   - name: global.persistence.basePath
     description: "全局持久化存储路径，是各组件在各节点上的存储根目录"
     recommendExpression: /data/edp
     valueType: InputString
     configurableInWizard: true
-    tag: "global"
-
-  - name: global.kube-prometheus.enable
-    description: "是否启用外部kube-prometheus支持"
-    recommendExpression: false
-    valueType: Switch
-    configurableInWizard: true
-    tag: "kube-prometheus"
-
-  - name: global.kube-prometheus.grafana.url
-    description: "外部grafana地址"
-    recommendExpression: "http://localhost:30902"
-    valueType: InputString
-    configurableInWizard: true
-    tag: "kube-prometheus"
+    tag: "通用"
 
   - name: global.imagePullPolicy
     description: "镜像拉取策略"
@@ -53,26 +47,11 @@ configurations:
     valueType: Select
     options: ["IfNotPresent","Always","Never"]
     configurableInWizard: true
-    tag: "global"
+    tag: "通用"
 
   - name: global.user.list
     description: "自定义用户列表,对不存在的用户名或组名将自动创建,格式为:[用户名a,组名a;用户名b,组名b]"
     recommendExpression: "user001,group001;user002,group002"
     valueType: InputString
     configurableInWizard: true
-    tag: "global"
-
-  - name: alert.node.disk.thresholdValue
-    description: "磁盘使用率告警阈值"
-    recommendExpression: 80.0
-    valueType: InputNumber
-    configurableInWizard: true
-    tag: "告警"
-
-  - name: alert.node.memory.thresholdValue
-    description: "内存使用率告警阈值"
-    recommendExpression: 80.0
-    valueType: InputNumber
-    configurableInWizard: true
-    tag: "告警"
-
+    tag: "通用"

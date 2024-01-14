@@ -16,29 +16,39 @@
  */
 package org.dromara.cloudeon.utils;
 
+import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.StrUtil;
+import io.fabric8.kubernetes.api.model.HasMetadata;
+import io.fabric8.kubernetes.api.model.LabelSelector;
+import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.api.model.PodList;
+import io.fabric8.kubernetes.api.model.apps.Deployment;
+import io.fabric8.kubernetes.api.model.apps.DeploymentStatus;
 import io.fabric8.kubernetes.api.model.batch.v1.Job;
+import io.fabric8.kubernetes.api.model.batch.v1.JobBuilder;
+import io.fabric8.kubernetes.api.model.batch.v1.JobSpec;
 import io.fabric8.kubernetes.api.model.batch.v1.JobStatus;
 import io.fabric8.kubernetes.client.*;
-import io.fabric8.kubernetes.client.dsl.FilterWatchListDeletable;
 import io.fabric8.kubernetes.client.dsl.LogWatch;
-import io.fabric8.kubernetes.client.dsl.PodResource;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.compress.utils.Lists;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
+import org.dromara.cloudeon.crd.helmchart.HelmChart;
+import org.dromara.cloudeon.processor.TaskParam;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@Slf4j
 public class K8sUtil {
     private static DateTimeFormatter chineseDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static ZoneId beijingZoneId = ZoneId.of("Asia/Shanghai");
@@ -53,6 +63,9 @@ public class K8sUtil {
         return getKubernetesClient(kubeConfig, null);
     }
 
+    public static String formatK8sNameStr(String nameStr) {
+        return nameStr.toLowerCase().replace("_", "-");
+    }
 
     public static String formatK8sDateStr(String dataStr) {
         if (StringUtils.isBlank(dataStr)) {
@@ -63,93 +76,223 @@ public class K8sUtil {
         return chineseDateTimeFormatter.format(beijingTime);
     }
 
-    public static int waitForJobCompleted(String namespace, String jobName, KubernetesClient client, Logger logger, long waitSeconds) {
+    @Slf4j
+    public static class DeploymentReadyWatcher implements Watcher<Deployment> {
+        private final CountDownLatch completionLatch;
+        private final TaskParam taskParam;
+
+        public DeploymentReadyWatcher(TaskParam taskParam, CountDownLatch completionLatch) {
+            super();
+            this.taskParam = taskParam;
+            this.completionLatch = completionLatch;
+        }
+
+        @Override
+        public void eventReceived(Action action, Deployment deployment) {
+            DeploymentStatus status = deployment.getStatus();
+            if (status == null) {
+                return;
+            }
+            boolean deploymentReady = deployment.getStatus().getReadyReplicas() != null
+                    && Objects.equals(deployment.getStatus().getReadyReplicas(), deployment.getStatus().getReplicas());
+            if (deploymentReady) {
+                completionLatch.countDown();
+            }
+        }
+
+        @Override
+        public void onClose() {
+            LogUtil.logWithTaskId(taskParam, () -> log.info("DeploymentReadyWatcher closed"));
+        }
+
+        @Override
+        public void onClose(WatcherException cause) {
+            LogUtil.logWithTaskId(taskParam, () -> {
+                log.info("DeploymentReadyWatcher closed with exception: " + cause.getMessage());
+                log.error(cause.getMessage(), cause);
+            });
+        }
+    }
+
+    @Slf4j
+    public static class JobCompleteWatcher implements Watcher<Job> {
+        private final TaskParam taskParam;
+        private final CountDownLatch completionLatch;
+        private final AtomicBoolean isJobEndSuccess;
+        private final AtomicInteger retryCount;
+
+        public JobCompleteWatcher(TaskParam taskParam, CountDownLatch completionLatch, AtomicBoolean isJobEndSuccess, AtomicInteger retryCount) {
+            super();
+            this.taskParam = taskParam;
+            this.completionLatch = completionLatch;
+            this.isJobEndSuccess = isJobEndSuccess;
+            this.retryCount = retryCount;
+        }
+
+        @Override
+        public void eventReceived(Action action, Job job) {
+            if (action != Action.MODIFIED) {
+                return;
+            }
+            JobStatus status = job.getStatus();
+            if (status == null || status.getConditions().isEmpty()) {
+                return;
+            }
+            isJobEndSuccess.set("Complete".equalsIgnoreCase(status.getConditions().get(0).getType()));
+            if (status.getFailed() != null) {
+                retryCount.set(status.getFailed());
+            }
+            completionLatch.countDown();
+        }
+
+        @Override
+        public void onClose() {
+            doClose();
+        }
+
+        @Override
+        public void onClose(WatcherException cause) {
+            LogUtil.logWithTaskId(taskParam, () -> {
+                log.info("Watcher closed with exception: " + cause.getMessage());
+                log.error(cause.getMessage(), cause);
+            });
+            doClose();
+        }
+
+        private void doClose() {
+            LogUtil.logWithTaskId(taskParam, () -> {
+                log.info("Watcher closed");
+            });
+        }
+    }
+
+    @Slf4j
+    public static class PodLogWatcher implements Watcher<Pod> {
+
+        private final TaskParam taskParam;
+        private final KubernetesClient client;
+        private List<LogWatch> logWatchelist = Lists.newArrayList();
+
+        public PodLogWatcher(TaskParam taskParam, KubernetesClient client) {
+            super();
+            this.taskParam = taskParam;
+            this.client = client;
+        }
+
+        @Override
+        public void eventReceived(Action action, Pod pod) {
+            if (action == Action.ADDED) {
+                String podName = pod.getMetadata().getName();
+                LogWatch logWatch = client.pods()
+                        .inNamespace(pod.getMetadata().getNamespace())
+                        .withName(podName)
+                        .watchLog(new LogOutputStream(taskParam,
+                                s -> "Log of pod " + podName + "> " + s));
+                logWatchelist.add(logWatch);
+            }
+        }
+
+        private void doClose() {
+            logWatchelist.forEach(IoUtil::close);
+            logWatchelist.clear();
+            LogUtil.logWithTaskId(taskParam, () -> log.info("PodLogWatcher closed"));
+        }
+
+        @Override
+        public void onClose() {
+            doClose();
+        }
+
+        @Override
+        public void onClose(WatcherException e) {
+            LogUtil.logWithTaskId(taskParam, () -> log.error(e.getMessage(), e));
+            doClose();
+        }
+    }
+
+    public static String getNamespace(KubernetesClient client, HasMetadata resource) {
+        if (StringUtils.isNotEmpty(resource.getMetadata().getNamespace())) {
+            return resource.getMetadata().getNamespace();
+        }
+        if (StringUtils.isNotEmpty(client.getNamespace())) {
+            return client.getNamespace();
+        }
+        return "default";
+    }
+
+    public static void waitForDeploymentReady(ResourceAction resourceAction, TaskParam taskParam, KubernetesClient client, Deployment deployment, long waitSeconds) {
+        CountDownLatch completionLatch = new CountDownLatch(1);
+        try (Watch ignored = client.apps().deployments().resource(deployment)
+                .watch(new DeploymentReadyWatcher(taskParam, completionLatch));
+             Watch ignored1 = client.pods().inNamespace(getNamespace(client, deployment)).withLabelSelector(deployment.getSpec().getSelector()).watch(new PodLogWatcher(taskParam, client))
+        ) {
+            resourceAction.action();
+            log.info("Waiting for deployment to be ready ...");
+            try {
+                if (!completionLatch.await(waitSeconds, TimeUnit.SECONDS)) {
+                    log.error("Deployment is not ready within {} seconds", waitSeconds);
+                    throw new RuntimeException("Deployment is not ready within " + waitSeconds + " seconds");
+                }
+            } catch (InterruptedException e) {
+                log.error(e.getMessage(), e);
+            }
+        }
+        log.info("Deployment is ready");
+    }
+
+    public static Job getInstallJobByHelmChart(KubernetesClient client, HelmChart helmChart) {
+        return getJobByHelmChart(client, helmChart, "install");
+    }
+
+    public static Job getDeleteJobByHelmChart(KubernetesClient client, HelmChart helmChart) {
+        return getJobByHelmChart(client, helmChart, "delete");
+    }
+
+    private static Job getJobByHelmChart(KubernetesClient client, HelmChart helmChart, String type) {
+        ObjectMeta jobMeta = new ObjectMeta();
+        jobMeta.setNamespace(K8sUtil.getNamespace(client, helmChart));
+        jobMeta.setName(StrUtil.format("helm-{}-{}", type, helmChart.getMetadata().getName()));
+        return new JobBuilder().withMetadata(jobMeta).build();
+    }
+
+    public static int waitForJobCompleted(ResourceAction resourceAction, TaskParam taskParam, KubernetesClient client, Job job, long waitSeconds) {
         CountDownLatch jobCompletionLatch = new CountDownLatch(1);
 
         AtomicBoolean isJobEndSuccess = new AtomicBoolean(false);
         AtomicInteger retryCount = new AtomicInteger(0);
-        Watcher<Job> watcher = new Watcher<Job>() {
-            @Override
-            public void eventReceived(Action action, Job job) {
-                if (action != Action.MODIFIED) {
-                    return;
-                }
-                JobStatus status = job.getStatus();
-                if (status == null || status.getConditions().isEmpty()) {
-                    return;
-                }
-                isJobEndSuccess.set("Complete".equalsIgnoreCase(status.getConditions().get(0).getType()));
-                if (status.getFailed() != null) {
-                    retryCount.set(status.getFailed());
-                }
-                jobCompletionLatch.countDown();
-            }
-
-            @Override
-            public void onClose(WatcherException cause) {
-                logger.info("Watcher closed");
-                if (cause != null) {
-                    logger.error(cause.getMessage(), cause);
-                }
-            }
-        };
-
-        Watch watch = client.batch().v1().jobs()
-                .inNamespace(namespace)
-                .withName(jobName)
-                .watch(watcher);
-
-        FilterWatchListDeletable<Pod, PodList, PodResource> podListWatch = client.pods().inNamespace(namespace).withLabel("job-name", jobName);
-        Watch podListLogWatch = podListWatch.watch(new Watcher<Pod>() {
-            @Override
-            public void eventReceived(Action action, Pod pod) {
-                if (action.equals(Action.ADDED)) {
-                    String podName = pod.getMetadata().getName();
-                    try (LogWatch logWatch = client.pods()
-                            .inNamespace(namespace)
-                            .withName(podName)
-                            .watchLog();
-                         BufferedReader reader = new BufferedReader(new InputStreamReader(logWatch.getOutput()))
-                    ) {
-                        String line = reader.readLine();
-                        while (line != null) {
-                            logger.info("Log of pod " + podName + "> " + line);
-                            line = reader.readLine();
-                        }
-                    } catch (IOException e) {
-                        logger.error(e.getMessage(), e);
-                    }
-                }
-            }
-
-            @Override
-            public void onClose() {
-                Watcher.super.onClose();
-            }
-
-            @Override
-            public void onClose(WatcherException e) {
-                logger.error(e.getMessage(), e);
-            }
-        });
-        logger.info("Waiting  for job to complete...");
-        try {
-            if (!jobCompletionLatch.await(waitSeconds, TimeUnit.SECONDS)) {
-                logger.error("Job is not completed within {} seconds", waitSeconds);
-                throw new RuntimeException("Job is not completed within " + waitSeconds + " seconds");
-            }
-        } catch (InterruptedException e) {
-            logger.error(e.getMessage(), e);
+        if (job.getSpec() == null || job.getSpec().getSelector() == null || job.getSpec().getSelector().getMatchLabels().isEmpty()) {
+            LabelSelector labelSelector = new LabelSelector();
+            labelSelector.setMatchLabels(MapUtil.of("job-name", job.getMetadata().getName()));
+            JobSpec jobSpec = new JobSpec();
+            jobSpec.setSelector(labelSelector);
+            job.setSpec(jobSpec);
         }
-        watch.close();
-        podListLogWatch.close();
-
+        try (Watch ignored = client.batch().v1().jobs()
+                .resource(job)
+                .watch(new JobCompleteWatcher(taskParam, jobCompletionLatch, isJobEndSuccess, retryCount));
+             Watch ignored1 = client.pods().inNamespace(getNamespace(client, job)).withLabelSelector(job.getSpec().getSelector()).watch(new PodLogWatcher(taskParam, client))
+        ) {
+            resourceAction.action();
+            log.info("Waiting  for job to complete...");
+            try {
+                if (!jobCompletionLatch.await(waitSeconds, TimeUnit.SECONDS)) {
+                    log.error("Job is not completed within {} seconds", waitSeconds);
+                    throw new RuntimeException("Job is not completed within " + waitSeconds + " seconds");
+                }
+            } catch (InterruptedException e) {
+                log.error(e.getMessage(), e);
+            }
+        }
         boolean flag = isJobEndSuccess.get();
-        logger.info("Job completed with success status: " + flag);
+        log.info("Job completed with success status: " + flag);
         if (!flag) {
             throw new RuntimeException("Job failed,retryCount: " + retryCount.get());
         }
         return retryCount.get();
     }
 
+
+    public interface ResourceAction {
+        void action();
+    }
 }

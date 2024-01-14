@@ -19,7 +19,7 @@ package org.dromara.cloudeon.controller;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.lang.Dict;
-import cn.hutool.core.thread.ThreadUtil;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
@@ -44,6 +44,7 @@ import org.dromara.cloudeon.enums.*;
 import org.dromara.cloudeon.processor.TaskParam;
 import org.dromara.cloudeon.service.CommandHandler;
 import org.dromara.cloudeon.service.KubeService;
+import org.dromara.cloudeon.service.ServiceService;
 import org.dromara.cloudeon.utils.DAG;
 import org.dromara.cloudeon.utils.K8sUtil;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,13 +57,13 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static org.dromara.cloudeon.utils.Constant.*;
+import static org.dromara.cloudeon.utils.Constant.AdminUserId;
+import static org.dromara.cloudeon.utils.Constant.VERTX_COMMAND_ADDRESS;
 
 /**
  * 集群服务相关接口
@@ -72,8 +73,8 @@ import static org.dromara.cloudeon.utils.Constant.*;
 @Slf4j
 public class ClusterServiceController {
 
-    ExecutorService flowSchedulerThreadPool = ThreadUtil.newExecutor(5, 10, 1024);
-
+    @Resource
+    private ServiceService serviceService;
     @Resource
     private CloudeonConfigProp cloudeonConfigProp;
 
@@ -866,34 +867,43 @@ public class ClusterServiceController {
         ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(serviceInstanceId).get();
         StackServiceEntity stackServiceEntity = stackServiceRepository.findById(serviceInstanceEntity.getStackServiceId()).get();
 
-
         // 通过服务框架的dashboard和Grafana地址拼接完整url
         String dashboardUid = stackServiceEntity.getDashboardUid();
+        if (StringUtils.isBlank(dashboardUid)) {
+            return ResultDTO.success("该组件未配置监控面板");
+        }
         Integer globalServiceInstanceId = serviceInstanceRepository.findByClusterIdAndStackServiceName(serviceInstanceEntity.getClusterId(), "GLOBAL");
         List<ServiceInstanceConfigEntity> globalConfigEntityList = serviceInstanceConfigRepository.findByServiceInstanceId(globalServiceInstanceId);
         Map<String, String> globalConfigMap = globalConfigEntityList.stream().collect(Collectors.toMap(ServiceInstanceConfigEntity::getName, ServiceInstanceConfigEntity::getValue));
 
-        String grafanaUrl = globalConfigMap.get("global.kube-prometheus.grafana.url");
-
-        if (Boolean.parseBoolean(globalConfigMap.get("global.kube-prometheus.enable")) && StringUtils.isNotBlank(grafanaUrl)) {
-            String url = String.format("%s/d/%s/?theme=light&orgId=1&from=now-5m&to=now&kiosk=tv", grafanaUrl, dashboardUid);
-            return ResultDTO.success(url);
+        String baseGrafanaUrl;
+        switch (globalConfigMap.get("global.monitor.type")) {
+            case "NONE":
+                return ResultDTO.success("请先安装启用/接入kube-prometheus服务");
+            case "EXTERNAL_KUBE_PROMETHEUS":
+                baseGrafanaUrl = globalConfigMap.get("global.kube-prometheus.external.grafana.url");
+                break;
+            case "INTERNAL_HELM_KUBE_PROMETHEUS":
+                String grafanaNodePort = serviceService
+                        .getConfigMaps(serviceInstanceEntity.getClusterId(), "KUBE_PROMETHEUS_STACK")
+                        .get("grafana.service.nodePort");
+                String grafanaHost = RandomUtil.randomEle(clusterNodeRepository.findAll()).getIp();
+                baseGrafanaUrl = StrUtil.format("http://{}:{}", grafanaHost, grafanaNodePort);
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + globalConfigMap.get("global.monitor.type"));
         }
+        Map<String, String> grafanaDashboardParams = new HashMap<>();
+        grafanaDashboardParams.put("var-namespace", serviceService.getNamespace(serviceInstanceEntity));
+        grafanaDashboardParams.put("orgId", "1");
+        grafanaDashboardParams.put("from", "now-5m");
+        grafanaDashboardParams.put("to", "now");
+        grafanaDashboardParams.put("kiosk", "tv");
 
-        // 如果没安装monitor服务，则提示请先安装
-        ServiceInstanceEntity monitorServiceInstance = serviceInstanceRepository.findEntityByClusterIdAndStackServiceName(serviceInstanceEntity.getClusterId(), MONITOR_SERVICE_NAME);
-        if (monitorServiceInstance == null) {
-            return ResultDTO.success("请先安装Monitor服务");
-        }
-        Integer monitorServiceInstanceId = monitorServiceInstance.getId();
-        String grafanaHttpPort = serviceInstanceConfigRepository.findByServiceInstanceIdAndName(monitorServiceInstanceId, "grafana.http.port").getValue();
-        ServiceRoleInstanceEntity grafana = roleInstanceRepository.findByServiceInstanceIdAndServiceRoleName(monitorServiceInstanceId, MONITOR_ROLE_GRAFANA).get(0);
-        Integer grafanaNodeId = grafana.getNodeId();
-        ClusterNodeEntity grafanaNodeEntity = clusterNodeRepository.findById(grafanaNodeId).get();
-//        http://fl001:3000/d/eea-9_siks/?theme=light&orgId=1&kiosk
-        String url = String.format("http://%s:%s/d/%s/?theme=light&orgId=1&from=now-5m&to=now&kiosk=tv", grafanaNodeEntity.getIp(), grafanaHttpPort, dashboardUid);
+        String paramStr = grafanaDashboardParams.entrySet().stream().map(e -> e.getKey() + "=" + e.getValue()).collect(Collectors.joining("&"));
+        String grafanaUrl = StrUtil.format("{}/d/{}/?{}", baseGrafanaUrl, dashboardUid, paramStr);
+        return ResultDTO.success(grafanaUrl);
 
-        return ResultDTO.success(url);
     }
 
     /**

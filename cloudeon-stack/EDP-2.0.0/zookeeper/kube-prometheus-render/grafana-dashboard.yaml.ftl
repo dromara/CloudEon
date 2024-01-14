@@ -125,7 +125,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "znode_count{instance=~\"$instance\",job=~\"$job\"}",
+              "expr": "znode_count{instance=~\"$instance\",namespace=~\"$namespace\"}",
               "format": "time_series",
               "instant": false,
               "interval": "",
@@ -134,7 +134,7 @@ data:
               "refId": "A"
             },
             {
-              "expr": "ephemerals_count{instance=~\"$instance\",job=~\"$job\"}",
+              "expr": "ephemerals_count{instance=~\"$instance\",namespace=~\"$namespace\"}",
               "format": "time_series",
               "instant": false,
               "interval": "",
@@ -226,7 +226,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "rate(znode_count{instance=~\"$instance\",job=~\"$job\"}[5m])",
+              "expr": "rate(znode_count{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
               "format": "time_series",
               "instant": false,
               "interval": "",
@@ -235,7 +235,7 @@ data:
               "refId": "A"
             },
             {
-              "expr": "rate(ephemerals_count{instance=~\"$instance\",job=~\"$job\"}[5m])",
+              "expr": "rate(ephemerals_count{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
               "format": "time_series",
               "instant": false,
               "interval": "",
@@ -329,7 +329,7 @@ data:
           "pluginVersion": "6.2.2",
           "targets": [
             {
-              "expr": "global_sessions{instance=~\"$instance\",job=~\"$job\"}",
+              "expr": "global_sessions{instance=~\"$instance\",namespace=~\"$namespace\"}",
               "format": "time_series",
               "instant": false,
               "intervalFactor": 2,
@@ -385,7 +385,7 @@ data:
           "pluginVersion": "6.2.2",
           "targets": [
             {
-              "expr": "local_sessions{instance=~\"$instance\",job=~\"$job\"}",
+              "expr": "local_sessions{instance=~\"$instance\",namespace=~\"$namespace\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}}",
@@ -435,7 +435,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "write_per_namespace_sum{instance=~\"$instance\",job=~\"$job\"}",
+              "expr": "write_per_namespace_sum{instance=~\"$instance\",namespace=~\"$namespace\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} write_per_namespace:{{key}}",
@@ -521,7 +521,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "read_per_namespace_sum{instance=~\"$instance\",job=~\"$job\"}",
+              "expr": "read_per_namespace_sum{instance=~\"$instance\",namespace=~\"$namespace\"}",
               "format": "time_series",
               "hide": false,
               "intervalFactor": 2,
@@ -608,7 +608,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "approximate_data_size{instance=~\"$instance\",job=~\"$job\"}",
+              "expr": "approximate_data_size{instance=~\"$instance\",namespace=~\"$namespace\"}",
               "format": "time_series",
               "intervalFactor": 1,
               "legendFormat": "{{instance}} approximate_data_size",
@@ -694,7 +694,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "packets_received{instance=~\"$instance\",job=~\"$job\"}",
+              "expr": "packets_received{instance=~\"$instance\",namespace=~\"$namespace\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} packets_received",
@@ -780,7 +780,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "packets_sent{instance=~\"$instance\",job=~\"$job\"}",
+              "expr": "packets_sent{instance=~\"$instance\",namespace=~\"$namespace\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} packets_sent",
@@ -866,28 +866,28 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "response_packet_cache_misses{instance=~\"$instance\",job=~\"$job\"}",
+              "expr": "response_packet_cache_misses{instance=~\"$instance\",namespace=~\"$namespace\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} response_packet_cache_misses",
               "refId": "A"
             },
             {
-              "expr": "response_packet_cache_hits{instance=~\"$instance\",job=~\"$job\"}",
+              "expr": "response_packet_cache_hits{instance=~\"$instance\",namespace=~\"$namespace\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} response_packet_cache_hits",
               "refId": "B"
             },
             {
-              "expr": "response_packet_get_children_cache_misses{instance=~\"$instance\",job=~\"$job\"}",
+              "expr": "response_packet_get_children_cache_misses{instance=~\"$instance\",namespace=~\"$namespace\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} response_packet_get_children_cache_misses",
               "refId": "C"
             },
             {
-              "expr": "response_packet_get_children_cache_hits{instance=~\"$instance\",job=~\"$job\"}",
+              "expr": "response_packet_get_children_cache_hits{instance=~\"$instance\",namespace=~\"$namespace\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} response_packet_get_children_cache_hits",
@@ -973,7 +973,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "unrecoverable_error_count{instance=~\"$instance\",job=~\"$job\"}",
+              "expr": "unrecoverable_error_count{instance=~\"$instance\",namespace=~\"$namespace\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} unrecoverable_error_count",
@@ -1060,7 +1060,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "digest_mismatches_count{instance=~\"$instance\",job=~\"$job\"}",
+              "expr": "digest_mismatches_count{instance=~\"$instance\",namespace=~\"$namespace\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} digest_mismatches_count",
@@ -1162,7 +1162,7 @@ data:
               "refId": "B"
             },
             {
-              "expr": "startup_snap_load_time_sum{instance=~\"$instance\",job=~\"$job\"}",
+              "expr": "startup_snap_load_time_sum{instance=~\"$instance\",namespace=~\"$namespace\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} startup_snap_load_time",
@@ -1264,7 +1264,7 @@ data:
               "refId": "B"
             },
             {
-              "expr": "startup_txns_loaded_sum{instance=~\"$instance\",job=~\"$job\"}",
+              "expr": "startup_txns_loaded_sum{instance=~\"$instance\",namespace=~\"$namespace\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} startup_txns_loaded",
@@ -1366,7 +1366,7 @@ data:
               "refId": "B"
             },
             {
-              "expr": "dbinittime_sum{instance=~\"$instance\",job=~\"$job\"}",
+              "expr": "dbinittime_sum{instance=~\"$instance\",namespace=~\"$namespace\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} db_init_time",
@@ -1489,7 +1489,7 @@ data:
               "tableColumn": "",
               "targets": [
                 {
-                  "expr": "max(quorum_size{instance=~\"$instance\",job=~\"$job\"})",
+                  "expr": "max(quorum_size{instance=~\"$instance\",namespace=~\"$namespace\"})",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "quorum_size",
@@ -1574,7 +1574,7 @@ data:
               "tableColumn": "",
               "targets": [
                 {
-                  "expr": "leader_uptime{instance=~\"$instance\",job=~\"$job\"}",
+                  "expr": "leader_uptime{instance=~\"$instance\",namespace=~\"$namespace\"}",
                   "format": "time_series",
                   "intervalFactor": 1,
                   "legendFormat": "{{instance}}",
@@ -1659,7 +1659,7 @@ data:
               "tableColumn": "",
               "targets": [
                 {
-                  "expr": "leader_uptime{instance=~\"$instance\",job=~\"$job\"}",
+                  "expr": "leader_uptime{instance=~\"$instance\",namespace=~\"$namespace\"}",
                   "format": "time_series",
                   "intervalFactor": 1,
                   "legendFormat": "{{instance}} leader_uptime",
@@ -1723,21 +1723,21 @@ data:
               "pluginVersion": "6.2.2",
               "targets": [
                 {
-                  "expr": "max(learners{instance=~\"$instance\",job=~\"$job\"})",
+                  "expr": "max(learners{instance=~\"$instance\",namespace=~\"$namespace\"})",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "learners",
                   "refId": "B"
                 },
                 {
-                  "expr": "max(synced_non_voting_followers{instance=~\"$instance\",job=~\"$job\"})",
+                  "expr": "max(synced_non_voting_followers{instance=~\"$instance\",namespace=~\"$namespace\"})",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "synced_non_voting_followers",
                   "refId": "C"
                 },
                 {
-                  "expr": "max(synced_observers{instance=~\"$instance\",job=~\"$job\"})",
+                  "expr": "max(synced_observers{instance=~\"$instance\",namespace=~\"$namespace\"})",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "synced_observers",
@@ -1797,7 +1797,7 @@ data:
                   "refId": "A"
                 },
                 {
-                  "expr": "election_time_count{instance=~\"$instance\",job=~\"$job\"}",
+                  "expr": "election_time_count{instance=~\"$instance\",namespace=~\"$namespace\"}",
                   "format": "time_series",
                   "hide": false,
                   "intervalFactor": 2,
@@ -1805,7 +1805,7 @@ data:
                   "refId": "B"
                 },
                 {
-                  "expr": "election_time_sum{instance=~\"$instance\",job=~\"$job\"}",
+                  "expr": "election_time_sum{instance=~\"$instance\",namespace=~\"$namespace\"}",
                   "format": "time_series",
                   "hide": false,
                   "intervalFactor": 2,
@@ -1813,7 +1813,7 @@ data:
                   "refId": "C"
                 },
                 {
-                  "expr": "election_time_sum/election_time_count{instance=~\"$instance\",job=~\"$job\"}",
+                  "expr": "election_time_sum/election_time_count{instance=~\"$instance\",namespace=~\"$namespace\"}",
                   "format": "time_series",
                   "hide": false,
                   "intervalFactor": 2,
@@ -1900,7 +1900,7 @@ data:
               "steppedLine": false,
               "targets": [
                 {
-                  "expr": "uptime{instance=~\"$instance\",job=~\"$job\"}",
+                  "expr": "uptime{instance=~\"$instance\",namespace=~\"$namespace\"}",
                   "format": "time_series",
                   "intervalFactor": 1,
                   "legendFormat": "{{instance}} uptime",
@@ -1986,7 +1986,7 @@ data:
               "steppedLine": false,
               "targets": [
                 {
-                  "expr": "learner_commit_received_count{instance=~\"$instance\",job=~\"$job\"}",
+                  "expr": "learner_commit_received_count{instance=~\"$instance\",namespace=~\"$namespace\"}",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} learner_commit_received_count",
@@ -2072,7 +2072,7 @@ data:
               "steppedLine": false,
               "targets": [
                 {
-                  "expr": "commit_count{instance=~\"$instance\",job=~\"$job\"}",
+                  "expr": "commit_count{instance=~\"$instance\",namespace=~\"$namespace\"}",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} commit_count",
@@ -2158,7 +2158,7 @@ data:
               "steppedLine": false,
               "targets": [
                 {
-                  "expr": "snap_count{instance=~\"$instance\",job=~\"$job\"}",
+                  "expr": "snap_count{instance=~\"$instance\",namespace=~\"$namespace\"}",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} snap_count",
@@ -2244,7 +2244,7 @@ data:
               "steppedLine": false,
               "targets": [
                 {
-                  "expr": "diff_count{instance=~\"$instance\",job=~\"$job\"}",
+                  "expr": "diff_count{instance=~\"$instance\",namespace=~\"$namespace\"}",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} diff_count",
@@ -2330,7 +2330,7 @@ data:
               "steppedLine": false,
               "targets": [
                 {
-                  "expr": "looking_count{instance=~\"$instance\",job=~\"$job\"}",
+                  "expr": "looking_count{instance=~\"$instance\",namespace=~\"$namespace\"}",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} looking_count",
@@ -2416,7 +2416,7 @@ data:
               "steppedLine": false,
               "targets": [
                 {
-                  "expr": "proposal_count{instance=~\"$instance\",job=~\"$job\"}",
+                  "expr": "proposal_count{instance=~\"$instance\",namespace=~\"$namespace\"}",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} proposal_count",
@@ -2502,21 +2502,21 @@ data:
               "steppedLine": false,
               "targets": [
                 {
-                  "expr": "last_proposal_size{instance=~\"$instance\",job=~\"$job\"}",
+                  "expr": "last_proposal_size{instance=~\"$instance\",namespace=~\"$namespace\"}",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} last_proposal_size",
                   "refId": "A"
                 },
                 {
-                  "expr": "max_proposal_size{instance=~\"$instance\",job=~\"$job\"}",
+                  "expr": "max_proposal_size{instance=~\"$instance\",namespace=~\"$namespace\"}",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} max_proposal_size",
                   "refId": "B"
                 },
                 {
-                  "expr": "min_proposal_size{instance=~\"$instance\",job=~\"$job\"}",
+                  "expr": "min_proposal_size{instance=~\"$instance\",namespace=~\"$namespace\"}",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} min_proposal_size",
@@ -2602,7 +2602,7 @@ data:
               "steppedLine": false,
               "targets": [
                 {
-                  "expr": "rate(follower_sync_time_sum{instance=~\"$instance\",job=~\"$job\"}[1m])",
+                  "expr": "rate(follower_sync_time_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[1m])",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} follower_sync_time",
@@ -2688,7 +2688,7 @@ data:
               "steppedLine": false,
               "targets": [
                 {
-                  "expr": "learner_handler_qp_size_sum{instance=~\"$instance\",job=~\"$job\"}",
+                  "expr": "learner_handler_qp_size_sum{instance=~\"$instance\",namespace=~\"$namespace\"}",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} learner_handler_qp_size_sum sid:{{key}}",
@@ -2774,7 +2774,7 @@ data:
               "steppedLine": false,
               "targets": [
                 {
-                  "expr": "quit_leading_due_to_disloyal_voter{instance=~\"$instance\",job=~\"$job\"}",
+                  "expr": "quit_leading_due_to_disloyal_voter{instance=~\"$instance\",namespace=~\"$namespace\"}",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} quit_leading_due_to_disloyal_voter",
@@ -2860,14 +2860,14 @@ data:
               "steppedLine": false,
               "targets": [
                 {
-                  "expr": "rate(om_commit_process_time_ms_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+                  "expr": "rate(om_commit_process_time_ms_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} om_commit_process_time",
                   "refId": "C"
                 },
                 {
-                  "expr": "rate(om_proposal_process_time_ms_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+                  "expr": "rate(om_proposal_process_time_ms_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} om_proposal_process_time",
@@ -2967,7 +2967,7 @@ data:
               "steppedLine": false,
               "targets": [
                 {
-                  "expr": "watch_count{instance=~\"$instance\",job=~\"$job\"}",
+                  "expr": "watch_count{instance=~\"$instance\",namespace=~\"$namespace\"}",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} watch_count",
@@ -3053,7 +3053,7 @@ data:
               "steppedLine": false,
               "targets": [
                 {
-                  "expr": "node_changed_watch_count_sum{instance=~\"$instance\",job=~\"$job\"}",
+                  "expr": "node_changed_watch_count_sum{instance=~\"$instance\",namespace=~\"$namespace\"}",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} node_changed_watch_count",
@@ -3139,7 +3139,7 @@ data:
               "steppedLine": false,
               "targets": [
                 {
-                  "expr": "node_children_watch_count_sum{instance=~\"$instance\",job=~\"$job\"}",
+                  "expr": "node_children_watch_count_sum{instance=~\"$instance\",namespace=~\"$namespace\"}",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} node_children_watch_count",
@@ -3225,7 +3225,7 @@ data:
               "steppedLine": false,
               "targets": [
                 {
-                  "expr": "node_deleted_watch_count_sum{instance=~\"$instance\",job=~\"$job\"}",
+                  "expr": "node_deleted_watch_count_sum{instance=~\"$instance\",namespace=~\"$namespace\"}",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} node_deleted_watch_count",
@@ -3311,7 +3311,7 @@ data:
               "steppedLine": false,
               "targets": [
                 {
-                  "expr": "node_created_watch_count_sum{instance=~\"$instance\",job=~\"$job\"}",
+                  "expr": "node_created_watch_count_sum{instance=~\"$instance\",namespace=~\"$namespace\"}",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} node_created_watch_count",
@@ -3397,7 +3397,7 @@ data:
               "steppedLine": false,
               "targets": [
                 {
-                  "expr": "revalidate_count{instance=~\"$instance\",job=~\"$job\"}",
+                  "expr": "revalidate_count{instance=~\"$instance\",namespace=~\"$namespace\"}",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} revalidate_count",
@@ -3483,7 +3483,7 @@ data:
               "steppedLine": false,
               "targets": [
                 {
-                  "expr": "stale_sessions_expired{instance=~\"$instance\",job=~\"$job\"}",
+                  "expr": "stale_sessions_expired{instance=~\"$instance\",namespace=~\"$namespace\"}",
                   "format": "time_series",
                   "intervalFactor": 1,
                   "legendFormat": "{{instance}} stale_sessions_expired",
@@ -3569,21 +3569,21 @@ data:
               "steppedLine": false,
               "targets": [
                 {
-                  "expr": "dead_watchers_cleared{instance=~\"$instance\",job=~\"$job\"}",
+                  "expr": "dead_watchers_cleared{instance=~\"$instance\",namespace=~\"$namespace\"}",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} dead_watchers_cleared",
                   "refId": "A"
                 },
                 {
-                  "expr": "dead_watchers_queued{instance=~\"$instance\",job=~\"$job\"}",
+                  "expr": "dead_watchers_queued{instance=~\"$instance\",namespace=~\"$namespace\"}",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} dead_watchers_queued",
                   "refId": "B"
                 },
                 {
-                  "expr": "rate(dead_watchers_cleaner_latency_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+                  "expr": "rate(dead_watchers_cleaner_latency_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} dead_watchers_cleaner_latency",
@@ -3669,7 +3669,7 @@ data:
               "steppedLine": false,
               "targets": [
                 {
-                  "expr": "add_dead_watcher_stall_time{instance=~\"$instance\",job=~\"$job\"}",
+                  "expr": "add_dead_watcher_stall_time{instance=~\"$instance\",namespace=~\"$namespace\"}",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} add_dead_watcher_stall_time",
@@ -3769,7 +3769,7 @@ data:
               "steppedLine": false,
               "targets": [
                 {
-                  "expr": "outstanding_requests{instance=~\"$instance\",job=~\"$job\"}",
+                  "expr": "outstanding_requests{instance=~\"$instance\",namespace=~\"$namespace\"}",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} outstanding_requests",
@@ -3855,21 +3855,21 @@ data:
               "steppedLine": false,
               "targets": [
                 {
-                  "expr": "last_client_response_size{instance=~\"$instance\",job=~\"$job\"}",
+                  "expr": "last_client_response_size{instance=~\"$instance\",namespace=~\"$namespace\"}",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} last_client_response_size",
                   "refId": "A"
                 },
                 {
-                  "expr": "min_client_response_size{instance=~\"$instance\",job=~\"$job\"}",
+                  "expr": "min_client_response_size{instance=~\"$instance\",namespace=~\"$namespace\"}",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} min_client_response_size",
                   "refId": "B"
                 },
                 {
-                  "expr": "max_client_response_size{instance=~\"$instance\",job=~\"$job\"}",
+                  "expr": "max_client_response_size{instance=~\"$instance\",namespace=~\"$namespace\"}",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} max_client_response_size",
@@ -3955,7 +3955,7 @@ data:
               "steppedLine": false,
               "targets": [
                 {
-                  "expr": "bytes_received_count{instance=~\"$instance\",job=~\"$job\"}",
+                  "expr": "bytes_received_count{instance=~\"$instance\",namespace=~\"$namespace\"}",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} bytes_received_count",
@@ -4041,7 +4041,7 @@ data:
               "steppedLine": false,
               "targets": [
                 {
-                  "expr": "connection_request_count{instance=~\"$instance\",job=~\"$job\"}",
+                  "expr": "connection_request_count{instance=~\"$instance\",namespace=~\"$namespace\"}",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} connection_request_count",
@@ -4127,7 +4127,7 @@ data:
               "steppedLine": false,
               "targets": [
                 {
-                  "expr": "num_alive_connections{instance=~\"$instance\",job=~\"$job\"}",
+                  "expr": "num_alive_connections{instance=~\"$instance\",namespace=~\"$namespace\"}",
                   "format": "time_series",
                   "intervalFactor": 1,
                   "legendFormat": "{{instance}} num_alive_connections",
@@ -4213,7 +4213,7 @@ data:
               "steppedLine": false,
               "targets": [
                 {
-                  "expr": "connection_rejected{instance=~\"$instance\",job=~\"$job\"}",
+                  "expr": "connection_rejected{instance=~\"$instance\",namespace=~\"$namespace\"}",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} connection_rejected",
@@ -4299,7 +4299,7 @@ data:
               "steppedLine": false,
               "targets": [
                 {
-                  "expr": "connection_drop_count{instance=~\"$instance\",job=~\"$job\"}",
+                  "expr": "connection_drop_count{instance=~\"$instance\",namespace=~\"$namespace\"}",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} connection_drop_count",
@@ -4385,7 +4385,7 @@ data:
               "steppedLine": false,
               "targets": [
                 {
-                  "expr": "connection_drop_probability{instance=~\"$instance\",job=~\"$job\"}",
+                  "expr": "connection_drop_probability{instance=~\"$instance\",namespace=~\"$namespace\"}",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} connection_drop_probability",
@@ -4471,7 +4471,7 @@ data:
               "steppedLine": false,
               "targets": [
                 {
-                  "expr": "sessionless_connections_expired{instance=~\"$instance\",job=~\"$job\"}",
+                  "expr": "sessionless_connections_expired{instance=~\"$instance\",namespace=~\"$namespace\"}",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} sessionless_connections_expired",
@@ -4557,7 +4557,7 @@ data:
               "steppedLine": false,
               "targets": [
                 {
-                  "expr": "rate(connection_token_deficit_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+                  "expr": "rate(connection_token_deficit_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
                   "format": "time_series",
                   "intervalFactor": 2,
                   "legendFormat": "{{instance}} connection_token_deficit",
@@ -4665,7 +4665,7 @@ data:
           "pluginVersion": "6.2.2",
           "targets": [
             {
-              "expr": "open_file_descriptor_count{instance=~\"$instance\",job=~\"$job\"}",
+              "expr": "open_file_descriptor_count{instance=~\"$instance\",namespace=~\"$namespace\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}}",
@@ -4718,7 +4718,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "fsynctime{instance=~\"$instance\",job=~\"$job\"}",
+              "expr": "fsynctime{instance=~\"$instance\",namespace=~\"$namespace\"}",
               "format": "time_series",
               "hide": true,
               "intervalFactor": 2,
@@ -4726,7 +4726,7 @@ data:
               "refId": "A"
             },
             {
-              "expr": "fsynctime_count{instance=~\"$instance\",job=~\"$job\"}",
+              "expr": "fsynctime_count{instance=~\"$instance\",namespace=~\"$namespace\"}",
               "format": "time_series",
               "hide": true,
               "interval": "",
@@ -4735,7 +4735,7 @@ data:
               "refId": "B"
             },
             {
-              "expr": "fsynctime_sum{instance=~\"$instance\",job=~\"$job\"}",
+              "expr": "fsynctime_sum{instance=~\"$instance\",namespace=~\"$namespace\"}",
               "format": "time_series",
               "hide": true,
               "intervalFactor": 2,
@@ -4743,7 +4743,7 @@ data:
               "refId": "C"
             },
             {
-              "expr": "fsynctime_sum * 1000 /fsynctime_count{instance=~\"$instance\",job=~\"$job\"}",
+              "expr": "fsynctime_sum * 1000 /fsynctime_count{instance=~\"$instance\",namespace=~\"$namespace\"}",
               "format": "time_series",
               "hide": false,
               "intervalFactor": 2,
@@ -4751,7 +4751,7 @@ data:
               "refId": "D"
             },
             {
-              "expr": "irate(fsynctime_sum{instance=~\"$instance\",job=~\"$job\"}[1m])",
+              "expr": "irate(fsynctime_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[1m])",
               "format": "time_series",
               "hide": false,
               "intervalFactor": 2,
@@ -4842,7 +4842,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "rate(snapshottime_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+              "expr": "rate(snapshottime_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
               "format": "time_series",
               "hide": false,
               "intervalFactor": 2,
@@ -4850,7 +4850,7 @@ data:
               "refId": "C"
             },
             {
-              "expr": "snapshottime_count{instance=~\"$instance\",job=~\"$job\"}",
+              "expr": "snapshottime_count{instance=~\"$instance\",namespace=~\"$namespace\"}",
               "format": "time_series",
               "hide": true,
               "intervalFactor": 2,
@@ -4858,7 +4858,7 @@ data:
               "refId": "A"
             },
             {
-              "expr": "snapshottime_sum / snapshottime_count{instance=~\"$instance\",job=~\"$job\"}",
+              "expr": "snapshottime_sum / snapshottime_count{instance=~\"$instance\",namespace=~\"$namespace\"}",
               "format": "time_series",
               "hide": true,
               "intervalFactor": 2,
@@ -4958,7 +4958,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "rate(prep_process_time_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+              "expr": "rate(prep_process_time_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
               "format": "time_series",
               "intervalFactor": 1,
               "legendFormat": "{{instance}} prep_process_time",
@@ -5044,7 +5044,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "rate(prep_processor_queue_time_ms_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+              "expr": "rate(prep_processor_queue_time_ms_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
               "format": "time_series",
               "intervalFactor": 1,
               "legendFormat": "{{instance}} prep_processor_queue_time_ms",
@@ -5130,7 +5130,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "rate(prep_processor_queue_size_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+              "expr": "rate(prep_processor_queue_size_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} prep_processor_queue_size",
@@ -5216,7 +5216,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "prep_processor_request_queued{instance=~\"$instance\",job=~\"$job\"}",
+              "expr": "prep_processor_request_queued{instance=~\"$instance\",namespace=~\"$namespace\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} prep_processor_request_queued",
@@ -5302,14 +5302,14 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "outstanding_changes_queued{instance=~\"$instance\",job=~\"$job\"}",
+              "expr": "outstanding_changes_queued{instance=~\"$instance\",namespace=~\"$namespace\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} outstanding_changes_queued",
               "refId": "A"
             },
             {
-              "expr": "outstanding_changes_removed{instance=~\"$instance\",job=~\"$job\"}",
+              "expr": "outstanding_changes_removed{instance=~\"$instance\",namespace=~\"$namespace\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} outstanding_changes_removed",
@@ -5395,7 +5395,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "rate(close_session_prep_time_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+              "expr": "rate(close_session_prep_time_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} close_session_prep_time",
@@ -5495,7 +5495,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "rate(sync_process_time_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+              "expr": "rate(sync_process_time_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} sync_process_time",
@@ -5581,7 +5581,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "rate(sync_processor_queue_flush_time_ms_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+              "expr": "rate(sync_processor_queue_flush_time_ms_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} sync_processor_queue_flush_time",
@@ -5667,7 +5667,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "rate(sync_processor_queue_size_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+              "expr": "rate(sync_processor_queue_size_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} sync_processor_queue_size",
@@ -5753,7 +5753,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "sync_processor_request_queued{instance=~\"$instance\",job=~\"$job\"}",
+              "expr": "sync_processor_request_queued{instance=~\"$instance\",namespace=~\"$namespace\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} sync_processor_request_queued",
@@ -5839,7 +5839,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "rate(sync_processor_batch_size_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+              "expr": "rate(sync_processor_batch_size_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} sync_processor_batch_size",
@@ -5938,21 +5938,21 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "rate(commit_process_time_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+              "expr": "rate(commit_process_time_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} commit_process_time",
               "refId": "C"
             },
             {
-              "expr": "rate(read_commitproc_time_ms_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+              "expr": "rate(read_commitproc_time_ms_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} read_commitproc_time",
               "refId": "A"
             },
             {
-              "expr": "rate(write_commitproc_time_ms_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+              "expr": "rate(write_commitproc_time_ms_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} write_commitproc_time",
@@ -6038,21 +6038,21 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "rate(write_commit_proc_req_queued_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+              "expr": "rate(write_commit_proc_req_queued_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} write_commit_proc_req_queued",
               "refId": "C"
             },
             {
-              "expr": "rate(read_commit_proc_req_queued_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+              "expr": "rate(read_commit_proc_req_queued_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} read_commit_proc_req_queued",
               "refId": "A"
             },
             {
-              "expr": "rate(commit_commit_proc_req_queued_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+              "expr": "rate(commit_commit_proc_req_queued_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} commit_commit_proc_req_queued",
@@ -6138,7 +6138,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "rate(requests_in_session_queue_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+              "expr": "rate(requests_in_session_queue_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} requests_in_session_queue",
@@ -6224,14 +6224,14 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "rate(read_commit_proc_issued_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+              "expr": "rate(read_commit_proc_issued_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} read_commit_proc_issued",
               "refId": "C"
             },
             {
-              "expr": "rate(write_commit_proc_issued_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+              "expr": "rate(write_commit_proc_issued_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} write_commit_proc_issued",
@@ -6317,7 +6317,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "rate(concurrent_request_processing_in_commit_processor_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+              "expr": "rate(concurrent_request_processing_in_commit_processor_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} concurrent_request_processing_in_commit_processor",
@@ -6403,7 +6403,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "rate(time_waiting_empty_pool_in_commit_processor_read_ms_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+              "expr": "rate(time_waiting_empty_pool_in_commit_processor_read_ms_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
               "format": "time_series",
               "hide": false,
               "intervalFactor": 2,
@@ -6490,7 +6490,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "rate(pending_session_queue_size_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+              "expr": "rate(pending_session_queue_size_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} pending_session_queue_size",
@@ -6576,7 +6576,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "rate(local_write_committed_time_ms_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+              "expr": "rate(local_write_committed_time_ms_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} local_write_committed_time_ms",
@@ -6662,7 +6662,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "rate(server_write_committed_time_ms_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+              "expr": "rate(server_write_committed_time_ms_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} server_write_committed_time",
@@ -6748,7 +6748,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "rate(write_batch_time_in_commit_processor_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+              "expr": "rate(write_batch_time_in_commit_processor_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
               "format": "time_series",
               "hide": false,
               "intervalFactor": 2,
@@ -6835,7 +6835,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "rate(reads_after_write_in_session_queue_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+              "expr": "rate(reads_after_write_in_session_queue_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
               "format": "time_series",
               "intervalFactor": 1,
               "legendFormat": "{{instance}} reads_after_write_in_session_queue",
@@ -6921,7 +6921,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "rate(session_queues_drained_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+              "expr": "rate(session_queues_drained_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} session_queues_drained",
@@ -7007,7 +7007,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "rate(reads_issued_from_session_queue_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+              "expr": "rate(reads_issued_from_session_queue_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} reads_issued_from_session_queue",
@@ -7093,7 +7093,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "request_commit_queued{instance=~\"$instance\",job=~\"$job\"}",
+              "expr": "request_commit_queued{instance=~\"$instance\",namespace=~\"$namespace\"}",
               "format": "time_series",
               "intervalFactor": 1,
               "legendFormat": "{{instance}} request_commit_queued",
@@ -7192,7 +7192,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "rate(write_final_proc_time_ms_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+              "expr": "rate(write_final_proc_time_ms_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} write_final_proc_time_ms",
@@ -7278,7 +7278,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "rate(read_final_proc_time_ms_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+              "expr": "rate(read_final_proc_time_ms_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} read_final_proc_time_ms",
@@ -7377,7 +7377,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "rate(readlatency_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+              "expr": "rate(readlatency_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} readlatency",
@@ -7465,7 +7465,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "rate(updatelatency_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+              "expr": "rate(updatelatency_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} updatelatency",
@@ -7553,14 +7553,14 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "max_latency{instance=~\"$instance\",job=~\"$job\"}",
+              "expr": "max_latency{instance=~\"$instance\",namespace=~\"$namespace\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} max_latency",
               "refId": "A"
             },
             {
-              "expr": "min_latency{instance=~\"$instance\",job=~\"$job\"}",
+              "expr": "min_latency{instance=~\"$instance\",namespace=~\"$namespace\"}",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 2,
@@ -7568,7 +7568,7 @@ data:
               "refId": "B"
             },
             {
-              "expr": "avg_latency{instance=~\"$instance\",job=~\"$job\"}",
+              "expr": "avg_latency{instance=~\"$instance\",namespace=~\"$namespace\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} avg_latency",
@@ -7654,7 +7654,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "rate(proposal_latency_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+              "expr": "rate(proposal_latency_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} proposal_latency",
@@ -7740,7 +7740,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "rate(quorum_ack_latency_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+              "expr": "rate(quorum_ack_latency_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} quorum_ack_latency",
@@ -7826,7 +7826,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "rate(ack_latency_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+              "expr": "rate(ack_latency_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} ack_latency_sum",
@@ -7912,7 +7912,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "rate(propagation_latency_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+              "expr": "rate(propagation_latency_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} propagation_latency",
@@ -7998,7 +7998,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "rate(commit_propagation_latency_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+              "expr": "rate(commit_propagation_latency_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} commit_propagation_latency",
@@ -8084,7 +8084,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "proposal_ack_creation_latency{instance=~\"$instance\",job=~\"$job\"}",
+              "expr": "proposal_ack_creation_latency{instance=~\"$instance\",namespace=~\"$namespace\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} proposal_ack_creation_latency-{{quantile}}",
@@ -8183,14 +8183,14 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "tls_handshake_exceeded{instance=~\"$instance\",job=~\"$job\"}",
+              "expr": "tls_handshake_exceeded{instance=~\"$instance\",namespace=~\"$namespace\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} tls_handshake_exceeded",
               "refId": "C"
             },
             {
-              "expr": "outstanding_tls_handshake{instance=~\"$instance\",job=~\"$job\"}",
+              "expr": "outstanding_tls_handshake{instance=~\"$instance\",namespace=~\"$namespace\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} outstanding_tls_handshake",
@@ -8276,21 +8276,21 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "ensemble_auth_fail{instance=~\"$instance\",job=~\"$job\"}",
+              "expr": "ensemble_auth_fail{instance=~\"$instance\",namespace=~\"$namespace\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} ensemble_auth_fail",
               "refId": "A"
             },
             {
-              "expr": "ensemble_auth_success{instance=~\"$instance\",job=~\"$job\"}",
+              "expr": "ensemble_auth_success{instance=~\"$instance\",namespace=~\"$namespace\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} ensemble_auth_success",
               "refId": "B"
             },
             {
-              "expr": "ensemble_auth_skip{instance=~\"$instance\",job=~\"$job\"}",
+              "expr": "ensemble_auth_skip{instance=~\"$instance\",namespace=~\"$namespace\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} ensemble_auth_skip",
@@ -8413,7 +8413,7 @@ data:
           "tableColumn": "",
           "targets": [
             {
-              "expr": "max(jvm_classes_loaded{instance=~\"$instance\",job=~\"$job\"})",
+              "expr": "max(jvm_classes_loaded{instance=~\"$instance\",namespace=~\"$namespace\"})",
               "format": "time_series",
               "intervalFactor": 1,
               "legendFormat": "",
@@ -8497,7 +8497,7 @@ data:
           "tableColumn": "",
           "targets": [
             {
-              "expr": "max(jvm_threads_current{instance=~\"$instance\",job=~\"$job\"})",
+              "expr": "max(jvm_threads_current{instance=~\"$instance\",namespace=~\"$namespace\"})",
               "format": "time_series",
               "intervalFactor": 1,
               "legendFormat": "",
@@ -8581,7 +8581,7 @@ data:
           "tableColumn": "",
           "targets": [
             {
-              "expr": "max(jvm_threads_deadlocked{instance=~\"$instance\",job=~\"$job\"})",
+              "expr": "max(jvm_threads_deadlocked{instance=~\"$instance\",namespace=~\"$namespace\"})",
               "format": "time_series",
               "intervalFactor": 1,
               "legendFormat": "",
@@ -8641,7 +8641,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "rate(jvm_pause_time_ms_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+              "expr": "rate(jvm_pause_time_ms_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} jvm_pause_time_ms",
@@ -8727,7 +8727,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "rate(jvm_gc_collection_seconds_sum{instance=~\"$instance\",job=~\"$job\"}[5m])",
+              "expr": "rate(jvm_gc_collection_seconds_sum{instance=~\"$instance\",namespace=~\"$namespace\"}[5m])",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} gc:{{gc}}",
@@ -8813,7 +8813,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "jvm_threads_state{instance=~\"$instance\",job=~\"$job\"}",
+              "expr": "jvm_threads_state{instance=~\"$instance\",namespace=~\"$namespace\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} state:{{state}}",
@@ -8899,7 +8899,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "jvm_memory_pool_bytes_used{instance=~\"$instance\",job=~\"$job\"}",
+              "expr": "jvm_memory_pool_bytes_used{instance=~\"$instance\",namespace=~\"$namespace\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "{{instance}} pool:{{pool}}",
@@ -8962,7 +8962,7 @@ data:
               "text": "Prometheus",
               "value": "Prometheus"
             },
-            "hide": 0,
+            "hide": 2,
             "includeAll": false,
             "label": "Datasource",
             "multi": false,
@@ -8970,7 +8970,7 @@ data:
             "options": [],
             "query": "prometheus",
             "refresh": 1,
-            "regex": "",
+            "regex": "/.*Prometheus.*/i",
             "skipUrlSync": false,
             "type": "datasource"
           },
@@ -8978,18 +8978,17 @@ data:
             "allValue": null,
             "current": {
               "selected": true,
-              "text": "metrics-${serviceFullName}",
-              "value": "metrics-${serviceFullName}"
+              "text": "${namespace}",
+              "value": "${namespace}"
             },
             "datasource": "$DS_PROMETHEUS",
-            "definition": "label_values(job)",
             "hide": 0,
             "includeAll": false,
-            "label": "Cluster",
+            "label": "Namespace",
             "multi": false,
-            "name": "job",
+            "name": "namespace",
             "options": [],
-            "query": "label_values(job)",
+            "query": "label_values({pod=~\".*zookeeper.*\",job!=\"kubelet\",job!=\"kube-state-metrics\"},namespace)",
             "refresh": 1,
             "regex": "",
             "skipUrlSync": false,
@@ -9004,14 +9003,13 @@ data:
             "allValue": null,
             "current": {},
             "datasource": "$DS_PROMETHEUS",
-            "definition": "label_values({job=~\"$job\"}, instance)",
             "hide": 0,
             "includeAll": true,
             "label": "Instance",
             "multi": true,
             "name": "instance",
             "options": [],
-            "query": "label_values({job=~\"$job\"}, instance)",
+            "query": "label_values({namespace=~\"$namespace\",pod=~\".*zookeeper.*\",job!=\"kubelet\",job!=\"kube-state-metrics\"}, instance)",
             "refresh": 1,
             "regex": "",
             "skipUrlSync": false,

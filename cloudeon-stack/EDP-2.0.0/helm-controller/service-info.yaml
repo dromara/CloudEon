@@ -1,0 +1,30 @@
+name: HELM_CONTROLLER
+label: "HELM CONTROLLER"
+description: "Helm控制器"
+version: 1.0.0
+
+dependencies:
+  - "GLOBAL"
+
+supportKerberos: false
+
+dashboard:
+  uid: ""
+
+roles:
+  - name: HELM_CONTROLLER
+    label: "HELM CONTROLLER"
+    roleFullName: "helm-controller"
+    sortNum: 1
+    type: DEPLOYMENT
+    needOdd: false
+
+customConfigFiles: []
+
+configurations:
+  - name: serverImage
+    description: "服务镜像"
+    recommendExpression: "registry.cn-guangzhou.aliyuncs.com/bigdata200/helm-controller:v0.15.4"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "镜像"

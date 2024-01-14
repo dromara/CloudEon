@@ -17,3 +17,12 @@ tail -F /workspace/logs/* &
 
 echo "---------------------------------------------开始----------------------------------------------"
 tail -f /dev/null
+
+# 功能测试，不会自动执行
+$ZOOKEEPER_HOME/bin/zkCli.sh  -server localhost:$ZK_CLIENT_PORT
+ls /
+create /tmp1
+ls /
+delete /tmp1
+ls /
+quit

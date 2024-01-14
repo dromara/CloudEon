@@ -1,7 +1,7 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: metrics-zookeeper-server
+  name: metrics-${serviceFullName}
   labels:
     sname: ${serviceFullName}
     roleFullName: zookeeper-server
@@ -9,7 +9,6 @@ metadata:
 spec:
   selector:
     sname: ${serviceFullName}
-    roleFullName: zookeeper-server
   ports:
   - name: metrics
     port: ${conf['zookeeper.metrics.port']}

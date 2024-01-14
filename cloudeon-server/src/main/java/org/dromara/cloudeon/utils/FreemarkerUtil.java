@@ -18,7 +18,7 @@ public class FreemarkerUtil {
 	private static String encoding = StandardCharsets.UTF_8.name();
 
 	static {
-		cfg = new Configuration(Configuration.getVersion());
+		cfg = new Configuration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
 		cfg.setObjectWrapper(new DefaultObjectWrapper(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS));
 		cfg.setDefaultEncoding(encoding);
 		cfg.setNumberFormat("computer");

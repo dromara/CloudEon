@@ -18,11 +18,10 @@ package org.dromara.cloudeon.processor;
 
 import lombok.NoArgsConstructor;
 
-/**
- * 为角色实例删除k8s资源
- */
 @NoArgsConstructor
-public class StopRoleK8sDeploymentTask extends RoleK8sTask {
+public class NodeLabelDeleteTask extends NodeLabelTask {
+
+
     @Override
     public boolean isApplyTask() {
         return false;
