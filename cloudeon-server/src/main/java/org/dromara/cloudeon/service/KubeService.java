@@ -16,6 +16,8 @@
  */
 package org.dromara.cloudeon.service;
 
+import cn.hutool.core.lang.func.Func1;
+import cn.hutool.core.lang.func.VoidFunc1;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.cloudeon.dao.ClusterInfoRepository;
@@ -39,10 +41,22 @@ public class KubeService {
         return client;
     }
 
+    public void executeWithKubeClient(Integer clusterId, VoidFunc1<KubernetesClient> func) {
+        try (KubernetesClient client = getKubeClient(clusterId)) {
+            func.callWithRuntimeException(client);
+        }
+    }
+
+    public <T> T executeWithKubeClient(Integer clusterId, Func1<KubernetesClient, T> func) {
+        try (KubernetesClient client = getKubeClient(clusterId)) {
+            return func.callWithRuntimeException(client);
+        }
+    }
+
 
     public void testConnect(KubernetesClient client) {
         String minor = client.getKubernetesVersion().getMinor();
-        log.info("成功连接k8s集群：{}", client.getMasterUrl());
+        log.debug("成功连接k8s集群：{}", client.getMasterUrl());
     }
 
     public boolean checkNamespace(KubernetesClient kubernetesClient, String namespace) {
