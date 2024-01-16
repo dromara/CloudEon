@@ -30,6 +30,7 @@ spec:
                 name: "${roleServiceFullName}"
                 podConflictName: "${roleServiceFullName}"
             topologyKey: "kubernetes.io/hostname"
+      hostNetwork: true
       containers:
         - name: "${roleServiceFullName}"
           image: "${conf['serverImage']}"
