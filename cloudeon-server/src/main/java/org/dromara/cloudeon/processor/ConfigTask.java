@@ -18,76 +18,46 @@ package org.dromara.cloudeon.processor;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
-import cn.hutool.core.io.resource.ResourceUtil;
-import cn.hutool.core.map.MapUtil;
-import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.json.JSONUtil;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.HasMetadata;
-import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.ParameterNamespaceListVisitFromServerGetDeleteRecreateWaitApplicable;
 import io.fabric8.kubernetes.client.dsl.Resource;
 import lombok.NoArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
-import org.dromara.cloudeon.config.CloudeonConfigProp;
-import org.dromara.cloudeon.dao.*;
-import org.dromara.cloudeon.dto.RoleNodeInfo;
-import org.dromara.cloudeon.entity.*;
-import org.dromara.cloudeon.service.KubeService;
-import org.dromara.cloudeon.service.ServiceService;
+import org.dromara.cloudeon.entity.ServiceInstanceConfigEntity;
+import org.dromara.cloudeon.entity.ServiceInstanceEntity;
+import org.dromara.cloudeon.entity.StackServiceEntity;
 import org.dromara.cloudeon.utils.Constant;
 import org.dromara.cloudeon.utils.FreemarkerUtil;
 import org.dromara.cloudeon.utils.K8sUtil;
-import org.springframework.core.env.Environment;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.*;
-import java.util.function.Function;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @NoArgsConstructor
 public abstract class ConfigTask extends BaseCloudeonTask implements ApplyOrDeleteTask {
 
-    private ServiceService serviceService = SpringUtil.getBean(ServiceService.class);
-    private ClusterInfoRepository clusterInfoRepository = SpringUtil.getBean(ClusterInfoRepository.class);
-    private StackServiceRepository stackServiceRepository = SpringUtil.getBean(StackServiceRepository.class);
-    private ServiceInstanceRepository serviceInstanceRepository = SpringUtil.getBean(ServiceInstanceRepository.class);
-    private ClusterNodeRepository clusterNodeRepository = SpringUtil.getBean(ClusterNodeRepository.class);
-    private ServiceRoleInstanceRepository roleInstanceRepository = SpringUtil.getBean(ServiceRoleInstanceRepository.class);
-    private ServiceInstanceConfigRepository configRepository = SpringUtil.getBean(ServiceInstanceConfigRepository.class);
-    private CloudeonConfigProp cloudeonConfigProp = SpringUtil.getBean(CloudeonConfigProp.class);
-    private Environment environment = SpringUtil.getBean(Environment.class);
-
-
     @Override
     public void internalExecute() {
-        TaskParam taskParam = getTaskParam();
         Integer serviceInstanceId = taskParam.getServiceInstanceId();
         ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(serviceInstanceId).get();
         StackServiceEntity stackServiceEntity = stackServiceRepository.findById(serviceInstanceEntity.getStackServiceId()).get();
-        // 查询服务实例所有配置项
-        List<ServiceInstanceConfigEntity> allConfigEntityList = configRepository.findByServiceInstanceId(serviceInstanceId);
-
+        Integer clusterId = serviceInstanceEntity.getClusterId();
         Integer globalServiceInstanceId = serviceInstanceRepository.findByClusterIdAndStackServiceName(serviceInstanceEntity.getClusterId(), "GLOBAL");
         List<ServiceInstanceConfigEntity> globalConfigEntityList = configRepository.findByServiceInstanceId(globalServiceInstanceId);
+
         Map<String, String> globalConfigMap = globalConfigEntityList.stream().collect(Collectors.toMap(ServiceInstanceConfigEntity::getName, ServiceInstanceConfigEntity::getValue));
-        if (!"GLOBAL".equalsIgnoreCase(stackServiceEntity.getName())) {
-            allConfigEntityList.addAll(globalConfigEntityList);
-        }
 
         String stackCode = stackServiceEntity.getStackCode();
         String stackServiceName = K8sUtil.formatK8sNameStr(stackServiceEntity.getName());
 
-        KubeService kubeService = SpringUtil.getBean(KubeService.class);
-        KubernetesClient client = kubeService.getKubeClient(serviceInstanceEntity.getClusterId());
-
-        Map<String, Object> dataModel = getDataModel(serviceInstanceId);
+        Map<String, Object> dataModel = serviceService.getDataModel(serviceInstanceId, taskParam.getRoleName());
         Map<String, String> labels = Maps.newHashMap();
         labels.put("name", K8sUtil.formatK8sNameStr(stackServiceEntity.getName()));
 
@@ -107,12 +77,15 @@ public abstract class ConfigTask extends BaseCloudeonTask implements ApplyOrDele
                 }
                 fileStrMap.put(renderFile.getName(), FileUtil.readUtf8String(renderFile));
             }
-            Resource<ConfigMap> configMapResource = client.configMaps().load(IoUtil.toUtf8Stream(ConfigTask.getConfigMapStr(stackServiceName + "-service-render", labels, fileStrMap)));
-            if (isApplyTask()) {
-                configMapResource.forceConflicts().serverSideApply();
-            } else {
-                configMapResource.delete();
-            }
+            Map<String, String> finalFileStrMap1 = fileStrMap;
+            kubeService.executeWithKubeClient(clusterId, client -> {
+                Resource<ConfigMap> configMapResource = client.configMaps().load(IoUtil.toUtf8Stream(K8sUtil.getConfigMapStr(stackServiceName + "-service-render", labels, finalFileStrMap1)));
+                if (isApplyTask()) {
+                    configMapResource.forceConflicts().serverSideApply();
+                } else {
+                    configMapResource.delete();
+                }
+            });
         } else {
             log.info("serviceRender目录为空");
         }
@@ -131,12 +104,15 @@ public abstract class ConfigTask extends BaseCloudeonTask implements ApplyOrDele
                 fileStrMap.put(file.getName(), FileUtil.readUtf8String(file));
             }
             fileStrMap.put("values.json", JSONUtil.toJsonStr(dataModel));
-            Resource<ConfigMap> resource = client.configMaps().load(IoUtil.toUtf8Stream(ConfigTask.getConfigMapStr(stackServiceName + "-service-common", labels, fileStrMap)));
-            if (isApplyTask()) {
-                resource.forceConflicts().serverSideApply();
-            } else {
-                resource.delete();
-            }
+            Map<String, String> finalFileStrMap = fileStrMap;
+            kubeService.executeWithKubeClient(clusterId, client -> {
+                Resource<ConfigMap> resource = client.configMaps().load(IoUtil.toUtf8Stream(K8sUtil.getConfigMapStr(stackServiceName + "-service-common", labels, finalFileStrMap)));
+                if (isApplyTask()) {
+                    resource.forceConflicts().serverSideApply();
+                } else {
+                    resource.delete();
+                }
+            });
         } else {
             log.info("serviceCommon目录为空");
         }
@@ -151,12 +127,14 @@ public abstract class ConfigTask extends BaseCloudeonTask implements ApplyOrDele
                 if (file.isDirectory()) {
                     continue;
                 }
-                ParameterNamespaceListVisitFromServerGetDeleteRecreateWaitApplicable<HasMetadata> resource = client.load(FileUtil.getInputStream(file));
-                if (isApplyTask()) {
-                    resource.forceConflicts().serverSideApply();
-                } else {
-                    resource.delete();
-                }
+                kubeService.executeWithKubeClient(clusterId, client -> {
+                    ParameterNamespaceListVisitFromServerGetDeleteRecreateWaitApplicable<HasMetadata> resource = client.load(FileUtil.getInputStream(file));
+                    if (isApplyTask()) {
+                        resource.forceConflicts().serverSideApply();
+                    } else {
+                        resource.delete();
+                    }
+                });
             }
         } else {
             log.info("k8sCommon目录为空");
@@ -173,17 +151,19 @@ public abstract class ConfigTask extends BaseCloudeonTask implements ApplyOrDele
                     continue;
                 }
                 String renderStr = FreemarkerUtil.templateEval(FileUtil.readUtf8String(file), dataModel);
-                ParameterNamespaceListVisitFromServerGetDeleteRecreateWaitApplicable<HasMetadata> resource = null;
-                try (InputStream in = IoUtil.toUtf8Stream(renderStr)) {
-                    resource = client.load(in);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                if (isApplyTask()) {
-                    resource.forceConflicts().serverSideApply();
-                } else {
-                    resource.delete();
-                }
+                kubeService.executeWithKubeClient(clusterId, client -> {
+                    ParameterNamespaceListVisitFromServerGetDeleteRecreateWaitApplicable<HasMetadata> resource = null;
+                    try (InputStream in = IoUtil.toUtf8Stream(renderStr)) {
+                        resource = client.load(in);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    if (isApplyTask()) {
+                        resource.forceConflicts().serverSideApply();
+                    } else {
+                        resource.delete();
+                    }
+                });
             }
         } else {
             log.info("k8sRender目录为空");
@@ -200,131 +180,24 @@ public abstract class ConfigTask extends BaseCloudeonTask implements ApplyOrDele
                         continue;
                     }
                     String renderStr = FreemarkerUtil.templateEval(FileUtil.readUtf8String(file), dataModel);
-                    ParameterNamespaceListVisitFromServerGetDeleteRecreateWaitApplicable<HasMetadata> resource = null;
-                    try (InputStream in = IoUtil.toUtf8Stream(renderStr)) {
-                        resource = client.load(in);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                    if (isApplyTask()) {
-                        resource.forceConflicts().serverSideApply();
-                    } else {
-                        resource.delete();
-                    }
+                    kubeService.executeWithKubeClient(clusterId, client -> {
+                        ParameterNamespaceListVisitFromServerGetDeleteRecreateWaitApplicable<HasMetadata> resource = null;
+                        try (InputStream in = IoUtil.toUtf8Stream(renderStr)) {
+                            resource = client.load(in);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        if (isApplyTask()) {
+                            resource.forceConflicts().serverSideApply();
+                        } else {
+                            resource.delete();
+                        }
+                    });
                 }
             } else {
                 log.info("kube-prometheus-render目录为空");
             }
         }
-
-
-    }
-
-    private Map<String, Object> getDataModel(Integer serviceInstanceId) {
-        ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(serviceInstanceId).get();
-        StackServiceEntity stackServiceEntity = stackServiceRepository.findById(serviceInstanceEntity.getStackServiceId()).get();
-        List<ServiceRoleInstanceEntity> roleInstanceEntities = roleInstanceRepository.findByServiceInstanceId(serviceInstanceId);
-
-        Map<String, Object> dataModel = new HashMap<>();
-
-        // 查询服务实例所有配置项,包括全局
-        List<ServiceInstanceConfigEntity> allConfigEntityList = configRepository.findByServiceInstanceId(serviceInstanceId);
-        if ("HELM_CONTROLLER".equalsIgnoreCase(stackServiceEntity.getName())) {
-            String kubeConfig = clusterInfoRepository.findById(serviceInstanceEntity.getClusterId()).get().getKubeConfig();
-            dataModel.put("super", MapUtil.of("kube_config", kubeConfig));
-        }
-        if (!"GLOBAL".equalsIgnoreCase(stackServiceEntity.getName())) {
-            Integer globalServiceInstanceId = serviceInstanceRepository.findByClusterIdAndStackServiceName(serviceInstanceEntity.getClusterId(), "GLOBAL");
-            allConfigEntityList.addAll(configRepository.findByServiceInstanceId(globalServiceInstanceId));
-        }
-        dataModel.put("namespace", serviceService.getNamespace(serviceInstanceEntity));
-        dataModel.put("serviceFullName", K8sUtil.formatK8sNameStr(serviceInstanceEntity.getServiceName()));
-        dataModel.put("service", serviceInstanceEntity);
-        dataModel.put("conf", allConfigEntityList.stream().collect(Collectors.toMap(ServiceInstanceConfigEntity::getName, ServiceInstanceConfigEntity::getValue)));
-        dataModel.put("serviceRoles", getServiceRoles(roleInstanceEntities, clusterNodeRepository));
-        try {
-            dataModel.put("cloudeonURL", "http://" + InetAddress.getLocalHost().getHostAddress() + ":" + environment.getProperty("server.port"));
-        } catch (UnknownHostException e) {
-            throw new RuntimeException(e);
-        }
-
-        // 获取该服务支持的自定义配置文件名
-        String customConfigFiles = stackServiceEntity.getCustomConfigFiles();
-        Map<String, Map<String, String>> confFiles = new HashMap<>();
-
-        if (StringUtils.isNoneBlank(customConfigFiles)) {
-            for (String confFileName : customConfigFiles.split(",")) {
-                List<ServiceInstanceConfigEntity> groupConfEntities = configRepository.findByServiceInstanceIdAndConfFile(serviceInstanceId, confFileName);
-                HashMap<String, String> map = new HashMap<>();
-                for (ServiceInstanceConfigEntity groupConf : groupConfEntities) {
-                    map.put(groupConf.getName(), groupConf.getValue());
-                }
-                confFiles.put(confFileName, map);
-            }
-        }
-        dataModel.put("confFiles", confFiles);
-
-        String dependenceServiceInstanceIds = serviceInstanceEntity.getDependenceServiceInstanceIds();
-        if (StringUtils.isNotBlank(dependenceServiceInstanceIds)) {
-            String[] depServiceInstanceIds = dependenceServiceInstanceIds.split(",");
-            buildDependenceServiceInModel(dataModel, depServiceInstanceIds);
-        }
-
-        return dataModel;
-
-    }
-
-
-    public static String getConfigMapStr(String configmapName, Map<String, String> labels, Map<String, String> fileStrMap) {
-        Map<String, Object> dataModel = Maps.newHashMapWithExpectedSize(3);
-        dataModel.put("configmapName", configmapName);
-        dataModel.put("labels", labels);
-        for (Map.Entry<String, String> dataEntry : fileStrMap.entrySet()) {
-            StringBuilder sb = new StringBuilder();
-            for (String line : dataEntry.getValue().split("\\R")) {
-                sb.append("    ").append(line).append("\n");
-            }
-            fileStrMap.put(dataEntry.getKey(), sb.toString());
-        }
-        dataModel.put("fileStrMap", fileStrMap);
-        return FreemarkerUtil.templateEval(ResourceUtil.readUtf8Str("templates/configmap.yaml.ftl"), dataModel);
-    }
-
-
-    /**
-     * 构建依赖服务进入Model中
-     */
-    private void buildDependenceServiceInModel(Map<String, Object> dataModel, String[] depServiceInstanceIds) {
-        Map<String, Object> services = new HashMap<>();
-        Arrays.stream(depServiceInstanceIds).forEach(id -> {
-            Integer serviceInstanceId = Integer.valueOf(id);
-            ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(serviceInstanceId).get();
-            Integer stackServiceId = serviceInstanceEntity.getStackServiceId();
-            String stackServiceName = stackServiceRepository.findById(stackServiceId).get().getName();
-
-            // 查询服务实例所有配置项
-            List<ServiceInstanceConfigEntity> allConfigEntityList = configRepository.findByServiceInstanceId(serviceInstanceId);
-            // 查出所有角色
-            List<ServiceRoleInstanceEntity> roleInstanceEntities = roleInstanceRepository.findByServiceInstanceId(serviceInstanceId);
-            Map<String, List<RoleNodeInfo>> serviceRoles = getServiceRoles(roleInstanceEntities, clusterNodeRepository);
-            services.put(stackServiceName, ImmutableMap.of(
-                    "conf", allConfigEntityList.stream().collect(Collectors.toMap(ServiceInstanceConfigEntity::getName, ServiceInstanceConfigEntity::getValue)),
-                    "serviceRoles", serviceRoles,
-                    "service", serviceInstanceEntity));
-        });
-
-        dataModel.put("dependencies", services);
-    }
-
-    private Map<String, List<RoleNodeInfo>> getServiceRoles(List<ServiceRoleInstanceEntity> roleInstanceEntities, ClusterNodeRepository clusterNodeRepository) {
-        Map<String, List<RoleNodeInfo>> serviceRoles = roleInstanceEntities.stream().map(new Function<ServiceRoleInstanceEntity, RoleNodeInfo>() {
-            @Override
-            public RoleNodeInfo apply(ServiceRoleInstanceEntity serviceRoleInstanceEntity) {
-                ClusterNodeEntity nodeEntity = clusterNodeRepository.findById(serviceRoleInstanceEntity.getNodeId()).get();
-                return new RoleNodeInfo(serviceRoleInstanceEntity.getId(), nodeEntity.getHostname(), serviceRoleInstanceEntity.getServiceRoleName());
-            }
-        }).collect(Collectors.groupingBy(RoleNodeInfo::getRoleName));
-        return serviceRoles;
     }
 
 }
