@@ -16,9 +16,13 @@ public enum LogUtil {
      * @param logFunction
      */
     public static void logWithTaskId(TaskParam taskParam, LogFunction logFunction) {
-        MDC.put(Constant.TASK_ID, (taskParam.getCommandId() + "-" + taskParam.getCommandTaskId()));
-        logFunction.log();
-        MDC.clear();
+        if (taskParam == null) {
+            logFunction.log();
+        } else {
+            MDC.put(Constant.TASK_ID, (taskParam.getCommandId() + "-" + taskParam.getCommandTaskId()));
+            logFunction.log();
+            MDC.clear();
+        }
     }
 
     public interface LogFunction {
