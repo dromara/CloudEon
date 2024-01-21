@@ -16,33 +16,35 @@
  */
 package org.dromara.cloudeon.utils;
 
-import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.io.resource.ResourceUtil;
+import cn.hutool.core.lang.func.Supplier2;
+import cn.hutool.core.lang.func.VoidFunc0;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
-import io.fabric8.kubernetes.api.model.HasMetadata;
-import io.fabric8.kubernetes.api.model.LabelSelector;
-import io.fabric8.kubernetes.api.model.ObjectMeta;
-import io.fabric8.kubernetes.api.model.Pod;
+import com.google.common.collect.Maps;
+import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
-import io.fabric8.kubernetes.api.model.apps.DeploymentStatus;
 import io.fabric8.kubernetes.api.model.batch.v1.Job;
 import io.fabric8.kubernetes.api.model.batch.v1.JobBuilder;
 import io.fabric8.kubernetes.api.model.batch.v1.JobSpec;
-import io.fabric8.kubernetes.api.model.batch.v1.JobStatus;
-import io.fabric8.kubernetes.client.*;
-import io.fabric8.kubernetes.client.dsl.LogWatch;
+import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClientBuilder;
+import io.fabric8.kubernetes.client.Watch;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.compress.utils.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.dromara.cloudeon.crd.helmchart.HelmChart;
 import org.dromara.cloudeon.processor.TaskParam;
+import org.dromara.cloudeon.utils.k8s.DeploymentReadyWatcher;
+import org.dromara.cloudeon.utils.k8s.JobCompleteWatcher;
+import org.dromara.cloudeon.utils.k8s.PodLogWatcher;
 
+import java.io.OutputStream;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -76,139 +78,6 @@ public class K8sUtil {
         return chineseDateTimeFormatter.format(beijingTime);
     }
 
-    @Slf4j
-    public static class DeploymentReadyWatcher implements Watcher<Deployment> {
-        private final CountDownLatch completionLatch;
-        private final TaskParam taskParam;
-
-        public DeploymentReadyWatcher(TaskParam taskParam, CountDownLatch completionLatch) {
-            super();
-            this.taskParam = taskParam;
-            this.completionLatch = completionLatch;
-        }
-
-        @Override
-        public void eventReceived(Action action, Deployment deployment) {
-            DeploymentStatus status = deployment.getStatus();
-            if (status == null) {
-                return;
-            }
-            boolean deploymentReady = deployment.getStatus().getReadyReplicas() != null
-                    && Objects.equals(deployment.getStatus().getReadyReplicas(), deployment.getStatus().getReplicas());
-            if (deploymentReady) {
-                completionLatch.countDown();
-            }
-        }
-
-        @Override
-        public void onClose() {
-            LogUtil.logWithTaskId(taskParam, () -> log.info("DeploymentReadyWatcher closed"));
-        }
-
-        @Override
-        public void onClose(WatcherException cause) {
-            LogUtil.logWithTaskId(taskParam, () -> {
-                log.info("DeploymentReadyWatcher closed with exception: " + cause.getMessage());
-                log.error(cause.getMessage(), cause);
-            });
-        }
-    }
-
-    @Slf4j
-    public static class JobCompleteWatcher implements Watcher<Job> {
-        private final TaskParam taskParam;
-        private final CountDownLatch completionLatch;
-        private final AtomicBoolean isJobEndSuccess;
-        private final AtomicInteger retryCount;
-
-        public JobCompleteWatcher(TaskParam taskParam, CountDownLatch completionLatch, AtomicBoolean isJobEndSuccess, AtomicInteger retryCount) {
-            super();
-            this.taskParam = taskParam;
-            this.completionLatch = completionLatch;
-            this.isJobEndSuccess = isJobEndSuccess;
-            this.retryCount = retryCount;
-        }
-
-        @Override
-        public void eventReceived(Action action, Job job) {
-            if (action != Action.MODIFIED) {
-                return;
-            }
-            JobStatus status = job.getStatus();
-            if (status == null || status.getConditions().isEmpty()) {
-                return;
-            }
-            isJobEndSuccess.set("Complete".equalsIgnoreCase(status.getConditions().get(0).getType()));
-            if (status.getFailed() != null) {
-                retryCount.set(status.getFailed());
-            }
-            completionLatch.countDown();
-        }
-
-        @Override
-        public void onClose() {
-            doClose();
-        }
-
-        @Override
-        public void onClose(WatcherException cause) {
-            LogUtil.logWithTaskId(taskParam, () -> {
-                log.info("Watcher closed with exception: " + cause.getMessage());
-                log.error(cause.getMessage(), cause);
-            });
-            doClose();
-        }
-
-        private void doClose() {
-            LogUtil.logWithTaskId(taskParam, () -> {
-                log.info("Watcher closed");
-            });
-        }
-    }
-
-    @Slf4j
-    public static class PodLogWatcher implements Watcher<Pod> {
-
-        private final TaskParam taskParam;
-        private final KubernetesClient client;
-        private List<LogWatch> logWatchelist = Lists.newArrayList();
-
-        public PodLogWatcher(TaskParam taskParam, KubernetesClient client) {
-            super();
-            this.taskParam = taskParam;
-            this.client = client;
-        }
-
-        @Override
-        public void eventReceived(Action action, Pod pod) {
-            if (action == Action.ADDED) {
-                String podName = pod.getMetadata().getName();
-                LogWatch logWatch = client.pods()
-                        .inNamespace(pod.getMetadata().getNamespace())
-                        .withName(podName)
-                        .watchLog(new LogOutputStream(taskParam,
-                                s -> "Log of pod " + podName + "> " + s));
-                logWatchelist.add(logWatch);
-            }
-        }
-
-        private void doClose() {
-            logWatchelist.forEach(IoUtil::close);
-            logWatchelist.clear();
-            LogUtil.logWithTaskId(taskParam, () -> log.info("PodLogWatcher closed"));
-        }
-
-        @Override
-        public void onClose() {
-            doClose();
-        }
-
-        @Override
-        public void onClose(WatcherException e) {
-            LogUtil.logWithTaskId(taskParam, () -> log.error(e.getMessage(), e));
-            doClose();
-        }
-    }
 
     public static String getNamespace(KubernetesClient client, HasMetadata resource) {
         if (StringUtils.isNotEmpty(resource.getMetadata().getNamespace())) {
@@ -220,13 +89,14 @@ public class K8sUtil {
         return "default";
     }
 
-    public static void waitForDeploymentReady(ResourceAction resourceAction, TaskParam taskParam, KubernetesClient client, Deployment deployment, long waitSeconds) {
+    public static void waitForDeploymentReady(VoidFunc0 resourceAction, TaskParam taskParam, KubernetesClient client, Deployment deployment, long waitSeconds) {
         CountDownLatch completionLatch = new CountDownLatch(1);
         try (Watch ignored = client.apps().deployments().resource(deployment)
                 .watch(new DeploymentReadyWatcher(taskParam, completionLatch));
-             Watch ignored1 = client.pods().inNamespace(getNamespace(client, deployment)).withLabelSelector(deployment.getSpec().getSelector()).watch(new PodLogWatcher(taskParam, client))
+             Watch ignored1 = client.pods().inNamespace(getNamespace(client, deployment)).withLabelSelector(deployment.getSpec().getSelector())
+                     .watch(new PodLogWatcher(client, getTaskParamOutputStreamSupplier(taskParam)))
         ) {
-            resourceAction.action();
+            resourceAction.callWithRuntimeException();
             log.info("Waiting for deployment to be ready ...");
             try {
                 if (!completionLatch.await(waitSeconds, TimeUnit.SECONDS)) {
@@ -255,7 +125,7 @@ public class K8sUtil {
         return new JobBuilder().withMetadata(jobMeta).build();
     }
 
-    public static int waitForJobCompleted(ResourceAction resourceAction, TaskParam taskParam, KubernetesClient client, Job job, long waitSeconds) {
+    public static int waitForJobCompleted(VoidFunc0 resourceAction, TaskParam taskParam, KubernetesClient client, Job job, long waitSeconds) {
         CountDownLatch jobCompletionLatch = new CountDownLatch(1);
 
         AtomicBoolean isJobEndSuccess = new AtomicBoolean(false);
@@ -270,9 +140,12 @@ public class K8sUtil {
         try (Watch ignored = client.batch().v1().jobs()
                 .resource(job)
                 .watch(new JobCompleteWatcher(taskParam, jobCompletionLatch, isJobEndSuccess, retryCount));
-             Watch ignored1 = client.pods().inNamespace(getNamespace(client, job)).withLabelSelector(job.getSpec().getSelector()).watch(new PodLogWatcher(taskParam, client))
+             Watch ignored1 = client.pods().inNamespace(getNamespace(client, job))
+                     .withLabelSelector(job.getSpec().getSelector())
+                     .watch(new PodLogWatcher(client, getTaskParamOutputStreamSupplier(taskParam)))
+
         ) {
-            resourceAction.action();
+            resourceAction.callWithRuntimeException();
             log.info("Waiting  for job to complete...");
             try {
                 if (!jobCompletionLatch.await(waitSeconds, TimeUnit.SECONDS)) {
@@ -291,8 +164,40 @@ public class K8sUtil {
         return retryCount.get();
     }
 
-
-    public interface ResourceAction {
-        void action();
+    private static Supplier2<OutputStream, Pod, ContainerStatus> getTaskParamOutputStreamSupplier(TaskParam taskParam) {
+        return (pod, containerStatus) -> {
+            String podName = pod.getMetadata().getName();
+            return new LogOutputStream(taskParam,
+                    pod.getStatus().getContainerStatuses().size() > 1
+                            ? s -> StrUtil.format("Log of pod {}({}) > {}", podName, containerStatus.getName(), s)
+                            : s -> StrUtil.format("Log of pod {} > {}", podName, s));
+        };
     }
+
+    public static String getConfigMapStr(String configmapName, Map<String, String> labels, Map<String, String> fileStrMap) {
+        Map<String, Object> dataModel = Maps.newHashMapWithExpectedSize(3);
+        dataModel.put("configmapName", configmapName);
+        dataModel.put("labels", labels);
+        for (Map.Entry<String, String> dataEntry : fileStrMap.entrySet()) {
+            StringBuilder sb = new StringBuilder();
+            for (String line : dataEntry.getValue().split("\\R")) {
+                sb.append("    ").append(line).append("\n");
+            }
+            fileStrMap.put(dataEntry.getKey(), sb.toString());
+        }
+        dataModel.put("fileStrMap", fileStrMap);
+        return FreemarkerUtil.templateEval(ResourceUtil.readUtf8Str("templates/configmap.yaml.ftl"), dataModel);
+    }
+
+    private static final DateTimeFormatter K8S_DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+
+    public static LocalDateTime parseDateStrToDateTime(String dateStr) {
+        return LocalDateTime.parse(dateStr, K8S_DATE_TIME_FORMATTER);
+    }
+
+    public static long parseDateStrToLong(String dateStr) {
+        return parseDateStrToDateTime(dateStr).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+    }
+
 }

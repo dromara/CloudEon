@@ -16,24 +16,32 @@
  */
 package org.dromara.cloudeon.service;
 
+import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.spring.SpringUtil;
-import io.fabric8.kubernetes.api.model.Container;
+import io.fabric8.kubernetes.api.model.ContainerState;
+import io.fabric8.kubernetes.api.model.ContainerStatus;
 import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.dsl.ContainerResource;
-import io.fabric8.kubernetes.client.dsl.LogWatch;
+import io.fabric8.kubernetes.api.model.apps.Deployment;
+import io.fabric8.kubernetes.api.model.batch.v1.Job;
+import io.fabric8.kubernetes.client.Watch;
 import io.fabric8.kubernetes.client.dsl.PodResource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
-import org.dromara.cloudeon.dao.*;
+import org.dromara.cloudeon.dao.ClusterNodeRepository;
+import org.dromara.cloudeon.dao.ServiceInstanceConfigRepository;
+import org.dromara.cloudeon.dao.ServiceInstanceRepository;
+import org.dromara.cloudeon.dao.ServiceRoleInstanceRepository;
 import org.dromara.cloudeon.dto.ServiceRoleLog;
 import org.dromara.cloudeon.dto.ServiceRoleLogPage;
 import org.dromara.cloudeon.dto.WsSessionBean;
 import org.dromara.cloudeon.entity.ClusterNodeEntity;
 import org.dromara.cloudeon.entity.ServiceInstanceEntity;
 import org.dromara.cloudeon.entity.ServiceRoleInstanceEntity;
-import org.dromara.cloudeon.entity.StackServiceRoleEntity;
+import org.dromara.cloudeon.enums.RoleType;
+import org.dromara.cloudeon.utils.K8sUtil;
+import org.dromara.cloudeon.utils.WebSocketSessionOutputStream;
+import org.dromara.cloudeon.utils.k8s.PodLogWatcher;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
@@ -50,10 +58,9 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import javax.annotation.Resource;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -63,20 +70,21 @@ import java.util.stream.Collectors;
 @Service
 public class LogService {
 
-
+    @Resource
+    private ServiceService serviceService;
     @Resource
     private ServiceRoleInstanceRepository roleInstanceRepository;
 
     @Resource
     private ServiceInstanceRepository serviceInstanceRepository;
-    @Resource
-    private StackServiceRoleRepository stackServiceRoleRepository;
 
     @Resource
     private ClusterNodeRepository clusterNodeRepository;
 
     @Resource
     private ServiceInstanceConfigRepository serviceInstanceConfigRepository;
+    @Resource
+    private KubeService kubeService;
 
     /**
      * 主要逻辑
@@ -93,76 +101,85 @@ public class LogService {
         Integer nodeId = roleInstanceEntity.getNodeId();
         ClusterNodeEntity clusterNodeEntity = clusterNodeRepository.findById(nodeId).get();
         String hostname = clusterNodeEntity.getHostname();
-        StackServiceRoleEntity stackServiceRoleEntity = stackServiceRoleRepository.findById(roleInstanceEntity.getStackServiceRoleId()).get();
-        KubeService kubeService = SpringUtil.getBean(KubeService.class);
-
         WebSocketSession wsSession = wsSessionBean.getWebSocketSession();
-
-        String roleServiceFullName = stackServiceRoleEntity.getRoleFullName() + "-" + serviceInstanceEntity.getServiceName().toLowerCase();
-
-        KubernetesClient client = kubeService.getKubeClient(serviceInstanceEntity.getClusterId());
-        Optional<Pod> podOptional = client.pods().withLabel("app", roleServiceFullName).list().getItems().stream().filter(
-                pod -> {
-                    if (pod.getSpec() == null) {
-                        return false;
-                    }
-                    return hostname.equals(pod.getSpec().getNodeName());
-                }
-        ).findFirst();
-        if (!podOptional.isPresent()) {
-            wsSession.sendMessage(new TextMessage(StrUtil.format("未找到Pod app标签值为{}且所在节点名为{}的Pod", roleServiceFullName, hostname)));
+        String roleServiceFullName = serviceService.getRoleServiceFullName(roleInstanceEntity);
+        RoleType roleType = serviceService.getRoleType(roleInstanceEntity);
+        if (!roleType.isSupportLogs()) {
+            wsSession.sendMessage(new TextMessage(StrUtil.format("该类型角色（{}）不支持日志查询", roleType)));
             return;
         }
-        Pod pod = podOptional.get();
-        PodResource podResource = client.pods().resource(pod);
-        List<Container> containers = pod.getSpec().getContainers();
-        Container mainContainer = containers.get(0);
-        if (containers.size() > 1) {
-            Optional<Container> serverContainerOp = containers.stream().filter(c -> c.getName().equalsIgnoreCase("server")).findFirst();
-            if (serverContainerOp.isPresent()) {
-                mainContainer = serverContainerOp.get();
-            } else {
-                int lastVolumnMountSize = 0;
-                for (Container container : containers) {
-                    if (container.getVolumeMounts().size() > lastVolumnMountSize) {
-                        lastVolumnMountSize = container.getVolumeMounts().size();
-                        mainContainer = container;
+        String namespace = serviceService.getNamespace(serviceInstanceEntity.getClusterId());
+        kubeService.executeWithKubeClient(serviceInstanceEntity.getClusterId(), client -> {
+            Pod pod;
+            switch (roleType) {
+                case JOB:
+                    Job job = client.batch().v1().jobs().inNamespace(namespace).withName(roleServiceFullName).get();
+                    Optional<Pod> jobPodOptional = client.pods().inNamespace(namespace)
+                            .withLabels(job.getSpec().getTemplate().getMetadata().getLabels())
+                            .list().getItems()
+                            .stream().max(Comparator.comparingLong(o -> K8sUtil.parseDateStrToLong(o.getStatus().getStartTime())));
+                    if (!jobPodOptional.isPresent()) {
+                        wsSession.sendMessage(new TextMessage(StrUtil.format("未找到Job {} 对应的Pod", roleServiceFullName)));
+                        return;
                     }
-                }
-            }
-        }
-        ContainerResource containerResource = podResource.inContainer(mainContainer.getName());
-
-        try (LogWatch logWatch = containerResource.tailingLines(200).watchLog();
-             BufferedReader reader = new BufferedReader(new InputStreamReader(logWatch.getOutput()))) {
-            while (true) {
-                String line = reader.readLine();
-                if (line == null || !wsSession.isOpen()) {
+                    pod = jobPodOptional.get();
                     break;
-                } else {
-                    wsSession.sendMessage(new TextMessage(line));
+                case DEPLOYMENT:
+                    Deployment deployment = client.apps().deployments().inNamespace(namespace).withName(roleServiceFullName).get();
+                    Optional<Pod> podOptional = client.pods().inNamespace(namespace).withLabels(deployment.getSpec().getTemplate().getMetadata().getLabels()).list().getItems().stream().filter(
+                            p -> {
+                                if (p.getSpec() == null) {
+                                    return false;
+                                }
+                                return hostname.equals(p.getSpec().getNodeName());
+                            }
+                    ).findFirst();
+                    if (!podOptional.isPresent()) {
+                        wsSession.sendMessage(new TextMessage(StrUtil.format("未找到Pod app标签值为{}且所在节点名为{}的Pod", roleServiceFullName, hostname)));
+                        return;
+                    }
+                    pod = podOptional.get();
+                    break;
+                default:
+                    wsSession.sendMessage(new TextMessage(StrUtil.format("该类型角色（{}）暂未支持日志查询", roleType)));
+                    return;
+            }
+            String podName = pod.getMetadata().getName();
+            PodResource podResource = client.pods().inNamespace(namespace).resource(pod);
+            wsSession.sendMessage(new TextMessage(StrUtil.format("当前Pod名称为： {}", podName)));
+            for (ContainerStatus containerStatus : pod.getStatus().getContainerStatuses()) {
+                String containerName = containerStatus.getName();
+                ContainerState state = containerStatus.getState();
+                wsSession.sendMessage(new TextMessage(StrUtil.format("容器 {} 状态为： {}", containerName, state.toString())));
+            }
+            try (Watch ignored = podResource.watch(new PodLogWatcher(client, (runPod, containerStatus) -> new WebSocketSessionOutputStream(wsSession,
+                    runPod.getStatus().getContainerStatuses().size() > 1
+                            ? s -> StrUtil.format("{} > {}", containerStatus.getName(), s)
+                            : s -> s)))) {
+                while (wsSession.isOpen()) {
+                    ThreadUtil.safeSleep(1000);
                 }
             }
-        }
+        });
         log.info("退出监听服务器日志: sessionID {}", wsSessionBean.getWsSessionId());
     }
 
 
     public ServiceRoleLogPage getServiceLog(Integer clusterId, String roleName, String logLevel, int from, int pageSize) {
+        if (StringUtils.isEmpty(roleName)) {
+            throw new IllegalArgumentException("roleName不能为空");
+        }
         ServiceRoleLogPage result = ServiceRoleLogPage.builder().build();
-        // 查询es服务实例
+//        查询es服务实例
         Integer serviceInstanceId = serviceInstanceRepository.findByServiceNameAndClusterId("ELASTICSEARCH",clusterId).getId();
         List<ServiceRoleInstanceEntity> roleInstanceEntities = roleInstanceRepository.findByServiceInstanceIdAndServiceRoleName(serviceInstanceId, "ELASTICSEARCH_NODE");
-        ServiceRoleInstanceEntity serviceRoleInstanceEntity = roleInstanceEntities.get(0);
-        String ip = clusterNodeRepository.findById(serviceRoleInstanceEntity.getNodeId()).get().getIp();
-        String value = serviceInstanceConfigRepository.findByServiceInstanceIdAndName(serviceInstanceId, "elasticsearch.http.listeners.port").getValue();
+        int esPort = Integer.parseInt(serviceInstanceConfigRepository.findByServiceInstanceIdAndName(serviceInstanceId, "elasticsearch.http.listeners.port").getValue());
+        HttpHost[] esHttpHostArr = roleInstanceEntities.stream().map(entity -> new HttpHost(
+                clusterNodeRepository.findById(entity.getNodeId()).get().getIp(),
+                esPort
+        )).toArray(HttpHost[]::new);
 
-
-        RestHighLevelClient client = new RestHighLevelClient(
-                RestClient.builder(
-                        new HttpHost(ip, Integer.parseInt(value), "http") // Elasticsearch主机和端口
-                )
-        );
+        RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(esHttpHostArr));
 
         // 构建查询条件
         BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
@@ -189,7 +206,7 @@ public class LogService {
                 @Override
                 public ServiceRoleLog apply(SearchHit documentFields) {
                     String message = (String) documentFields.getSourceAsMap().get("message");
-                    String hostip = (String) documentFields.getSourceAsMap().get("hostip");
+                    String hostip = (String) documentFields.getSourceAsMap().get("nodename");
                     String bizTime = (String) documentFields.getSourceAsMap().get("bizTime");
                     return ServiceRoleLog.builder().message(message).hostip(hostip).bizTime(bizTime).build();
                 }

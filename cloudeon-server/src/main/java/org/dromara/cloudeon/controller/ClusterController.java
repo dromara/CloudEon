@@ -91,12 +91,13 @@ public class ClusterController {
             clusterInfoEntity = clusterInfoRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("can't find cluster info by id:" + id));
         }
         // 检验kubeconfig是否正确能连接k8s集群
-        KubernetesClient kubernetesClient = K8sUtil.getKubernetesClient(req.getKubeConfig());
-        kubeService.testConnect(kubernetesClient);
+        try (KubernetesClient kubernetesClient = K8sUtil.getKubernetesClient(req.getKubeConfig())) {
+            kubeService.testConnect(kubernetesClient);
 
-        // 校验 k8s namespace是否存在
-        if (!kubeService.checkNamespace(kubernetesClient, req.getNamespace())) {
-            return ResultDTO.failed("k8s namespace不存在");
+            // 校验 k8s namespace是否存在
+            if (!kubeService.checkNamespace(kubernetesClient, req.getNamespace())) {
+                return ResultDTO.failed("k8s namespace不存在");
+            }
         }
 
         BeanUtils.copyProperties(req, clusterInfoEntity);

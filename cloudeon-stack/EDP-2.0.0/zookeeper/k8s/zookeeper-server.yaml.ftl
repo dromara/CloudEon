@@ -26,6 +26,7 @@ spec:
         app: "${roleServiceFullName}"
         podConflictName: "${roleServiceFullName}"
         sname: ${serviceFullName}
+        inject-filebeat: "true"
     spec:
       affinity:
         podAntiAffinity:
@@ -88,6 +89,8 @@ spec:
           mountPath: /opt/global/10.render
         - name: global-usersync-config
           mountPath: /opt/global/20.usersync
+        - name: global-copy-filebeat-config
+          mountPath: /opt/global/30.copy-filebeat-config
         - name: service-render
           mountPath: /opt/service-render
         - name: service-common
@@ -110,6 +113,9 @@ spec:
       - name: global-usersync-config
         configMap:
           name: global-usersync-config
+      - name: global-copy-filebeat-config
+        configMap:
+          name: global-copy-filebeat-config
       - name: service-render
         configMap:
           name: zookeeper-service-render

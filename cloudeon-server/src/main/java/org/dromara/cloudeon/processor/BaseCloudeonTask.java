@@ -21,16 +21,17 @@ import cn.hutool.extra.spring.SpringUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.dromara.cloudeon.dao.CommandRepository;
-import org.dromara.cloudeon.dao.CommandTaskRepository;
+import org.dromara.cloudeon.config.CloudeonConfigProp;
+import org.dromara.cloudeon.dao.*;
 import org.dromara.cloudeon.entity.CommandEntity;
 import org.dromara.cloudeon.entity.CommandTaskEntity;
 import org.dromara.cloudeon.enums.CommandState;
-import org.dromara.cloudeon.utils.RemoteSshTaskErrorLineHandler;
-import org.dromara.cloudeon.utils.RemoteSshTaskLineHandler;
+import org.dromara.cloudeon.service.KubeService;
+import org.dromara.cloudeon.service.ServiceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+import org.springframework.core.env.Environment;
 
 import java.util.Date;
 
@@ -48,16 +49,37 @@ public abstract class BaseCloudeonTask implements Runnable {
     protected CommandRepository commandRepository;
     protected TaskParam taskParam;
 
-    protected RemoteSshTaskLineHandler remoteSshTaskLineHandler;
-    protected RemoteSshTaskErrorLineHandler remoteSshTaskErrorLineHandler;
+    protected StackServiceRepository stackServiceRepository;
+    protected ServiceInstanceRepository serviceInstanceRepository;
+    protected StackServiceRoleRepository stackServiceRoleRepository;
+    protected ServiceRoleInstanceRepository serviceRoleInstanceRepository;
+    protected ServiceInstanceConfigRepository configRepository;
+    protected KubeService kubeService;
+    protected ServiceService serviceService;
+    protected CloudeonConfigProp cloudeonConfigProp;
+    protected Environment environment;
+    protected ClusterInfoRepository clusterInfoRepository;
+    protected ClusterNodeRepository clusterNodeRepository;
+    protected ServiceRoleInstanceRepository roleInstanceRepository;
 
 
     private void init() {
-        remoteSshTaskLineHandler = new RemoteSshTaskLineHandler(log);
-        remoteSshTaskErrorLineHandler = new RemoteSshTaskErrorLineHandler(log);
-        // 填充数据库操作类
+        // 填充SpringBean
         commandTaskRepository = SpringUtil.getBean(CommandTaskRepository.class);
         commandRepository = SpringUtil.getBean(CommandRepository.class);
+        stackServiceRepository = SpringUtil.getBean(StackServiceRepository.class);
+        serviceInstanceRepository = SpringUtil.getBean(ServiceInstanceRepository.class);
+        stackServiceRoleRepository = SpringUtil.getBean(StackServiceRoleRepository.class);
+        serviceRoleInstanceRepository = SpringUtil.getBean(ServiceRoleInstanceRepository.class);
+        configRepository = SpringUtil.getBean(ServiceInstanceConfigRepository.class);
+        kubeService = SpringUtil.getBean(KubeService.class);
+        serviceService = SpringUtil.getBean(ServiceService.class);
+        cloudeonConfigProp = SpringUtil.getBean(CloudeonConfigProp.class);
+        environment = SpringUtil.getBean(Environment.class);
+        clusterInfoRepository = SpringUtil.getBean(ClusterInfoRepository.class);
+        clusterNodeRepository = SpringUtil.getBean(ClusterNodeRepository.class);
+        roleInstanceRepository = SpringUtil.getBean(ServiceRoleInstanceRepository.class);
+
         // 日志标识
         MDC.put(TASKID, (taskParam.getCommandId() + "-" + taskParam.getCommandTaskId()));
         // 记录任务开始时间
@@ -73,7 +95,6 @@ public abstract class BaseCloudeonTask implements Runnable {
     @Override
     public void run() {
         init();
-
         try {
             internalExecute();
         } catch (Exception e) {

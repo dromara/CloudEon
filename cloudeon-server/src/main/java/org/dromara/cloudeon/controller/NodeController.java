@@ -19,7 +19,6 @@ package org.dromara.cloudeon.controller;
 import cn.hutool.core.bean.BeanUtil;
 import io.fabric8.kubernetes.api.model.Node;
 import io.fabric8.kubernetes.api.model.NodeList;
-import io.fabric8.kubernetes.client.KubernetesClient;
 import org.dromara.cloudeon.config.CloudeonConfigProp;
 import org.dromara.cloudeon.controller.request.SaveNodeRequest;
 import org.dromara.cloudeon.controller.response.NodeInfoVO;
@@ -27,7 +26,6 @@ import org.dromara.cloudeon.dao.ClusterNodeRepository;
 import org.dromara.cloudeon.dto.ResultDTO;
 import org.dromara.cloudeon.entity.ClusterNodeEntity;
 import org.dromara.cloudeon.service.KubeService;
-import org.dromara.cloudeon.service.SshPoolService;
 import org.dromara.cloudeon.utils.ByteConverter;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -39,7 +37,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @RestController
@@ -56,9 +53,6 @@ public class NodeController {
     @Resource
     private KubeService kubeService;
 
-    @Resource
-    private SshPoolService sshPoolService;
-
     @PostMapping("/add")
     @Transactional(rollbackFor = Exception.class)
     public ResultDTO<Void> addNode(@RequestBody SaveNodeRequest req) throws IOException {
@@ -68,22 +62,16 @@ public class NodeController {
         if (clusterNodeRepository.countByIp(ip) > 0) {
             return ResultDTO.failed("已添加ip为：" + ip + " 的节点(服务器)");
         }
-        KubernetesClient kubeClient = kubeService.getKubeClient(clusterId);
-        NodeList nodeList = kubeClient.nodes().list();
-        List<Node> items = nodeList.getItems();
-        // 获取该节点在k8s上的信息
-        NodeInfoVO k8sNodeInfoVO = items.stream().filter(new Predicate<Node>() {
-            @Override
-            public boolean test(Node node) {
+        NodeInfoVO k8sNodeInfoVO = kubeService.executeWithKubeClient(clusterId, kubeClient -> {
+            NodeList nodeList = kubeClient.nodes().list();
+            List<Node> items = nodeList.getItems();
+            // 获取该节点在k8s上的信息
+            return items.stream().filter(node -> {
                 String nodeIp = getNodeIp(node);
                 return ip.equals(nodeIp);
-            }
-        }).map(new Function<Node, NodeInfoVO>() {
-            @Override
-            public NodeInfoVO apply(Node node) {
-                return getNodeInfoVO(node);
-            }
-        }).findFirst().get();
+            }).map(node -> getNodeInfoVO(node)).findFirst().get();
+        });
+
         String containerRuntimeVersion = k8sNodeInfoVO.getContainerRuntimeVersion();
         // 保存到数据库
         ClusterNodeEntity newClusterNodeEntity = new ClusterNodeEntity();
@@ -103,15 +91,10 @@ public class NodeController {
     public ResultDTO<List<NodeInfoVO>> listNode(Integer clusterId) {
         List<NodeInfoVO> result;
         // 获取k8s集群节点信息
-        KubernetesClient kubeClient = kubeService.getKubeClient(clusterId);
-        NodeList nodeList = kubeClient.nodes().list();
-        List<Node> items = nodeList.getItems();
-        Map<String, Node> nodeMap = items.stream().collect(Collectors.toMap(new Function<Node, String>() {
-            @Override
-            public String apply(Node node) {
-                return getNodeIp(node);
-            }
-        }, node -> node));
+        Map<String, Node> nodeMap = kubeService.executeWithKubeClient(clusterId, kubeClient -> {
+            List<Node> items = kubeClient.nodes().list().getItems();
+            return items.stream().collect(Collectors.toMap(this::getNodeIp, node -> node));
+        });
         // 从数据库查出当前集群绑定的节点
         List<ClusterNodeEntity> nodeEntities = clusterNodeRepository.findByClusterId(clusterId);
         result = nodeEntities.stream().map(nodeEntity -> {
@@ -140,24 +123,14 @@ public class NodeController {
             }
         }).collect(Collectors.toSet());
         // 通过集群id连接k8s集群
-        KubernetesClient kubeClient = kubeService.getKubeClient(clusterId);
-        // 获取k8s集群节点信息
-        NodeList nodeList = kubeClient.nodes().list();
-        List<Node> items = nodeList.getItems();
-        List<NodeInfoVO> result = items.stream().filter(new Predicate<Node>() {
-            @Override
-            public boolean test(Node node) {
+        List<NodeInfoVO> result = kubeService.executeWithKubeClient(clusterId, kubeClient -> {
+            // 获取k8s集群节点信息
+            return kubeClient.nodes().list().getItems().stream().filter(node -> {
                 String ip = getNodeIp(node);
                 //  过滤出未绑定的节点
                 return !clusterIpSets.contains(ip);
-            }
-        }).map(e -> {
-            NodeInfoVO nodeInfoVO = getNodeInfoVO(e);
-
-            return nodeInfoVO;
-
-        }).collect(Collectors.toList());
-
+            }).map(this::getNodeInfoVO).collect(Collectors.toList());
+        });
         return ResultDTO.success(result);
     }
 

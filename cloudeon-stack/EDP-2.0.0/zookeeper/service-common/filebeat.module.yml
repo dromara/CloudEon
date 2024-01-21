@@ -1,0 +1,13 @@
+- module: zookeeper
+  audit:
+    enabled: false
+    var.paths:
+      - "/workspace/logs/zookeeper_audit.log*"
+  log:
+    enabled: true
+    input:
+      fields:
+        service: ZOOKEEPER
+        role: ZOOKEEPER_SERVER
+    var.paths:
+      - "/workspace/logs/zookeeper*.log*"

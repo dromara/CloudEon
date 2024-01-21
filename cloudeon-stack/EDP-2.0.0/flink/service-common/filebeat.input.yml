@@ -1,0 +1,11 @@
+- type: log
+  enabled: true
+  fields:
+    service: FLINK
+    role: FLINK_HISTORY_SERVER
+  paths:
+    - /workspace/logs/flink*historyserver*.log
+  multiline.pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}'
+  multiline.negate: true
+  multiline.match: after
+  close_timeout: 5m

@@ -1,0 +1,102 @@
+name: ELASTICSEARCH
+label: "Elasticsearch"
+description: "分布式、高扩展、近实时的搜索和分析引擎"
+version: 7.16.3
+dependencies: []
+
+supportKerberos: false
+
+dashboard:
+  uid: "elasticsearch001"
+
+roles:
+  - name: ELASTICSEARCH_NODE
+    label: "Elasticsearch Node"
+    roleFullName: "elasticsearch-node"
+    sortNum: 1
+    type: DEPLOYMENT
+    minNum : 1
+    linkExpression: "http://${localhostname}:${conf['elasticsearch.http.listeners.port']}"
+
+customConfigFiles:
+  - elasticsearch.yml
+  - jvm.options
+
+configurations:
+  - name: serverImage
+    description: "服务镜像"
+    recommendExpression: "registry.cn-guangzhou.aliyuncs.com/bigdata200/elasticsearch:7.16.3"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "镜像"
+
+  - name: exporterImage
+    description: "exporter镜像"
+    recommendExpression: "registry.cn-guangzhou.aliyuncs.com/bigdata200/elasticsearch_exporter:v1.7.0"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "镜像"
+
+  - name: data.path.list
+    description: "Elasticsearch 存储挂载路径列表，逗号分隔。当为空时使用默认路径：全局参数global.persistence.basePath/角色名称/data"
+    recommendExpression: ""
+    valueType: InputString
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: elasticsearch.container.limit.cpu
+    description: "Elasticsearch Server容器的CPU使用限额"
+    recommendExpression: 1.0
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: elasticsearch.container.limit.memory
+    description: "Elasticsearch Server容器的内存使用限额，单位MB"
+    recommendExpression: 2048
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: elasticsearch.container.request.cpu
+    description: "Elasticsearch Server容器的CPU请求量"
+    recommendExpression: 0.2
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: elasticsearch.container.request.memory
+    description: "Elasticsearch Server容器的内存请求量，单位MB"
+    recommendExpression: 1024
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: elasticsearch.http.listeners.port
+    recommendExpression: 9200
+    valueType: InputNumber
+    configurableInWizard: true
+    description: "Elasticsearch http端口"
+    tag: "端口"
+
+  - name: elasticsearch.tcp.listeners.port
+    recommendExpression: 9300
+    valueType: InputNumber
+    configurableInWizard: true
+    description: "Elasticsearch tcp端口"
+    tag: "端口"
+  - name: elasticsearch.head.port
+    recommendExpression: 9100
+    valueType: InputNumber
+    configurableInWizard: true
+    description: "Elasticsearch web插件端口"
+    tag: "端口"
+
+  - name: elasticsearch.exporter.port
+    recommendExpression: 5557
+    valueType: InputNumber
+    configurableInWizard: true
+    description: "Elasticsearch exporter metrics端口"
+    tag: "端口"

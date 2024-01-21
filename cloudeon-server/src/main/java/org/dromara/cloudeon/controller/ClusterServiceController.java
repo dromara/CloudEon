@@ -29,7 +29,6 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import io.fabric8.kubernetes.api.model.EventList;
 import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.client.KubernetesClient;
 import io.vertx.core.Vertx;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -963,36 +962,31 @@ public class ClusterServiceController {
         String hostIp = clusterNodeRepository.findById(nodeId).get().getIp();
         String namespace = clusterInfoRepository.findById(clusterId).get().getNamespace();
         ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(roleInstanceEntity.getServiceInstanceId()).get();
-        KubernetesClient client = kubeService.getKubeClient(clusterId);
-        String roleServiceFullName = stackServiceRoleEntity.getRoleFullName() + "-" + serviceInstanceEntity.getServiceName().toLowerCase();
+        return kubeService.executeWithKubeClient(clusterId, client -> {
+            String roleServiceFullName = stackServiceRoleEntity.getRoleFullName() + "-" + serviceInstanceEntity.getServiceName().toLowerCase();
 
-        // 带有标签的pod
-        List<Pod> podList = client.pods().inNamespace(namespace).withLabel("app", roleServiceFullName).list().getItems();
-        // 指定节点的pod
-        Pod pod = podList.stream().filter(new Predicate<Pod>() {
-            @Override
-            public boolean test(Pod pod) {
-                return pod.getStatus().getHostIP().equals(hostIp);
-            }
-        }).findFirst().get();
+            // 带有标签的pod
+            List<Pod> podList = client.pods().inNamespace(namespace).withLabel("app", roleServiceFullName).list().getItems();
+            // 指定节点的pod
+            Pod pod = podList.stream().filter(pod1 -> pod1.getStatus().getHostIP().equals(hostIp)).findFirst().get();
+            
+            EventList eventList = client.v1().events()
+                    .inNamespace(namespace)
+                    .withField("involvedObject.name", pod.getMetadata().getName())
+                    .list();
 
-
-        EventList eventList = client.v1().events()
-            .inNamespace(namespace)
-            .withField("involvedObject.name",pod.getMetadata().getName())
-            .list();
-
-        List<RolePodEventVO> rolePodEventVOS = eventList.getItems().stream().map(event -> {
-            RolePodEventVO eventVO = RolePodEventVO.builder()
-                    .type(event.getType())
-                    .message(event.getMessage())
-                    .reason(event.getReason())
-                    .count(event.getCount())
-                    .lastTimestamp(K8sUtil.formatK8sDateStr(event.getLastTimestamp()))
-                    .build();
-            return eventVO;
-        }).collect(Collectors.toList());
-        return ResultDTO.success(rolePodEventVOS);
+            List<RolePodEventVO> rolePodEventVOS = eventList.getItems().stream().map(event -> {
+                RolePodEventVO eventVO = RolePodEventVO.builder()
+                        .type(event.getType())
+                        .message(event.getMessage())
+                        .reason(event.getReason())
+                        .count(event.getCount())
+                        .lastTimestamp(K8sUtil.formatK8sDateStr(event.getLastTimestamp()))
+                        .build();
+                return eventVO;
+            }).collect(Collectors.toList());
+            return ResultDTO.success(rolePodEventVOS);
+        });
     }
 
 }

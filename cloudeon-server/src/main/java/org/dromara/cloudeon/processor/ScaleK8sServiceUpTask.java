@@ -14,21 +14,15 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.dromara.cloudeon.utils;
+package org.dromara.cloudeon.processor;
 
-import cn.hutool.core.io.LineHandler;
+import lombok.NoArgsConstructor;
 
-import org.slf4j.Logger;
+@NoArgsConstructor
+public class ScaleK8sServiceUpTask extends ScaleK8sServiceTask {
 
-public class RemoteSshTaskLineHandler implements LineHandler {
-
-    private Logger logger ;
-
-    public RemoteSshTaskLineHandler(Logger logger) {
-        this.logger = logger;
-    }
     @Override
-    public void handle(String line) {
-        logger.info(line);
+    public boolean isApplyTask() {
+        return true;
     }
 }

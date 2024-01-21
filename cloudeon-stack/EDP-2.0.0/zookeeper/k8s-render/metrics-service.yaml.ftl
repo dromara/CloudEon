@@ -4,7 +4,6 @@ metadata:
   name: metrics-${serviceFullName}
   labels:
     sname: ${serviceFullName}
-    roleFullName: zookeeper-server
     enable-default-service-monitor: true
 spec:
   selector:

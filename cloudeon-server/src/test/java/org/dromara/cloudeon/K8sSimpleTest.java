@@ -17,12 +17,23 @@
 package org.dromara.cloudeon;
 
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.thread.ThreadUtil;
+import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import io.fabric8.kubernetes.api.model.*;
+import io.fabric8.kubernetes.api.model.apps.Deployment;
+import io.fabric8.kubernetes.api.model.batch.v1.Job;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
+import io.fabric8.kubernetes.client.dsl.LogWatch;
+import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.ParameterNamespaceListVisitFromServerGetDeleteRecreateWaitApplicable;
+import io.fabric8.kubernetes.client.dsl.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.cloudeon.crd.helmchart.HelmChart;
+import org.dromara.cloudeon.processor.TaskParam;
 import org.dromara.cloudeon.utils.K8sUtil;
 import org.junit.Test;
 
@@ -30,7 +41,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
 @Slf4j
@@ -42,29 +55,125 @@ public class K8sSimpleTest {
                 "apiVersion: v1\n" +
                 "clusters:\n" +
                 "- cluster:\n" +
-                "    certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUMvRENDQWVTZ0F3SUJBZ0lVTGpWWFk5Y0lSMkhNdnhEWjJUU1VpYTdHWWhzd0RRWUpLb1pJaHZjTkFRRUwKQlFBd0ZURVRNQkVHQTFVRUF3d0thM1ZpWlhKdVpYUmxjekFnRncweU16QTFNekF3TmpRd01qVmFHQTh5TVRJegpNRFV3TmpBMk5EQXlOVm93RlRFVE1CRUdBMVVFQXd3S2EzVmlaWEp1WlhSbGN6Q0NBU0l3RFFZSktvWklodmNOCkFRRUJCUUFEZ2dFUEFEQ0NBUW9DZ2dFQkFPT2pJZTZqTjMwNC9jdC9VZmQ1VjB0WGF2OTBDWE1HaXd4NW0ycnEKNE5ZWGE0ay9ldEVnQndLV2ZHUStzbGhGWng3UjI5ajZvQ0N6SGwxNXlSUzhteEhSdG5LWWMxMWlYbGdQZlVlVQpCUHFxTzFkT1RjcTIxbW5UME80TFZ5Z1NaU3ZWSjZubGovK0R3YnZkSStXeXVHajN5c1lCQmcyQ3dVNFM0VVViCnRHdk1oVWpab3VvT2F6ZXEwVENOcHpqYUc3TU5VK24xTkNmTzV2dDY4Y0tVcGlIVmMxeGpiS3JoSjFiL0p3bXQKcHF4WGJyMWZVRWpSSVhtc1BrdExNSExVOXlGbnUxS2VyMEVJN0haUUx4ZURaL1RCa0djb2kveXM1Y2MrRGZ3VgpwYXFHTkx3czVrZkRVeXltRGlRRHNyYy9EcmJtUjdLbzIrNmQrMjFhMUNSYkZWY0NBd0VBQWFOQ01FQXdEd1lEClZSMFRBUUgvQkFVd0F3RUIvekFPQmdOVkhROEJBZjhFQkFNQ0FxUXdIUVlEVlIwT0JCWUVGSFA3MDVnNUNsS3UKRjRhUzZlMnFMUUVJampDN01BMEdDU3FHU0liM0RRRUJDd1VBQTRJQkFRQjVQMHJDMEVmMG9GRysvWFNva3VFLwpHWHJrNDA3NGxtb1JkcFpjYkZ4YytTaUI3bS9WMzMrcHcwOHcwbTMwY0tITk9aZ1J1bGJKL1p3azcxNU1mLzlBCkEzakF5RlZXS3VFR1JTbUNVZEJGem92ZjNNREZuRUExUWlMb0VyVndhTVNWNEs1bUg5UzdhZzNTZnFHR2xqYkIKVkhxVmdMdm9RbkM0M0lRcmlZUVp0bmY5NWJZNWlYdDhacElVVDZleHF6dFpvMGhyUXMzVVVJbmx4Wkltdis4eAp6Z1J0dC9zMEJSMTdMU0ZQUjFIVWt2dmV6VEFzamp1WExaOVltODl5bldhYWUzS3EvOFJEK01vSG5jWXc1ZUJUCkU2ekY3L3M0S1Jna3NsRW9PbnR5YnpDMVpNeEcrZFpnVWgybzF0ekdoSUZOTC9rSTBhZkd4bDlMVzVNdG1XWHgKLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=\n" +
-                "    server: https://192.168.100.192:8443\n" +
-                "  name: kubernetes\n" +
+                "    certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUMvakNDQWVhZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFWTVJNd0VRWURWUVFERXdwcmRXSmwKY201bGRHVnpNQjRYRFRJek1URXlPVEE1TXpNek1Gb1hEVE16TVRFeU5qQTVNek16TUZvd0ZURVRNQkVHQTFVRQpBeE1LYTNWaVpYSnVaWFJsY3pDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDQVFvQ2dnRUJBTDY3CmdjRUQwM1ZnTWZyVzJvbkpMQkZjZVE1WlFDOVFTZjJscFZoRHNpa09OQXUvNGhseHgxNmRCSDJ2T2wvSnkycWEKNnF3NmpPeXBITnFKaTNxVURBY2x2Zm9EaXdHUVFNVUw2Y0FoVGVsWENyYnFyU1YwNGJzczB0QzRNMWJlWkJ2Uwpxb2NZY1VMZ1VEN1AxQmlWU2hnR09lY3ByUm14VGpZSFJ1Q2ZtRGJ2VWRPSmdrUFQ0V2tUNWozNlNjeUdLZ2tlCm9wZFozUUd5MTVDb2p0VDJjS0pDcVhINnZkZDFwNjFMTHlCLzlBZzZDQllvdExlYUdTZUFOdHNjZDFnNE5CMGIKN3g1dWN3VmQyUW9iNUt5QlZta3ladFAvZFBDWVlwcWhFZ3o4ZldJOU1RKzBiL0pGS0Yza2w1YUtpYVljQTBpWgpuK3lrSHZQMU8vYXRjWFQ1VGUwQ0F3RUFBYU5aTUZjd0RnWURWUjBQQVFIL0JBUURBZ0trTUE4R0ExVWRFd0VCCi93UUZNQU1CQWY4d0hRWURWUjBPQkJZRUZOV2xLWG1qMnh5VFdhSCtINDRjSXBIWHdSYVRNQlVHQTFVZEVRUU8KTUF5Q0NtdDFZbVZ5Ym1WMFpYTXdEUVlKS29aSWh2Y05BUUVMQlFBRGdnRUJBQU9SUVNvWVB3Mko4bm16eVduawpQRURnRjhnVDhXRTM1WkpZSDFEVTNUdk85RDNmK1p0dEFPYkpYYjhDV3p5T1psWUptTDY3SW1sWkVnUWNBSDQrCkRBdGs3NWhBejdwM3BOV0RseUl6cDVUR1NzR1hvYzRuWDFzN3NQWXhzTVIvOU82UkJ6bUtpYXJjOWl3Yno5NkgKaW5DTHJpb2R5ZjBGNDFoNkd3TjRaL1BXTForMUt4WkMrRTZhUForWHorSVUvTklYNGFqRlJJNnJ1Q1ZDVldGdgpoVmFNRFZNSEltT0E5azQyL2xvNVVNUXFpUXpZYTllNUpyRUVHdkNzWUxGMTBqR1p5ZlRUQjBtZitrOXVLSm1hCnNnd2ZyQVFMbWhnUyt6NWhwT25XeFNhVGgzSFBBaTg1cUJFalRrS3ZZVm1hb2l0RDBvUU1xay81S0ZrczhvOXYKaG8wPQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==\n" +
+                "    server: https://k8sserver:6443\n" +
+                "  name: cluster.local\n" +
                 "contexts:\n" +
                 "- context:\n" +
-                "    cluster: kubernetes\n" +
+                "    cluster: cluster.local\n" +
                 "    user: kubernetes-admin\n" +
-                "  name: kubernetes-admin@kubernetes\n" +
-                "current-context: kubernetes-admin@kubernetes\n" +
+                "  name: kubernetes-admin@cluster.local\n" +
+                "current-context: kubernetes-admin@cluster.local\n" +
                 "kind: Config\n" +
                 "preferences: {}\n" +
                 "users:\n" +
                 "- name: kubernetes-admin\n" +
                 "  user:\n" +
-                "    client-certificate-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURTekNDQWpPZ0F3SUJBZ0lVZmdLeGwrV2xvWHB0UFk4YVkrbnd1R1FKdlU4d0RRWUpLb1pJaHZjTkFRRUwKQlFBd0ZURVRNQkVHQTFVRUF3d0thM1ZpWlhKdVpYUmxjekFnRncweU16QTFNekF3TmpRd05EbGFHQTh5TVRJegpNRFV3TmpBMk5EQTBPVm93TkRFWk1CY0dBMVVFQXd3UWEzVmlaWEp1WlhSbGN5MWhaRzFwYmpFWE1CVUdBMVVFCkNnd09jM2x6ZEdWdE9tMWhjM1JsY25Nd2dnRWlNQTBHQ1NxR1NJYjNEUUVCQVFVQUE0SUJEd0F3Z2dFS0FvSUIKQVFETXhCWnVweGpIRVkvaVF2NHhyOW1KdDhTaVJySGNtdUpvV2VCVDJNd1VLT0pTK1pFaFRtKzZkbDdBb0Iydgp1WXpWbHlkZmhoTWVtSUFQZnl5Y3dWbHRYZnhCcWFCOElkcThCM2FubnNDQ3JRMGUrQXBHM0V2dm12TUoxU3lQCkxTdWVvUWlKWWQ3UWZVM3BYdEdzYlorclpXT2J3Tm1RYTFWS3UvalFONlJlbytmZjRpcmE4ZEROdHU3SU1iVGgKT1pmYmVmMmdiR01nYXhJTStZSUI1bXpMODJ3NmJjeVAxUHkwY0d0ZVhydHJCSnZOT1NWQXlKcS9Oa2dNNno0RApzNGVxclNTME81MFB1LzlPTUNtVmtSSnp6MXFaYTdtdnc2emlwMC9nSEhtYkJqY2dndDNYNFpuOWR6NnhGQnppCjlqR1V4SDgvdW5MVFRFcnNNMW9OTlNoVEFnTUJBQUdqY2pCd01Ba0dBMVVkRXdRQ01BQXdEZ1lEVlIwUEFRSC8KQkFRREFnV2dNQk1HQTFVZEpRUU1NQW9HQ0NzR0FRVUZCd01DTUIwR0ExVWREZ1FXQkJSVzFNWWZFajlZOFBFRwoyVFRHTU41emhZdDB2REFmQmdOVkhTTUVHREFXZ0JSeis5T1lPUXBTcmhlR2t1bnRxaTBCQ0k0d3V6QU5CZ2txCmhraUc5dzBCQVFzRkFBT0NBUUVBR2FRdDJQdWRmTUlSUFNJamdzbWRUOUlVK3B6ZU9GblZvajdHZWVSNjcxL1QKZ1VmdXRSeTZsQ3FFMzFPaXA0LzlCelNNd1lPZDdMaThXUVFCYlNkZjdtdEo2SDFuVUpGcDdZZnRKaGlqN3hXdwpIeU4zbTVwYlBIcWVHMFAyM1pyeGVCbEhTN0ZhNXFtRzFRR0JId0kzblVLS1hXaDZpdUVZZE5mMm9GY1ByK2hoCk5CbjFweFY0aS9na1BoZHoxZ2o1YjVLd25kdVJTRDl4WDVtRW1SRGJvbHpRV3ZjNEU3UXc3bllNL0pwdlo3MlcKaUJ0NytHTGYzZ0E4aXowTHJZcnlXRnpUbUFvQ24ySHdYa0VyWGdDS1ZHTTBzczk1WThSOGhhN1VBYkp1ZGZlUwpZeUt3SGhtNHYwbEF2MlNnSU9vdzd5SzJnMVlOb0dtVWpoTmU1U3ZZcUE9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==\n" +
-                "    client-key-data: LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUV2d0lCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQktrd2dnU2xBZ0VBQW9JQkFRRE14Qlp1cHhqSEVZL2kKUXY0eHI5bUp0OFNpUnJIY211Sm9XZUJUMk13VUtPSlMrWkVoVG0rNmRsN0FvQjJ2dVl6Vmx5ZGZoaE1lbUlBUApmeXljd1ZsdFhmeEJxYUI4SWRxOEIzYW5uc0NDclEwZStBcEczRXZ2bXZNSjFTeVBMU3Vlb1FpSllkN1FmVTNwClh0R3NiWityWldPYndObVFhMVZLdS9qUU42UmVvK2ZmNGlyYThkRE50dTdJTWJUaE9aZmJlZjJnYkdNZ2F4SU0KK1lJQjVtekw4Mnc2YmN5UDFQeTBjR3RlWHJ0ckJKdk5PU1ZBeUpxL05rZ002ejREczRlcXJTUzBPNTBQdS85TwpNQ21Wa1JKenoxcVphN212dzZ6aXAwL2dISG1iQmpjZ2d0M1g0Wm45ZHo2eEZCemk5akdVeEg4L3VuTFRURXJzCk0xb05OU2hUQWdNQkFBRUNnZ0VBVk9GQnhUdVo3MGNONUVaTjlZM0YrS3NISlJkMStoTHdJRDZGV1d4b2FFRHMKVkdYa2JiQ0Vhd0JQVmJ6cG9XS2lpUlYvdWo2ckpVY2s2b2VXbUNJajdreUQyVG8xN3M3Znk0cXllbGc1eDlGeApPM0dwWE9kTHlQWnJvWnRPdmNrRktGdnJYSHVINzlmSldLQTMvU2h5QkF2aXh2a2hscGFQaEF1NFg2TjVETXRZCjNsa3c0NExHbXdYTWpGbk9oQnpMNjQxNDNQU0VRejUrYzRnL216RU9QTGgxSENqelJEVnNZdTlJQW90MzZJaUYKZWVFYVhYSEllNkoxRXhiMEE4V2lFdzAvWUp1cm1Lc09zVGNHNHpVeUxLMFhqNys1TysvVjcxdno2Qy9ZZUUwcwpFeXdDR1VoUUZuUjFUNHFaa3hPQndLaHVnSy9ZMjFZWlZ1OXlxbDNoalFLQmdRRE9BY0pSWGZjVWpac1UxZzd1CmNKRnNaQ3JiR05rckphVkp0VG52STBkdFMwZGNpaDRTQzExaFN1S2hHNkVjOXJqYnJhYmZiYktJc2VnVjA3cWIKU2UxYlhncCtkUlhZZGJTOTFGQ2pQOUNwMWV0MmxIeWtmV2VacWtQYTJtZmdqMmNSSEN0aWR4UXh4VUs2ajNRTQpCaFh4aDlWcy9YMmpvazRwbU1jcDRZeDFod0tCZ1FEK2RUeXRtZ2FDUGZkRHNyM1JzbkYzZ1RESFBjcU05MnpFCmdLT2duVG5nWkxyZ1hRcVB6ZlZTeUhSK1dqVzErWmw5RGF6M2hCSGg3RUlkQ3o3KzhnUWZyTTF5UVN4UXR1N2UKa05oaXRTdi9FNEtjYXROOXg4M2pGWGR2MW83V1A3R2lORTVQZWdQelo2a3FZT0tibi83YXJWUEwxUUlKRGNtVApDc1U2aUlWcDFRS0JnUUN5dUNQMG95aHYxRW51VWFheWhVWWtXdUl6SWVPRjR5cjZQeGI3dUFlSGNmOSs4UFFWCmczYUhxWWZqYlN6aEM4cGtDc3J5bXlDQUpwZktGOTJVU3haNFphV0UvOTdyNDNIaUhnZTNHTzNWNlpoVlQ0eXkKeDNqUmZ6MU82SnVsM2NMMHZST0dZUGhNRlc1R201MTVzTzNvbEljNy9zNjQzMTRnQ0VNQXVvUTRrUUtCZ1FEVQp4aEc4Rkl5V3dkd09KdHRsQ3JLb3ZFV2VoVVBuQmtwVU1rRWczL2Z5ZENoenpqa3pzSVFQK2dDM1d4V0ltak5ICmgzVDM3OTdJTExmSDg0eDB3TWpEOThvL1hOSUNtRVU3cEtEY1FTU09BYkY0dkRjbStUbG5ScDc5ek1yWnlwN3QKeEpFckVodFZvSHVyTFNLd0FXU3BWTUE2TkY2a1ZYd1YwYTdFV0Q0L0ZRS0JnUUNvV3JXSVB2MzdkUHFrTlhuaAp5NWNORmhJS1JJYURpSWt1bUxuMkZha1Z1VEJwRnlNR2M1cFdvZXBKcWN4eHU1ZnJGaGowWEtPOXZCODNETjNGCmRxclVma3d2YXpSdVdoVHRYdFlNbGV0aUtIY1RZcXpodjNQRWd5MFBvVEwwTHhPZmxmaUhOR2t2RS9PdWkwTzEKY2pyVkRWdVloeHBraGd6blVZc3pzWnJlalE9PQotLS0tLUVORCBQUklWQVRFIEtFWS0tLS0tCg==" +
+                "    client-certificate-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURJVENDQWdtZ0F3SUJBZ0lJQnQrM25WejFzS1F3RFFZSktvWklodmNOQVFFTEJRQXdGVEVUTUJFR0ExVUUKQXhNS2EzVmlaWEp1WlhSbGN6QWVGdzB5TXpFeE1qa3dPVE16TXpCYUZ3MHlOREV5TXpBeE9URXdNREphTURReApGekFWQmdOVkJBb1REbk41YzNSbGJUcHRZWE4wWlhKek1Sa3dGd1lEVlFRREV4QnJkV0psY201bGRHVnpMV0ZrCmJXbHVNSUlCSWpBTkJna3Foa2lHOXcwQkFRRUZBQU9DQVE4QU1JSUJDZ0tDQVFFQXhvYnVYa3BtVkd5blFVYksKT1MzMXV3OXhIVm11S0xrVnB6REUxaGtITHVkY201ejFiMThMV09YMTF5ZnVlOWpadmxMa3M4ekcxT2piM0gxNQpTWFJoSkM4eG52TG5lbklpOTUvc3YvZFRyNG1DQ2ZIakx1cWRlV1pDeTFMOTF3dXNrcHFZZ2UyNHdJNXQ5bjErCkc2eDhhdXVMZEhodkkyRzJ0QW9iTGJCQ2FjVGdsQWhnTjQ4NDNYd0hsemZxV2xya1hjNmJWK0hrQmVTZ09OQ2UKWVpqNGFJRDArRGtnTGVkWkVaY1NJREJYUEI2ZmZkRzRwL3VtSHJJWjFxQUhqbnJHOUxhMXBZL1Rja0Q0SkJsdgpWSEkzZHlPdEcvY0FtTklqRzlzWWlKVk1ybmhJYUJoWFZ0bFJTZVVhb00rUmltWmdJL01iblhqbE0rdVhuV3pjCittbDB5d0lEQVFBQm8xWXdWREFPQmdOVkhROEJBZjhFQkFNQ0JhQXdFd1lEVlIwbEJBd3dDZ1lJS3dZQkJRVUgKQXdJd0RBWURWUjBUQVFIL0JBSXdBREFmQmdOVkhTTUVHREFXZ0JUVnBTbDVvOXNjazFtaC9oK09IQ0tSMThFVwprekFOQmdrcWhraUc5dzBCQVFzRkFBT0NBUUVBSlBUaE04WE1hejAwTWlLbysvME50WkVUcEdrSmdhbndCRFF1CkhhTGxKN2FCcWJDekZoUUFYbEJQdVdPdWV1VkJncFlwaGRjYTUzRUQvMS9ReElCVFZmYjdpSWxJN3FrbGdrWWsKcFZtODczQ2pWV2lsRVlLeWdiUW5iTCtHMXVFRGxkMTRvdmtFcG92QjRLeXUwTTRNOHZmakxHSHd5UzVmKzlrRQpBcDdtNkczTTArTTN4aW8xcEFRbUR5c2F6QzdhaklSdmZrNHBnbXllbkVKRkhxUWwrcVNDVXM2Y2duQnRmVnZ5CnRkK0J0eStPRU9JK2N3eGROYVpnNHdRQk1EYVJwSkdiZHZqcklCT0E3SVBCckh2VWs4QWFlTEE2SHJVVjZZUmcKVjZZcXQxalJ2WVBYUUJMZno0eEc2OWU2OGdHRFlBaENNc01OdGxUOStVRE1GbkpHZVE9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==\n" +
+                "    client-key-data: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFcEFJQkFBS0NBUUVBeG9idVhrcG1WR3luUVViS09TMzF1dzl4SFZtdUtMa1ZwekRFMWhrSEx1ZGNtNXoxCmIxOExXT1gxMXlmdWU5alp2bExrczh6RzFPamIzSDE1U1hSaEpDOHhudkxuZW5JaTk1L3N2L2RUcjRtQ0NmSGoKTHVxZGVXWkN5MUw5MXd1c2twcVlnZTI0d0k1dDluMStHNng4YXV1TGRIaHZJMkcydEFvYkxiQkNhY1RnbEFoZwpONDg0M1h3SGx6ZnFXbHJrWGM2YlYrSGtCZVNnT05DZVlaajRhSUQwK0RrZ0xlZFpFWmNTSURCWFBCNmZmZEc0CnAvdW1IcklaMXFBSGpuckc5TGExcFkvVGNrRDRKQmx2VkhJM2R5T3RHL2NBbU5Jakc5c1lpSlZNcm5oSWFCaFgKVnRsUlNlVWFvTStSaW1aZ0kvTWJuWGpsTSt1WG5XemMrbWwweXdJREFRQUJBb0lCQVFERVVtRGMrOFFRRHRhagpkY2E3SHRrWFlDRGkvbkY4c2ZOWXY2Q1hmRzZmRW9xQkZJbWQxaWFaaGVkRUdxZjY3eW44eldwKzU2MWtsTlgvClNGR3RzeG54TjM1aGlpSWc4MGZqQ3RLTHo2Q0JRWUZJSmwwY1kwVFE3YkIxOHg4MURzVmN3T2E1N2dTNjN0NmQKVitKaXFZTHNGUHgyZERhcmpaQ29vQ25hVjZpRmdENnNITXRjMVhQalNrOUhsVHROWkJKUmhEc0l3eTBzbVcyegoveWw2clFLcTA3M1ZGNDFoanQrSG5uYUl6ZFowTnl6VnVwQVIzeHpQcnF1Vi9VN2s3a2VsV08wNEpuQkJOQVBNCmtqcWgyamZCOTNxOEhxVE5sRXF3dnJXN0pnS1ZSUjJ2QnFVNUNTSjk3Znk3TVNvZ1NwT1NoQTUxVndzaWpVK3UKUDY4N3BQTzVBb0dCQU5mSTloTng2dHJVWGhxRWkxSkpJMUdiRXF0TURsREM0T1RkTFIrRzd3WXpmZlpLZ2VGaApYRy8ySW5VMHhkMHhodWxnYzlYaXBZbEJyeTg1M1N5NEdVckRYcFZSWDFEQ29tY29hRitiM25sNFRlUU9KeDk3CjA4b1VTRHMrL2ZMYWlsYVlqSmVwaWpLcm5LZGEvQU5VUXE0M2FRTzNzdXhneWRyb2h1ZFZNYVJ2QW9HQkFPdUcKbVdIcEN4WUUyNkkrUnVob3dNbTRPSWhUU0VuRmljdkcxeERVWDVlMkxtaE4xNWd4UzhlOU0vVW51VjdVUXNubApwRHpDZE1Bd0NETlpxbXVRSTlhTVQrTmQvYS96aGlLWm9wRmJwUHBVL3p3UDBUSHRSTGliOStHdk9EZnZaa0dGCnhlcWRrUTVXL1lMTHV1enl1SWk5ZmRzcjdMQk1reXViUnRWRThqdGxBb0dCQU1UZWhDT1plenZMSlUvc1BYQUYKYWtPNXgzNmhGUzU1bmRVd05VcmVRSlRYeGNRK2xlQ2FnMHRpdEcxYWlHc1dGSkEzZjNkVUlOTHBLbnRidjM1ZApPRFlOcU8xeUlCUCtmMHkrZ1BzNXFmQUk0b2Qrb2hNSFZtSzN2bTdQT2NHbndTN2dYdVMvdVdZaFMvc2o5MmpTCkowUHJLZFJLZE9OVUt0V2Q3L1orczV2aEFvR0FZeXVpcStwZmc1NzZCLytuQmJjTjdpSUdrOGhWZU5LWGFkbEkKdDBwbEVkRmhDd1F6MGw1M1pSd1NvNWhkWWtPSDk5RWM3WVNIZW1EL0l2Z1BYUWt0UGVxSXZOalh0OTJYVGp4WQppbElIVG15NXA4V1ZOU3VOc3huaEx3TURiZkg4b1h3OVVNT1Z6MjdyZ2NaYzUrWnZzd3Z1MFhsV1NRbUZNbWhJClZBYWE1RTBDZ1lBRlh5M3dlZWFYVG9pTWJ5d05td05ocHR0WVNZMXJYd1pXSldFdllvcHpLYUM0emVVRHNqeG4KVU1vWHFQcWNNaHdNRUYwS1pNU0k3bGRDOWhDeHVLUGxYQ0RUZnIrdHIxTktrcmtwTTNxSEpVREFVNHRaYjFZawpYMGFwVDZsbVB0YUlrdy9MUGZCdXBsMjE3RkI1V09ZaFFRSDZYS1IxZk9ER3hpQVY0dFZXVnc9PQotLS0tLUVORCBSU0EgUFJJVkFURSBLRVktLS0tLQo=" +
                 "";
         return K8sUtil.getKubernetesClient(kubeConfig);
     }
 
     @Test
+    public void listHelm() {
+        KubernetesClient client = getClient();
+        List<HelmChart> helmChartList = client.resources(HelmChart.class).inNamespace("monitoring").list().getItems();
+        for (HelmChart helmChart : helmChartList) {
+            log.info(JSON.toJSONString(helmChart, SerializerFeature.PrettyFormat));
+        }
+    }
+
+    private String helmChartYamlStr = "" +
+            "apiVersion: helm.cattle.io/v1\n" +
+            "kind: HelmChart\n" +
+            "metadata:\n" +
+            "  name: prometheus-stack \n" +
+            "  namespace: monitoring\n" +
+            "spec:\n" +
+            "  #repo: https://charts.grapps.cn\n" +
+            "  #repo: https://helm-charts.itboon.top/prometheus-community\n" +
+            "  #repo: https://prometheus-community.github.io/helm-charts\n" +
+            "  repo: https://files.linshenkx.cn:33443/charts\n" +
+            "  chart: kube-prometheus-stack\n" +
+            "  targetNamespace: monitoring\n" +
+            "  set:\n" +
+            "    namespaceOverride: \"monitoring\"\n" +
+            "    alertmanager.service.type: \"NodePort\"\n" +
+            "    grafana.defaultDashboardsTimezone: \"Asia/Shanghai\"\n" +
+            "    grafana.adminPassword: \"1qaz@WSX\"\n" +
+            "    grafana.sidecar.dashboards.folderAnnotation: \"folder\"\n" +
+            "    grafana.sidecar.dashboards.provider.allowUiUpdates: \"true\"\n" +
+            "    grafana.service.nodePort: \"30902\"\n" +
+            "    grafana.service.type: \"NodePort\"\n" +
+            "    prometheus.service.nodePort: \"30900\"\n" +
+            "    prometheus.service.type: \"NodePort\"\n" +
+            "    prometheus.prometheusSpec.additionalScrapeConfigsSecret.enabled: \"true\"\n" +
+            "    prometheus.prometheusSpec.additionalScrapeConfigsSecret.name: \"additional-scrape-configs\"\n" +
+            "    prometheus.prometheusSpec.additionalScrapeConfigsSecret.key: \"prometheus-additional.yaml\"\n" +
+            "    kubelet.serviceMonitor.cAdvisorMetricRelabelings: \"\"\n" +
+            "" +
+            "";
+    private String helmChartYamlStr2 = "" +
+            "apiVersion: helm.cattle.io/v1\n" +
+            "kind: HelmChart\n" +
+            "metadata:\n" +
+            "  name: traefik \n" +
+            "  namespace: bdata \n" +
+            "spec:\n" +
+            "  chart: stable/traefik\n" +
+            "  set:\n" +
+            "    rbac.enabled: \"true\"\n" +
+            "    ssl.enabled: \"true\"" +
+            "";
+
+    @Test
+    public void deleteHelm() {
+        KubernetesClient client = getClient();
+        ParameterNamespaceListVisitFromServerGetDeleteRecreateWaitApplicable<HasMetadata> loadResource = client.load(IoUtil.toUtf8Stream(helmChartYamlStr));
+        loadResource.delete();
+        loadResource.waitUntilCondition(Objects::isNull, 3, TimeUnit.MINUTES);
+//        MixedOperation<HelmChart, KubernetesResourceList<HelmChart>, Resource<HelmChart>> helmResourceClient = client.resources(HelmChart.class);
+//        Resource<HelmChart> helmChartResource = helmResourceClient.load(IoUtil.toUtf8Stream(helmChartYamlStr));
+//        String lastJobName = helmChartResource.get().getStatus().getJobName();
+//        helmChartResource.delete();
+//        helmChartResource.waitUntilCondition(Objects::isNull, 10, TimeUnit.MINUTES);
+
+//        //等待状态发生改变，否则获取到的还是之前的任务，如install
+//        helmChartResource.waitUntilCondition(r -> !lastJobName.equals(r.getStatus().getJobName()), 10, TimeUnit.MINUTES);
+//        HelmChart helmChart = helmChartResource.get();
+//        String resourceName = helmChart.getMetadata().getName();
+//        String resourceNamespace = helmChart.getMetadata().getNamespace();
+//        log.info("jobName: " + helmChart.getStatus().getJobName());
+//        K8sUtil.waitForJobCompleted(resourceNamespace, helmChart.getStatus().getJobName(), client, log, 600);
+//
+//        log.info(resourceNamespace + " " + resourceName);
+    }
+
+    @Test
+    public void applyHelm() {
+        KubernetesClient client = getClient();
+
+        MixedOperation<HelmChart, KubernetesResourceList<HelmChart>, Resource<HelmChart>> helmResourceClient = client.resources(HelmChart.class);
+        Resource<HelmChart> helmChartResource = helmResourceClient.load(IoUtil.toUtf8Stream(helmChartYamlStr));
+//        helmChartResource.create();
+//        helmChartResource.waitUntilCondition(r -> r.getStatus() != null && r.getStatus().getJobName() != null, 10, TimeUnit.MINUTES);
+//        HelmChart helmChart = helmChartResource.get();
+        HelmChart helmChart = helmChartResource.item();
+        String resourceName = helmChart.getMetadata().getName();
+        String resourceNamespace = helmChart.getMetadata().getNamespace();
+        String jobName = StrUtil.format("helm-{}-{}", "install", helmChart.getMetadata().getName());
+        log.info("jobName: " + jobName);
+//        K8sUtil.waitForJobCompleted(resourceNamespace, helmChart.getStatus().getJobName(), client, log, 600);
+        TaskParam taskParam = new TaskParam();
+//        K8sUtil.waitForJobCompleted(helmChartResource::create, taskParam, resourceNamespace, jobName, client, log, 600);
+
+        log.info(resourceNamespace + " " + resourceName);
+    }
+
+    @Test
     public void waitForJobCompleted() {
-        String jobYamlStr = "" +
+        String modelYamlStr = "" +
                 "" +
                 "apiVersion: batch/v1\n" +
                 "kind: Job\n" +
@@ -91,16 +200,12 @@ public class K8sSimpleTest {
                 "          fi\n" +
                 "";
         KubernetesClient client = getClient();
-        while (true) {
-            ParameterNamespaceListVisitFromServerGetDeleteRecreateWaitApplicable<HasMetadata> loaded = client.load(IoUtil.toUtf8Stream(jobYamlStr));
-            if (loaded.get().get(0) != null) {
-                loaded.delete();
+        ParameterNamespaceListVisitFromServerGetDeleteRecreateWaitApplicable<HasMetadata> loadResource = client.load(IoUtil.toUtf8Stream(modelYamlStr));
+        if (loadResource.get().get(0) != null) {
+            loadResource.delete();
             }
-            List<HasMetadata> metadata = loaded.forceConflicts().serverSideApply();
-            String resourceName = metadata.get(0).getMetadata().getName();
-            int retryCount = K8sUtil.waitForJobCompleted("default", resourceName, client, log, 60);
-            log.info("retryCount: " + retryCount);
-        }
+        Job job = client.batch().v1().jobs().load(IoUtil.toUtf8Stream(modelYamlStr)).item();
+        K8sUtil.waitForJobCompleted(() -> loadResource.forceConflicts().serverSideApply(), null, client, job, 600);
     }
 
 
@@ -132,6 +237,25 @@ public class K8sSimpleTest {
         Namespace namespace = client.namespaces().withName("default2").get();
         System.out.printf("Namespace %s exists: %s%n", namespace.getMetadata().getName(), namespace != null);
 
+    }
+
+    @Test
+    public void logDeployment() {
+        KubernetesClient client = getClient();
+        Deployment deployment = client.apps().deployments().inNamespace("bdata").withName("helm-controller-helm-controller").get();
+        LogWatch logWatch = client.apps().deployments().inNamespace("bdata").withName("helm-controller-helm-controller").watchLog(System.out);
+//        try (LogWatch logWatch = client.apps().deployments().inNamespace("bdata").withName("helm-controller-helm-controller").watchLog(System.out);
+//             BufferedReader reader = new BufferedReader(new InputStreamReader(logWatch.getOutput()))
+//        ) {
+//            String line = reader.readLine();
+//            while (line != null) {
+//                log.info("Log of deployment " + deployment.getMetadata().getName() + "> " + line);
+//                line = reader.readLine();
+//            }
+//        } catch (Exception e) {
+//            log.error(e.getMessage(), e);
+//        }
+        ThreadUtil.safeSleep(10000);
     }
 
     @Test

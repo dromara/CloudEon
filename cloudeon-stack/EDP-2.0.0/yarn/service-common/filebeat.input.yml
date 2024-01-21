@@ -1,0 +1,49 @@
+- type: log
+  enabled: true
+  fields:
+    service: YARN
+    role: YARN_RESOURCEMANAGER
+  paths:
+    - /workspace/logs/hadoop-*-resourcemanager-*.log
+  multiline.pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}'
+  multiline.negate: true
+  multiline.match: after
+  close_timeout: 5m
+
+
+- type: log
+  enabled: true
+  fields:
+    service: YARN
+    role: YARN_NODEMANAGER
+  paths:
+    - /workspace/logs/hadoop-*-nodemanager-*.log
+  multiline.pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}'
+  multiline.negate: true
+  multiline.match: after
+  close_timeout: 5m
+
+- type: log
+  enabled: true
+  fields:
+    service: YARN
+    role: YARN_HISTORYSERVER
+  paths:
+    - /workspace/logs/hadoop-*-historyserver-*.log
+  multiline.pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}'
+  multiline.negate: true
+  multiline.match: after
+  close_timeout: 5m
+
+- type: log
+  enabled: true
+  fields:
+    service: YARN
+    role: YARN_TIMELINESERVER
+  paths:
+    - /workspace/logs/hadoop-*-timelineserver-*.log
+  multiline.pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}'
+  multiline.negate: true
+  multiline.match: after
+  close_timeout: 5m
+

@@ -1,0 +1,118 @@
+name: OPEN_KRUISE
+label: "OpenKruise"
+description: "基于 Kubernetes 的扩展套件，主要聚焦于云原生应用的自动化，比如部署、发布、运维以及可用性防护"
+version: 1.0.0
+
+dependencies:
+  - HELM_CONTROLLER
+
+supportKerberos: false
+
+dashboard:
+  uid: ""
+
+roles:
+  - name: HELM_CHART
+    label: "HELM CHART"
+    roleFullName: "helm-chart"
+    sortNum: 1
+    type: HELM_CHART
+    needOdd: false
+    fixedNum: 1
+
+customConfigFiles:
+  - kruise.conf
+#部署需修改系统参数，否则任意失败：https://github.com/openkruise/kruise/issues/989
+# echo 'fs.inotify.max_user_instances = 10240' | sudo tee -a /etc/sysctl.conf
+# sysctl -p
+configurations: 
+
+  - name: installation.namespace
+    description: "kruise 安装到的 namespace，缺少则自动创建，建议保持默认或用其他新命名空间，已有命名空间易失败"
+    recommendExpression: "kruise-system"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "k8s"
+
+  - name: kruise.helm.repo
+    description: "kruise部署所用的helm仓库。\n
+    网络允许推荐使用：https://openkruise.github.io/charts \n
+    内网环境：需要使用私有helm仓库，如果没有的话可以用CloudEon自带的helm镜像仓库服务: http://CloudEonWeb地址/apiPre/charts/2 \n
+      CloudEon自带的helm仓库服务只支持1.5.1版本的kruise,要求kubeVersion>=1.16.0-0
+    "
+    recommendExpression: "https://openkruise.github.io/charts"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "k8s"
+
+  - name: manager.image.repository
+    recommendExpression: "openkruise/kruise-manager"
+    description: "kruise-manager/kruise-daemon 镜像仓库，国内环境可用：openkruise-registry.cn-shanghai.cr.aliyuncs.com/openkruise/kruise-manager"
+    valueType: InputString
+    confFile:  "kruise.conf"
+    configurableInWizard: true
+    tag: "image"
+
+  - name: manager.image.tag
+    recommendExpression: "v1.5.1"
+    description: "kruise-manager/kruise-daemon 镜像版本"
+    valueType: InputString
+    confFile:  "kruise.conf"
+    configurableInWizard: true
+    tag: "image"
+
+  - name: manager.metrics.port
+    recommendExpression: 32080
+    description: "metrics 服务的监听端口"
+    valueType: InputNumber
+    confFile:  "kruise.conf"
+    configurableInWizard: true
+    tag: "port"
+
+  - name: manager.webhook.port
+    recommendExpression: 32081
+    description: "webhook 服务的监听端口"
+    valueType: InputNumber
+    confFile:  "kruise.conf"
+    configurableInWizard: true
+    tag: "port"
+
+  - name: daemon.port
+    recommendExpression: 32082
+    description: "kruise-daemon 的 metrics/healthz 服务监听端口"
+    valueType: InputNumber
+    confFile:  "kruise.conf"
+    configurableInWizard: true
+    tag: "port"
+
+  - name: manager.resources.limits.cpu
+    recommendExpression: "200m"
+    description: "kruise-manager 的 limit CPU 资源"
+    valueType: InputString
+    confFile:  "kruise.conf"
+    configurableInWizard: true
+    tag: "resources"
+
+  - name: manager.resources.limits.memory
+    recommendExpression: "512Mi"
+    description: "kruise-manager 的 limit memory 资源"
+    valueType: InputString
+    confFile:  "kruise.conf"
+    configurableInWizard: true
+    tag: "resources"
+
+  - name: daemon.resources.limits.cpu
+    recommendExpression: "50m"
+    description: "	kruise-daemon 的 limit CPU 资源"
+    valueType: InputString
+    confFile:  "kruise.conf"
+    configurableInWizard: true
+    tag: "resources"
+
+  - name: daemon.resources.limits.memory
+    recommendExpression: "128Mi"
+    description: "kruise-daemon 的 limit memory 资源	"
+    valueType: InputString
+    confFile:  "kruise.conf"
+    configurableInWizard: true
+    tag: "resources"

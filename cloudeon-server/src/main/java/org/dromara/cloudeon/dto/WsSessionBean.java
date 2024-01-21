@@ -16,7 +16,6 @@
  */
 package org.dromara.cloudeon.dto;
 
-import com.jcraft.jsch.Session;
 import org.springframework.web.socket.WebSocketSession;
 
 /**
@@ -29,8 +28,6 @@ public class WsSessionBean {
     /** WebSocket Client与Server的连接 */
     private WebSocketSession webSocketSession;
 
-    /** SSH连接 */
-    private Session sshSession;
 
     public String getWsSessionId() {
         return wsSessionId;
@@ -48,11 +45,5 @@ public class WsSessionBean {
         this.webSocketSession = webSocketSession;
     }
 
-    public Session getSshSession() {
-        return sshSession;
-    }
 
-    public void setSshSession(Session sshSession) {
-        this.sshSession = sshSession;
-    }
 }

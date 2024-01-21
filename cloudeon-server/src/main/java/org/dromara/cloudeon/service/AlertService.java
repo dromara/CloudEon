@@ -17,16 +17,8 @@
 package org.dromara.cloudeon.service;
 
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.extra.spring.SpringUtil;
-import cn.hutool.extra.ssh.JschUtil;
-import cn.hutool.extra.ssh.Sftp;
-import com.jcraft.jsch.Session;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.sshd.client.session.ClientSession;
-import org.apache.sshd.sftp.client.SftpClientFactory;
-import org.apache.sshd.sftp.client.fs.SftpFileSystem;
 import org.dromara.cloudeon.config.CloudeonConfigProp;
 import org.dromara.cloudeon.dao.ClusterAlertRuleRepository;
 import org.dromara.cloudeon.dao.ClusterNodeRepository;
@@ -37,9 +29,7 @@ import org.dromara.cloudeon.entity.ClusterNodeEntity;
 import org.dromara.cloudeon.entity.ServiceInstanceEntity;
 import org.dromara.cloudeon.entity.ServiceRoleInstanceEntity;
 import org.dromara.cloudeon.utils.Constant;
-import org.dromara.cloudeon.utils.SshUtils;
 import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
@@ -47,14 +37,14 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static org.dromara.cloudeon.utils.Constant.*;
+import static org.dromara.cloudeon.utils.Constant.MONITOR_ROLE_PROMETHEUS;
+import static org.dromara.cloudeon.utils.Constant.MONITOR_SERVICE_NAME;
 
 @Service
 public class AlertService {
@@ -76,8 +66,6 @@ public class AlertService {
     @Resource
     private ClusterNodeRepository clusterNodeRepository;
 
-    @Resource
-    private SshPoolService sshPoolService;
 
     public void upgradeMonitorAlertRule(Integer clusterId, Logger log) {
         String workHome = cloudeonConfigProp.getWorkHome();
@@ -118,13 +106,6 @@ public class AlertService {
         ServiceInstanceEntity monitorServiceInstance = serviceInstanceRepository.findEntityByClusterIdAndStackServiceName(clusterId, MONITOR_SERVICE_NAME);
         ServiceRoleInstanceEntity prometheus = roleInstanceRepository.findByServiceInstanceIdAndServiceRoleName(monitorServiceInstance.getId(), MONITOR_ROLE_PROMETHEUS).get(0);
         ClusterNodeEntity prometheusNode = clusterNodeRepository.findById(prometheus.getNodeId()).get();
-        // 建立ssh连接
-        Session clientSession = sshPoolService.openSession(prometheusNode);
-        Sftp sftp = JschUtil.createSftp(clientSession);
-        String remoteConfDirPath = "/opt/edp/" + monitorServiceInstance.getServiceName() + "/conf/rule/";
-        log.info("拷贝本地配置目录：" + alertRuleOutputPath + " 到节点" + prometheusNode.getIp() + "的：" + remoteConfDirPath);
-        sftp.syncUpload(new File(alertRuleOutputPath), remoteConfDirPath);
-        JschUtil.close(sftp.getClient());
 
     }
 }
