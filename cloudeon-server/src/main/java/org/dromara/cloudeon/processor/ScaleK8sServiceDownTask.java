@@ -19,16 +19,10 @@ package org.dromara.cloudeon.processor;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-public class ExampleTask extends BaseCloudeonTask {
+public class ScaleK8sServiceDownTask extends ScaleK8sServiceTask {
 
     @Override
-    public void internalExecute() {
-
-        // todo 日志采集的相关执行
-        log.info(taskParam.getCommandTaskId() + ":模拟执行。。。。");
-        if (taskParam.getCommandTaskId() == 10) {
-//            int a = 1 / 0;
-        }
-
+    public boolean isApplyTask() {
+        return false;
     }
 }

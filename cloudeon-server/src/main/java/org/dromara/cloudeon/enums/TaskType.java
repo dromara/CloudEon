@@ -31,8 +31,8 @@ public enum TaskType {
     DELETE_ROLE_CONFIGMAP(12, "删除角色相关k8s配置", "org.dromara.cloudeon.processor.ConfigDeleteTask", true),
     DELETE_SERVICE_DB_DATA(13, "删除服务相关db数据库", "org.dromara.cloudeon.processor.DeleteServiceDBDataTask", false),
     STOP_ROLE_POD(14, "停止角色Pod", "org.dromara.cloudeon.processor.StopRolePodTask", true),
-    SCALE_DOWN_K8S_SERVICE(15, "按规模减少k8s服务", "org.dromara.cloudeon.processor.ScaleDownK8sServiceTask", false),
-    SCALE_UP_K8S_SERVICE(16, "按规模增加k8s服务", "org.dromara.cloudeon.processor.ScaleUpK8sServiceTask", false),
+    SCALE_DOWN_K8S_SERVICE(15, "按规模减少k8s服务", "org.dromara.cloudeon.processor.ScaleK8sServiceDownTask", false),
+    SCALE_UP_K8S_SERVICE(16, "按规模增加k8s服务", "org.dromara.cloudeon.processor.ScaleK8sServiceUpTask", false),
     UPDATE_SERVICE_STATE(17, "更新服务实例状态", "org.dromara.cloudeon.processor.UpdateServiceStateTask", false),
 
 
