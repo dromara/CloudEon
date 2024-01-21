@@ -1,0 +1,44 @@
+- module: elasticsearch
+  server:
+    enabled: true
+    input:
+      fields:
+        service: ELASTICSEARCH
+        role: ELASTICSEARCH_NODE
+    var.paths:
+      - /workspace/logs/elasticsearch.log          # Plain text logs
+      - /workspace/logs/elasticsearch_server.json  # JSON logs
+  gc:
+    enabled: true
+    var.paths:
+      - /workspace/logs/gc*.log.[0-9]*
+      - /workspace/logs/gc*.log
+  audit:
+    enabled: true
+    input:
+      fields:
+        service: ELASTICSEARCH
+        role: ELASTICSEARCH_NODE
+    var.paths:
+      - /workspace/logs/*_access.log  # Plain text logs
+      - /workspace/logs/*_audit.json  # JSON logs
+  slowlog:
+    enabled: true
+    input:
+      fields:
+        service: ELASTICSEARCH
+        role: ELASTICSEARCH_NODE
+    var.paths:
+      - /workspace/logs/*_index_search_slowlog.log     # Plain text logs
+      - /workspace/logs/*_index_indexing_slowlog.log   # Plain text logs
+      - /workspace/logs/*_index_search_slowlog.json    # JSON logs
+      - /workspace/logs/*_index_indexing_slowlog.json  # JSON logs
+  deprecation:
+    enabled: true
+    input:
+      fields:
+        service: ELASTICSEARCH
+        role: ELASTICSEARCH_NODE
+    var.paths:
+      - /workspace/logs/*_deprecation.log   # Plain text logs
+      - /workspace/logs/*_deprecation.json  # JSON logs
