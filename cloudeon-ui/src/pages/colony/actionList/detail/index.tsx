@@ -4,8 +4,9 @@ import styles from './index.less'
 import { /*commandInfos,*/ statusColor,trailColor } from '../../../../utils/colonyColor'
 import { formatDate } from '@/utils/common'
 import { useState, useEffect, ReactChild, ReactFragment, ReactPortal } from 'react';
-import { getCommandDetailAPI, getTaskLogAPI } from '@/services/ant-design-pro/colony';
+import { getCommandDetailAPI, getTaskLogAPI, stopCommandAPI, retryCommandAPI } from '@/services/ant-design-pro/colony';
 import { FormattedMessage, history, SelectLang, useIntl, useModel } from 'umi';
+import { PlayCircleOutlined, ReloadOutlined, PoweroffOutlined, DeleteOutlined, AlertFilled, DownOutlined } from '@ant-design/icons';
 
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/hljs';
@@ -62,6 +63,13 @@ const actionDetail: React.FC = () => {
     getTaskLog({commandTaskId: id})
   }
 
+  const handleStopCommand = async () => {
+    const result: API.logResult =  await stopCommandAPI({commandId: commandInfos?.id});
+  }
+
+  const handleRetryCommand = async () => {
+    const result: API.logResult =  await retryCommandAPI({commandId: commandInfos?.id});
+  }
 
   useEffect(() => {
     const { query } = history.location;
@@ -116,6 +124,12 @@ const actionDetail: React.FC = () => {
                             <div className={styles.otherInfoItem}>结束时间：{formatDate(commandInfos.endTime, 'yyyy-MM-dd hh:mm:ss')}</div>
                             <div className={styles.otherInfoItem}>提交时间：{formatDate(commandInfos.submitTime, 'yyyy-MM-dd hh:mm:ss')}</div>
                             <div className={styles.otherInfoItem}>操作人：{commandInfos.operateUserId}</div>
+                            <div className={styles.actionItem ,styles.clickedItem,styles.otherInfoItem }>
+                              <a onClick={()=>handleStopCommand()}> 停止 </a>
+                            </div>
+                            <div className={styles.actionItem ,styles.clickedItem,styles.otherInfoItem }>
+                              <a onClick={()=>handleRetryCommand()}> 重试 </a>
+                            </div>
                         </div>
                     </div>
                     <div className={styles.content}>

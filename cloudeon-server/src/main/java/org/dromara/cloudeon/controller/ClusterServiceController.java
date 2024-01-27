@@ -833,4 +833,26 @@ public class ClusterServiceController {
         });
     }
 
+    @PostMapping("/stopCommand")
+    public ResultDTO<Void> stopCommand(Integer commandId) {
+        CommandEntity commandEntity = commandRepository.findById(commandId).get();
+        CommandState commandState = commandEntity.getCommandState();
+        if (!commandState.isEnd()) {
+            cloudeonVertx.eventBus().request(Constant.VERTX_STOP_COMMAND_ADDRESS, commandId);
+        }
+        return ResultDTO.success(null);
+    }
+
+    @PostMapping("/retryCommand")
+    public ResultDTO<Void> retryCommand(Integer commandId) {
+        CommandEntity commandEntity = commandRepository.findById(commandId).get();
+        CommandState commandState = commandEntity.getCommandState();
+        // 非 停止或错误 状态无法执行重试
+        if (!(commandState.equals(CommandState.STOPPED) || commandState.equals(CommandState.ERROR))) {
+            throw new IllegalArgumentException("指令状态为" + commandState + "，重试无效");
+        }
+        cloudeonVertx.eventBus().request(Constant.VERTX_RETRY_COMMAND_ADDRESS, commandId);
+        return ResultDTO.success(null);
+    }
+
 }

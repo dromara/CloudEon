@@ -95,6 +95,14 @@ const actionList: React.FC = () => {
           text: '出错',
           status: 'Error',
         },
+        'STOPPING': {
+          text: '正在停止',
+          status: 'Stopping',
+        },
+        'STOPPED': {
+          text: '已停止',
+          status: 'Stopped',
+        },
       },
     },
     {
