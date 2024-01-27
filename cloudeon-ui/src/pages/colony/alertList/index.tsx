@@ -244,7 +244,7 @@ const alertList: React.FC = () => {
       key: 'createTime',
       render: (_: any, record:API.alertItem) => {
         return (
-          <div>{formatDate(record.createTime, 'yyyy-MM-dd hh:mm:ss')}</div>
+          <div>{formatDate(record.fireTime, 'yyyy-MM-dd hh:mm:ss')}</div>
         )
       },
     },
@@ -254,7 +254,7 @@ const alertList: React.FC = () => {
       key: 'updateTime',
       render: (_: any, record:API.alertItem) => {
         return (
-          <div>{formatDate(record.createTime, 'yyyy-MM-dd hh:mm:ss')}</div>
+          <div>{formatDate(record.solveTime, 'yyyy-MM-dd hh:mm:ss')}</div>
         )
       },
     },
@@ -519,7 +519,7 @@ const alertList: React.FC = () => {
             columns={rulesColumns} 
             dataSource={rulesListData}
             request={async (params = {}, sort, filter) => {
-              return getRulesAlertAPI({ });;
+              return getRulesAlertAPI({clusterId:getData.clusterId});;
             }}
           />
       </>
