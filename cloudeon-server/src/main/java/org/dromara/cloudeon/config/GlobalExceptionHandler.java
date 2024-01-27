@@ -16,8 +16,8 @@
  */
 package org.dromara.cloudeon.config;
 
-import org.dromara.cloudeon.dto.ResultDTO;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.cloudeon.dto.ResultDTO;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -32,9 +32,11 @@ public class GlobalExceptionHandler {
     public ResultDTO<Void> globalException(HttpServletResponse response, Exception ex) {
         log.info("GlobalExceptionHandler...");
         log.info("错误代码：" + response.getStatus());
-        ex.printStackTrace();
-        ResultDTO<Void> resultDTO = ResultDTO.failed(ex.getCause().getMessage());
-        return resultDTO;
+        log.error(ex.getMessage(), ex);
+        if (ex.getCause() != null) {
+            return ResultDTO.failed(ex.getCause().getMessage());
+        }
+        return ResultDTO.failed(ex.getMessage());
     }
 
     @ResponseBody
