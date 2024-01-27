@@ -16,6 +16,7 @@
  */
 package org.dromara.cloudeon.processor;
 
+import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
 import io.fabric8.kubernetes.api.model.HasMetadata;
@@ -157,7 +158,7 @@ public abstract class RoleK8sTask extends BaseCloudeonTask implements ApplyOrDel
                     }
                 } catch (Exception e) {
                     log.error(e.getMessage() + ":\n" + modelYamlStr);
-                    throw new RuntimeException(e);
+                    ExceptionUtil.wrapAndThrow(e);
                 }
             }
         });
