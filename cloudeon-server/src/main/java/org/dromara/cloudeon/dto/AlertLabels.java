@@ -28,6 +28,7 @@ public class AlertLabels {
 
 
     private int clusterId;
+    private String serviceName;
     private String serviceRoleName;
     /**
      * exception(s1) 或 warning(s2)

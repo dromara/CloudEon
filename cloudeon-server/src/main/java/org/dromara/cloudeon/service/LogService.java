@@ -166,10 +166,10 @@ public class LogService {
 
 
     public ServiceRoleLogPage getServiceLog(Integer clusterId, String roleName, String logLevel, int from, int pageSize) {
-        if (StringUtils.isEmpty(roleName)) {
-            throw new IllegalArgumentException("roleName不能为空");
-        }
         ServiceRoleLogPage result = ServiceRoleLogPage.builder().build();
+        if (StringUtils.isEmpty(roleName)) {
+            return result;
+        }
 //        查询es服务实例
         Integer serviceInstanceId = serviceInstanceRepository.findByServiceNameAndClusterId("ELASTICSEARCH",clusterId).getId();
         List<ServiceRoleInstanceEntity> roleInstanceEntities = roleInstanceRepository.findByServiceInstanceIdAndServiceRoleName(serviceInstanceId, "ELASTICSEARCH_NODE");

@@ -1,0 +1,7 @@
+rules:
+    - alert: Zookeeper进程存活
+      promql: sum(up{service="metrics-zookeeper"})<#{{${serviceRoles['ZOOKEEPER_SERVER']?size}}}#
+      alertLevel: exception
+      serviceRoleName: ZOOKEEPER_SERVER
+      alertAdvice: Zookeeper发生宕机，请检查日志或执行重启
+      alertInfo: "ZookeeperServer发生宕机，当前实例数为：{{$value}}"

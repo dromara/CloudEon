@@ -24,9 +24,11 @@ import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Maps;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
+import io.fabric8.kubernetes.api.model.apps.DeploymentStatus;
 import io.fabric8.kubernetes.api.model.batch.v1.Job;
 import io.fabric8.kubernetes.api.model.batch.v1.JobBuilder;
 import io.fabric8.kubernetes.api.model.batch.v1.JobSpec;
+import io.fabric8.kubernetes.api.model.batch.v1.JobStatus;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import io.fabric8.kubernetes.client.Watch;
@@ -45,10 +47,9 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 public class K8sUtil {
@@ -89,7 +90,23 @@ public class K8sUtil {
         return "default";
     }
 
-    public static void waitForDeploymentReady(VoidFunc0 resourceAction, TaskParam taskParam, KubernetesClient client, Deployment deployment, long waitSeconds) {
+    public static boolean checkDeploymentReady(Deployment deployment) {
+        if (deployment == null) {
+            return false;
+        }
+        DeploymentStatus status = deployment.getStatus();
+        if (status == null || deployment.getStatus().getReadyReplicas() == null) {
+            return false;
+        }
+        return Objects.equals(deployment.getStatus().getReadyReplicas(), deployment.getStatus().getReplicas());
+    }
+
+    public static void waitForDeploymentReady(VoidFunc0 resourceAction, TaskParam taskParam, KubernetesClient client, Deployment deployment, long waitSeconds) throws InterruptedException {
+        // 如果已经在运行了则不再跟踪日志,当任务被中断重试可能进入此状态
+        if (checkDeploymentReady(client.apps().deployments().resource(deployment).get())) {
+            log.info("Deployment is ready");
+            return;
+        }
         CountDownLatch completionLatch = new CountDownLatch(1);
         try (Watch ignored = client.apps().deployments().resource(deployment)
                 .watch(new DeploymentReadyWatcher(taskParam, completionLatch));
@@ -98,13 +115,9 @@ public class K8sUtil {
         ) {
             resourceAction.callWithRuntimeException();
             log.info("Waiting for deployment to be ready ...");
-            try {
-                if (!completionLatch.await(waitSeconds, TimeUnit.SECONDS)) {
-                    log.error("Deployment is not ready within {} seconds", waitSeconds);
-                    throw new RuntimeException("Deployment is not ready within " + waitSeconds + " seconds");
-                }
-            } catch (InterruptedException e) {
-                log.error(e.getMessage(), e);
+            if (!completionLatch.await(waitSeconds, TimeUnit.SECONDS)) {
+                log.error("Deployment is not ready within {} seconds", waitSeconds);
+                throw new RuntimeException("Deployment is not ready within " + waitSeconds + " seconds");
             }
         }
         log.info("Deployment is ready");
@@ -125,43 +138,59 @@ public class K8sUtil {
         return new JobBuilder().withMetadata(jobMeta).build();
     }
 
-    public static int waitForJobCompleted(VoidFunc0 resourceAction, TaskParam taskParam, KubernetesClient client, Job job, long waitSeconds) {
-        CountDownLatch jobCompletionLatch = new CountDownLatch(1);
-
-        AtomicBoolean isJobEndSuccess = new AtomicBoolean(false);
-        AtomicInteger retryCount = new AtomicInteger(0);
-        if (job.getSpec() == null || job.getSpec().getSelector() == null || job.getSpec().getSelector().getMatchLabels().isEmpty()) {
-            LabelSelector labelSelector = new LabelSelector();
-            labelSelector.setMatchLabels(MapUtil.of("job-name", job.getMetadata().getName()));
-            JobSpec jobSpec = new JobSpec();
-            jobSpec.setSelector(labelSelector);
-            job.setSpec(jobSpec);
+    public static boolean checkJobEnded(Job job) {
+        if (job == null) {
+            return false;
         }
-        try (Watch ignored = client.batch().v1().jobs()
-                .resource(job)
-                .watch(new JobCompleteWatcher(taskParam, jobCompletionLatch, isJobEndSuccess, retryCount));
-             Watch ignored1 = client.pods().inNamespace(getNamespace(client, job))
-                     .withLabelSelector(job.getSpec().getSelector())
-                     .watch(new PodLogWatcher(client, getTaskParamOutputStreamSupplier(taskParam)))
+        JobStatus status = job.getStatus();
+        return status != null && !status.getConditions().isEmpty();
+    }
 
-        ) {
-            resourceAction.callWithRuntimeException();
-            log.info("Waiting  for job to complete...");
-            try {
+    public static boolean checkJobEndedSuccess(Job job) {
+        JobStatus status = job.getStatus();
+        return "Complete".equalsIgnoreCase(status.getConditions().get(0).getType());
+    }
+
+    public static void waitForJobCompleted(VoidFunc0 resourceAction, TaskParam taskParam, KubernetesClient client, Job job, long waitSeconds) throws InterruptedException {
+        boolean isJobEndSuccess;
+        int retryCount = 0;
+        // 如果已经在运行了则不再跟踪日志,当任务被中断重试可能进入此状态
+        if (!checkJobEnded(client.batch().v1().jobs().resource(job).get())) {
+            CountDownLatch jobCompletionLatch = new CountDownLatch(1);
+            if (job.getSpec() == null || job.getSpec().getSelector() == null || job.getSpec().getSelector().getMatchLabels().isEmpty()) {
+                LabelSelector labelSelector = new LabelSelector();
+                labelSelector.setMatchLabels(MapUtil.of("job-name", job.getMetadata().getName()));
+                JobSpec jobSpec = new JobSpec();
+                jobSpec.setSelector(labelSelector);
+                job.setSpec(jobSpec);
+            }
+            try (Watch ignored = client.batch().v1().jobs()
+                    .resource(job)
+                    .watch(new JobCompleteWatcher(taskParam, jobCompletionLatch));
+                 Watch ignored1 = client.pods().inNamespace(getNamespace(client, job))
+                         .withLabelSelector(job.getSpec().getSelector())
+                         .watch(new PodLogWatcher(client, getTaskParamOutputStreamSupplier(taskParam)))
+
+            ) {
+                resourceAction.callWithRuntimeException();
+                log.info("Waiting  for job to complete...");
                 if (!jobCompletionLatch.await(waitSeconds, TimeUnit.SECONDS)) {
                     log.error("Job is not completed within {} seconds", waitSeconds);
                     throw new RuntimeException("Job is not completed within " + waitSeconds + " seconds");
                 }
-            } catch (InterruptedException e) {
-                log.error(e.getMessage(), e);
             }
         }
-        boolean flag = isJobEndSuccess.get();
-        log.info("Job completed with success status: " + flag);
-        if (!flag) {
-            throw new RuntimeException("Job failed,retryCount: " + retryCount.get());
+
+        job = client.batch().v1().jobs().resource(job).get();
+        JobStatus status = job.getStatus();
+        isJobEndSuccess = K8sUtil.checkJobEndedSuccess(job);
+        if (status.getFailed() != null) {
+            retryCount = status.getFailed();
         }
-        return retryCount.get();
+        log.info("Job ended with status: " + (isJobEndSuccess ? "success" : "failed") + ", retryCount: " + retryCount);
+        if (!isJobEndSuccess) {
+            throw new RuntimeException("Job failed,retryCount: " + retryCount);
+        }
     }
 
     private static Supplier2<OutputStream, Pod, ContainerStatus> getTaskParamOutputStreamSupplier(TaskParam taskParam) {

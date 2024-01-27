@@ -17,6 +17,7 @@
 package org.dromara.cloudeon.processor;
 
 import ch.qos.logback.classic.ClassicConstants;
+import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -136,11 +137,7 @@ public abstract class BaseCloudeonTask implements Runnable {
         commandTaskEntity.setCommandState(CommandState.ERROR);
         commandTaskRepository.saveAndFlush(commandTaskEntity);
 
-        // 更新command状态
-        CommandEntity updateCommandEntity = commandRepository.findById(taskParam.getCommandId()).get();
-        updateCommandEntity.setCommandState(CommandState.ERROR);
-        commandRepository.saveAndFlush(updateCommandEntity);
-        throw new RuntimeException();
+        ExceptionUtil.wrapAndThrow(e);
     }
 
     abstract public void internalExecute();

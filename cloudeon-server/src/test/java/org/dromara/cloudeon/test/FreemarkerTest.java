@@ -20,7 +20,6 @@ import cn.hutool.core.lang.Dict;
 import cn.hutool.extra.template.TemplateConfig;
 import cn.hutool.extra.template.TemplateEngine;
 import cn.hutool.extra.template.TemplateUtil;
-import org.dromara.cloudeon.entity.ServiceInstanceEntity;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import freemarker.cache.StringTemplateLoader;
@@ -33,6 +32,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.dromara.cloudeon.entity.ServiceInstanceEntity;
+import org.dromara.cloudeon.utils.FreemarkerUtil;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
@@ -54,6 +55,27 @@ public class FreemarkerTest {
     ClusterNode node003 = new ClusterNode("node003", 3);
     ClusterNode node004 = new ClusterNode("node004", 4);
     ClusterNode node005 = new ClusterNode("node005", 5);
+
+    @Test
+    public void interpret() {
+        String tplStr = "" +
+                "<#macro executeDynamicCode userInput>\n" +
+                "    <#assign startIdx = userInput?index_of('#{{')>\n" +
+                "    <#assign endIdx = userInput?last_index_of('}}#')>\n" +
+                "    <#if startIdx gt 0 && endIdx gt 0>\n" +
+                "        <#assign dynamicCode = userInput?substring(startIdx + 3, endIdx)>\n" +
+                "        ${userInput?substring(0,startIdx)}<@dynamicCode?interpret />${userInput?substring(endIdx+3)}<#t>\n" +
+                "    <#else >\n" +
+                "        ${userInput}\n" +
+                "    </#if><#t>\n" +
+                "</#macro>" +
+                "DynamicCode: <@executeDynamicCode yourtext />" +
+                "";
+        Map<String, Object> data = new HashMap<>();
+        data.put("serviceFullName", "zookeeper");
+        data.put("yourtext", "${serviceFullName}:#{{${serviceFullName}}}# ?");
+        System.out.println(FreemarkerUtil.templateEval(tplStr, data));
+    }
 
     @Test
     public void bean() throws IOException, TemplateException {

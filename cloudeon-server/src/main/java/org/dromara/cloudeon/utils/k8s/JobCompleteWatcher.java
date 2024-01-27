@@ -1,30 +1,24 @@
 package org.dromara.cloudeon.utils.k8s;
 
 import io.fabric8.kubernetes.api.model.batch.v1.Job;
-import io.fabric8.kubernetes.api.model.batch.v1.JobStatus;
 import io.fabric8.kubernetes.client.Watcher;
 import io.fabric8.kubernetes.client.WatcherException;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.cloudeon.processor.TaskParam;
+import org.dromara.cloudeon.utils.K8sUtil;
 import org.dromara.cloudeon.utils.LogUtil;
 
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 public class JobCompleteWatcher implements Watcher<Job> {
     private final TaskParam taskParam;
     private final CountDownLatch completionLatch;
-    private final AtomicBoolean isJobEndSuccess;
-    private final AtomicInteger retryCount;
 
-    public JobCompleteWatcher(TaskParam taskParam, CountDownLatch completionLatch, AtomicBoolean isJobEndSuccess, AtomicInteger retryCount) {
+    public JobCompleteWatcher(TaskParam taskParam, CountDownLatch completionLatch) {
         super();
         this.taskParam = taskParam;
         this.completionLatch = completionLatch;
-        this.isJobEndSuccess = isJobEndSuccess;
-        this.retryCount = retryCount;
     }
 
     @Override
@@ -32,13 +26,8 @@ public class JobCompleteWatcher implements Watcher<Job> {
         if (action != Action.MODIFIED) {
             return;
         }
-        JobStatus status = job.getStatus();
-        if (status == null || status.getConditions().isEmpty()) {
+        if (!K8sUtil.checkJobEnded(job)) {
             return;
-        }
-        isJobEndSuccess.set("Complete".equalsIgnoreCase(status.getConditions().get(0).getType()));
-        if (status.getFailed() != null) {
-            retryCount.set(status.getFailed());
         }
         completionLatch.countDown();
     }
@@ -51,7 +40,7 @@ public class JobCompleteWatcher implements Watcher<Job> {
     @Override
     public void onClose(WatcherException cause) {
         LogUtil.logWithTaskId(taskParam, () -> {
-            log.info("Watcher closed with exception: " + cause.getMessage());
+            log.info("JobCompleteWatcher closed with exception: " + cause.getMessage());
             log.error(cause.getMessage(), cause);
         });
         doClose();
@@ -59,7 +48,7 @@ public class JobCompleteWatcher implements Watcher<Job> {
 
     private void doClose() {
         LogUtil.logWithTaskId(taskParam, () -> {
-            log.info("Watcher closed");
+            log.info("JobCompleteWatcher closed");
         });
     }
 }

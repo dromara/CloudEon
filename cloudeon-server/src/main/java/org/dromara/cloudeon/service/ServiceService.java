@@ -45,6 +45,8 @@ public class ServiceService {
     @Resource
     private ClusterNodeRepository clusterNodeRepository;
     @Resource
+    private ClusterAlertRuleRepository clusterAlertRuleRepository;
+    @Resource
     private Environment environment;
 
     public String getNamespace(Integer clusterId) {
@@ -99,7 +101,10 @@ public class ServiceService {
         List<ServiceRoleInstanceEntity> roleInstanceEntities = roleInstanceRepository.findByServiceInstanceId(serviceInstanceId);
 
         Map<String, Object> dataModel = new HashMap<>();
-
+        Integer clusterId = serviceInstanceEntity.getClusterId();
+        dataModel.put("clusterId", clusterId);
+        Integer stackId = stackServiceEntity.getId();
+        dataModel.put("stackId", stackId);
         // 查询服务实例所有配置项,包括全局
         List<ServiceInstanceConfigEntity> allConfigEntityList = configRepository.findByServiceInstanceId(serviceInstanceId);
         if ("HELM_CONTROLLER".equalsIgnoreCase(stackServiceEntity.getName())) {
@@ -131,7 +136,8 @@ public class ServiceService {
         } catch (UnknownHostException e) {
             throw new RuntimeException(e);
         }
-
+        List<ClusterAlertRuleEntity> clusterAlertRuleEntities = clusterAlertRuleRepository.findByClusterId(clusterId);
+        dataModel.put("alertRules", clusterAlertRuleEntities);
         // 获取该服务支持的自定义配置文件名
         String customConfigFiles = stackServiceEntity.getCustomConfigFiles();
         Map<String, Map<String, String>> confFiles = new HashMap<>();
@@ -189,5 +195,6 @@ public class ServiceService {
 
         dataModel.put("dependencies", services);
     }
+
 
 }

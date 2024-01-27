@@ -21,6 +21,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -38,4 +39,6 @@ public class HistoryAlertVO {
     private String serviceInstanceName;
     private String serviceRoleLabel;
     private String hostname;
+    private LocalDateTime fireTime;
+    private LocalDateTime solveTime;
 }

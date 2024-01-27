@@ -32,31 +32,30 @@ import io.fabric8.kubernetes.api.model.Pod;
 import io.vertx.core.Vertx;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.dromara.cloudeon.config.CloudeonConfigProp;
 import org.dromara.cloudeon.controller.request.InitServiceRequest;
 import org.dromara.cloudeon.controller.request.ServiceConfUpgradeRequest;
 import org.dromara.cloudeon.controller.response.*;
 import org.dromara.cloudeon.dao.*;
-import org.dromara.cloudeon.dto.*;
+import org.dromara.cloudeon.dto.ResultDTO;
+import org.dromara.cloudeon.dto.ServiceConfiguration;
+import org.dromara.cloudeon.dto.ServiceCustomConf;
+import org.dromara.cloudeon.dto.ServicePresetConf;
 import org.dromara.cloudeon.entity.*;
 import org.dromara.cloudeon.enums.*;
-import org.dromara.cloudeon.processor.TaskParam;
 import org.dromara.cloudeon.service.CommandHandler;
 import org.dromara.cloudeon.service.KubeService;
 import org.dromara.cloudeon.service.ServiceService;
+import org.dromara.cloudeon.utils.Constant;
 import org.dromara.cloudeon.utils.DAG;
 import org.dromara.cloudeon.utils.K8sUtil;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.persistence.EntityManager;
-import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -74,8 +73,7 @@ public class ClusterServiceController {
 
     @Resource
     private ServiceService serviceService;
-    @Resource
-    private CloudeonConfigProp cloudeonConfigProp;
+
 
     @Resource(name = "cloudeonVertx")
     private Vertx cloudeonVertx;
@@ -102,12 +100,8 @@ public class ClusterServiceController {
     private ServiceInstanceConfigRepository serviceInstanceConfigRepository;
 
     @Resource
-    private EntityManager entityManager;
-
-    @Resource
     private CommandRepository commandRepository;
-    @Resource
-    private CommandTaskRepository commandTaskRepository;
+
 
     @Resource
     private CommandHandler commandHandler;
@@ -260,7 +254,7 @@ public class ClusterServiceController {
 
         //  生成新增服务command （按照安装服务间的依赖生成）
         List<ServiceInstanceEntity> serviceInstanceEntities = installedServiceInstanceIds.stream().map(e -> serviceInstanceRepository.findById(e).get()).collect(Collectors.toList());
-        Integer commandId = buildServiceCommand(serviceInstanceEntities, clusterId, CommandType.INSTALL_SERVICE);
+        Integer commandId = commandHandler.buildServiceCommand(serviceInstanceEntities, clusterId, CommandType.INSTALL_SERVICE);
 
         //  调用workflow
         cloudeonVertx.eventBus().request(VERTX_COMMAND_ADDRESS, commandId);
@@ -413,7 +407,7 @@ public class ClusterServiceController {
         ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(serviceInstanceId).get();
         //  生成停止服务command
         List<ServiceInstanceEntity> serviceInstanceEntities = Lists.newArrayList(serviceInstanceEntity);
-        Integer commandId = buildServiceCommand(serviceInstanceEntities, serviceInstanceEntity.getClusterId(), CommandType.STOP_SERVICE);
+        Integer commandId = commandHandler.buildServiceCommand(serviceInstanceEntities, serviceInstanceEntity.getClusterId(), CommandType.STOP_SERVICE);
 
         //  调用workflow
         cloudeonVertx.eventBus().request(VERTX_COMMAND_ADDRESS, commandId);
@@ -431,7 +425,7 @@ public class ClusterServiceController {
         ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(serviceInstanceId).get();
         //  生成刷新服务配置command
         List<ServiceInstanceEntity> serviceInstanceEntities = Lists.newArrayList(serviceInstanceEntity);
-        Integer commandId = buildServiceCommand(serviceInstanceEntities, serviceInstanceEntity.getClusterId(), CommandType.UPGRADE_SERVICE_CONFIG);
+        Integer commandId = commandHandler.buildServiceCommand(serviceInstanceEntities, serviceInstanceEntity.getClusterId(), CommandType.UPGRADE_SERVICE_CONFIG);
 
         //  调用workflow
         cloudeonVertx.eventBus().request(VERTX_COMMAND_ADDRESS, commandId);
@@ -445,7 +439,7 @@ public class ClusterServiceController {
         ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(serviceInstanceId).get();
         //  生成重启服务command
         List<ServiceInstanceEntity> serviceInstanceEntities = Lists.newArrayList(serviceInstanceEntity);
-        Integer commandId = buildServiceCommand(serviceInstanceEntities, serviceInstanceEntity.getClusterId(), CommandType.RESTART_SERVICE);
+        Integer commandId = commandHandler.buildServiceCommand(serviceInstanceEntities, serviceInstanceEntity.getClusterId(), CommandType.RESTART_SERVICE);
 
         //  调用workflow
         cloudeonVertx.eventBus().request(VERTX_COMMAND_ADDRESS, commandId);
@@ -461,7 +455,7 @@ public class ClusterServiceController {
         ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(serviceInstanceId).get();
         //  生成启动服务command
         List<ServiceInstanceEntity> serviceInstanceEntities = Lists.newArrayList(serviceInstanceEntity);
-        Integer commandId = buildServiceCommand(serviceInstanceEntities, serviceInstanceEntity.getClusterId(), CommandType.START_SERVICE);
+        Integer commandId = commandHandler.buildServiceCommand(serviceInstanceEntities, serviceInstanceEntity.getClusterId(), CommandType.START_SERVICE);
 
         //  调用workflow
         cloudeonVertx.eventBus().request(VERTX_COMMAND_ADDRESS, commandId);
@@ -471,156 +465,6 @@ public class ClusterServiceController {
         serviceInstanceRepository.save(serviceInstanceEntity);
 
         return ResultDTO.success(null);
-    }
-
-    /**
-     * 通过模板生成服务实例持久化到宿主机的目录
-     */
-    private String genPersistencePaths(String persistencePaths, ServiceInstanceEntity serviceInstance) {
-        String result = Arrays.stream(persistencePaths.split(",")).map(new Function<String, String>() {
-            @Override
-            public String apply(String pathTemplate) {
-                Configuration cfg = new Configuration();
-                StringTemplateLoader stringLoader = new StringTemplateLoader();
-                stringLoader.putTemplate("myTemplate", pathTemplate);
-                cfg.setTemplateLoader(stringLoader);
-                try (Writer out = new StringWriter(2048);) {
-                    Template temp = cfg.getTemplate("myTemplate", "utf-8");
-                    temp.process(Dict.create().set("service", serviceInstance), out);
-                    return out.toString();
-                } catch (IOException | TemplateException e) {
-                    e.printStackTrace();
-                }
-
-                return null;
-            }
-        }).collect(Collectors.joining(","));
-
-
-        return result;
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    public Integer buildServiceCommand(List<ServiceInstanceEntity> serviceInstanceEntities,
-                                       Integer ClusterId, CommandType commandType) {
-        return buildInternalCommand(serviceInstanceEntities, Lists.newArrayList(), ClusterId, commandType);
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    public Integer buildRoleCommand(List<ServiceInstanceEntity> serviceInstanceEntities, List<ServiceRoleInstanceEntity> spceRoleInstanceEntities,
-                                    Integer ClusterId, CommandType commandType) {
-        return buildInternalCommand(serviceInstanceEntities, spceRoleInstanceEntities, ClusterId, commandType);
-    }
-
-    private Integer buildInternalCommand(List<ServiceInstanceEntity> serviceInstanceEntities, List<ServiceRoleInstanceEntity> spceRoleInstanceEntities,
-                                         Integer ClusterId, CommandType commandType) {
-
-        // 创建 command
-        CommandEntity commandEntity = new CommandEntity();
-        commandEntity.setCommandState(CommandState.RUNNING);
-        commandEntity.setCurrentProgress(0);
-        commandEntity.setClusterId(ClusterId);
-        commandEntity.setName(commandType.getDesc());
-        commandEntity.setSubmitTime(new Date());
-        commandEntity.setOperateUserId(AdminUserId);
-        commandEntity.setType(commandType);
-        // 持久化 command
-        commandRepository.saveAndFlush(commandEntity);
-
-        // todo 根据服务依赖进行调整顺序
-        //  遍历command 涉及的服务实例
-        AtomicInteger taskModelId = new AtomicInteger(1);
-        for (ServiceInstanceEntity serviceInstanceEntity : serviceInstanceEntities) {
-            StackServiceEntity stackServiceEntity = stackServiceRepository.findById(serviceInstanceEntity.getStackServiceId()).get();
-            // 生成TaskGroupTypes
-            List<TaskGroupType> taskGroupTypes = commandHandler.buildTaskGroupTypes(commandType, stackServiceEntity.getName());
-
-            LinkedHashMap<String, List<NodeInfo>> roleHostMaps = new LinkedHashMap<>();
-            // 查出该服务有的角色
-            List<StackServiceRoleEntity> stackServiceRoleEntities = stackServiceRoleRepository.findByServiceIdOrderBySortNum(serviceInstanceEntity.getStackServiceId());
-            // 遍历每个角色
-            for (StackServiceRoleEntity stackServiceRoleEntity : stackServiceRoleEntities) {
-                // 查出该角色的各个节点实例
-                List<ServiceRoleInstanceEntity> roleInstanceEntities = roleInstanceRepository.findByServiceInstanceIdAndStackServiceRoleId(serviceInstanceEntity.getId(), stackServiceRoleEntity.getId());
-
-                List<NodeInfo> nodeInfos = roleInstanceEntities.stream().map(new Function<ServiceRoleInstanceEntity, NodeInfo>() {
-                    @Override
-                    public NodeInfo apply(ServiceRoleInstanceEntity serviceRoleInstanceEntity) {
-                        ClusterNodeEntity clusterNodeEntity = clusterNodeRepository.findById(serviceRoleInstanceEntity.getNodeId()).get();
-                        return NodeInfo.builder().hostName(clusterNodeEntity.getHostname()).ip(clusterNodeEntity.getIp()).build();
-                    }
-                }).collect(Collectors.toList());
-                roleHostMaps.put(stackServiceRoleEntity.getName(), nodeInfos);
-            }
-
-
-            ServiceTaskGroupType serviceTaskGroupType = ServiceTaskGroupType.builder()
-                    .serviceName(serviceInstanceEntity.getServiceName())
-                    .stackServiceName(stackServiceEntity.getName())
-                    .taskGroupTypes(taskGroupTypes)
-                    .roleHostMaps(roleHostMaps).build();
-
-            List<TaskModel> taskModels;
-            // 确定是角色相关指令还是服务指令
-            if (!spceRoleInstanceEntities.isEmpty()) {
-                List<SpecRoleHost> specRoleHosts = spceRoleInstanceEntities.stream().map(new Function<ServiceRoleInstanceEntity, SpecRoleHost>() {
-                    @Override
-                    public SpecRoleHost apply(ServiceRoleInstanceEntity serviceRoleInstanceEntity) {
-                        ClusterNodeEntity clusterNodeEntity = clusterNodeRepository.findById(serviceRoleInstanceEntity.getNodeId()).get();
-                        SpecRoleHost specRoleHost = SpecRoleHost.builder()
-                                .roleName(serviceRoleInstanceEntity.getServiceRoleName())
-                                .hostName(clusterNodeEntity.getHostname())
-                                .build();
-                        return specRoleHost;
-                    }
-                }).collect(Collectors.toList());
-                taskModels = commandHandler.buildTaskModels(serviceTaskGroupType, specRoleHosts);
-            } else {
-                taskModels = commandHandler.buildTaskModels(serviceTaskGroupType);
-            }
-            List<TaskModel> models = taskModels.stream().map(e -> {
-                e.setTaskSortNum(taskModelId.getAndIncrement());
-                return e;
-            }).collect(Collectors.toList());
-
-            // 根据taskModels生成command task，并持久化数据库
-            saveCommandTask2DB(commandEntity, serviceInstanceEntity, models);
-        }
-
-        return commandEntity.getId();
-    }
-
-    private void saveCommandTask2DB(CommandEntity commandEntity, ServiceInstanceEntity serviceInstanceEntity, List<TaskModel> models) {
-        for (TaskModel taskModel : models) {
-            CommandTaskEntity commandTaskEntity = new CommandTaskEntity();
-            commandTaskEntity.setCommandId(commandEntity.getId());
-            commandTaskEntity.setProgress(0);
-            commandTaskEntity.setProcessorClassName(taskModel.getProcessorClassName());
-            commandTaskEntity.setTaskName(taskModel.getTaskName());
-            commandTaskEntity.setTaskShowSortNum(taskModel.getTaskSortNum());
-            commandTaskEntity.setCommandState(CommandState.WAITING);
-            commandTaskEntity.setServiceInstanceId(serviceInstanceEntity.getId());
-            commandTaskEntity.setServiceInstanceName(serviceInstanceEntity.getServiceName());
-            commandTaskRepository.saveAndFlush(commandTaskEntity);
-            // 更新日志路径
-            commandTaskEntity.setTaskLogPath(cloudeonConfigProp.getTaskLog() + File.separator + commandEntity.getId() + "-" + commandTaskEntity.getId() + ".log");
-            // 更新任务参数
-            TaskParam taskParam = buildTaskParam(taskModel, commandEntity, serviceInstanceEntity, commandTaskEntity);
-            commandTaskEntity.setTaskParam(JSONObject.toJSONString(taskParam));
-            commandTaskRepository.saveAndFlush(commandTaskEntity);
-        }
-    }
-
-    private TaskParam buildTaskParam(TaskModel taskModel, CommandEntity commandEntity,
-                                     ServiceInstanceEntity serviceInstanceEntity, CommandTaskEntity commandTaskEntity) {
-        TaskParam taskParam = new TaskParam();
-        BeanUtil.copyProperties(taskModel, taskParam);
-        taskParam.setCommandTaskId(commandTaskEntity.getId());
-        taskParam.setCommandId(commandEntity.getId());
-        taskParam.setServiceInstanceId(serviceInstanceEntity.getId());
-        taskParam.setServiceInstanceName(serviceInstanceEntity.getServiceName());
-        taskParam.setStackServiceId(serviceInstanceEntity.getStackServiceId());
-        return taskParam;
     }
 
 
@@ -636,7 +480,7 @@ public class ClusterServiceController {
 
         //  生成停止角色command
         List<ServiceInstanceEntity> serviceInstanceEntities = Lists.newArrayList(serviceInstanceEntity);
-        Integer commandId = buildRoleCommand(serviceInstanceEntities, Lists.newArrayList(roleInstanceEntity),
+        Integer commandId = commandHandler.buildRoleCommand(serviceInstanceEntities, Lists.newArrayList(roleInstanceEntity),
                 serviceInstanceEntity.getClusterId(), CommandType.STOP_ROLE);
         //  调用workflow
         cloudeonVertx.eventBus().request(VERTX_COMMAND_ADDRESS, commandId);
@@ -654,7 +498,7 @@ public class ClusterServiceController {
         roleInstanceRepository.save(roleInstanceEntity);
         //  生成启动角色command
         List<ServiceInstanceEntity> serviceInstanceEntities = Lists.newArrayList(serviceInstanceEntity);
-        Integer commandId = buildRoleCommand(serviceInstanceEntities, Lists.newArrayList(roleInstanceEntity),
+        Integer commandId = commandHandler.buildRoleCommand(serviceInstanceEntities, Lists.newArrayList(roleInstanceEntity),
                 serviceInstanceEntity.getClusterId(), CommandType.START_ROLE);
         //  调用workflow
         cloudeonVertx.eventBus().request(VERTX_COMMAND_ADDRESS, commandId);
@@ -846,7 +690,7 @@ public class ClusterServiceController {
 
         //  生成删除服务command
         List<ServiceInstanceEntity> serviceInstanceEntities = Lists.newArrayList(serviceInstanceEntity);
-        Integer commandId = buildServiceCommand(serviceInstanceEntities, serviceInstanceEntity.getClusterId(), CommandType.DELETE_SERVICE);
+        Integer commandId = commandHandler.buildServiceCommand(serviceInstanceEntities, serviceInstanceEntity.getClusterId(), CommandType.DELETE_SERVICE);
         //  调用workflow
         cloudeonVertx.eventBus().request(VERTX_COMMAND_ADDRESS, commandId);
 
@@ -987,6 +831,28 @@ public class ClusterServiceController {
             }).collect(Collectors.toList());
             return ResultDTO.success(rolePodEventVOS);
         });
+    }
+
+    @PostMapping("/stopCommand")
+    public ResultDTO<Void> stopCommand(Integer commandId) {
+        CommandEntity commandEntity = commandRepository.findById(commandId).get();
+        CommandState commandState = commandEntity.getCommandState();
+        if (!commandState.isEnd()) {
+            cloudeonVertx.eventBus().request(Constant.VERTX_STOP_COMMAND_ADDRESS, commandId);
+        }
+        return ResultDTO.success(null);
+    }
+
+    @PostMapping("/retryCommand")
+    public ResultDTO<Void> retryCommand(Integer commandId) {
+        CommandEntity commandEntity = commandRepository.findById(commandId).get();
+        CommandState commandState = commandEntity.getCommandState();
+        // 非 停止或错误 状态无法执行重试
+        if (!(commandState.equals(CommandState.STOPPED) || commandState.equals(CommandState.ERROR))) {
+            throw new IllegalArgumentException("指令状态为" + commandState + "，重试无效");
+        }
+        cloudeonVertx.eventBus().request(Constant.VERTX_RETRY_COMMAND_ADDRESS, commandId);
+        return ResultDTO.success(null);
     }
 
 }

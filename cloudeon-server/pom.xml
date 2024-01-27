@@ -75,7 +75,11 @@
             <version>${vertx.version}</version>
         </dependency>
         <!-- 自定义依赖 -->
-
+        <dependency>
+            <groupId>net.tascalate</groupId>
+            <artifactId>net.tascalate.concurrent</artifactId>
+            <version>0.9.7</version> <!-- Any version above 0.8.0, the latest one is recommended -->
+        </dependency>
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>

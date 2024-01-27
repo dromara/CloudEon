@@ -1,7 +1,7 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: metrics-${serviceFullName}
+  name: metrics-zookeeper
   labels:
     sname: ${serviceFullName}
     enable-default-service-monitor: true

@@ -22,6 +22,14 @@ public enum CommandState {
      */
     WAITING,
     /**
+     * 正在停止
+     */
+    STOPPING,
+    /**
+     * 已停止
+     */
+    STOPPED,
+    /**
      * 正在运行
      */
     RUNNING,
@@ -33,5 +41,15 @@ public enum CommandState {
      * 失败
      */
     ERROR;
+
+    /**
+     * 任务是否结束
+     * 成功/失败/已停止 都认为是结束状态
+     *
+     * @return
+     */
+    public boolean isEnd() {
+        return this == SUCCESS || this == ERROR || this == STOPPED;
+    }
 
 }

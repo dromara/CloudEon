@@ -17,17 +17,27 @@
 package org.dromara.cloudeon.controller;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.date.LocalDateTimeUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Lists;
+import io.vertx.core.Vertx;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.dromara.cloudeon.controller.response.ActiveAlertVO;
 import org.dromara.cloudeon.controller.response.HistoryAlertVO;
 import org.dromara.cloudeon.dao.*;
 import org.dromara.cloudeon.dto.*;
-import org.dromara.cloudeon.entity.*;
+import org.dromara.cloudeon.entity.AlertMessageEntity;
+import org.dromara.cloudeon.entity.ClusterAlertRuleEntity;
+import org.dromara.cloudeon.entity.ServiceInstanceEntity;
+import org.dromara.cloudeon.entity.ServiceRoleInstanceEntity;
 import org.dromara.cloudeon.enums.AlertLevel;
+import org.dromara.cloudeon.enums.CommandType;
+import org.dromara.cloudeon.service.CommandHandler;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -35,11 +45,16 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static org.dromara.cloudeon.utils.Constant.VERTX_COMMAND_ADDRESS;
+
 @Slf4j
 @RestController
 @RequestMapping("/alert")
 public class AlertController {
-
+    @Resource(name = "cloudeonVertx")
+    private Vertx cloudeonVertx;
+    @Resource
+    private CommandHandler commandHandler;
     @Resource
     private AlertMessageRepository alertMessageRepository;
 
@@ -75,9 +90,12 @@ public class AlertController {
                     String alertname = labels.getAlertname();
 
                     int clusterId = labels.getClusterId();
+                    // 告警不一定是实例级别的，不一定携带instance
                     String instance = labels.getInstance();
-                    String hostname = instance.split(":")[0];
+                    boolean hasInstance = StringUtils.isNotEmpty(instance);
+                    String hostname = hasInstance ? instance.split(":")[0] : null;
                     String serviceRoleName = labels.getServiceRoleName();
+                    String serviceName = labels.getServiceName();
                     log.info("接收到firing告警，根据告警信息查找活跃告警, alertName:{} , startsAt: {} ,hostname:{} , serviceRoleName:{}", alertname, startsAt,hostname,serviceRoleName);
                     // 判断是否已经保存过了
                     AlertMessageEntity messageEntity = alertMessageRepository.findByFireTimeAndAlertNameAndHostname(startsAt, alertname,hostname);
@@ -85,24 +103,16 @@ public class AlertController {
                         // 之前已经保存过的就不需要了
                         return null;
                     }
-                    // 查询服务角色实例
-                    ServiceRoleInstanceEntity serviceRoleInstanceEntity = roleInstanceRepository.findByServiceRoleNameAndClusterIdAndHostname(clusterId, serviceRoleName, hostname);
-                    if (serviceRoleInstanceEntity == null) {
-                        return null;
-                    }
-                    // 根据节点hostname查询节点id
-                    ClusterNodeEntity roleClusterNode = clusterNodeRepository.findByHostname(hostname);
+                    ServiceInstanceEntity serviceInstance = serviceInstanceRepository.findByServiceNameAndClusterId(serviceName, clusterId);
+
                     String severity = labels.getAlertLevel();
                     AlertLevel alertLevel = AlertLevel.fromDesc(severity);
                     Annotations annotations = alert.getAnnotations();
                     String alertAdvice = annotations.getAlertAdvice();
                     String alertInfo = annotations.getAlertInfo();
                     AlertMessageEntity alertMessageEntity = AlertMessageEntity.builder()
-                            .serviceInstanceId(serviceRoleInstanceEntity.getServiceInstanceId())
-                            .serviceRoleInstanceId(serviceRoleInstanceEntity.getId())
-                            .hostname(hostname)
-                            .nodeId(roleClusterNode.getId())
                             .fireTime(startsAt)
+                            .serviceInstanceId(serviceInstance.getId())
                             .createTime(new Date())
                             .alertName(alertname)
                             .alertLevel(alertLevel)
@@ -110,6 +120,16 @@ public class AlertController {
                             .alertInfo(alertInfo)
                             .clusterId(clusterId)
                             .build();
+                    if (hasInstance) {
+                        // 根据节点hostname查询节点id
+                        Integer nodeId = clusterNodeRepository.findByHostname(hostname).getId();
+                        // 查询服务角色实例
+                        ServiceRoleInstanceEntity serviceRoleInstanceEntity = roleInstanceRepository.findByServiceRoleNameAndClusterIdAndHostname(clusterId, serviceRoleName, hostname);
+
+                        alertMessageEntity.setHostname(hostname);
+                        alertMessageEntity.setServiceRoleInstanceId(serviceRoleInstanceEntity.getServiceInstanceId());
+                        alertMessageEntity.setNodeId(nodeId);
+                    }
                     return alertMessageEntity;
                 }
             }).filter(Objects::nonNull).collect(Collectors.toList());
@@ -124,7 +144,9 @@ public class AlertController {
                 AlertLabels labels = alert.getLabels();
                 String alertname = labels.getAlertname();
                 String instance = labels.getInstance();
-                String hostname = instance.split(":")[0];
+                boolean hasInstance = StringUtils.isNotEmpty(instance);
+                String hostname = hasInstance ? instance.split(":")[0] : null;
+
                 log.info("接收到已处理的告警，根据告警信息查找活跃告警, alertName:{} , startsAt: {} ,hostname:{}", alertname, startsAt,hostname);
                 AlertMessageEntity alertMessageEntity =alertMessageRepository.findByFireTimeAndAlertNameAndHostname(startsAt, alertname,hostname);
                 if (alertMessageEntity != null) {
@@ -204,6 +226,8 @@ public class AlertController {
                             .serviceInstanceId(serviceInstanceId)
                             .hostname(alertMessageEntity.getHostname())
                             .serviceRoleInstanceId(roleInstanceId)
+                            .solveTime(LocalDateTimeUtil.of(Instant.parse(alertMessageEntity.getSolveTime())))
+                            .fireTime(LocalDateTimeUtil.of(Instant.parse(alertMessageEntity.getFireTime())))
                             .build();
                 }else {
                     return null;
@@ -236,7 +260,15 @@ public class AlertController {
             clusterAlertRuleEntity.setUpdateTime(createTime);
             clusterAlertRuleRepository.save(clusterAlertRuleEntity);
         }
-
+        Integer clusterId = clusterAlertRuleEntity.getClusterId();
+        String stackServiceName = clusterAlertRuleEntity.getStackServiceName();
+        ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findEntityByClusterIdAndStackServiceName(clusterId, stackServiceName);
+        //  生成刷新服务配置command
+        List<ServiceInstanceEntity> serviceInstanceEntities = Lists.newArrayList(serviceInstanceEntity);
+        Integer commandId = commandHandler.buildServiceCommand(serviceInstanceEntities, serviceInstanceEntity.getClusterId(), CommandType.UPGRADE_SERVICE_CONFIG);
+        //  调用workflow
+        cloudeonVertx.eventBus().request(VERTX_COMMAND_ADDRESS, commandId);
+        
         return ResultDTO.success(null);
     }
 }

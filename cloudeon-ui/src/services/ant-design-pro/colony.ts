@@ -181,6 +181,26 @@ export async function getTaskLogAPI(options?: { [key: string]: any }) {
   });
 }
 
+/** 停止命令 */
+export async function stopCommandAPI(options?: { [key: string]: any }) {
+  return request<API.logResult>('/apiPre/service/stopCommand', {
+    method: 'POST',
+    params: {
+      ...options,
+    },
+  });
+}
+
+/** 重试命令 */
+export async function retryCommandAPI(options?: { [key: string]: any }) {
+  return request<API.logResult>('/apiPre/service/retryCommand', {
+    method: 'POST',
+    params: {
+      ...options,
+    },
+  });
+}
+
 // 启动服务
 export async function startServiceAPI(options?: { [key: string]: any}) {
   return request<API.normalResult>('/apiPre/service/startService', {

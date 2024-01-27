@@ -31,13 +31,13 @@ public abstract class ScaleK8sServiceTask extends BaseCloudeonTask implements Ap
     public void internalExecute() {
         ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(taskParam.getServiceInstanceId()).get();
         String roleName = taskParam.getRoleName();
-        RoleType roleType = RoleType.getRoleType(roleName);
+        StackServiceRoleEntity stackServiceRoleEntity = stackServiceRoleRepository.findByServiceIdAndName(taskParam.getStackServiceId(), roleName);
+
+        RoleType roleType = RoleType.getRoleType(stackServiceRoleEntity.getType());
         if (roleType != RoleType.DEPLOYMENT) {
             return;
         }
 
-        // 查询框架服务角色名获取deployment名字
-        StackServiceRoleEntity stackServiceRoleEntity = stackServiceRoleRepository.findByServiceIdAndName(taskParam.getStackServiceId(), roleName);
         String deploymentName = serviceService.getRoleServiceFullName(stackServiceRoleEntity, serviceInstanceEntity);
         String serviceName = serviceInstanceEntity.getServiceName();
 
