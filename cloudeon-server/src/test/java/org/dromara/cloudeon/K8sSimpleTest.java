@@ -172,7 +172,7 @@ public class K8sSimpleTest {
     }
 
     @Test
-    public void waitForJobCompleted() {
+    public void waitForJobCompleted() throws InterruptedException {
         String modelYamlStr = "" +
                 "" +
                 "apiVersion: batch/v1\n" +
