@@ -5,6 +5,7 @@ import cn.hutool.core.map.MapUtil;
 import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.dromara.cloudeon.config.CloudeonConfigProp;
 import org.dromara.cloudeon.dao.*;
 import org.dromara.cloudeon.dto.RoleNodeInfo;
 import org.dromara.cloudeon.entity.*;
@@ -27,7 +28,8 @@ import java.util.stream.Collectors;
 public class ServiceService {
     @Resource
     private ServiceRoleInstanceRepository serviceRoleInstanceRepository;
-
+    @Resource
+    private CloudeonConfigProp cloudeonConfigProp;
     @Resource
     private ClusterInfoRepository clusterInfoRepository;
     @Resource
@@ -107,8 +109,8 @@ public class ServiceService {
         dataModel.put("stackId", stackId);
         // 查询服务实例所有配置项,包括全局
         List<ServiceInstanceConfigEntity> allConfigEntityList = configRepository.findByServiceInstanceId(serviceInstanceId);
-        if ("HELM_CONTROLLER".equalsIgnoreCase(stackServiceEntity.getName())) {
-            String kubeConfig = clusterInfoRepository.findById(serviceInstanceEntity.getClusterId()).get().getKubeConfig();
+        if (cloudeonConfigProp.getKubeConfigStackServiceNameList().contains(stackServiceEntity.getName())) {
+            String kubeConfig = clusterInfoRepository.findById(clusterId).get().getKubeConfig();
             dataModel.put("super", MapUtil.of("kube_config", kubeConfig));
         }
         if (!"GLOBAL".equalsIgnoreCase(stackServiceEntity.getName())) {

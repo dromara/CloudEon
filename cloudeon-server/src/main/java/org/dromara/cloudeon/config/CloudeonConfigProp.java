@@ -23,6 +23,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -37,6 +39,8 @@ public class CloudeonConfigProp {
     private String taskLog;
     @Value("${cloudeon.work.home}")
     private String workHome;
+    @Value("${cloudeon.stackService.withKubeConfig}")
+    private List<String> kubeConfigStackServiceNameList;
 
 }
 
