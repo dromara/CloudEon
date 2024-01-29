@@ -147,9 +147,8 @@ public class ClusterServiceController {
             Integer stackServiceId = serviceInfo.getStackServiceId();
 
             ServiceInstanceEntity serviceInstanceEntity = new ServiceInstanceEntity();
-            String stackServiceName = serviceInfo.getStackServiceName().toLowerCase();
-            String serviceName = stackServiceName;
-            serviceInstanceEntity.setServiceName(serviceName);
+            String stackServiceName = K8sUtil.formatK8sNameStr(serviceInfo.getStackServiceName());
+            serviceInstanceEntity.setServiceName(stackServiceName);
             serviceInstanceEntity.setLabel(serviceInfo.getStackServiceLabel());
             serviceInstanceEntity.setClusterId(clusterId);
             serviceInstanceEntity.setCreateTime(new Date());
