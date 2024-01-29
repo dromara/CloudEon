@@ -138,7 +138,7 @@ public class ServiceService {
         } catch (UnknownHostException e) {
             throw new RuntimeException(e);
         }
-        List<ClusterAlertRuleEntity> clusterAlertRuleEntities = clusterAlertRuleRepository.findByClusterId(clusterId);
+        List<ClusterAlertRuleEntity> clusterAlertRuleEntities = clusterAlertRuleRepository.findByClusterIdAndStackServiceName(clusterId, stackServiceEntity.getName());
         dataModel.put("alertRules", clusterAlertRuleEntities);
         // 获取该服务支持的自定义配置文件名
         String customConfigFiles = stackServiceEntity.getCustomConfigFiles();
