@@ -105,7 +105,7 @@ public class ServiceService {
         Map<String, Object> dataModel = new HashMap<>();
         Integer clusterId = serviceInstanceEntity.getClusterId();
         dataModel.put("clusterId", clusterId);
-        Integer stackId = stackServiceEntity.getId();
+        Integer stackId = stackServiceEntity.getStackId();
         dataModel.put("stackId", stackId);
         // 查询服务实例所有配置项,包括全局
         List<ServiceInstanceConfigEntity> allConfigEntityList = configRepository.findByServiceInstanceId(serviceInstanceId);
