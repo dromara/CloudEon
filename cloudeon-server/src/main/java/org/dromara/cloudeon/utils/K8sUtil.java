@@ -50,6 +50,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
 public class K8sUtil {
@@ -139,23 +140,19 @@ public class K8sUtil {
     }
 
     public static boolean checkJobEnded(Job job) {
-        if (job == null) {
-            return false;
-        }
         JobStatus status = job.getStatus();
         return status != null && !status.getConditions().isEmpty();
     }
 
-    public static boolean checkJobEndedSuccess(Job job) {
-        JobStatus status = job.getStatus();
+    public static boolean checkJobEndedSuccess(JobStatus status) {
         return "Complete".equalsIgnoreCase(status.getConditions().get(0).getType());
     }
 
     public static void waitForJobCompleted(VoidFunc0 resourceAction, TaskParam taskParam, KubernetesClient client, Job job, long waitSeconds) throws InterruptedException {
-        boolean isJobEndSuccess;
-        int retryCount = 0;
-        // 如果已经在运行了则不再跟踪日志,当任务被中断重试可能进入此状态
-        if (!checkJobEnded(client.batch().v1().jobs().resource(job).get())) {
+        Job runningJob = client.batch().v1().jobs().resource(job).get();
+        AtomicReference<JobStatus> finalJobStatus = new AtomicReference<>();
+        if (runningJob == null || !checkJobEnded(runningJob)) {
+            // 如果job不存在或者job已存在但未结束，则跟踪日志
             CountDownLatch jobCompletionLatch = new CountDownLatch(1);
             if (job.getSpec() == null || job.getSpec().getSelector() == null || job.getSpec().getSelector().getMatchLabels().isEmpty()) {
                 LabelSelector labelSelector = new LabelSelector();
@@ -166,11 +163,10 @@ public class K8sUtil {
             }
             try (Watch ignored = client.batch().v1().jobs()
                     .resource(job)
-                    .watch(new JobCompleteWatcher(taskParam, jobCompletionLatch));
+                    .watch(new JobCompleteWatcher(taskParam, jobCompletionLatch, finalJobStatus));
                  Watch ignored1 = client.pods().inNamespace(getNamespace(client, job))
                          .withLabelSelector(job.getSpec().getSelector())
                          .watch(new PodLogWatcher(client, getTaskParamOutputStreamSupplier(taskParam)))
-
             ) {
                 resourceAction.callWithRuntimeException();
                 log.info("Waiting  for job to complete...");
@@ -179,11 +175,13 @@ public class K8sUtil {
                     throw new RuntimeException("Job is not completed within " + waitSeconds + " seconds");
                 }
             }
+        } else {
+            finalJobStatus.set(runningJob.getStatus());
         }
-
-        job = client.batch().v1().jobs().resource(job).get();
-        JobStatus status = job.getStatus();
-        isJobEndSuccess = K8sUtil.checkJobEndedSuccess(job);
+        JobStatus status = finalJobStatus.get();
+        boolean isJobEndSuccess;
+        int retryCount = 0;
+        isJobEndSuccess = K8sUtil.checkJobEndedSuccess(status);
         if (status.getFailed() != null) {
             retryCount = status.getFailed();
         }
