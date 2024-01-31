@@ -836,9 +836,10 @@ public class ClusterServiceController {
     public ResultDTO<Void> stopCommand(Integer commandId) {
         CommandEntity commandEntity = commandRepository.findById(commandId).get();
         CommandState commandState = commandEntity.getCommandState();
-        if (!commandState.isEnd()) {
-            cloudeonVertx.eventBus().request(Constant.VERTX_STOP_COMMAND_ADDRESS, commandId);
+        if (commandState.isEnd()) {
+            throw new IllegalArgumentException("指令已经结束");
         }
+        cloudeonVertx.eventBus().request(Constant.VERTX_STOP_COMMAND_ADDRESS, commandId);
         return ResultDTO.success(null);
     }
 
