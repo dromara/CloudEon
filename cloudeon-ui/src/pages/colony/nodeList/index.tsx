@@ -67,18 +67,8 @@ const nodeList: React.FC = () => {
         let params = {
           ip :  arr && arr[1],
           hostname: arr && arr[0],
-          sshAuthType: values.sshAuthType,
-          sshPassword: values.sshPassword,
-          privateKeyPath: values.privateKeyPath,
-          sshPort: values.sshPort,
-          sshUser: values.sshUser,
         }
 
-        if(sshAuthType === "PASSWORD"){
-          delete params.privateKeyPath
-        }else{
-          delete params.sshPassword
-        }
         setCreateLoading(true)
         const result: API.normalResult = await createNodeAPI({...params, clusterId: getData.clusterId})
         if(result && result.success){
@@ -218,57 +208,6 @@ const nodeList: React.FC = () => {
                   options={ipList}
                 />
             </Form.Item>
-
-            <Form.Item
-              label="ssh端口"
-              name="sshPort"
-              initialValue={22}
-              rules={[{ required: true, message: 'ssh端口!' }]}
-            >
-              <Input />
-            </Form.Item>
-
-            <Form.Item
-              label="ssh账号"
-              name="sshUser"
-              initialValue={'root'}
-              rules={[{ required: true, message: '请输入ssh账号!' }]}
-            >
-              <Input />
-            </Form.Item>
-
-            <Form.Item
-              label="认证方式"
-              name="sshAuthType"
-              initialValue={"PASSWORD"}
-              rules={[{ required: true, message: '请选择认证方式!' }]}
-            >
-              <Radio.Group name="sshAuthType" >
-                <Radio value="PASSWORD">PASSWORD</Radio>
-                <Radio value="PRIVATEKEY">PRIVATEKEY</Radio>
-              </Radio.Group>
-            </Form.Item>
-
-            {
-              // form.getFieldsValue(['sshAuthType'])
-              sshAuthType === "PASSWORD"?(
-                <Form.Item
-                  label="ssh密码"
-                  name="sshPassword"
-                  rules={[{ required: true, message: '请输入ssh密码!' }]}
-                >
-                  <Input.Password />
-                </Form.Item>
-              ):(
-                <Form.Item
-                  label="私钥路径"
-                  name="privateKeyPath"
-                  rules={[{ required: true, message: '请输入私钥路径!' }]}
-                >
-                  <Input />
-                </Form.Item>
-              )
-            }
 
             {/* <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
               <Button key='addnodebtn' type="primary" htmlType="submit">
