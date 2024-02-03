@@ -1,3 +1,8 @@
+<#if conf["data.path.list"]??&& conf["data.path.list"]?trim?has_content>
+    <#assign dataPathListSize=conf["data.path.list"]?trim?split(",")?size>
+<#else >
+    <#assign dataPathListSize=1>
+</#if>
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <#--Simple macro definition-->
 <#macro property key value>
@@ -48,9 +53,19 @@
 </#if>
 
 <#--handle data dir-->
-<@property "dfs.datanode.data.dir" "/workspace/data/datanode"/>
-<@property "dfs.namenode.name.dir" "/workspace/data/namenode"/>
-<@property "dfs.journalnode.edits.dir" "/workspace/data/journal"/>
+<#--    datanode支持多路径存储-->
+<#assign concatenatedPaths="">
+<#list 1..dataPathListSize as dataPathIndex>
+  <#assign concatenatedPaths = concatenatedPaths + "file:///data/${dataPathIndex}">
+    <#if dataPathIndex < dataPathListSize>
+        <#assign concatenatedPaths = concatenatedPaths + ",">
+    </#if>
+</#list>
+    <@property "dfs.datanode.data.dir" concatenatedPaths/>
+    <#--    namenode的持久化路径支持多个，但每个路径存储的数据是重复的，没必要写多个-->
+    <@property "dfs.namenode.name.dir" "/data/1/namenode"/>
+    <#--    journalnode的持久化路径只能有一个-->
+    <@property "dfs.journalnode.edits.dir" "/data/1/journalnode"/>
 
 <#--handle journalnode-->
 <#assign useWildcard=conf['journalnode.use.wildcard']

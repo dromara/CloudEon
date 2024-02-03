@@ -18,7 +18,6 @@ export HADOOP_YARN_USER=${r"${HADOOP_YARN_USER:-yarn}"}
 
 # resolve links - $0 may be a softlink
 export YARN_LOG_DIR=/workspace/logs
-export NODEMANAGER_LOCAL_DIRS=/workspace/data/local
 
 export YARN_RESOURCEMANAGER_ADDRRESS=${serviceRoles['YARN_RESOURCEMANAGER'][0]['hostname']}
 <#if serviceRoles['YARN_TIMELINESERVER']??>

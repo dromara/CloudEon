@@ -1,10 +1,9 @@
 #!/bin/bash
 set -e
 
-mkdir -p /workspace/data
 mkdir -p /workspace/logs
 
-\cp -f /opt/service-render-output/myid /workspace/data/
+\cp -f /opt/service-render-output/myid /data/1/
 \cp -f /opt/service-render-output/zoo.cfg $ZOOKEEPER_HOME/conf/
 \cp -f /opt/service-render-output/zookeeper-env.sh $ZOOKEEPER_HOME/conf/
 

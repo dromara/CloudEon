@@ -1,10 +1,9 @@
 #!/bin/bash
 
+# 这里不递归修改
 chown elasticsearch:elasticsearch /workspace
-mkdir /data
-chown elasticsearch:elasticsearch /data
+chown elasticsearch:elasticsearch /data/*
 
-su -m elasticsearch -c "mkdir -p /workspace/data"
 su -m elasticsearch -c "mkdir -p /workspace/logs"
 su -m elasticsearch -c "mkdir -p /workspace/tmp"
 

@@ -25,9 +25,9 @@ data:
     >
     <configuration>
 
-
-        <@property "yarn.nodemanager.local-dirs" "/workspace/data/local"/>
-        <@property "yarn.nodemanager.log-dirs" "/workspace/logs"/>
+<#--对外暴露的yarn-site.xml文件不需要提供存储位置-->
+<#--        <@property "yarn.nodemanager.local-dirs" "/workspace/data/local"/>-->
+<#--        <@property "yarn.nodemanager.log-dirs" "/workspace/logs"/>-->
         <#--handle dependencies.hdfs-->
         <#assign hdfs=dependencies.HDFS >
         <@property "yarn.nodemanager.remote-app-log-dir" "hdfs://${hdfs.conf['nameservices']}${conf['remote.app.log.dir']}"/>

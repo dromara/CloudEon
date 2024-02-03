@@ -3,8 +3,10 @@ package org.dromara.cloudeon.service;
 
 import cn.hutool.core.map.MapUtil;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.dromara.cloudeon.config.CloudeonConfigProp;
 import org.dromara.cloudeon.dao.*;
 import org.dromara.cloudeon.dto.RoleNodeInfo;
 import org.dromara.cloudeon.entity.*;
@@ -16,10 +18,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -27,7 +26,8 @@ import java.util.stream.Collectors;
 public class ServiceService {
     @Resource
     private ServiceRoleInstanceRepository serviceRoleInstanceRepository;
-
+    @Resource
+    private CloudeonConfigProp cloudeonConfigProp;
     @Resource
     private ClusterInfoRepository clusterInfoRepository;
     @Resource
@@ -103,12 +103,12 @@ public class ServiceService {
         Map<String, Object> dataModel = new HashMap<>();
         Integer clusterId = serviceInstanceEntity.getClusterId();
         dataModel.put("clusterId", clusterId);
-        Integer stackId = stackServiceEntity.getId();
+        Integer stackId = stackServiceEntity.getStackId();
         dataModel.put("stackId", stackId);
         // 查询服务实例所有配置项,包括全局
         List<ServiceInstanceConfigEntity> allConfigEntityList = configRepository.findByServiceInstanceId(serviceInstanceId);
-        if ("HELM_CONTROLLER".equalsIgnoreCase(stackServiceEntity.getName())) {
-            String kubeConfig = clusterInfoRepository.findById(serviceInstanceEntity.getClusterId()).get().getKubeConfig();
+        if (cloudeonConfigProp.getKubeConfigStackServiceNameList().contains(stackServiceEntity.getName())) {
+            String kubeConfig = clusterInfoRepository.findById(clusterId).get().getKubeConfig();
             dataModel.put("super", MapUtil.of("kube_config", kubeConfig));
         }
         if (!"GLOBAL".equalsIgnoreCase(stackServiceEntity.getName())) {
@@ -136,7 +136,7 @@ public class ServiceService {
         } catch (UnknownHostException e) {
             throw new RuntimeException(e);
         }
-        List<ClusterAlertRuleEntity> clusterAlertRuleEntities = clusterAlertRuleRepository.findByClusterId(clusterId);
+        List<ClusterAlertRuleEntity> clusterAlertRuleEntities = clusterAlertRuleRepository.findByClusterIdAndStackServiceName(clusterId, stackServiceEntity.getName());
         dataModel.put("alertRules", clusterAlertRuleEntities);
         // 获取该服务支持的自定义配置文件名
         String customConfigFiles = stackServiceEntity.getCustomConfigFiles();
@@ -153,12 +153,7 @@ public class ServiceService {
             }
         }
         dataModel.put("confFiles", confFiles);
-
-        String dependenceServiceInstanceIds = serviceInstanceEntity.getDependenceServiceInstanceIds();
-        if (StringUtils.isNotBlank(dependenceServiceInstanceIds)) {
-            String[] depServiceInstanceIds = dependenceServiceInstanceIds.split(",");
-            buildDependenceServiceInModel(dataModel, depServiceInstanceIds);
-        }
+        dataModel.put("dependencies", getDependenceService(serviceInstanceId));
 
         return dataModel;
     }
@@ -172,12 +167,13 @@ public class ServiceService {
     }
 
     /**
-     * 构建依赖服务进入Model中
+     * 获取依赖服务，包含多层级依赖
      */
-    private void buildDependenceServiceInModel(Map<String, Object> dataModel, String[] depServiceInstanceIds) {
+    private Map<String, Object> getDependenceService(Integer baseServiceInstanceId) {
+        // 获取多层级依赖id
+        Set<Integer> depServiceInstanceIdsList = getDepServiceInstanceIds(baseServiceInstanceId);
         Map<String, Object> services = new HashMap<>();
-        Arrays.stream(depServiceInstanceIds).forEach(id -> {
-            Integer serviceInstanceId = Integer.valueOf(id);
+        depServiceInstanceIdsList.forEach(serviceInstanceId -> {
             ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(serviceInstanceId).get();
             Integer stackServiceId = serviceInstanceEntity.getStackServiceId();
             String stackServiceName = stackServiceRepository.findById(stackServiceId).get().getName();
@@ -192,8 +188,23 @@ public class ServiceService {
                     "serviceRoles", serviceRoles,
                     "service", serviceInstanceEntity));
         });
+        return services;
 
-        dataModel.put("dependencies", services);
+    }
+
+    private Set<Integer> getDepServiceInstanceIds(Integer serviceInstanceId) {
+        ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(serviceInstanceId).get();
+        if (StringUtils.isBlank(serviceInstanceEntity.getDependenceServiceInstanceIds())) {
+            return Sets.newHashSet();
+        }
+        return Arrays.stream(serviceInstanceEntity.getDependenceServiceInstanceIds().split(","))
+                .map(Integer::valueOf)
+                .flatMap(id -> {
+                    Set<Integer> depServiceInstanceIds = getDepServiceInstanceIds(id);
+                    depServiceInstanceIds.add(id);
+                    return depServiceInstanceIds.stream();
+                })
+                .collect(Collectors.toSet());
     }
 
 

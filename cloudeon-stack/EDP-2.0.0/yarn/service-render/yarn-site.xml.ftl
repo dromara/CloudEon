@@ -1,3 +1,8 @@
+<#if conf["data.path.list"]??&& conf["data.path.list"]?trim?has_content>
+    <#assign dataPathListSize=conf["data.path.list"]?trim?split(",")?size>
+<#else >
+    <#assign dataPathListSize=1>
+</#if>
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <#--Simple macro definition-->
 <#macro property key value>
@@ -16,10 +21,22 @@
     rm_webapp_port=conf['resourcemanager.webapp.port']
 >
 <configuration>
-
-
-    <@property "yarn.nodemanager.local-dirs" "/workspace/data/local"/>
-    <@property "yarn.nodemanager.log-dirs" "/workspace/logs"/>
+<#assign concatenatedPaths="">
+<#list 1..dataPathListSize as dataPathIndex>
+  <#assign concatenatedPaths = concatenatedPaths + "file:///data/${dataPathIndex}/local">
+    <#if dataPathIndex < dataPathListSize>
+        <#assign concatenatedPaths = concatenatedPaths + ",">
+    </#if>
+</#list>
+    <@property "yarn.nodemanager.local-dirs" concatenatedPaths/>
+<#assign concatenatedPaths="">
+<#list 1..dataPathListSize as dataPathIndex>
+  <#assign concatenatedPaths = concatenatedPaths + "file:///data/${dataPathIndex}/log">
+    <#if dataPathIndex < dataPathListSize>
+        <#assign concatenatedPaths = concatenatedPaths + ",">
+    </#if>
+</#list>
+    <@property "yarn.nodemanager.log-dirs" concatenatedPaths/>
     <#--handle dependencies.hdfs-->
     <#assign hdfs=dependencies.HDFS >
     <@property "yarn.nodemanager.remote-app-log-dir" "hdfs://${hdfs.conf['nameservices']}${conf['remote.app.log.dir']}"/>

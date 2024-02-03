@@ -147,9 +147,8 @@ public class ClusterServiceController {
             Integer stackServiceId = serviceInfo.getStackServiceId();
 
             ServiceInstanceEntity serviceInstanceEntity = new ServiceInstanceEntity();
-            String stackServiceName = serviceInfo.getStackServiceName().toLowerCase();
-            String serviceName = stackServiceName;
-            serviceInstanceEntity.setServiceName(serviceName);
+            String stackServiceName = K8sUtil.formatK8sNameStr(serviceInfo.getStackServiceName());
+            serviceInstanceEntity.setServiceName(stackServiceName);
             serviceInstanceEntity.setLabel(serviceInfo.getStackServiceLabel());
             serviceInstanceEntity.setClusterId(clusterId);
             serviceInstanceEntity.setCreateTime(new Date());
@@ -837,9 +836,10 @@ public class ClusterServiceController {
     public ResultDTO<Void> stopCommand(Integer commandId) {
         CommandEntity commandEntity = commandRepository.findById(commandId).get();
         CommandState commandState = commandEntity.getCommandState();
-        if (!commandState.isEnd()) {
-            cloudeonVertx.eventBus().request(Constant.VERTX_STOP_COMMAND_ADDRESS, commandId);
+        if (commandState.isEnd()) {
+            throw new IllegalArgumentException("指令已经结束");
         }
+        cloudeonVertx.eventBus().request(Constant.VERTX_STOP_COMMAND_ADDRESS, commandId);
         return ResultDTO.success(null);
     }
 

@@ -1,3 +1,8 @@
+<#if conf["data.path.list"]??&& conf["data.path.list"]?trim?has_content>
+    <#assign dataPathListSize=conf["data.path.list"]?trim?split(",")?size>
+<#else >
+    <#assign dataPathListSize=1>
+</#if>
 # ======================== Elasticsearch Configuration =========================
 #
 # NOTE: Elasticsearch comes with reasonable defaults for most settings.
@@ -36,13 +41,9 @@ node.name: ${NODE_NAME}
 path:
     logs: /workspace/logs
     data:
-<#if conf["data.path.list"]??&& conf["data.path.list"]?trim?has_content>
-<#list conf["data.path.list"] as dataPath>
-        - /data/${dataPath?index}
+<#list 1..dataPathListSize as dataPathIndex>
+        - /data/${dataPathIndex}
 </#list>
-<#else >
-        - /workspace/data
-</#if>
 #
 # ----------------------------------- Memory -----------------------------------
 #

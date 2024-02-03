@@ -40,11 +40,11 @@ historyserver.web.port: ${conf['flink.history.ui.port']}
 
 historyserver.archive.fs.dir: ${conf['flink.history.fs.logDirectory']}
 
-historyserver.web.tmpdir: /workspace/data/tmp
+historyserver.web.tmpdir: /data/1/tmp
 
 
 env.java.opts: -Dlog4j2.formatMsgNoLookups=true
-env.pid.dir: /workspace/data
+env.pid.dir: /workspace/pid
 env.log.dir: /workspace/logs
 
 <#list confFiles['flink-conf.yaml']?keys as key>

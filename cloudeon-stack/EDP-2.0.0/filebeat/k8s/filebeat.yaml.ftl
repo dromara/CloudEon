@@ -18,6 +18,9 @@ spec:
 # 配置为 enabled 后会把应用容器中所有挂载点注入 sidecar 同一路经下(sidecar中本身就有声明的数据卷和挂载点除外）
     shareVolumePolicy:
       type: enabled
+# 设置root用户运行，避免写入filebeat.registry失败
+    securityContext:
+      runAsUser: 0
     env:
       - name: NODE_NAME
         valueFrom:

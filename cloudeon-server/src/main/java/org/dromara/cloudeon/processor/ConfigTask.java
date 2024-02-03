@@ -16,6 +16,7 @@
  */
 package org.dromara.cloudeon.processor;
 
+import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.json.JSONUtil;
@@ -33,7 +34,6 @@ import org.dromara.cloudeon.utils.FreemarkerUtil;
 import org.dromara.cloudeon.utils.K8sUtil;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
@@ -77,13 +77,18 @@ public abstract class ConfigTask extends BaseCloudeonTask implements ApplyOrDele
                 }
                 fileStrMap.put(renderFile.getName(), FileUtil.readUtf8String(renderFile));
             }
-            Map<String, String> finalFileStrMap1 = fileStrMap;
+            String configMapStr = K8sUtil.getConfigMapStr(stackServiceName + "-service-render", labels, fileStrMap);
             kubeService.executeWithKubeClient(clusterId, client -> {
-                Resource<ConfigMap> configMapResource = client.configMaps().load(IoUtil.toUtf8Stream(K8sUtil.getConfigMapStr(stackServiceName + "-service-render", labels, finalFileStrMap1)));
-                if (isApplyTask()) {
-                    configMapResource.forceConflicts().serverSideApply();
-                } else {
-                    configMapResource.delete();
+                try (InputStream in = IoUtil.toUtf8Stream(configMapStr)) {
+                    Resource<ConfigMap> configMapResource = client.configMaps().load(in);
+                    if (isApplyTask()) {
+                        configMapResource.forceConflicts().serverSideApply();
+                    } else {
+                        configMapResource.delete();
+                    }
+                } catch (Exception e) {
+                    log.error("处理资源失败，资源内容如下：\n" + configMapStr);
+                    ExceptionUtil.wrapAndThrow(e);
                 }
             });
         } else {
@@ -104,13 +109,18 @@ public abstract class ConfigTask extends BaseCloudeonTask implements ApplyOrDele
                 fileStrMap.put(file.getName(), FileUtil.readUtf8String(file));
             }
             fileStrMap.put("values.json", JSONUtil.toJsonStr(dataModel));
-            Map<String, String> finalFileStrMap = fileStrMap;
+            String configMapStr = K8sUtil.getConfigMapStr(stackServiceName + "-service-common", labels, fileStrMap);
             kubeService.executeWithKubeClient(clusterId, client -> {
-                Resource<ConfigMap> resource = client.configMaps().load(IoUtil.toUtf8Stream(K8sUtil.getConfigMapStr(stackServiceName + "-service-common", labels, finalFileStrMap)));
-                if (isApplyTask()) {
-                    resource.forceConflicts().serverSideApply();
-                } else {
-                    resource.delete();
+                try (InputStream in = IoUtil.toUtf8Stream(configMapStr)) {
+                    Resource<ConfigMap> configMapResource = client.configMaps().load(in);
+                    if (isApplyTask()) {
+                        configMapResource.forceConflicts().serverSideApply();
+                    } else {
+                        configMapResource.delete();
+                    }
+                } catch (Exception e) {
+                    log.error("处理资源失败，资源内容如下：\n" + configMapStr);
+                    ExceptionUtil.wrapAndThrow(e);
                 }
             });
         } else {
@@ -127,15 +137,22 @@ public abstract class ConfigTask extends BaseCloudeonTask implements ApplyOrDele
                 if (file.isDirectory()) {
                     continue;
                 }
+                String resourceStr = FileUtil.readUtf8String(file);
                 kubeService.executeWithKubeClient(clusterId, client -> {
-                    ParameterNamespaceListVisitFromServerGetDeleteRecreateWaitApplicable<HasMetadata> resource = client.load(FileUtil.getInputStream(file));
-                    if (isApplyTask()) {
-                        resource.forceConflicts().serverSideApply();
-                    } else {
-                        resource.delete();
+                    try (InputStream in = IoUtil.toUtf8Stream(resourceStr)) {
+                        ParameterNamespaceListVisitFromServerGetDeleteRecreateWaitApplicable<HasMetadata> resource = client.load(in);
+                        if (isApplyTask()) {
+                            resource.forceConflicts().serverSideApply();
+                        } else {
+                            resource.delete();
+                        }
+                    } catch (Exception e) {
+                        log.error("处理资源失败，资源内容如下：\n" + resourceStr);
+                        ExceptionUtil.wrapAndThrow(e);
                     }
                 });
             }
+
         } else {
             log.info("k8sCommon目录为空");
         }
@@ -152,16 +169,16 @@ public abstract class ConfigTask extends BaseCloudeonTask implements ApplyOrDele
                 }
                 String renderStr = FreemarkerUtil.templateEval(FileUtil.readUtf8String(file), dataModel);
                 kubeService.executeWithKubeClient(clusterId, client -> {
-                    ParameterNamespaceListVisitFromServerGetDeleteRecreateWaitApplicable<HasMetadata> resource = null;
                     try (InputStream in = IoUtil.toUtf8Stream(renderStr)) {
-                        resource = client.load(in);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                    if (isApplyTask()) {
-                        resource.forceConflicts().serverSideApply();
-                    } else {
-                        resource.delete();
+                        ParameterNamespaceListVisitFromServerGetDeleteRecreateWaitApplicable<HasMetadata> resource = client.load(in);
+                        if (isApplyTask()) {
+                            resource.forceConflicts().serverSideApply();
+                        } else {
+                            resource.delete();
+                        }
+                    } catch (Exception e) {
+                        log.error("处理资源失败，资源内容如下：\n" + renderStr);
+                        ExceptionUtil.wrapAndThrow(e);
                     }
                 });
             }
@@ -181,16 +198,16 @@ public abstract class ConfigTask extends BaseCloudeonTask implements ApplyOrDele
                     }
                     String renderStr = FreemarkerUtil.templateEval(FileUtil.readUtf8String(file), dataModel);
                     kubeService.executeWithKubeClient(clusterId, client -> {
-                        ParameterNamespaceListVisitFromServerGetDeleteRecreateWaitApplicable<HasMetadata> resource = null;
                         try (InputStream in = IoUtil.toUtf8Stream(renderStr)) {
-                            resource = client.load(in);
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                        if (isApplyTask()) {
-                            resource.forceConflicts().serverSideApply();
-                        } else {
-                            resource.delete();
+                            ParameterNamespaceListVisitFromServerGetDeleteRecreateWaitApplicable<HasMetadata> resource = client.load(in);
+                            if (isApplyTask()) {
+                                resource.forceConflicts().serverSideApply();
+                            } else {
+                                resource.delete();
+                            }
+                        } catch (Exception e) {
+                            log.error("处理资源失败，资源内容如下：\n" + renderStr);
+                            ExceptionUtil.wrapAndThrow(e);
                         }
                     });
                 }

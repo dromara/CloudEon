@@ -147,8 +147,6 @@ declare namespace API {
     coreNum?: number,
     totalMem?: number,
     totalDisk?: number,
-    sshUser?: string,
-    sshPort?: number,
     clusterId?: number,
     cpuArchitecture?: string,
     nodeLabel?: string,
