@@ -27,10 +27,7 @@ import org.dromara.cloudeon.controller.response.ActiveAlertVO;
 import org.dromara.cloudeon.controller.response.HistoryAlertVO;
 import org.dromara.cloudeon.dao.*;
 import org.dromara.cloudeon.dto.*;
-import org.dromara.cloudeon.entity.AlertMessageEntity;
-import org.dromara.cloudeon.entity.ClusterAlertRuleEntity;
-import org.dromara.cloudeon.entity.ServiceInstanceEntity;
-import org.dromara.cloudeon.entity.ServiceRoleInstanceEntity;
+import org.dromara.cloudeon.entity.*;
 import org.dromara.cloudeon.enums.AlertLevel;
 import org.dromara.cloudeon.enums.CommandType;
 import org.dromara.cloudeon.service.CommandHandler;
@@ -38,10 +35,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.time.Instant;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -68,6 +62,10 @@ public class AlertController {
     private ClusterNodeRepository clusterNodeRepository;
     @Resource
     private ClusterAlertRuleRepository clusterAlertRuleRepository;
+    @Resource
+    StackAlertRuleRepository stackAlertRuleRepository;
+    @Resource
+    private ClusterInfoRepository clusterInfoRepository;
 
     /**
      * 接收alertmanager告警回调
@@ -269,6 +267,28 @@ public class AlertController {
         //  调用workflow
         cloudeonVertx.eventBus().request(VERTX_COMMAND_ADDRESS, commandId);
         
+        return ResultDTO.success(null);
+    }
+
+    @PostMapping("/loadDefaultRule")
+    public ResultDTO<Void> loadDefaultRule(Integer clusterId) {
+        ClusterInfoEntity clusterInfo = clusterInfoRepository.findById(clusterId).orElseThrow(() -> new IllegalArgumentException("can't find cluster info by id:" + clusterId));
+        Set<String> clusterAlertRuleSet = clusterAlertRuleRepository.findByClusterId(clusterId).stream().map(
+                clusterAlertRuleEntity -> clusterAlertRuleEntity.getStackRoleName() + "-" + clusterAlertRuleEntity.getRuleName()
+        ).collect(Collectors.toSet());
+        // 加载默认规则到集群中
+        stackAlertRuleRepository.findByStackId(clusterInfo.getStackId()).forEach(stackAlertRuleEntity -> {
+            String key = stackAlertRuleEntity.getStackRoleName() + "-" + stackAlertRuleEntity.getRuleName();
+            if (clusterAlertRuleSet.contains(key)) {
+                return;
+            }
+            ClusterAlertRuleEntity clusterAlertRuleEntity = new ClusterAlertRuleEntity();
+            BeanUtil.copyProperties(stackAlertRuleEntity, clusterAlertRuleEntity);
+            clusterAlertRuleEntity.setClusterId(clusterInfo.getId());
+            clusterAlertRuleEntity.setCreateTime(new Date());
+            clusterAlertRuleEntity.setUpdateTime(new Date());
+            clusterAlertRuleRepository.save(clusterAlertRuleEntity);
+        });
         return ResultDTO.success(null);
     }
 }

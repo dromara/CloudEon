@@ -3,7 +3,7 @@ import { Space, Card, Table, Tag, Button, Modal, Form, Input, message, Select, S
 import React, { useState, useEffect, useRef } from 'react';
 import type { FormInstance } from 'antd/es/form';
 import { FormattedMessage, useIntl, history } from 'umi';
-import { getActiveAlertAPI, getHistoryAlertAPI, getRulesAlertAPI, saveRulesAlertAPI,getStackServiceRolesAPI } from '@/services/ant-design-pro/colony';
+import { getActiveAlertAPI, getHistoryAlertAPI, getRulesAlertAPI,loadDefaultRuleAPI, saveRulesAlertAPI,getStackServiceRolesAPI } from '@/services/ant-design-pro/colony';
 import { formatDate } from '@/utils/common'
 import styles from './index.less'
 // import { RightOutlined } from '@ant-design/icons';
@@ -98,7 +98,10 @@ const alertList: React.FC = () => {
     setLoading(false)
     setRulesListData(result?.data)
   }
-
+  const loadDefaultRule = async () => {
+    const result: API.alertListResult =  await loadDefaultRuleAPI({clusterId:getData.clusterId});
+    getRulesData()
+  };
   const getStackService = async () => {
     setLoading(true)
     const result: API.normalResult =  await getStackServiceRolesAPI({stackId: getData.stackId})
@@ -512,6 +515,10 @@ const alertList: React.FC = () => {
             showModal(null,'add')
           }}>
             新增告警规则
+          </Button>
+          &nbsp;
+          <Button type="primary" onClick={()=>loadDefaultRule()}>
+            重新加载默认告警规则
           </Button>
           <ProTable 
             search={false} 

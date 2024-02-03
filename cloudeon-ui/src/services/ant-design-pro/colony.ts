@@ -357,7 +357,15 @@ export async function getRulesAlertAPI(options?: { [key: string]: any }) {
     },
   });
 }
-
+/** 加载默认告警规则列表 */
+export async function loadDefaultRuleAPI(options?: { [key: string]: any }) {
+  return request<API.alertListResult>('/apiPre/alert/loadDefaultRule', {
+    method: 'POST',
+    params: {
+      ...options,
+    },
+  });
+}
 /** 保存告警规则 */
 export async function saveRulesAlertAPI(options?: { [key: string]: any }) {
   return request<API.alertRulesListResult>('/apiPre/alert/saveRule', {
