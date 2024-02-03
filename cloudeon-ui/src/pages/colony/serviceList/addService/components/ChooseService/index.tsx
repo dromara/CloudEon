@@ -43,7 +43,6 @@ const ChooseService: React.FC<{
                   </div>
                   {/* ${item.installedInCluster?styles.disabledText:''} */}
                   <div className={`${styles.serviceImgWrap} ${styles.serviceItemDesc} `}>
-                    <div>镜像：{item.dockerImage}</div>
                     <div>版本：{item.version}</div>
                   </div>
                   <div className={`serviceStatusWrap`}>
