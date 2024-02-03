@@ -1,5 +1,5 @@
 <#compress>
-dataDir=/workspace/data
+dataDir=/data/1
 clientPort=${conf['zookeeper.client.port']}
 admin.enableServer=false
 metricsProvider.className=org.apache.zookeeper.metrics.prometheus.PrometheusMetricsProvider

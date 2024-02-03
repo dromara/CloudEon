@@ -84,7 +84,7 @@ export HADOOP_LOG_DIR=/workspace/logs
 export HADOOP_SECURE_DN_LOG_DIR=${r"${HADOOP_LOG_DIR}"}
 
 # The directory where pid files are stored. /tmp by default.
-export HADOOP_PID_DIR=/workspace/data
+export HADOOP_PID_DIR=/workspace/
 export HADOOP_SECURE_DN_PID_DIR=${r"${HADOOP_PID_DIR}"}
 
 # A string representing this instance of hadoop. $USER by default.
@@ -98,8 +98,3 @@ export JOURNALNODE_RPC_PORT=${conf['journalnode.rpc-port']}
 # export HDFS_JOURNAL_NODE_COUNT=${serviceRoles.HDFS_JOURNALNODE?size}
 </#if>
 
-# Export dfs.datanode.data.dir
-export DATANODE_DATA_DIRS=/workspace/data/datanode
-
-# Export dfs.namenode.name.dir
-export NAMENODE_DATA_DIRS=/workspace/data/namenode

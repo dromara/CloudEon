@@ -1,0 +1,13 @@
+rules:
+    - alert: Elasticsearch存活数检测
+      promql: sum(up{job="metrics-elasticsearch"})<#{{${serviceRoles['ELASTICSEARCH_NODE']?size}}}#
+      alertLevel: exception
+      serviceRoleName: ELASTICSEARCH_NODE
+      alertAdvice: Elasticsearch发生宕机，请检查日志或执行重启
+      alertInfo: "Elasticsearch Node发生宕机，当前存活实例数为：{{$value}}"
+    - alert: ElasticsearchNode进程存活
+      promql: up{job="metrics-elasticsearch"} != 1
+      alertLevel: exception
+      serviceRoleName: ELASTICSEARCH_NODE
+      alertAdvice: ElasticsearchNode宕机，请重新启动
+      alertInfo: "{{ $labels.job }}的{{ $labels.instance }}实例产生告警"

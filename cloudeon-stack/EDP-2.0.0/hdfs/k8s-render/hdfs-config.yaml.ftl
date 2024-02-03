@@ -107,10 +107,11 @@ data:
         <@property "dfs.namenode.http-address." + ns nn_http_port/>
     </#if>
 
+<#--对外暴露的yarn-site.xml文件不需要提供存储位置-->
     <#--handle data dir-->
-    <@property "dfs.datanode.data.dir" "/workspace/data/datanode"/>
-    <@property "dfs.namenode.name.dir" "/workspace/data/namenode"/>
-    <@property "dfs.journalnode.edits.dir" "/workspace/data/journal"/>
+<#--    <@property "dfs.datanode.data.dir" "/workspace/data/datanode"/>-->
+<#--    <@property "dfs.namenode.name.dir" "/workspace/data/namenode"/>-->
+<#--    <@property "dfs.journalnode.edits.dir" "/workspace/data/journal"/>-->
 
     <#--handle journalnode-->
     <#assign useWildcard=conf['journalnode.use.wildcard']

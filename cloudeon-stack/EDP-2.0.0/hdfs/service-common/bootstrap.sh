@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -e
 
-mkdir -p /workspace/data
 mkdir -p /workspace/logs
 
 \cp -f /opt/service-render-output/* $HADOOP_CONF_DIR

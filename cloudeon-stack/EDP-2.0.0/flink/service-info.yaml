@@ -33,6 +33,13 @@ configurations:
     configurableInWizard: true
     tag: "镜像"
 
+  - name: data.path.list
+    description: "持久化挂载路径列表，逗号分隔(但当前组件只有第一个路径生效)。当为空时使用默认路径：全局参数global.persistence.basePath/角色名称"
+    recommendExpression: ""
+    valueType: InputString
+    configurableInWizard: true
+    tag: "资源管理"
+
   - name: flink.hs.container.limit.cpu
     description: "Flink HistoryServer容器的CPU使用限额"
     recommendExpression: 1.0

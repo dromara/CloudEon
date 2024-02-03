@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
 export ZOO_LOG_DIR=/workspace/logs
-export ZOOKEEPER_DATA_DIR=/workspace/data
-export ZOOPIDFILE=$ZOOKEEPER_DATA_DIR/zookeeper-server.pid
+export ZOOPIDFILE=/workspace/zookeeper-server.pid
 
 export SERVER_JVMFLAGS="-Dcom.sun.management.jmxremote.port=${conf['zookeeper.jmxremote.port']} -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false"
 

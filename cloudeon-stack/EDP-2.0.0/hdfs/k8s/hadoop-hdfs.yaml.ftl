@@ -1,3 +1,16 @@
+<#if conf["data.path.list"]??&& conf["data.path.list"]?trim?has_content>
+    <#assign primeDataPathList=conf["data.path.list"]?trim?split(",")>
+<#else >
+    <#assign primeDataPathList=[conf['global.persistence.basePath']]>
+</#if>
+<#assign dataPathList = []>
+<#list primeDataPathList as dataPath>
+    <#if dataPath?ends_with("/")>
+      <#assign dataPathList = dataPathList + [dataPath+ roleFullName]>
+    <#else>
+      <#assign dataPathList = dataPathList + [dataPath+"/"+ roleFullName]>
+    </#if>
+</#list>
 ---
 apiVersion: "apps/v1"
 kind: "Deployment"
@@ -164,6 +177,10 @@ spec:
           mountPath: /opt/service-common
         - mountPath: "/workspace"
           name: "workspace"
+<#list dataPathList as dataPath>
+        - name: local-data-${dataPath?index+1}
+          mountPath: /data/${dataPath?index+1}
+</#list>
       nodeSelector:
         ${roleServiceFullName}: "true"
       terminationGracePeriodSeconds: 30
@@ -189,7 +206,13 @@ spec:
       - name: service-common
         configMap:
           name: hdfs-service-common
-      - hostPath:
-          path: "${conf['global.persistence.basePath']}/${roleFullName}"
+      - name: "workspace"
+        hostPath:
           type: DirectoryOrCreate
-        name: "workspace"
+          path: "${dataPathList[0]}/workspace"
+<#list dataPathList as dataPath>
+      - name: local-data-${dataPath?index+1}
+        hostPath:
+          path: ${dataPath}/data
+          type: DirectoryOrCreate
+</#list>

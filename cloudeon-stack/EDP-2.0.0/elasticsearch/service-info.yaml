@@ -38,7 +38,7 @@ configurations:
     tag: "镜像"
 
   - name: data.path.list
-    description: "Elasticsearch 存储挂载路径列表，逗号分隔。当为空时使用默认路径：全局参数global.persistence.basePath/角色名称/data"
+    description: "持久化挂载路径列表，逗号分隔。当为空时使用默认路径：全局参数global.persistence.basePath/角色名称"
     recommendExpression: ""
     valueType: InputString
     configurableInWizard: true
