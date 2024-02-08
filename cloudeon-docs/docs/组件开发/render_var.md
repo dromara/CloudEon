@@ -1,3 +1,7 @@
+# 注入变量介绍
+
+这部分介绍编写k8s、k8s-render、kube-prometheus-render、service-render等目录的ftl文件时可以注入使用的变量。
+
 ## 总体变量
 
 | 变量名                 | 中文名             | 示例值                   | 说明                                                                                        |

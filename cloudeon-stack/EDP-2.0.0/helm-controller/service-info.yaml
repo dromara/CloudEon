@@ -1,7 +1,7 @@
 name: HELM_CONTROLLER
 label: "HELM CONTROLLER"
 description: "Helm控制器"
-version: 1.0.0
+version: 0.15.4
 
 dependencies:
   - "GLOBAL"
@@ -17,6 +17,7 @@ roles:
     roleFullName: "helm-controller"
     sortNum: 1
     type: DEPLOYMENT
+    minNum : 1
     needOdd: false
 
 customConfigFiles: []
