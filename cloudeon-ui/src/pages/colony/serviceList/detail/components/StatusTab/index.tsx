@@ -24,10 +24,6 @@ const statusTab:React.FC<{statusInfo: API.serviceInfos, dashboardUrl:string, loa
                         <div>{statusInfo.version}</div>
                     </div>
                     <div>
-                        <div>镜像名：</div>
-                        <div>{statusInfo.dockerImage}</div>
-                    </div>
-                    <div>
                         <div>服务描述：</div>
                         <div>{statusInfo.stackServiceDesc}</div>
                     </div>
