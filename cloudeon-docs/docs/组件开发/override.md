@@ -1,49 +1,89 @@
-## 一 组件文件结构
+# 总览
+
+## 总流程
+
+### 1.拉取源码
+
+https://github.com/dromara/CloudEon.git
+
+### 2.新建组件目录并编写内容
+
+如`CloudEon\cloudeon-stack\EDP-2.0.0\组件服务名`
+这个过程可以参考其他组件的实现，并结合文档进行编写
+
+### 3.重启cloudeon服务
+
+cloudeon启动时会自动加载组件
+
+### 4.编写文档
+
+    1. CloudEon\cloudeon-docs\docs\组件说明\组件名.md
+    2. 在CloudEon\cloudeon-docs\docs\mkdocs.yml的nav添加对应组件说明文件路径
+
+## 组件文件结构
 
 一个完整的组件目录结构如下：
 
 - docker
+
   组件所需的镜像来源文件，通常是Dockerfile和对应的build.sh
+
 - icons
+
   名称固定为app.png的组件logo图片，大小应为200*200像素，logo的提取可以使用这个网站：https://icon.horse
+
 - k8s
+
   组件角色的k8s资源文件模板，通常是yaml.ftl后缀，将注入模型变量然后根据freemarker语法生成k8s资源文件。虽然k8s支持一个文件包含多个资源（如同时包含Deployment和ConfigMap），但不建议这样做，应该把ConfigMap、Service放到k8s-common、k8s-render下。因为这个目录里的资源不仅仅执行apply，还可能会进行识别名称、状态检查、日志跟踪等操作。
   注意：不同角色可使用同一模板文件，将使用文件名和角色进行前缀匹配，匹配度最高的文件作为该角色的模板文件。例如有hadoop-hdfs.yaml.ftl和hadoop-hdfs-zkfc-format.yaml.ftl两个模板文件，hadoop-hdfs-journalnode、hadoop-hdfs-namenode、hadoop-hdfs-datanode都会匹配使用hadoop-hdfs.yaml.ftl（hadoop-hdfs-zkfc-format不能被作为这几个角色的前缀，所以被筛选掉），而hadoop-hdfs-zkfc-format就会匹配到hadoop-hdfs-zkfc-format.yaml.ftl（hadoop-hdfs.yaml.ftl也符合条件，但匹配长度较短）
+
 - k8s-common
+
   直接使用kubectl apply -f 的k8s资源文件的文件夹。应用较少。
+
 - k8s-render
+
   k8s资源文件的模板文件，会注入模型渲染后发布，生成可用的k8s资源文件，然后进行apply。
+
 - kube-prometheus-render
+
   kube-prometheus相关k8s资源的模板文件目录。本质上和k8s-render一样。但如果在全局参数中设置监控方案为“不启用”则不会处理此目录。因为这个目录下的资源通常是kube-prometheus-stack的自定义资源，如ServiceMonitor、PrometheusRule之类。
+
 - service-common
+
   此文件夹下的文件会不经过渲染直接放到根据其组件命名的configmap中。通常放启动脚本、检活脚本之类不需要渲染的文件，以及模型变量转换得到的value.json文件。
   configmap的名称为：stackServiceName + "-service-common"
   。其中stackServiceName为service-info.yaml的name的k8s规范形式（小写、'-'代替'_'）。
   补充说明见下
+
 - service-render
+
   此文件夹存放freemarker模板文件，此文件夹下的文件会不经过渲染直接放到根据其组件命名的configmap中。通常放组件需要渲染的配置文件，如zoo.cfg.ftl等。
   configmap的名称为：stackServiceName + "-service-render"
   。其中stackServiceName为service-info.yaml的name的k8s规范形式（小写、'-'代替'_'）。
   补充说明见下
 
 - service-info.yaml
+
   组件服务核心配置文件
   补充说明见下
+
 - alert-rule.yaml
+
   默认告警规则列表
 
 注意，以上只有service-info.yaml和icons是必需的。
 
 其中k8s对应组件角色启停任务，k8s-common、k8s-render、kube-prometheus-render、service-common、service-render对应组件配置启停任务
 
-## 二 service-common和service-render
+## service-common和service-render
 
 组件的配置文件（脚本）的注入是核心。因为组件的配置文件通常是与实例相关的，如很多配置文件中都需要填写当前实例的hostname、ip。所以同一角色的不同实例的配置文件必然是不同的。但不同实例又同属一个deployment之类的部署资源。所以解决思路有2种。
 
 1. 给每个实例单独生成一份配置文件，放到一个configmap里面，容器启动时再根据当前节点信息筛选自身需要的配置文件进行使用
 2. 把模板和渲染所需的模型变量都传递到容器里面，容器启动时再结合当前节点信息（环境变量）进行渲染，得到真正可用的配置文件，如zoo.cfg。
 
-最终我选择思路2，感觉更优雅，思维上更直接，至于渲染操作过程的复杂性，可以借助global全局启动脚本（见下）将其隐藏掉，只需按约定编写k8s资源文件即可。
+最终选择思路2，感觉更优雅，思维上更直接，至于渲染操作过程的复杂性，可以借助global全局启动脚本（见下）将其隐藏掉，只需按约定编写k8s资源文件即可。
 
 要渲染的模板文件通过service-render注入，模型变量则作为value.json通过service-common注入
 
@@ -102,7 +142,7 @@ spec:
 
 ```
 
-## 三 全局启动脚本
+## 全局启动脚本
 
 全局启动脚本用于插件化统一化地完成容器的操作。如容器启动后的模板渲染操作、linux用户从configmmap中定时同步操作。
 
@@ -147,7 +187,7 @@ spec:
 
 ```
 
-## 四 service-info
+## service-info
 
 这是一个简化后的组件信息文件
 
@@ -257,7 +297,7 @@ configurations:
     tag: "资源管理"
 ```
 
-## 五 alert-rule.yaml
+## alert-rule.yaml
 
 初始告警规则列表，可以在cloudeon界面中管理修改
 
@@ -284,168 +324,4 @@ rules:
 "sum(up{job=\"metrics-zookeeper\"})<#{{${serviceRoles['ZOOKEEPER_SERVER']?size}}}#"
 当zookeeper存活进程数低于目标数时告警。目标数根据实际配置注入。
 
-## 六 组件开发步骤
 
-### 1 编写info文件
-
-这个过程确定组件的基础信息、角色信息
-配置项、配置文件可以先不写
-
-另外需要寻找logo文件存放到icons目录下
-
-### 2 编写docker镜像构造/获取脚本
-
-有个别镜像直接pull、tag、push即可，但大部分需要自己构建。
-以下是相关的规范建议：
-
-1. 使用base或其他组件镜像作为基础镜像
-2. 在环境变量中设置组件目录，目录通常为 /opt/组件名
-3. 在下一个环境变量中将 组件执行路径（通常是 组件目录/bin）添加到 PATH中
-4. 添加组件所要求的环境变量，如 ZOOBINDIR、HADOOP_CONF_DIR 等
-5. 通过网络（通常是wget）获取组件安装包并解压到前面设置的组件目录
-6. 设置工作目录为组件目录
-
-dockerfile的核心是配置基础环境变量和下载安装软件，其他和业务相关的操作应放到启动脚本里面去，保持dockerfile整洁
-
-```dockerfile
-FROM registry.cn-guangzhou.aliyuncs.com/bigdata200/jdk:latest
-
-ENV ZOOKEEPER_HOME=/opt/zookeeper \
-    ZOOKEEPER_VERSION=3.7.1
-ENV PATH=${PATH}:${ZOOKEEPER_HOME}/bin \
-    ZOOBINDIR=${ZOOKEEPER_HOME}/bin
-
-RUN wget https://archive.apache.org/dist/zookeeper/zookeeper-${ZOOKEEPER_VERSION}/apache-zookeeper-${ZOOKEEPER_VERSION}-bin.tar.gz \
-    && tar -zxvf apache-zookeeper-*-bin.tar.gz -C /opt \
-    && mv /opt/apache-zookeeper-* $ZOOKEEPER_HOME \
-    && rm -f apache-zookeeper-*-bin.tar.gz
-
-WORKDIR $ZOOKEEPER_HOME
-
-
-```
-
-### 3 根据角色信息在k8s文件夹下编写资源文件
-
-这里的资源文件主要复制自其他组件进行修改即可，同类型组件结构都差不多的。
-核心的差异是在启动脚本里面。
-
-这里需补充说明：
-
-1. 参考全局启动脚本部分的说明编写command、args、volumeMounts、volumes
-2. 环境变量至少需要额外添加NODE_NAME、MEM_LIMIT，让启动脚本可以获取到期节点名称、内存限制信息
-3. 存储挂载至少需要额外添加 /etc/localtime，用于同步时区
-4. 数据存储挂载及多盘挂载见下
-
-### 3 数据存储挂载及多盘挂载
-
-组件需要挂载的目录有2种，一种是组件要存储的数据目录，一般在支持在配置文件中指定路径，如果组件是做数据存储的，通常还支持多路径配置，如kafka、hdfs，这种目录存储的数据是重中之重，通常需要合理规划磁盘/目录。另外一种就是组件运行持久化目录，通常存放日志、状态文件（如pid）之类，相对没那么重要，通常对磁盘也不会有太高的要求。
-
-为了屏蔽数据目录结构的复杂性，我们约定这两种目录在容器内为如下结构：
-
-1. /workspace : 工作区目录，日志、状态文件等都应该放到这个目录
-2. ["/data/1","/data/2"..."/data/x"] : 数据存储目录列表
-
-为了简化，我们统一在所有需要持久化存储的组件中提供 `data.path.list`
-配置项。即持久化挂载路径列表，逗号分隔。当为空时使用默认路径[全局参数global.persistence.basePath/组件名称]。
-然后在k8s资源文件中，会将 `data.path.list`
-的第一个路径的workspace子文件夹挂载成容器内的`/workspace`路径。如果组件有需要，再将`data.path.list`
-的各个路径的data子文件夹挂载成容器内的`/data/数字`路径
-
-实现这一方法的k8s资源文件的volumeMounts和volumes写法如下:
-注意，使用如下写法，容器内至少会存在/workspace和/data/1目录
-
-```ftl
-<#if conf["data.path.list"]??&& conf["data.path.list"]?trim?has_content>
-    <#assign primeDataPathList=conf["data.path.list"]?trim?split(",")>
-<#else >
-    <#assign primeDataPathList=[conf['global.persistence.basePath']]>
-</#if>
-<#assign dataPathList = []>
-<#list primeDataPathList as dataPath>
-    <#if dataPath?ends_with("/")>
-      <#assign dataPathList = dataPathList + [dataPath+ roleFullName]>
-    <#else>
-      <#assign dataPathList = dataPathList + [dataPath+"/"+ roleFullName]>
-    </#if>
-</#list>
-apiVersion: "apps/v1"
-kind: "Deployment"
-metadata:
-  name: "${roleServiceFullName}"
-spec:
-  template:
-    spec:
-      containers:
-      - name: "server"
-        volumeMounts:
-        - mountPath: "/workspace"
-          name: "workspace"
-<#list dataPathList as dataPath>
-        - name: local-data-${dataPath?index+1}
-          mountPath: /data/${dataPath?index+1}
-</#list>
-      volumes:
-      - name: "workspace"
-        hostPath:
-          type: DirectoryOrCreate
-          path: "${dataPathList[0]}/workspace"
-<#list dataPathList as dataPath>
-      - name: local-data-${dataPath?index+1}
-        hostPath:
-          path: ${dataPath}/data
-          type: DirectoryOrCreate
-</#list>
-
-```
-
-对应的组件配置文件写法如下：
-
-```ftl
-<#if conf["data.path.list"]??&& conf["data.path.list"]?trim?has_content>
-    <#assign dataPathListSize=conf["data.path.list"]?trim?split(",")?size>
-<#else >
-    <#assign dataPathListSize=1>
-</#if>
-# ----------------------------------- Paths ------------------------------------
-#
-# Path to directory where to store the data (separate multiple locations by comma):
-#
-#
-# Path to log files:
-#
-path:
-    logs: /workspace/logs
-    data:
-<#list 1..dataPathListSize as dataPathIndex>
-        - /data/${dataPathIndex}
-</#list>
-
-```
-
-### 4 根据角色的实际情况编写配置文件
-
-这部分对应service-common和service-render目录
-
-其中service-common通常写自定义功能脚本，如启动、检活脚本
-service-render写需要注入变量渲染的组件本身的配置文件
-
-如果配置文件本身和组件自带的完全一样，并不需要修改/渲染，则应该直接不写，用组件默认的就行
-
-### 5 完善监控告警
-
-#### 1 指标采集
-
-首先需要在k8s-render添加一个metrics-service，以便由serviceMonitor自动发现抓取指标数据。
-默认的ServiceMonitor（default-service-monitor）会根据标签enable-default-service-monitor="true"
-抓取service的metrics端口。如果有特殊要求可以自己写个ServiceMonitor放到kube-prometheus-render目录下。
-
-#### 2 监控面板
-
-grafana面板对应的k8s资源为Configmap类型。其label需要包含grafana_dashboard="1"，其annotations需要包含folder="
-${serviceFullName}"。然后在configmap里面放个k8s-dashboard.json就行了。其uid需要与info文件的一致，个人习惯统一命名为 组件名001
-，另外其templating的Datasource设置隐藏，通常只保留Namespace和Instance两个查询项。面板的原始来源主要有：官方exporter的面板，grafana云服务提供的各组件的面板。这两个都没有再尝试寻找第三方面板。
-
-#### 3 告警规则
-
-告警规则的模板文件是kube-prometheus-render/alert-rule.yaml.ftl，无特殊情况每个组件的这个文件都一样。关键的规则实体在alert-rule.yaml.ftl中编写。但是需要注意，alert-rule.yaml.ftl中的规则只是默认规则，只在平台初次加载时生效，后面规则内容在平台中进行管理，如增删改，并不会再反映到这个文件上。

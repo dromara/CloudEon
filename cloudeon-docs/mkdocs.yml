@@ -62,28 +62,45 @@ nav:
       - 安装部署/docker.md
       - 安装部署/local.md
   - quickstart.md
-  - 支持组件:
-      - 支持组件/supportservice.md
-      - 支持组件/HDFSonK8s.md
-      - 支持组件/YarnonK8s.md
-      - 支持组件/DorisonK8s.md
-      - 支持组件/ZookeeperOnK8s.md
-      - 支持组件/AmoroOnK8s.md
-      - 支持组件/KafkaOnK8s.md
-      - 支持组件/HbaseOnK8s.md
-      - 支持组件/FlinkOnK8s.md
-      - 支持组件/SparkOnK8s.md
-      - 支持组件/HiveOnK8s.md
-      - 支持组件/KyuubiOnK8s.md
-      - 支持组件/MonitorOnK8s.md
-      - 支持组件/KylinOnK8s.md
-      - 支持组件/DinkyOnK8s.md
-      - 支持组件/DolphinschedulerOnK8s.md
-      - 支持组件/ElasticsearchOnK8s.md
-      - 支持组件/IcebergOnK8s.md
-      - 支持组件/TrinoOnK8s.md
-      - 支持组件/SeatunnelOnK8s.md
-  - component_extension.md
+  - 组件说明:
+      - 组件说明/0.override.md
+      - 组件说明/1.global.md
+      - 组件说明/2.helm-controller.md
+      - 组件说明/3.kube-prometheus.md
+      - 组件说明/4.open-kruise.md
+      - 组件说明/5.elasticsearch.md
+      - 组件说明/6.filebeat.md
+      - 组件说明/7.zookeeper.md
+      - 组件说明/8.hdfs.md
+      - 组件说明/9.yarn.md
+      - 组件说明/10.flink.md
+#  - 支持组件:
+#      - 支持组件/supportservice.md
+#      - 支持组件/HDFSonK8s.md
+#      - 支持组件/YarnonK8s.md
+#      - 支持组件/DorisonK8s.md
+#      - 支持组件/ZookeeperOnK8s.md
+#      - 支持组件/AmoroOnK8s.md
+#      - 支持组件/KafkaOnK8s.md
+#      - 支持组件/HbaseOnK8s.md
+#      - 支持组件/FlinkOnK8s.md
+#      - 支持组件/SparkOnK8s.md
+#      - 支持组件/HiveOnK8s.md
+#      - 支持组件/KyuubiOnK8s.md
+#      - 支持组件/MonitorOnK8s.md
+#      - 支持组件/KylinOnK8s.md
+#      - 支持组件/DinkyOnK8s.md
+#      - 支持组件/DolphinschedulerOnK8s.md
+#      - 支持组件/ElasticsearchOnK8s.md
+#      - 支持组件/IcebergOnK8s.md
+#      - 支持组件/TrinoOnK8s.md
+#      - 支持组件/SeatunnelOnK8s.md
+  - 组件开发:
+      - 组件开发/override.md
+      - 组件开发/flow.md
+      - 组件开发/volumes.md
+      - 组件开发/render_var.md
+#  - component_extension.md
   - 社区贡献:
       - 社区贡献/communicate.md
       - 社区贡献/contribute.md
