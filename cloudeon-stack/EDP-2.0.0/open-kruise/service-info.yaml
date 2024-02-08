@@ -1,7 +1,7 @@
 name: OPEN_KRUISE
 label: "OpenKruise"
 description: "基于 Kubernetes 的扩展套件，主要聚焦于云原生应用的自动化，比如部署、发布、运维以及可用性防护"
-version: 1.0.0
+version: 1.5.1
 
 dependencies:
   - HELM_CONTROLLER

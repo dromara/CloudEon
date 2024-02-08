@@ -1,7 +1,7 @@
 name: KUBE_PROMETHEUS_STACK
 label: "KubePrometheusStack"
 description: "基于helm部署的kube-prometheus套件"
-version: 1.0.0
+version: 55.0.0
 
 dependencies:
   - HELM_CONTROLLER
@@ -12,7 +12,7 @@ dashboard:
   uid: ""
 
 roles:
-  - name: KUBE_PROMETHEUS_STACK
+  - name: HELM_CHART
     label: "KUBE PROMETHEUS STACK HELM CHART"
     roleFullName: "kube-prometheus-stack"
     sortNum: 1
