@@ -64,8 +64,8 @@
                     <npmVersion>${maven-frontend-plugin.npmVersion}</npmVersion>
                     <yarnVersion>${maven-frontend-plugin.yarnVersion}</yarnVersion>
                     <!-- 若不方便访问官网，可手动设置镜像地址-->
-                    <nodeDownloadRoot>https://npm.taobao.org/mirrors/node/</nodeDownloadRoot>
-                    <npmDownloadRoot>https://registry.npm.taobao.org/npm/-/</npmDownloadRoot>
+                    <nodeDownloadRoot>https://npmmirror.com/mirrors/node/</nodeDownloadRoot>
+                    <npmDownloadRoot>https://registry.npmmirror.com/npm/-/</npmDownloadRoot>
                 </configuration>
             </plugin>
         </plugins>
