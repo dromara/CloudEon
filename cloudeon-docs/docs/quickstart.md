@@ -1,13 +1,33 @@
 # 快速开始
-## 创建集群
-<iframe src="//player.bilibili.com/player.html?aid=269979753&bvid=BV1Qc411p7tG&cid=1093052683&page=1&autoplay=0" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" height="500px" width="100%"> </iframe>
 
-## 添加节点
-<iframe src="//player.bilibili.com/player.html?aid=227430487&bvid=BV1Zh411M7mY&cid=1093055867&page=1&autoplay=0" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"  height="500px" width="100%"> </iframe>
+## 安装
 
-## 安装服务
-<iframe src="//player.bilibili.com/player.html?aid=439941993&bvid=BV1vL411f7rw&cid=1093040702&page=1&autoplay=0" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"  height="500px" width="100%"> </iframe>
+建议采用docker安装部署的方式快速完成服务运行，无需挂载外部配置，数据库使用默认的H2即可
 
-## 管理服务
-<iframe src="//player.bilibili.com/player.html?aid=354887563&bvid=BV1zX4y1r7En&cid=1093048586&page=1&autoplay=0" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"  height="500px" width="100%"> </iframe>
+## 创建集群和添加节点
 
+参考docker部分的教程
+
+## 安装global组件
+
+global.monitor.type 选 NONE，即不启用监控，其他默认即可
+
+## 安装zookeeper组件
+
+保持默认配置即可
+
+## 验证
+
+```shell
+# 进入zookeeper容器
+kubectl -n=命名空间 exec -it pod名称 bash
+# 进入zk命令终端
+$ZOOKEEPER_HOME/bin/zkCli.sh  -server localhost:$ZK_CLIENT_PORT
+# 执行zk命令测试功能
+ls /
+create /tmp1
+ls /
+delete /tmp1
+ls /
+quit
+```
