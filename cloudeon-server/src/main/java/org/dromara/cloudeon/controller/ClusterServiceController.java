@@ -472,7 +472,9 @@ public class ClusterServiceController {
 
         ServiceRoleInstanceEntity roleInstanceEntity = roleInstanceRepository.findById(roleInstanceId).get();
         ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(roleInstanceEntity.getServiceInstanceId()).get();
-
+        if (roleInstanceEntity.getServiceRoleState() != ServiceRoleState.ROLE_STARTED) {
+            throw new RuntimeException("角色未启动,无法执行停止!");
+        }
         // 更新角色实例状态
         roleInstanceEntity.setServiceRoleState(ServiceRoleState.STOPPING_ROLE);
         roleInstanceRepository.save(roleInstanceEntity);
@@ -492,6 +494,9 @@ public class ClusterServiceController {
 
         ServiceRoleInstanceEntity roleInstanceEntity = roleInstanceRepository.findById(roleInstanceId).get();
         ServiceInstanceEntity serviceInstanceEntity = serviceInstanceRepository.findById(roleInstanceEntity.getServiceInstanceId()).get();
+        if (roleInstanceEntity.getServiceRoleState() != ServiceRoleState.ROLE_STOPPED) {
+            throw new RuntimeException("角色未停止,无法执行启动!");
+        }
         // 更新角色实例状态
         roleInstanceEntity.setServiceRoleState(ServiceRoleState.STARTING_ROLE);
         roleInstanceRepository.save(roleInstanceEntity);
