@@ -48,7 +48,7 @@ public abstract class ScaleK8sServiceTask extends BaseCloudeonTask implements Ap
 
         kubeService.executeWithKubeClient(serviceInstanceEntity.getClusterId(), client -> {
             RollableScalableResource<Deployment> resource = client.apps().deployments().inNamespace(namespace).withName(deploymentName);
-            Integer replicas = resource.get().getStatus().getReplicas();
+            Integer replicas = resource.get().getSpec().getReplicas();
             log.info("当前deployment: {} Replicas: {}", deploymentName, replicas);
             if (!isApplyTask()) {
                 int count = replicas - 1;
