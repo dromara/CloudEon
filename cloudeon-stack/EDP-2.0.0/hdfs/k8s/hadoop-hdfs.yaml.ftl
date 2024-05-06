@@ -157,8 +157,6 @@ spec:
           value: "/opt/service-common/values.json"
         - name: ROLE_FULL_NAME
           value: "${roleFullName}"
-        securityContext:
-          privileged: true
         volumeMounts:
         - mountPath: "/etc/localtime"
           name: "timezone"

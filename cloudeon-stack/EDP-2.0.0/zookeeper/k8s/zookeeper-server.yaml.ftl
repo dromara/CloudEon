@@ -51,9 +51,13 @@ spec:
             topologyKey: "kubernetes.io/hostname"
       hostPID: false
       hostNetwork: true
+      nodeSelector:
+        ${roleServiceFullName}: "true"
+      terminationGracePeriodSeconds: 30
       containers:
       - image: "${conf['serverImage']}"
         imagePullPolicy: "${conf['global.imagePullPolicy']}"
+        name: "${roleServiceFullName}"
         command: ["/bin/bash","-c"]
         args:
           - |
@@ -69,7 +73,6 @@ spec:
           periodSeconds: 30
           successThreshold: 1
           timeoutSeconds: 15
-        name: "${roleServiceFullName}"
         resources:
           requests:
             memory: "${conf['zookeeper.container.request.memory']}Mi"
@@ -86,12 +89,12 @@ spec:
           valueFrom:
             resourceFieldRef:
               resource: limits.memory
-        - name: ZK_CLIENT_PORT
-          value: "${conf['zookeeper.client.port']}"
         - name: RENDER_TPL_DIR
           value: "/opt/service-render"
         - name: RENDER_MODEL
           value: "/opt/service-common/values.json"
+        - name: ZK_CLIENT_PORT
+          value: "${conf["zookeeper.client.port"]}"
         volumeMounts:
         - mountPath: "/etc/localtime"
           name: "timezone"
@@ -114,9 +117,6 @@ spec:
         - name: local-data-${dataPath?index+1}
           mountPath: /data/${dataPath?index+1}
 </#list>
-      nodeSelector:
-        ${roleServiceFullName}: "true"
-      terminationGracePeriodSeconds: 30
       volumes:
       - hostPath:
           path: "/etc/localtime"

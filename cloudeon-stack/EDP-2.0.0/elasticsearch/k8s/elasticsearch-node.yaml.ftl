@@ -94,8 +94,6 @@ spec:
           limits:
             memory: "${conf['elasticsearch.container.limit.memory']}Mi"
             cpu: "${conf['elasticsearch.container.limit.cpu']}"
-        securityContext:
-          privileged: true
         env:
         - name: ES_HTTP_PORT
           value: "${conf['elasticsearch.http.listeners.port']}"

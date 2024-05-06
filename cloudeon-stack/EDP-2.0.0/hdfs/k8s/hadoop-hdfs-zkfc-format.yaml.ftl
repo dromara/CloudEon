@@ -39,8 +39,6 @@ spec:
           - |
             /bin/bash /opt/global/bootstrap.sh && \
             /bin/bash /opt/service-common/bootstrap.sh;
-        securityContext:
-          privileged: true
         env:
         - name: NODE_NAME
           valueFrom:

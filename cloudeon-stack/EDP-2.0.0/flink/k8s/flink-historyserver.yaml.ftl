@@ -54,6 +54,9 @@ spec:
             topologyKey: "kubernetes.io/hostname"
       hostPID: false
       hostNetwork: true
+      nodeSelector:
+        ${roleServiceFullName}: "true"
+      terminationGracePeriodSeconds: 30
       containers:
       - image: "${conf['serverImage']}"
         imagePullPolicy: "${conf['global.imagePullPolicy']}"
@@ -123,9 +126,6 @@ spec:
         - name: local-data-${dataPath?index+1}
           mountPath: /data/${dataPath?index+1}
 </#list>
-      nodeSelector:
-        ${roleServiceFullName}: "true"
-      terminationGracePeriodSeconds: 30
       volumes:
       - hostPath:
           path: "/etc/localtime"
