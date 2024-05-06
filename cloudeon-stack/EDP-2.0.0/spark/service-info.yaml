@@ -1,0 +1,269 @@
+name: SPARK
+label: "Spark"
+description: "快速、高效的大数据处理引擎  "
+version: 3.2.3
+dockerImage: "registry.cn-hangzhou.aliyuncs.com/udh/spark:3.2.3"
+dependencies:
+    - "HDFS"
+    - "YARN"
+    - "HIVE"
+
+supportKerberos: false
+
+dashboard:
+  uid: ""
+
+roles:
+  - name: SPARK_INIT
+    label: "Spark Init"
+    roleFullName: "spark-init"
+    sortNum: 0
+    type: JOB
+    needOdd: true
+    fixedNum: 1
+
+  - name: SPARK_THRIFT_SERVER
+    label: "Spark Thrift Server"
+    roleFullName: "spark-thriftserver"
+    sortNum: 1
+    type: DEPLOYMENT
+    minNum : 1
+
+  - name: SPARK_HISTORY_SERVER
+    label: "Spark History Server"
+    roleFullName: "spark-historyserver"
+    sortNum: 2
+    type: DEPLOYMENT
+    minNum: 1
+    linkExpression: "http://${localhostname}:${conf['spark.history.ui.port']}"
+
+customConfigFiles:
+  - spark-defaults.conf
+  - hive-site.xml
+
+configurations:
+  - name: serverImage
+    description: "服务镜像"
+    recommendExpression: "registry.cn-guangzhou.aliyuncs.com/bigdata200/spark:3.2.3"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "镜像"
+
+  - name: spark.daemon.jvm.memory.percentage
+    description: "Spark进程JVM占容器内存限额的百分比"
+    recommendExpression: 75
+    valueType: InputNumber
+    unit: ".0"
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: spark.hs.container.limit.cpu
+    description: "Spark HistoryServer容器的CPU使用限额"
+    recommendExpression: 1.0
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: spark.hs.container.limit.memory
+    description: "Spark HistoryServer容器的内存使用限额，单位MB"
+    recommendExpression: 2048
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: spark.hs.container.request.cpu
+    description: "Spark HistoryServer容器的CPU请求量"
+    recommendExpression: 0.2
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: spark.hs.container.request.memory
+    description: "Spark HistoryServer容器的内存请求量，单位MB"
+    recommendExpression: 1024
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: spark.ts.container.limit.cpu
+    description: "Spark ThriftServer容器的CPU使用限额"
+    recommendExpression: 1.0
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: spark.ts.container.limit.memory
+    description: "Spark ThriftServer容器的内存使用限额，单位MB"
+    recommendExpression: 2048
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: spark.ts.container.request.cpu
+    description: "Spark ThriftServer容器的CPU请求量"
+    recommendExpression: 0.2
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: spark.ts.container.request.memory
+    description: "Spark ThriftServer容器的内存请求量，单位MB"
+    recommendExpression: 1024
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: "spark.hive.server2.thrift.port"
+    recommendExpression: "10005"
+    valueType: InputNumber
+    configurableInWizard: true
+    description: "spark thrift server端口"
+    confFile:  "spark-defaults.conf"
+    tag: "端口"
+  - name: "spark.history.ui.port"
+    recommendExpression: "18080"
+    valueType: InputNumber
+    configurableInWizard: true
+    description: "history server web ui端口"
+    confFile:  "spark-defaults.conf"
+    tag: "端口"
+
+  - name: "spark.history.retainedApplications"
+    recommendExpression: "300"
+    valueType: InputNumber
+    configurableInWizard: false
+    description: "spark history server保留的应用数量"
+    confFile:  "spark-defaults.conf"
+    tag: "常用参数"
+
+  - name: "spark.history.fs.cleaner.enabled"
+    recommendExpression: "true"
+    valueType: Switch
+    configurableInWizard: false
+    description: "是否启用spark history server的清理功能"
+    confFile:  "spark-defaults.conf"
+    tag: "常用参数"
+
+  - name: "spark.ui.showConsoleProgress"
+    recommendExpression: "true"
+    valueType: Switch
+    configurableInWizard: false
+    description: "是否在spark web ui上显示进度条"
+    confFile:  "spark-defaults.conf"
+    tag: "常用参数"
+
+  - name: "spark.history.fs.logDirectory"
+    recommendExpression: "hdfs:///app/spark/history"
+    valueType: InputString
+    configurableInWizard: true
+    description: "spark history server的日志目录"
+    confFile:  "spark-defaults.conf"
+    tag: "常用参数"
+
+  - name: "spark.eventLog.compress"
+    recommendExpression: "false"
+    valueType: Switch
+    configurableInWizard: false
+    description: "是否压缩spark event log"
+    confFile:  "spark-defaults.conf"
+    tag: "常用参数"
+
+  - name: "spark.eventLog.enabled"
+    recommendExpression: "true"
+    valueType: Switch
+    configurableInWizard: true
+    description: "是否启用spark event log"
+    confFile:  "spark-defaults.conf"
+    tag: "常用参数"
+
+  - name: "spark.eventLog.dir"
+    recommendExpression: "hdfs:///app/spark/history"
+    valueType: InputString
+    configurableInWizard: true
+    description: "spark event log的目录"
+    confFile:  "spark-defaults.conf"
+    tag: "常用参数"
+
+  - name: "spark.serializer"
+    recommendExpression: "org.apache.spark.serializer.KryoSerializer"
+    configurableInWizard: false
+    description: "spark序列化方式"
+    tag: "性能"
+    confFile:  "spark-defaults.conf"
+    valueType: Select
+    options: ["org.apache.spark.serializer.KryoSerializer","org.apache.spark.serializer.JavaSerializer"]
+
+  - name: "spark.executor.extraJavaOptions"
+    recommendExpression: "-Dio.netty.tryReflectionSetAccessible=true -XX:+UseG1GC -XX:ReservedCodeCacheSize=1024M"
+    valueType: InputString
+    configurableInWizard: false
+    description: "spark executor的jvm参数"
+    tag: "性能"
+    confFile:  "spark-defaults.conf"
+
+  - name: "spark.sql.shuffle.partitions"
+    recommendExpression: 64
+    valueType: InputNumber
+    description: "spark sql shuffle分区数"
+    configurableInWizard: true
+    confFile:  "spark-defaults.conf"
+    tag: "性能"
+
+  - name: "spark.sql.shuffle.partitions"
+    recommendExpression: 64
+    valueType: InputNumber
+    description: "spark sql shuffle分区数"
+    configurableInWizard: true
+    confFile:  "spark-defaults.conf"
+    tag: "性能"
+  - name: "spark.sql.adaptive.enabled"
+    recommendExpression: true
+    valueType: Switch
+    description: "是否启用spark sql adaptive"
+    configurableInWizard: false
+    confFile:  "spark-defaults.conf"
+    tag: "高级参数"
+  - name: "hive.server2.enable.doAs"
+    recommendExpression: false
+    valueType: Switch
+    description: "是否启用hive server2的doAs功能"
+    configurableInWizard: false
+    confFile:  "hive-site.xml"
+    tag: "安全"
+  - name: "hive.metastore.client.connect.retry.delay"
+    recommendExpression: 5
+    valueType: InputNumber
+    description: "hive metastore client重试延迟时间"
+    configurableInWizard: true
+    confFile:  "hive-site.xml"
+    tag: "高级参数"
+  - name: "hive.metastore.client.socket.timeout"
+    recommendExpression: 120000
+    valueType: InputNumber
+    description: "hive metastore client socket超时时间"
+    configurableInWizard: true
+    confFile:  "hive-site.xml"
+    tag: "高级参数"
+    unit: Ms
+  - name: "plugin.iceberg"
+    recommendExpression: false
+    valueType: Switch
+    description: "是否启用iceberg"
+    configurableInWizard: false
+    tag: "数据湖"
+  - name: "plugin.iceberg.warehouse"
+    recommendExpression: "hdfs:///iceberg/warehouse"
+    valueType: InputString
+    configurableInWizard: false
+    description: "iceberg数据目录"
+    tag: "数据湖"
+  - name: "plugin.iceberg.as.defaultCatalog"
+    recommendExpression: false
+    valueType: Switch
+    configurableInWizard: false
+    description: "是否默认用iceberg catalog，如果是则不用 ` use iceberg_catalog; `语句进行切换catalog。开启后，如果要切换回默认的catalog查询hive上的数据，则需用语句`use spark_catalog; `"
+    tag: "数据湖"

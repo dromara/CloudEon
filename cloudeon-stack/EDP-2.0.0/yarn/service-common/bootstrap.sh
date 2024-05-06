@@ -24,8 +24,12 @@ echo "========================start timelineserver========================"
   yarn-daemon.sh start timelineserver
 fi
 
-until find /workspace/logs -mmin -1 | egrep -q '.*'; echo "`date`: Waiting for logs..." ; do sleep 2 ; done
-tail -F /workspace/logs/* &
+until find /workspace/logs -mmin -1 -type f -name '*.log' ! -name '*gc*' | grep -q .
+do
+  echo "`date`: Waiting for logs..."
+  sleep 2
+done
+find /workspace/logs -mmin -1 -type f -name '*.log' ! -name '*gc*' -exec tail -F {} +
 
 echo "---------------------------------------------开始----------------------------------------------"
 tail -f /dev/null

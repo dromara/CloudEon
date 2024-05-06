@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.dromara.cloudeon.config.CloudeonConfigProp;
 import org.dromara.cloudeon.dao.*;
+import org.dromara.cloudeon.dto.NodeInfo;
 import org.dromara.cloudeon.dto.RoleNodeInfo;
 import org.dromara.cloudeon.entity.*;
 import org.dromara.cloudeon.enums.RoleType;
@@ -48,6 +49,8 @@ public class ServiceService {
     private ClusterAlertRuleRepository clusterAlertRuleRepository;
     @Resource
     private Environment environment;
+    @Resource
+    private ClusterNodeRepository nodeRepository;
 
     public String getNamespace(Integer clusterId) {
         String namespace = clusterInfoRepository.findById(clusterId).get().getNamespace();
@@ -103,6 +106,10 @@ public class ServiceService {
         Map<String, Object> dataModel = new HashMap<>();
         Integer clusterId = serviceInstanceEntity.getClusterId();
         dataModel.put("clusterId", clusterId);
+        List<ClusterNodeEntity> nodeEntityList = nodeRepository.findByClusterId(clusterId);
+        Map<String, NodeInfo> nodeInfoMap = nodeEntityList.stream().map(nodeEntity -> NodeInfo.builder().ip(nodeEntity.getIp()).hostName(nodeEntity.getHostname()).build())
+                .collect(Collectors.toMap(NodeInfo::getHostName, nodeInfo -> nodeInfo));
+        dataModel.put("nodeInfo", nodeInfoMap);
         Integer stackId = stackServiceEntity.getStackId();
         dataModel.put("stackId", stackId);
         // 查询服务实例所有配置项,包括全局

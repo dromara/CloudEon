@@ -1,0 +1,128 @@
+name: AMORO
+label: "Amoro"
+description: "数据湖管理平台"
+version: 0.6.1
+dependencies:
+  - ZOOKEEPER
+  - HDFS
+  - YARN
+
+supportKerberos: false
+
+dashboard:
+  uid: ""
+
+roles:
+  - name: AMORO_AMS
+    label: "AMORO AMS"
+    roleFullName: "amoro-ams"
+    sortNum: 1
+    type: DEPLOYMENT
+    needOdd: false
+    fixedNum: 1
+    linkExpression: "http://${localhostname}:${conf['http-server.port']}"
+
+customConfigFiles: []
+
+configurations:
+  - name: serverImage
+    description: "服务镜像"
+    recommendExpression: "registry.cn-guangzhou.aliyuncs.com/bigdata200/amoro:0.6.1"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "镜像"
+
+  - name: data.path.list
+    description: "持久化挂载路径列表，逗号分隔(但当前组件只有第一个路径生效)。当为空时使用默认路径：全局参数global.persistence.basePath/角色名称"
+    recommendExpression: ""
+    valueType: InputString
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: amoro.ams.container.limit.cpu
+    description: "Amoro AMS容器的CPU使用限额"
+    recommendExpression: 1.0
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: amoro.ams.container.limit.memory
+    description: "Amoro AMS容器的内存使用限额，单位MB"
+    recommendExpression: 2048
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: amoro.ams.container.request.cpu
+    description: "Amoro AMS容器的CPU请求量"
+    recommendExpression: 0.2
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: amoro.ams.container.request.memory
+    description: "Amoro AMS容器的内存请求量，单位MB"
+    recommendExpression: 1024
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: amoro.ams.jvm.memory.percentage
+    description: "Amoro AMS JVM占容器内存限额的百分比"
+    recommendExpression: 75
+    valueType: InputNumber
+    unit: ".0"
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: optimizing-service.port
+    recommendExpression: 1261
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "端口"
+
+  - name: table-service.port
+    recommendExpression: 1260
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "端口"
+
+  - name: http-server.port
+    recommendExpression: 1630
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "端口"
+
+  - name: "ams.admin.password"
+    recommendExpression: "123456"
+    valueType: InputString
+    configurableInWizard: true
+    description: "ams的admin账号的密码"
+    needChangeInWizard: false
+    tag: "常用参数"
+
+  - name: "ams.mysql.ConnectionUserName"
+    recommendExpression: "root"
+    valueType: InputString
+    configurableInWizard: true
+    description: "依赖mysql数据库的登录账户"
+    needChangeInWizard: false
+    tag: "常用参数"
+
+  - name: "ams.mysql.ConnectionPassword"
+    recommendExpression: "XXX"
+    valueType: InputString
+    configurableInWizard: true
+    description: "依赖mysql数据库的登录密码"
+    needChangeInWizard: true
+    tag: "常用参数"
+
+  - name: "ams.mysql.ConnectionURL"
+    recommendExpression: "jdbc:mysql://127.0.0.1:3306/amoro?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=UTF8&autoReconnect=true&useAffectedRows=true&useSSL=false"
+    valueType: InputString
+    configurableInWizard: true
+    description: "依赖mysql数据库的jdbc访问地址"
+    needChangeInWizard: true
+    tag: "常用参数"

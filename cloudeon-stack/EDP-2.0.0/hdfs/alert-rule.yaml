@@ -119,7 +119,7 @@ rules:
         - alert: ZKFailoverController进程存活
           promql: up{job="metrics-hadoop-hdfs-zkfc"} != 1
           alertLevel: exception
-          serviceRoleName: ZKFC
+          serviceRoleName: HDFS_NAMENODE
           alertAdvice: ZKFC宕机，请重新启动
           alertInfo: "{{ $labels.job }}的{{ $labels.instance }}实例产生告警"
 

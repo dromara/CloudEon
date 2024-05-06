@@ -1,0 +1,25 @@
+rules:
+    - alert: HBaseMaster存活数检测
+      promql: sum(up{job="metrics-hbase-master"})<#{{${serviceRoles['HBASE_MASTER']?size}}}#
+      alertLevel: exception
+      serviceRoleName: HBASE_MASTER
+      alertAdvice: HBASE_MASTER发生宕机，请检查日志或执行重启
+      alertInfo: "HBASE_MASTER发生宕机，当前存活实例数为：{{$value}}"
+    - alert: HBaseMaster进程存活
+      promql: up{job="metrics-hbase-master"} != 1
+      alertLevel: exception
+      serviceRoleName: HBASE_MASTER
+      alertAdvice: HBASE_MASTER宕机，请重新启动
+      alertInfo: "{{ $labels.job }}的{{ $labels.instance }}实例产生告警"
+    - alert: HRegionServer存活数检测
+      promql: sum(up{job="metrics-hbase-regionserver"})<#{{${serviceRoles['HBASE_REGIONSERVER']?size}}}#
+      alertLevel: exception
+      serviceRoleName: HBASE_REGIONSERVER
+      alertAdvice: HBASE_REGIONSERVER发生宕机，请检查日志或执行重启
+      alertInfo: "HBASE_REGIONSERVER发生宕机，当前存活实例数为：{{$value}}"
+    - alert: HRegionServer进程存活
+      promql: up{job="metrics-hbase-regionserver"} != 1
+      alertLevel: exception
+      serviceRoleName: HBASE_REGIONSERVER
+      alertAdvice: HBASE_REGIONSERVER宕机，请重新启动
+      alertInfo: "{{ $labels.job }}的{{ $labels.instance }}实例产生告警"

@@ -1,0 +1,12 @@
+- module: kafka
+  log:
+    enabled: true
+    input:
+      fields:
+        service: KAFKA
+        role: KAFKA_BROKER
+    var.paths:
+      - "/workspace/logs/controller.log*"
+      - "/workspace/logs/server.log*"
+      - "/workspace/logs/state-change.log*"
+      - "/workspace/logs/kafka-*.log*"
