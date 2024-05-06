@@ -1,0 +1,13 @@
+rules:
+    - alert: KafkaBorker存活数检测
+      promql: sum(up{job="metrics-kafka"})<#{{${serviceRoles['KAFKA_BROKER']?size}}}#
+      alertLevel: exception
+      serviceRoleName: KAFKA_BROKER
+      alertAdvice: Kafka发生宕机，请检查日志或执行重启
+      alertInfo: "KafkaServer发生宕机，当前存活实例数为：{{$value}}"
+    - alert: KafkaBorker进程存活
+      promql: up{job="metrics-kafka"} != 1
+      alertLevel: exception
+      serviceRoleName: KAFKA_BROKER
+      alertAdvice: KafkaServer宕机，请重新启动
+      alertInfo: "{{ $labels.job }}的{{ $labels.instance }}实例产生告警"

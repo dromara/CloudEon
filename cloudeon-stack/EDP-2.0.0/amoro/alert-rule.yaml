@@ -1,0 +1,13 @@
+rules:
+    - alert: AmoroAms存活数检测
+      promql: sum(up{job="metrics-amoro-ams"})<#{{${serviceRoles['AMORO_AMS']?size}}}#
+      alertLevel: exception
+      serviceRoleName: AMORO_AMS
+      alertAdvice: AmoroAms发生宕机，请检查日志或执行重启
+      alertInfo: "Flink历史服务器发生宕机，当前存活实例数为：{{$value}}"
+    - alert: AmoroAms进程存活
+      promql: up{job="metrics-amoro-ams"} != 1
+      alertLevel: exception
+      serviceRoleName: AMORO_AMS
+      alertAdvice: AmoroAms发生宕机，请检查日志或执行重启
+      alertInfo: "{{ $labels.job }}的{{ $labels.instance }}实例发生宕机"

@@ -1,0 +1,229 @@
+name: KAFKA
+label: "Kafka"
+description: "Kafka分布式事件流系统"
+version: 2.8.2
+
+dependencies:
+  - "ZOOKEEPER"
+
+supportKerberos: false
+
+dashboard:
+  uid: "kafka001"
+
+roles:
+  - name: KAFKA_BROKER
+    label: "Kafka Broker"
+    roleFullName: "kafka-broker"
+    sortNum: 1
+    type: DEPLOYMENT
+    minNum : 1
+
+customConfigFiles:
+  - server.properties
+
+configurations:
+  - name: serverImage
+    description: "服务镜像"
+    recommendExpression: "registry.cn-guangzhou.aliyuncs.com/bigdata200/kafka:2.8.2"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "镜像"
+
+  - name: data.path.list
+    description: "持久化挂载路径列表，逗号分隔(但当前组件只有第一个路径生效)。当为空时使用默认路径：全局参数global.persistence.basePath/角色名称"
+    recommendExpression: ""
+    valueType: InputString
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: "kafka.listeners.port"
+    recommendExpression: 9092
+    valueType: InputNumber
+    configurableInWizard: true
+    description: "Kafka监听端口"
+    tag: "端口"
+  - name: "kafka.jmx.port"
+    recommendExpression: 9921
+    valueType: InputNumber
+    configurableInWizard: true
+    description: "Kafka JMX监听端口"
+    tag: "端口"
+  - name: kafka.container.limit.cpu
+    description: "Kafka Server容器的CPU使用限额"
+    recommendExpression: 1.0
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: kafka.container.limit.memory
+    description: "Kafka Server容器的内存使用限额，单位MB"
+    recommendExpression: 2048
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: kafka.container.request.cpu
+    description: "Kafka Server容器的CPU请求量"
+    recommendExpression: 0.2
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: kafka.container.request.memory
+    description: "Kafka Server容器的内存请求量，单位MB"
+    recommendExpression: 1024
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: kafka.server.heap.memory.percentage
+    description: "Kafka Server 堆内存占容器内存限额的百分比，用于Kafka jvm，需预留内存供pagecache使用"
+    recommendExpression: 25
+    valueType: InputNumber
+    unit: ".0"
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: kafka.server.direct.memory.percentage
+    description: "Kafka Server 直接内存占容器内存限额的百分比，用于Kafka 网络IO，需预留内存供pagecache使用"
+    recommendExpression: 25
+    valueType: InputNumber
+    unit: ".0"
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: "num.partitions"
+    recommendExpression: 8
+    valueType: InputNumber
+    confFile:  "server.properties"
+    description: "Kafka分区数"
+    tag: "常用参数"
+  - name: "offsets.topic.replication.factor"
+    recommendExpression: 2
+    valueType: InputNumber
+    confFile:  "server.properties"
+    description: "内置Topic副本数"
+    tag: "常用参数"
+  - name: "default.replication.factor"
+    recommendExpression: 2
+    valueType: InputNumber
+    confFile:  "server.properties"
+    description: "Topic副本数"
+    tag: "常用参数"
+  - name: "log.retention.hours"
+    recommendExpression: 168
+    valueType: InputNumber
+    confFile:  "server.properties"
+    description: "数据保留时间"
+    unit: Hour
+    tag: "常用参数"
+  - name: "auto.create.topics.enable"
+    recommendExpression: "false"
+    valueType: Switch
+    configurableInWizard: true
+    description: 是否允许自动创建Topic
+    confFile:  "server.properties"
+    tag: "常用参数"
+  - name: "unclean.leader.election.enable"
+    recommendExpression: "false"
+    valueType: Switch
+    configurableInWizard: true
+    description: "是否允许Unclean Leader选举"
+    confFile:  "server.properties"
+    tag: "高级参数"
+  - name: "auto.leader.rebalance.enable"
+    recommendExpression: "true"
+    valueType: Switch
+    configurableInWizard: true
+    description: "是否允许Leader重平衡"
+    confFile:  "server.properties"
+    tag: "高级参数"
+  - name: "message.max.bytes"
+    recommendExpression: "1000012"
+    valueType: InputNumber
+    configurableInWizard: true
+    unit: bytes
+    description: "Broker能够接收的一条消息最大大小"
+    confFile:  "server.properties"
+    tag: "性能"
+  - name: "message.max.bytes"
+    recommendExpression: "1048576"
+    valueType: InputNumber
+    configurableInWizard: true
+    unit: bytes
+    description: "kafka接收单个消息size的最大限制,默认为1M左右 message.max.bytes必须小于等于replica.fetch.max.bytes"
+    confFile:  "server.properties"
+    tag: "性能"
+  - name: "num.network.threads"
+    recommendExpression: "3"
+    valueType: InputNumber
+    configurableInWizard: false
+    description: "server用来处理网络请求的网络线程数目"
+    confFile:  "server.properties"
+    tag: "性能"
+  - name: "num.io.threads"
+    recommendExpression: "12"
+    valueType: InputNumber
+    configurableInWizard: true
+    description: "server用来处理请求的I/O线程的数目；这个线程数目至少要等于硬盘的个数。"
+    confFile:  "server.properties"
+    tag: "性能"
+  - name: "queued.max.requests"
+    recommendExpression: "500"
+    valueType: InputNumber
+    configurableInWizard: false
+    description: "在网络线程停止读取新请求之前，可以排队等待I/O线程处理的最大请求个数"
+    confFile:  "server.properties"
+    tag: "性能"
+  - name: "socket.receive.buffer.bytes"
+    recommendExpression: "102400"
+    valueType: InputNumber
+    configurableInWizard: false
+    description: "socket接收服务的缓存区大小"
+    confFile:  "server.properties"
+    unit: bytes
+    tag: "性能"
+  - name: "socket.send.buffer.bytes"
+    recommendExpression: "102400"
+    valueType: InputNumber
+    configurableInWizard: false
+    description: "socket发送服务的缓存区大小"
+    confFile:  "server.properties"
+    unit: bytes
+    tag: "性能"
+  - name: "socket.request.max.bytes"
+    recommendExpression: "102857600"
+    valueType: InputNumber
+    configurableInWizard: false
+    description: "socket每次请求的最大字节数"
+    confFile:  "server.properties"
+    unit: bytes
+    tag: "性能"
+  - name: "log.flush.interval.messages"
+    recommendExpression: "1000000"
+    valueType: InputNumber
+    configurableInWizard: false
+    description: "在将消息刷新到磁盘之前，日志分区上累积的消息数，该值将影响PageCache的大小"
+    confFile:  "server.properties"
+    tag: "性能"
+  - name: "log.flush.interval.ms"
+    recommendExpression: "10000"
+    valueType: InputNumber
+    configurableInWizard: false
+    description: "任何主题中的消息在刷新到磁盘之前保存在内存中的最长时间(以毫秒为单位)，该值将影响PageCache的大小"
+    confFile:  "server.properties"
+    unit: ms
+    tag: "性能"
+  - name: "log.flush.scheduler.interval.ms"
+    recommendExpression: "10000"
+    valueType: InputNumber
+    configurableInWizard: false
+    description: "日志刷新程序检查是否需要将日志刷新到磁盘的频率(以毫秒为单位)，该值将影响PageCache的大小"
+    confFile:  "server.properties"
+    unit: ms
+    tag: "性能"
+  - name: "zookeeper.connection.timeout.ms"
+    recommendExpression: "18000"
+    valueType: InputNumber
+    configurableInWizard: false
+    description: "Zookeeper连接超时时长"
+    confFile:  "server.properties"
+    unit: Ms
+    tag: "高级参数"

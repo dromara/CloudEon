@@ -1,0 +1,13 @@
+rules:
+    - alert: KyuubiServer存活数检测
+      promql: sum(up{job="metrics-kyuubi-server"})<#{{${serviceRoles['KYUUBI_SERVER']?size}}}#
+      alertLevel: exception
+      serviceRoleName: KYUUBI_SERVER
+      alertAdvice: KyuubiServer发生宕机，请检查日志或执行重启
+      alertInfo: "KyuubiServer发生宕机，当前存活实例数为：{{$value}}"
+    - alert: KyuubiServer进程存活
+      promql: up{job="metrics-kyuubi-server"} != 1
+      alertLevel: exception
+      serviceRoleName: KYUUBI_SERVER
+      alertAdvice: KyuubiServer发生宕机，请检查日志或执行重启
+      alertInfo: "{{ $labels.job }}的{{ $labels.instance }}实例发生宕机"

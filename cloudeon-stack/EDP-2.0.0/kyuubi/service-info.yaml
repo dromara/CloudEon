@@ -1,0 +1,126 @@
+name: KYUUBI
+label: "Kyuubi"
+description: "分布式和多租户的SQL网关"
+version: 1.7.0
+dependencies:
+    - "SPARK"
+
+supportKerberos: false
+
+dashboard:
+  uid: "kyuubi001"
+
+roles:
+
+  - name: KYUUBI_SERVER
+    label: "Kyuubi Server"
+    roleFullName: "kyuubi-server"
+    sortNum: 1
+    type: DEPLOYMENT
+    minNum: 1
+    linkExpression: "http://${localhostname}:${conf['kyuubi.frontend.rest.bind.port']}"
+
+
+customConfigFiles:
+  - kyuubi-defaults.conf
+
+configurations:
+  - name: serverImage
+    description: "服务镜像"
+    recommendExpression: "registry.cn-guangzhou.aliyuncs.com/bigdata200/kyuubi:1.7.0"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "镜像"
+
+  - name: kyuubi.jvm.memory.percentage
+    description: "Kyuubi进程JVM占容器内存限额的百分比"
+    recommendExpression: 75
+    valueType: InputNumber
+    unit: ".0"
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: kyuubi.container.limit.cpu
+    description: "Kyuubi Server容器的CPU使用限额"
+    recommendExpression: 1.0
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: kyuubi.container.limit.memory
+    description: "Kyuubi Server容器的内存使用限额，单位MB"
+    recommendExpression: 2048
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: kyuubi.container.request.cpu
+    description: "Kyuubi Server容器的CPU请求量"
+    recommendExpression: 0.2
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: kyuubi.container.request.memory
+    description: "Kyuubi Server容器的内存请求量，单位MB"
+    recommendExpression: 1024
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: "kyuubi.frontend.thrift.binary.bind.port"
+    recommendExpression: "10009"
+    valueType: InputNumber
+    configurableInWizard: true
+    confFile:  "kyuubi-defaults.conf"
+    description: "kyuubi front thrift服务端口"
+    tag: "端口"
+  - name: "kyuubi.frontend.rest.bind.port"
+    recommendExpression: "10099"
+    valueType: InputNumber
+    configurableInWizard: true
+    confFile:  "kyuubi-defaults.conf"
+    description: "kyuubi front rest服务端口"
+    tag: "端口"
+  - name: "kyuubi.metrics.prometheus.port"
+    recommendExpression: "10019"
+    valueType: InputNumber
+    configurableInWizard: true
+    confFile:  "kyuubi-defaults.conf"
+    description: "kyuubi prometheus服务端口"
+    tag: "端口"
+
+  - name: "kyuubi.engine.share.level"
+    recommendExpression: USER
+    valueType: Select
+    options: ["CONNECTION","USER","GROUP","SERVER"]
+    description: | 
+      CONNECTION：引擎不会被共享，仅由当前客户端连接使用。这意味着每个连接都将启动一个新的查询引擎。USER：引擎将由所有由唯一用户名创建的会话共享。GROUP：引擎将由所有属于同一主组名称的用户创建的会话共享。SERVER：引擎将由所有Kyuubi服务器共享。
+    confFile:  "kyuubi-defaults.conf"
+    tag: "高级参数"
+
+
+  - name: "plugin.iceberg"
+    recommendExpression: false
+    valueType: Switch
+    description: "是否启用iceberg"
+    configurableInWizard: false
+    tag: "数据湖"
+  - name: "plugin.iceberg.warehouse"
+    recommendExpression: "hdfs:///iceberg/warehouse"
+    valueType: InputString
+    configurableInWizard: false
+    description: "iceberg数据目录"
+    tag: "数据湖"
+  - name: "plugin.iceberg.as.defaultCatalog"
+    recommendExpression: false
+    valueType: Switch
+    configurableInWizard: false
+    description: "是否默认用iceberg catalog，如果是则不用 ` use iceberg_catalog; `语句进行切换catalog。开启后，如果要切换回默认的catalog查询hive上的数据，则需用语句`use spark_catalog; `"
+    tag: "数据湖"
+
+
+
+

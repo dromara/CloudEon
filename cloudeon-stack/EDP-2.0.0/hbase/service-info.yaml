@@ -1,0 +1,162 @@
+name: HBASE
+label: "Hbase"
+description: "分布式、可扩展、面向列的NoSQL数据库"
+version: 2.4.16
+dependencies:
+    - "HDFS"
+    - "ZOOKEEPER"
+
+supportKerberos: false
+
+dashboard:
+  uid: ""
+
+roles:
+  - name: HBASE_MASTER
+    label: "Hbase Master"
+    roleFullName: "hbase-master"
+    sortNum: 1
+    type: DEPLOYMENT
+    minNum : 1
+    linkExpression: "http://${localhostname}:${conf['hbase.master.info.port']}"
+
+  - name: HBASE_REGIONSERVER
+    label: "Hbase Regionserver"
+    roleFullName: "hbase-regionserver"
+    sortNum: 2
+    type: DEPLOYMENT
+    minNum: 1
+    linkExpression: "http://${localhostname}:${conf['hbase.regionserver.info.port']}"
+
+
+customConfigFiles:
+  - hbase-site.xml
+
+configurations:
+  - name: serverImage
+    description: "服务镜像"
+    recommendExpression: "registry.cn-guangzhou.aliyuncs.com/bigdata200/hbase:2.4.16"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "镜像"
+
+  - name: data.path.list
+    description: "持久化挂载路径列表，逗号分隔(但当前组件只有第一个路径生效)。当为空时使用默认路径：全局参数global.persistence.basePath/角色名称"
+    recommendExpression: ""
+    valueType: InputString
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: "hbase.wal.provider"
+    recommendExpression: "filesystem"
+    valueType: InputString
+    configurableInWizard: false
+    confFile:  "hbase-site.xml"
+    tag: "常用参数"
+
+  - name: "hbase.unsafe.stream.capability.enforce"
+    recommendExpression: "false"
+    valueType: Switch
+    configurableInWizard: true
+    confFile:  "hbase-site.xml"
+    tag: "常用参数"
+
+  - name: "hbase.master.port"
+    recommendExpression: "16001"
+    valueType: InputNumber
+    configurableInWizard: true
+    description: "Hbase master 端口"
+    confFile:  "hbase-site.xml"
+    tag: "端口"
+
+  - name: "hbase.master.info.port"
+    recommendExpression: "16011"
+    valueType: InputNumber
+    configurableInWizard: true
+    description: "Hbase master http 服务端口"
+    confFile:  "hbase-site.xml"
+    tag: "端口"
+
+  - name: "hbase.regionserver.port"
+    recommendExpression: "16021"
+    valueType: InputNumber
+    configurableInWizard: true
+    confFile:  "hbase-site.xml"
+    description: "Region Server 端口"
+    tag: "端口"
+
+  - name: "hbase.regionserver.info.port"
+    recommendExpression: "16030"
+    valueType: InputNumber
+    configurableInWizard: true
+    confFile:  "hbase-site.xml"
+    description: "Region Server http 端口"
+    tag: "端口"
+
+  - name: hbase.heap.memory.percentage
+    description: "Hbase Master/RegionServer jvm堆内存占容器内存限额的百分比"
+    recommendExpression: 75
+    min: 10
+    max: 80
+    valueType: InputNumber
+    unit: ".0"
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: hbase.master.container.limit.cpu
+    description: "Hbase Master容器的CPU使用限额"
+    recommendExpression: 1.0
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: hbase.master.container.limit.memory
+    description: "Hbase Master容器的内存使用限额，单位MB"
+    recommendExpression: 2048
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: hbase.master.container.request.cpu
+    description: "Hbase Master容器的CPU请求量"
+    recommendExpression: 0.2
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: hbase.master.container.request.memory
+    description: "Hbase Master容器的内存请求量，单位MB"
+    recommendExpression: 1024
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: hbase.regionserver.container.limit.cpu
+    description: "Hbase RegionServer容器的CPU使用限额"
+    recommendExpression: 1.0
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: hbase.regionserver.container.limit.memory
+    description: "Hbase RegionServer容器的内存使用限额，单位MB"
+    recommendExpression: 2048
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: hbase.regionserver.container.request.cpu
+    description: "Hbase RegionServer容器的CPU请求量"
+    recommendExpression: 0.2
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: hbase.regionserver.container.request.memory
+    description: "Hbase RegionServer容器的内存请求量，单位MB"
+    recommendExpression: 1024
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+
+
+
+
