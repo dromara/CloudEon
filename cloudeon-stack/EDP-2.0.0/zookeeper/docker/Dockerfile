@@ -1,4 +1,4 @@
-FROM registry.cn-guangzhou.aliyuncs.com/bigdata200/jdk:8-ubuntu
+FROM registry.cn-guangzhou.aliyuncs.com/bigdata200/jdk:latest
 
 ENV ZOOKEEPER_HOME=/opt/zookeeper \
     ZOOKEEPER_VERSION=3.7.1

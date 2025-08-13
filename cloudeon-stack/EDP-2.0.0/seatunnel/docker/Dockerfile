@@ -1,4 +1,4 @@
-FROM registry.cn-guangzhou.aliyuncs.com/bigdata200/jdk:8-ubuntu
+FROM registry.cn-guangzhou.aliyuncs.com/bigdata200/jdk:latest
 
 ENV SEATUNNEL_VERSION="2.3.7"
 ENV SEATUNNEL_HOME="/opt/seatunnel"

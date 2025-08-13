@@ -8,7 +8,7 @@ WORKDIR /opt
 RUN wget https://dlcdn.apache.org/seatunnel/seatunnel-web/${SEATUNNEL_WEB_VERSION}/apache-seatunnel-web-${SEATUNNEL_WEB_VERSION}-bin.tar.gz
 RUN tar -xzvf apache-seatunnel-web-${SEATUNNEL_WEB_VERSION}-bin.tar.gz && rm -f *.gz
 RUN mv apache-seatunnel-web-* ${SEATUNNEL_WEB_HOME}
-RUN chsrc set ubuntu first && apt-get install -y mysql-client
+RUN apt-get install -y mysql-client
 WORKDIR $SEATUNNEL_WEB_HOME
 
 ENV MYSQL_JDBC_DRIVER_VERSION=8.0.30

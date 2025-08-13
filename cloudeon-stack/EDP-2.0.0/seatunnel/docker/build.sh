@@ -1,7 +1,3 @@
-docker build  -f Dockerfile -t registry.cn-guangzhou.aliyuncs.com/bigdata200/seatunnel:2.3.7  .
-docker push  registry.cn-guangzhou.aliyuncs.com/bigdata200/seatunnel:2.3.7
+docker buildx build --platform linux/amd64,linux/arm64 -f Dockerfile -t registry.cn-guangzhou.aliyuncs.com/bigdata200/seatunnel:2.3.7 --push .
 
-docker build  -f Dockerfile_web -t registry.cn-guangzhou.aliyuncs.com/bigdata200/seatunnel-web:1.0.1  .
-docker push  registry.cn-guangzhou.aliyuncs.com/bigdata200/seatunnel-web:1.0.1
-
-
+docker buildx build --platform linux/amd64,linux/arm64 -f Dockerfile_web -t registry.cn-guangzhou.aliyuncs.com/bigdata200/seatunnel-web:1.0.1 --push .

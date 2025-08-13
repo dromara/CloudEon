@@ -1,4 +1,4 @@
-FROM registry.cn-guangzhou.aliyuncs.com/bigdata200/jdk:8-ubuntu
+FROM registry.cn-guangzhou.aliyuncs.com/bigdata200/jdk:latest
 
 ENV KAFKA_HOME=/opt/kafka \
     KAFKA_VERSION=2.8.2

@@ -1,13 +1,6 @@
 FROM registry.cn-guangzhou.aliyuncs.com/bigdata200/jdk:latest
 
-RUN rm -rf $JAVA_HOME
-
-ENV JAVA_HOME=/opt/jdk17
+ENV JAVA_HOME=/usr/lib/jvm/java-17
 ENV PATH=$JAVA_HOME/bin:$PATH
 
-COPY wgetLatestJdk17.sh /tmp/
-
-RUN source /tmp/wgetLatestJdk17.sh -P /opt \
-    && tar -zxvf /opt/jdk*.tar.gz -C /opt/ \
-    && rm -f /opt/jdk*.tar.gz \
-    && mv /opt/jdk* $JAVA_HOME
+RUN yum remove -y java-1.8.0-openjdk-devel && yum install -y java-17-openjdk-devel
