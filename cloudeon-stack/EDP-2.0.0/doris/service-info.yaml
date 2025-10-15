@@ -1,7 +1,7 @@
 name: DORIS
 label: "Doris"
 description: "基于 MPP 架构的高性能、实时分析型数据库"
-version: 2.1.8.1
+version: 2.1.11
 dependencies: []
 
 supportKerberos: false
@@ -52,7 +52,7 @@ customConfigFiles:
 configurations:
   - name: serverImage
     description: "服务镜像"
-    recommendExpression: "registry.cn-guangzhou.aliyuncs.com/bigdata200/doris:2.1.8.1"
+    recommendExpression: "registry.cn-guangzhou.aliyuncs.com/bigdata200/doris:2.1.11"
     valueType: InputString
     configurableInWizard: true
     tag: "镜像"
@@ -265,4 +265,3 @@ configurations:
     unit: Mi
     configurableInWizard: true
     tag: "资源管理"
-
