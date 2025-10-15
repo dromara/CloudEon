@@ -1,6 +1,6 @@
 name: KAFKA
 label: "Kafka"
-description: "Kafka分布式事件流系统"
+description: "分布式事件流系统"
 version: 2.8.2
 
 dependencies:

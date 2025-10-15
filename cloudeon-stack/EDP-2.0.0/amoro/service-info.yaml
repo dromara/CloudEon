@@ -1,6 +1,6 @@
 name: AMORO
 label: "Amoro"
-description: "数据湖管理平台"
+description: "开放式架构下的湖仓管理系统，支持多种数据湖格式和计算引擎"
 version: 0.6.1
 dependencies:
   - ZOOKEEPER
@@ -14,7 +14,7 @@ dashboard:
 
 roles:
   - name: AMORO_AMS
-    label: "AMORO AMS"
+    label: "Amoro AMS"
     roleFullName: "amoro-ams"
     sortNum: 1
     type: DEPLOYMENT

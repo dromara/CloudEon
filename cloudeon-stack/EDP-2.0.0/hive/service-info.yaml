@@ -1,6 +1,6 @@
 name: HIVE
 label: "Hive"
-description: "hadoop离线数据仓库"
+description: "Hadoop 离线数据仓库"
 version: 3.1.3
 dependencies:
     - "HDFS"
@@ -13,7 +13,7 @@ dashboard:
 
 roles:
   - name: HIVE_INIT
-    label: "HIVE INIT"
+    label: "Hive INIT"
     roleFullName: "hive-init"
     sortNum: 0
     type: JOB
@@ -271,4 +271,3 @@ configurations:
     unit: Mi
     configurableInWizard: true
     tag: "资源管理"
-
