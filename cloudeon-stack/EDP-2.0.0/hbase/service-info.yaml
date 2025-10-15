@@ -1,5 +1,5 @@
 name: HBASE
-label: "Hbase"
+label: "HBase"
 description: "分布式、可扩展、面向列的NoSQL数据库"
 version: 2.4.16
 dependencies:
@@ -156,7 +156,3 @@ configurations:
     unit: Mi
     configurableInWizard: true
     tag: "资源管理"
-
-
-
-
