@@ -1,6 +1,6 @@
 name: TRINO
 label: "Trino"
-description: "Trino是一个分布式SQL查询引擎，用于在大型数据集上执行交互式分析。"
+description: "分布式SQL查询引擎，用于在大型数据集上执行交互式分析"
 version: "424"
 dependencies:
   - "HIVE"
@@ -160,10 +160,3 @@ configurations:
     unit: Mi
     configurableInWizard: true
     tag: "资源管理"
-
-
-
-
-
-
-
