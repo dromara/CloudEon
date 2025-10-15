@@ -1,6 +1,6 @@
 name: SEATUNNEL
-label: "Seatunnel"
-description: "海量数据同步引擎"
+label: "SeaTunnel"
+description: "超高性能的分布式数据集成工具，支持实时/离线海量数据同步"
 version: 2.3.7
 dependencies:
   - "HDFS"
@@ -12,21 +12,21 @@ dashboard:
 
 roles:
   - name: SEATUNNEL_MASTER
-    label: "Seatunnel Master"
+    label: "SeaTunnel Master"
     roleFullName: "seatunnel-master"
     sortNum: 1
     type: DEPLOYMENT
     minNum: 1
     needOdd: true
   - name: SEATUNNEL_WORKER
-    label: "Seatunnel Worker"
+    label: "SeaTunnel Worker"
     roleFullName: "seatunnel-worker"
     sortNum: 2
     type: DEPLOYMENT
     minNum: 1
     needOdd: false
   - name: SEATUNNEL_WEB
-    label: "Seatunnel Web"
+    label: "SeaTunnel Web"
     roleFullName: "seatunnel-web"
     sortNum: 3
     type: DEPLOYMENT
