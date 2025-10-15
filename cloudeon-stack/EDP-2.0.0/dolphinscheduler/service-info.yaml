@@ -1,6 +1,6 @@
 name: DOLPHINSCHEDULER
 label: "DolphinScheduler"
-description: "可视化分布式任务调度与计算平台"
+description: "分布式易扩展的可视化 DAG 工作流任务调度系统"
 version: 3.2.2
 dependencies:
   - "ZOOKEEPER"
@@ -269,4 +269,3 @@ configurations:
     unit: Mi
     configurableInWizard: true
     tag: "资源管理"
-
