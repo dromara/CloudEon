@@ -1,0 +1,143 @@
+name: OPEN_METADATA
+label: "OpenMetadata"
+description: "用于数据发现、血缘、质量、可观测性和治理的开放统一元数据平台"
+version: 1.10.2
+
+dependencies:
+  - OPEN_METADATA_DEPS
+
+supportKerberos: false
+
+dashboard:
+  uid: "" # TODO
+
+roles:
+  - name: HELM_CHART
+    label: "OpenMetadata Helm Chart"
+    roleFullName: "open-metadata"
+    sortNum: 1
+    type: HELM_CHART
+    needOdd: false
+    fixedNum: 1
+  - name: OPEN_METADATA
+    label: "OpenMetadata"
+    roleFullName: "open-metadata"
+    sortNum: 2
+    type: EMPTY
+    needOdd: false
+    minNum: 1
+    linkExpression: "http://${localhostname}:${conf['open-metadata.service.node-port']}"
+
+customConfigFiles:
+  - open-metadata.conf
+
+configurations: 
+
+  - name: open-metadata.namespace
+    description: "OpenMetadata 部署所用的命名空间"
+    recommendExpression: "open-metadata"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "k8s"
+
+  - name: open-metadata.helm.repo
+    description: "OpenMetadata 部署所用的 Helm 仓库。\n
+    网络允许推荐使用：https://helm.open-metadata.org/\n
+    内网环境：需要使用私有 Helm 仓库，另外，内网环境下需要将镜像上传到私有镜像仓库，并在 open-metadata.conf 添加配置项\n
+      如：global.imageRegistry 。具体参考对应版本的 OpenMetadata 的 values.yaml 文件
+    "
+    recommendExpression: "http://172.30.16.10:8117/helm-repo/openmetadata"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "k8s"
+
+  - name: openmetadata.helm.version
+    description: "OpenMetadata Helm Chart 的版本号"
+    recommendExpression: "1.10.2"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "k8s"
+
+  - name: image.registry.proxy.docker
+    description: "docker.io 的代理镜像地址，避免因网络问题导致镜像拉取失败。可参考 https://github.com/ciiiii/cloudflare-docker-proxy"
+#    needChangeInWizard: false
+    recommendExpression: "172.30.16.10"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "镜像"
+
+  - name: database.sql.endpoint
+    description: "数据库地址"
+    recommendExpression: "172.30.16.10"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "database"
+
+  - name: database.port
+    description: "数据库端口"
+    recommendExpression: 3306
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "database"
+
+  - name: database.driver.class
+    description: "数据库驱动类"
+    recommendExpression: "com.mysql.cj.jdbc.Driver"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "database"
+
+  - name: database.db.scheme
+    description: "参考 OpenMetadata Helm Chart 包中 values.yaml 的 database.dbScheme"
+    recommendExpression: "mysql"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "database"
+
+  - name: database.name
+    description: "数据库名"
+    recommendExpression: "openmetadata_db"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "database"
+
+  - name: database.username
+    description: "数据库用户"
+    recommendExpression: "openmetadata_user"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "database"
+
+  - name: open-metadata.service.port
+    description: "OpenMetadata 的 web 服务端口"
+    recommendExpression: 8585
+    valueType: InputNumber
+    confFile:  "open-metadata.conf"
+    configurableInWizard: true
+    tag: "openmetadata"
+
+  # Health Checks & Metrics endpoints 的端口，无需在 webUrls 中展示出来
+  - name: open-metadata.service.metrics-port
+    description: "OpenMetadata Helm Charts 的 Health Checks & Metrics endpoints 的端口"
+    recommendExpression: 8586
+    valueType: InputNumber
+    confFile:  "open-metadata.conf"
+    configurableInWizard: true
+    tag: "openmetadata"
+
+  - name: open-metadata.service.node-port
+    description: "OpenMetadata 对外暴露的 web 服务端口"
+    recommendExpression: 30585
+    valueType: InputNumber
+    confFile:  "open-metadata.conf"
+    configurableInWizard: true
+    tag: "openmetadata"
+
+  # OpenMetadata Helm Charts 暴露出来的 Health Checks & Metrics endpoints 的端口，无需在 webUrls 中展示出来
+  - name: open-metadata.service.node-metrics-port
+    description: "OpenMetadata Helm Charts 对外暴露的 Health Checks & Metrics endpoints 的端口"
+    recommendExpression: 30586
+    valueType: InputNumber
+    confFile:  "open-metadata.conf"
+    configurableInWizard: true
+    tag: "openmetadata"
