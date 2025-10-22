@@ -12,6 +12,9 @@ spec:
     image:
       repository: ${conf['image.registry.proxy.docker']}/openmetadata/server
       pullPolicy: "IfNotPresent"
+    <#-- 保证部署到配置页面上所选定的 K8s 节点 -->
+    nodeSelector:
+      ${roleServiceFullName}: "true"
     openmetadata:
       config:
         database:
