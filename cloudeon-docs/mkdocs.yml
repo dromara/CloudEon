@@ -73,6 +73,9 @@ nav:
       - 组件说明/8.hdfs.md
       - 组件说明/9.yarn.md
       - 组件说明/10.flink.md
+      - 组件说明/11.minio.md
+      - 组件说明/12.open-metadata.md
+      - 组件说明/13.datavines.md
   - 组件开发:
       - 组件开发/override.md
       - 组件开发/flow.md
