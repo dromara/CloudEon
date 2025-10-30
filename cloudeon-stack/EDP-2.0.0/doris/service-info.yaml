@@ -52,7 +52,7 @@ customConfigFiles:
 configurations:
   - name: serverImage
     description: "服务镜像"
-    recommendExpression: "registry.cn-guangzhou.aliyuncs.com/bigdata200/doris:2.1.11"
+    recommendExpression: "registry.cn-hangzhou.aliyuncs.com/cloudeon-dev/doris:2.1.11"
     valueType: InputString
     configurableInWizard: true
     tag: "镜像"
