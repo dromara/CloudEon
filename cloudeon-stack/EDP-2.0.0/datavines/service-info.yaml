@@ -1,6 +1,6 @@
 name: DATAVINES
 label: "Datavines"
-description: "易用的数据可观测性平台，提供数据目录和数据概览，内置数据质量检查"
+description: "一站式数据可观测性平台，提供元数据管理、数据概览和数据质量管理"
 version: 1.0.0
 dependencies:
   - "GLOBAL"
@@ -25,7 +25,7 @@ customConfigFiles: []
 configurations:
   - name: serverImage
     description: "服务镜像"
-    recommendExpression: "registry.cn-guangzhou.aliyuncs.com/bigdata200/datavines:1.0.0"
+    recommendExpression: "registry.cn-hangzhou.aliyuncs.com/cloudeon-dev/datavines:1.0.0"
     valueType: InputString
     configurableInWizard: true
     tag: "镜像"
