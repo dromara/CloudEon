@@ -12,6 +12,8 @@ RUN wget $DORIS_DOWNLOAD_URL \
     && tar -xvf apache-doris-*.tar.gz -C /opt \
     && rm -f apache-doris-*.tar.gz && mv /opt/apache-doris-*  $DORIS_HOME \
     && apt-get update \
-    && apt-get install -y mariadb-client
+    && apt-get install -y mariadb-client \
+    # 清理 apt 安装软件包后的缓存
+    && apt-get clean
 
 WORKDIR $DORIS_HOME
