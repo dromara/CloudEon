@@ -29,7 +29,7 @@ customConfigFiles:
 configurations:
   - name: serverImage
     description: "服务镜像"
-    recommendExpression: "registry.cn-guangzhou.aliyuncs.com/bigdata200/minio:2021-04-22T15-44-28Z"
+    recommendExpression: "registry.cn-hangzhou.aliyuncs.com/cloudeon-dev/minio:2021-04-22T15-44-28Z"
     valueType: InputString
     configurableInWizard: true
     tag: "镜像"
